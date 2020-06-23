@@ -1,2 +1,2 @@
 # DA2X
-a simple doubling array in C
+A simple dynamic array implemented as static inline calls in a C header file.
