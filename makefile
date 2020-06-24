@@ -2,19 +2,23 @@
 
 CC= gcc
 CFLAGS= -Wall -g
+TARGETS= DA2x.o DA2x_test DA2xIt_test
 
 .PHONY: all
-all: DA2x_test DA2xIt_test
+all: $(TARGETS)
 
-DA2x_test: DA2x_test.c DA2x.h
-	$(CC) $(CFLAGS) -o DA2x_test DA2x_test.c
+DA2x.o: DA2x.c
+	$(CC) -c DA2x.c
 
-DA2xIt_test: DA2xIt_test.c DA2xIt.h
-	$(CC) $(CFLAGS) -o DA2xIt_test DA2xIt_test.c
+DA2x_test: DA2x_test.c DA2x.o DA2x.h DA2x_malloc_counter.h
+	$(CC) $(CFLAGS) -o DA2x_test DA2x.o DA2x_test.c 
+
+DA2xIt_test: DA2xIt_test.c DA2xIt.h DA2x_malloc_counter.h
+	$(CC) $(CFLAGS) -o DA2xIt_test DA2x.o DA2xIt_test.c
 
 .PHONY: clean
 clean:
-	rm -f DA2x_test DA2xIt_test
+	rm -f $(TARGETS)
 
 
 

@@ -5,18 +5,25 @@
 #include <stdbool.h>
 #include <assert.h>
 
-//#define DA2x_F_PREFIX
-//#define DA2x_F_PREFIX extern inline
-#define DA2x_F_PREFIX static inline
 
-// must be a power of 2
+//--------------------------------------------------------------------------------
+// global stuff
 //
-// The allocation will automatically contract by 1/2 each time a pop() discovers the data
-// takes 1/4 or less of the total allocation after the pop.
-//
-  #define DA2x_INITIAL_ALLOCATION_LENGTH 4 
 
-// we guarantee that the array size is always an non-negative integer multiple of the element_size
+  // referenced in DA2x_init and DA2x_data_dealloc, used to count the number of
+  // dynamic arrays that have allocations on the heap. Useful for debug, easily removed.
+  extern size_t DA2x_outstanding_cnt;
+
+  // inlining the interface
+  //#define DA2x_F_PREFIX
+  //#define DA2x_F_PREFIX extern inline
+  #define DA2x_F_PREFIX static inline
+
+  // We guarantee that the array size is always an non-negative integer multiple of the
+  // element_size.  
+  //
+    #define DA2x_INITIAL_ALLOCATION_LENGTH 4 
+
 
 //--------------------------------------------------------------------------------
 // doubling array instance
@@ -27,6 +34,43 @@
     char *allocation_byte_np1_pt; // one byte beyond the end of the allocation
     size_t element_size;
   } DA2x;
+
+//--------------------------------------------------------------------------------
+// alloc/init/dealloc
+//
+  DA2x_F_PREFIX DA2x *DA2x_init(DA2x *dap ,size_t element_size){
+    DA2x_outstanding_cnt++;
+    dap->element_size = element_size;
+    size_t allocation_size = DA2x_INITIAL_ALLOCATION_LENGTH * element_size;
+    dap->byte_0_pt = malloc(allocation_size);
+    assert(dap->byte_0_pt);
+    dap->allocation_byte_np1_pt = dap->byte_0_pt + allocation_size;
+    dap->byte_np1_pt = dap->byte_0_pt; 
+    return dap;
+  }
+
+  // after data_dallocation, the DA2x may be re-initialized and used again
+  DA2x_F_PREFIX void DA2x_data_dealloc(DA2x *dap){
+    free(dap->byte_0_pt);
+    DA2x_outstanding_cnt--;
+  }
+
+  DA2x_F_PREFIX size_t DA2x_outstanding(DA2x *dap){
+    return DA2x_outstanding_cnt;
+  }
+
+  // for dynammic allocation of DA2xs:
+  DA2x_F_PREFIX DA2x *DA2x_alloc(size_t element_size){
+    DA2x *dap = malloc(sizeof(DA2x));
+    DA2x_init(dap ,element_size);
+    return dap;
+  }
+  DA2x_F_PREFIX void DA2x_dealloc(DA2x *dap){
+    DA2x_data_dealloc(dap);
+    free(dap);
+  }
+
+
 
 //--------------------------------------------------------------------------------
 // adjectives
@@ -45,42 +89,6 @@
   }
 
 //--------------------------------------------------------------------------------
-// alloc/init/dealloc
-//
-  DA2x_F_PREFIX DA2x *DA2x_init(DA2x *dap ,size_t element_size){
-    dap->element_size = element_size;
-    size_t allocation_size = DA2x_INITIAL_ALLOCATION_LENGTH * element_size;
-    dap->byte_0_pt = malloc(allocation_size);
-    assert(dap->byte_0_pt);
-    dap->allocation_byte_np1_pt = dap->byte_0_pt + allocation_size;
-    dap->byte_np1_pt = dap->byte_0_pt; 
-    return dap;
-  }
-
-  // after data_dallocation, the DA2x may be re-initialized and used again
-  DA2x_F_PREFIX void DA2x_data_dealloc(DA2x *dap){
-    free(dap->byte_0_pt);
-  }
-
-  DA2x_F_PREFIX void DA2x_reset(DA2x *dap ,size_t element_size){
-    DA2x_data_dealloc(dap);
-    size_t new_element_size = !element_size ? DA2x_element_size(dap) : element_size;
-    DA2x_init(dap, new_element_size);
-  }
-
-  // convenience for dynammic allocation of DA2xs:
-  DA2x_F_PREFIX DA2x *DA2x_alloc(size_t element_size){
-    DA2x *dap = malloc(sizeof(DA2x));
-    DA2x_init(dap ,element_size);
-    return dap;
-  }
-  DA2x_F_PREFIX void DA2x_dealloc(DA2x *dap){
-    DA2x_data_dealloc(dap);
-    free(dap);
-  }
-
-
-//--------------------------------------------------------------------------------
 // change size
 //
   // private
@@ -89,7 +97,7 @@
     char *new_data_allocation_pt = malloc( new_allocation_size );
     assert( new_data_allocation_pt );
     memcpy( new_data_allocation_pt ,dap->byte_0_pt ,data_size );
-    DA2x_data_dealloc(dap);
+    free(dap->byte_0_pt);
     dap->byte_0_pt = new_data_allocation_pt;
     dap->byte_np1_pt = new_data_allocation_pt + data_size;
     dap->allocation_byte_np1_pt = new_data_allocation_pt + new_allocation_size;
@@ -99,8 +107,10 @@
     __DA2x_adjust(dap ,new_allocation_size);
   }
   DA2x_F_PREFIX void DA2x_contract(DA2x *dap){
+    size_t initial_allocation_size = DA2x_INITIAL_ALLOCATION_LENGTH * DA2x_element_size(dap);
     size_t new_allocation_size = DA2x_allocation_size(dap) >> 1;
-    if( new_allocation_size == 0 || dap->byte_0_pt + new_allocation_size < dap->byte_np1_pt ) return;
+    if( new_allocation_size < initial_allocation_size || dap->byte_0_pt + new_allocation_size < dap->byte_np1_pt )
+      return;
     __DA2x_adjust(dap ,new_allocation_size);
   }
 
