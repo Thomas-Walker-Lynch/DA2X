@@ -55,7 +55,7 @@ A doubling array in C
 
   The main array code is a set of inline functions defined in `DA2x.h`.
   
-  An iterator and quantifiers are defined in DA2xIt.h
+  An iterator and quantifiers are defined in `DA2xIt.h`
   
   The file `DA2x.c`, which makes to `DA2x.o` defines a counter that may be used 
   to check the balance between `DA2x_init` and `DA2x_data_dealloc` calls. 
@@ -68,7 +68,7 @@ A doubling array in C
 
   Either manually instantiate the `DA2x` struct statically, or dynamically.  Then use `DA2x_init`
   on the instance.  When finished with the instance call `DA2x_data_dealloc` to release the heap data.
-  Or, alternatively, use the macro DA2x_Make to statically allocate and initialize in one step, or
+  Or, alternatively, use the macro `DA2x_Make` to statically allocate and initialize in one step, or
   call `DA2x_alloc` to make a `DA2x` struct instance on the heap and ot initialize it. The use 
   `DA2x_dealloc` to free the data array and the `DA2x` struct.
 
