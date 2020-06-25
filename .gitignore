@@ -1,0 +1,8 @@
+
+tmp/
+.*
+!.gitignore
+*~
+*.o
+DA2x_test
+DA2xIt_test

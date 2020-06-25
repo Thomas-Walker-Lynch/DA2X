@@ -4,10 +4,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-size_t DA2_malloc_cnt = 0;
-#define malloc(size) (DA2_malloc_cnt++ ,malloc(size))
-#define free(pt) (DA2_malloc_cnt-- ,free(pt))
-
 #include "DA2x_malloc_counter.h"
 #include "DA2x.h"
 #include "DA2xIt.h"
@@ -18,35 +14,38 @@ typedef struct {
   uint result;
 } DA2xItClosure;
 
-bool DA2xIT_f0(uint *item ,DA2xItClosure *c){
-  c->result = c->result && (*item == *(c->ref++));
+void DA2xIt_f0(void *item_pt , void *closure){
+  uint item = *(uint *)item_pt;
+  DA2xItClosure *cpt = closure; 
+  cpt->result = cpt->result && (item == cpt->ref++);
 }
 
 DA2x_Result test_0(){
-  size_t malloc_cnt = DA2_malloc_cnt;
-  bool f[5];
+  size_t malloc_cnt = DA2x_malloc_cnt;
+  size_t outstanding_cnt = DA2x_outstanding_cnt;
+  bool f[3];
   uint i = 0;
 
   DA2x_Result r ,*rp; rp = &r;
   DA2x_Result_init(rp);
+  DA2x *a0p = DA2x_alloc(sizeof(int));
 
-  DA2x a0 ,*a0p; a0p=&a0;
-  DA2x_init(a0p ,sizeof(int));
-
+  // make an array of data
   uint j=10;
   while(j < 100){
     DA2x_push_write(a0p ,&j);    
     ++j;
   }
 
-  DA2xITClosure c;
+  DA2xItClosure c;
   c.ref = 10;
   c.result = true;
-  Da2xIt_foreach(a0p ,DA2xIT_f0 ,&c);
+  DA2xIt_foreach(a0p ,DA2xIt_f0 ,&c);
   f[i++] = c.result;
 
-  DA2x_data_dealloc(a0p);
-  f[i++] = malloc_cnt == DA2_malloc_cnt;
+  DA2x_dealloc(a0p);
+  f[i++] = malloc_cnt == DA2x_malloc_cnt;
+  f[i++] = outstanding_cnt == DA2x_outstanding_cnt;
   DA2x_Result_tally(rp ,f ,i);
   if( r.failed > 0 ) DA2x_Result_print(&r ,"test_0 ");
   return r;
