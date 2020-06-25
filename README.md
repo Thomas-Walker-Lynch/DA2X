@@ -1,6 +1,7 @@
 # DA2x
 
-A doubling array in C
+Dynamic Array 2x.  A doubling array in C.
+
 
 ## Fundamentals
 
@@ -22,15 +23,15 @@ A doubling array in C
   are sequences of bytes, it follows that an array is also a sequence of bytes.  Hence,
   an array is both a sequence of elements, and a sequence of bytes.
 
-  The 'element' is a semantic unit, and memory management is based on bytes, so we need
-  both of these concepts.  This leads to a bit of a confusing situation where we have two
-  length measures for an array, one for its length in elements, and one for its length
-  in bytes.  In order to disambiguate these two length measures it has become conventional in C
-  programming to use the term 'length' when counting elements, and the term 'size' when
-  counting bytes.
+  To the programmer an 'element' is a semantic unit.  When doing memory management in C
+  everything is based on bytes.  This leads to a bit of a confusing situation where we
+  have two length measures for an array, one for its length in elements, and one for its
+  length in bytes.  In order to disambiguate these two length measures it has become
+  conventional in C programming to use the term 'length' when counting elements, and the
+  term 'size' when counting bytes.
 
   A memory allocation must have the same size, or larger size, than the size of the array
-  being allocated.  Hence, we must distinguish between the size of the array we are storing
+  being put in it.  Hence, we must distinguish between the size of the array we are storing
   in memory and the size of the allocation that the array is stored in.  If the allocation size
   is larger than the array size, there will be some allocated memory that goes unused.
 
@@ -49,7 +50,6 @@ A doubling array in C
   Arrays will expanded as a result of using `DA2x_push_alloc` or one of the routines that
   call it, and, except for the minimum case, will collapse after a `DA2x_pop` cause the
   data to shrink to less than 1/4 of the allocation size.
-
 
 ## Files
 
