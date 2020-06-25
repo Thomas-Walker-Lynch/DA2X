@@ -94,10 +94,10 @@ DA2x_Result test_1(){
   f[i++] = DA2xIt_exists(a0p ,DA2xIt_p3 ,NULL);
   f[i++] = !DA2xIt_exists(a0p ,DA2xIt_p4 ,NULL);
 
-  DA2xIt_Make(it ,a0p);
+  DA2xIt_Mount(it ,a0p);
   DA2xIt_find(it ,a0p ,DA2xIt_p2 ,NULL);
-  uint t0 = DA2xIt_Deref(it ,uint);
-  f[i++] = DA2xIt_inbound(it ,a0p) && t0 == 248;
+  uint t0 = DA2xIt_Read(it ,uint);
+  f[i++] = DA2xIt_is_on_tape(it ,a0p) && t0 == 248;
   
   DA2x_dealloc(a0p);
   f[i++] = malloc_cnt == DA2x_malloc_cnt;

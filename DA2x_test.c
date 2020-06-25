@@ -47,10 +47,10 @@ DA2x_Result test_1(){
 
   // push 1 ,2 ,3 ,4
   //
-    int *pt = (int *)DA2x_push_alloc(a0p);
+    int *pt = (int *)DA2x_push_alloc(a0p ,1);
     *pt = 1;
 
-    pt = (int *)DA2x_push_alloc(a0p);
+    pt = (int *)DA2x_push_alloc(a0p ,1);
     *pt = 2;
 
     int x = 3;

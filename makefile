@@ -2,9 +2,10 @@
 
 CC= gcc
 CFLAGS= -Wall -g
+TARGETS= DA2x.o DA2x_test DA2xIt_test
 
 .PHONY: all
-all: test
+all: $(TARGETS)
 
 DA2x.o: DA2x.c
 	$(CC) -c DA2x.c

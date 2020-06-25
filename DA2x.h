@@ -113,14 +113,15 @@
     __DA2x_adjust(dap ,new_allocation_size);
   }
 
-  DA2x_F_PREFIX char *DA2x_push_alloc(DA2x *dap){
-    if( dap->byte_np1_pt + DA2x_element_size(dap) > dap->allocation_byte_np1_pt ) DA2x_expand(dap);
+  DA2x_F_PREFIX char *DA2x_push_alloc(DA2x *dap ,size_t count){
+    size_t push_size = count * DA2x_element_size(dap);
+    while( dap->byte_np1_pt + push_size > dap->allocation_byte_np1_pt ) DA2x_expand(dap);
     char *element_pt = dap->byte_np1_pt;
-    dap->byte_np1_pt += DA2x_element_size(dap);
+    dap->byte_np1_pt += push_size;
     return element_pt;
   }
   DA2x_F_PREFIX char *DA2x_push_write(DA2x *dap, void *src_element_pt){
-    char *dst_element_pt = DA2x_push_alloc(dap);
+    char *dst_element_pt = DA2x_push_alloc(dap ,1);
     memcpy(dst_element_pt, src_element_pt, DA2x_element_size(dap));
     return dst_element_pt;
   }
@@ -171,12 +172,15 @@
     memcpy(dst_element_pt, src_element_pt, DA2x_element_size(dap));
     return true;
   }
+  #define DA2x_Read(dap ,index ,x) assert(DA2x_read ,index ,&x))
+
   DA2x_F_PREFIX bool DA2x_write(DA2x *dap ,size_t index ,void *src_element_pt){
     char *dst_element_pt = DA2x_at_index_pt(dap ,index);
     if( dst_element_pt >= dap->byte_np1_pt ) return false;
     memcpy(dst_element_pt, src_element_pt, DA2x_element_size(dap));
     return true;
   }
+  #define DA2x_Write(dap ,index ,x) assert(DA2x_write ,index ,&x))
 
 
 #endif
