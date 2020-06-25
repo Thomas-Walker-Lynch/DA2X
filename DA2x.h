@@ -105,7 +105,7 @@
     size_t new_allocation_size = DA2x_allocation_size(dap) << 1;
     __DA2x_adjust(dap ,new_allocation_size);
   }
-  DA2x_F_PREFIX void DA2x_contract(DA2x *dap){
+  DA2x_F_PREFIX void DA2x_collapse(DA2x *dap){
     size_t initial_allocation_size = DA2x_INITIAL_ALLOCATION_LENGTH * DA2x_element_size(dap);
     size_t new_allocation_size = DA2x_allocation_size(dap) >> 1;
     if( new_allocation_size < initial_allocation_size || dap->byte_0_pt + new_allocation_size < dap->byte_np1_pt )
@@ -132,9 +132,9 @@
     if( dst_element_pt ) memcpy(dst_element_pt, src_element_pt, DA2x_element_size(dap));
     dap->byte_np1_pt = src_element_pt;
 
-    // if the array fits in 1/4 of the allocation, then contract the alloction by 1/2
-    size_t allocation_size_contract_threshold = DA2x_allocation_size(dap) >> 2;
-    if( DA2x_size(dap) <= allocation_size_contract_threshold ) DA2x_contract(dap);
+    // if the array fits in 1/4 of the allocation, then collapse the alloction by 1/2
+    size_t allocation_size_collapse_threshold = DA2x_allocation_size(dap) >> 2;
+    if( DA2x_size(dap) <= allocation_size_collapse_threshold ) DA2x_collapse(dap);
 
     return true;
   }

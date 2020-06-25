@@ -2,7 +2,7 @@
 
 A doubling array in C
 
-## Nomenclature
+## Fundamentals
 
   In mathematics, a sequence consists of a series of indexable elements.
 
@@ -18,53 +18,59 @@ A doubling array in C
   array.
   
   An 'element' in turn is a compact allocation of 'bytes'. The element itself is a sort of
-  array where the elements are bytes.  As arrays is a sequence of elements, and elements
+  array where the elements are bytes.  As an array is a sequence of elements, and elements
   are sequences of bytes, it follows that an array is also a sequence of bytes.  Hence,
-  an array is two sequences all at once.
+  an array is both a sequence of elements, and a sequence of bytes.
 
-  Programmers typically assign some meaning to array elements, so we do not want to toss that
-  concept aside and just use bytes. However, memory management really is based on
-  bytes.  This leads to a bit of a confusing situation, we have two concepts of length
-  for an array.  In order to disambiguate these two it has become conventional in C programming
-  to use the term 'length' when counting elements, and the term 'size' when counting
-  bytes.
+  The 'element' is a semantic unit, and memory management is based on bytes, so we need
+  both of these concepts.  This leads to a bit of a confusing situation where we have two
+  concepts of length for an array, one for its length in elements, and one for its length
+  in bytes.  In order to disambiguate these two lengths it has become conventional in C
+  programming to use the term 'length' when counting elements, and the term 'size' when
+  counting bytes.
 
   A memory allocation must have the same size, or larger size, than the size of the array
   being allocated.  Hence, we must distinguish between the size of the array we are storing
   in memory and the size of the allocation that the array is stored in.  If the allocation size
   is larger than the array size, there will be some allocated memory that goes unused.
 
-## Algorithm
+## Allocation Algorithm
 
-  Here we are implementing a dynamic array, i.e. one that may grow in length when elements
+  We are implementing a dynamic array, i.e. one that may grow in length when elements
   are added to the end of it.  This in turn leads to a dynamic memory allocation problem.
   The apporach we use here is that when an array grows in size beyond that of the current
   allocation, we make a new allocation of twice the size of the original, and then copy
   the contents of the original array into this newly allocated area.
 
-  The way the code is currently setup, once an array is initialized, the heap allocation
-  will never be smaller than the initial heap allocation.  Apart from that, the allocation
-  will automatically contract by 1/2 each time a pop() discovers, after the pop, that the
-  data takes 1/4 or less of the total heap allocation.
+  Conversely, when the array data becomes 1/4 or less than the heap allocation, we 
+  collapse the allocation to half its former size; however, we never make the array
+  smaller than the initial heap allocation.
+
+  Arrays will expanded as a result of using `DA2x_push_alloc` or one of the routines that
+  call it, and, except for the minimum case, will collapse after a `DA2x_pop` cause the
+  data to shrink to less than 1/4 of the allocation size.
+
 
 ## Files
 
   The main array code is a set of inline functions defined in `DA2x.h`.
   
-  There is an iterator and quantifiers defined in a set of inline functions defined in DA2xIt.h
+  An iterator and quantifiers are defined in DA2xIt.h
   
-  There is a file `DA2x.c`, which makes to `DA2x.o` which defines a counter in case a person
-  wants to balance the `DA2x_init` and `DA2x_data_dealloc` calls.  Later this file
-  will also have the extern versions in case the `DA2x_F_PREFIX` is changed.
+  The file `DA2x.c`, which makes to `DA2x.o` defines a counter that may be used 
+  to check the balance between `DA2x_init` and `DA2x_data_dealloc` calls. 
+
+  Eventually DA2x.c will also hold the non-linine definitions which the compiler will
+  fall back upon should the `DA2x_F_PREFIX` be changed to `extern inline` and the compiler
+  opts not to use the inline definition.  Currently definitions are `static inline`.
   
-## Usage
+## Array Usage
 
-  Instantiate the `DA2x` struct either statically, automatically.  Then `DA2x_init`
-  the instance.  When finished with the instance call `DA2x_data_dealloc` to release the heap data.
-
-  For dynamic allocation call DA2x_alloc to make a `DA2x` struct on the heap and initialize it in 
-  one step.  When finished with it call `DA2x_dealloc` to free the array and the `DA2x` struct.
-  If the array holds pointers to data that must also be freed, call `DA2xIt_dealloc`.
+  Either manually instantiate the `DA2x` struct statically, or dynamically.  Then use `DA2x_init`
+  on the instance.  When finished with the instance call `DA2x_data_dealloc` to release the heap data.
+  Or, alternatively, use the macro DA2x_Make to statically allocate and initialize in one step, or
+  call `DA2x_alloc` to make a `DA2x` struct instance on the heap and ot initialize it. The use 
+  `DA2x_dealloc` to free the data array and the `DA2x` struct.
 
   Note the example usage in the test files.
 
