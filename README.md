@@ -24,8 +24,8 @@ A doubling array in C
 
   The 'element' is a semantic unit, and memory management is based on bytes, so we need
   both of these concepts.  This leads to a bit of a confusing situation where we have two
-  concepts of length for an array, one for its length in elements, and one for its length
-  in bytes.  In order to disambiguate these two lengths it has become conventional in C
+  length measures for an array, one for its length in elements, and one for its length
+  in bytes.  In order to disambiguate these two length measures it has become conventional in C
   programming to use the term 'length' when counting elements, and the term 'size' when
   counting bytes.
 
