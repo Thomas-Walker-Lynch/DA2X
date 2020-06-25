@@ -61,9 +61,13 @@ bool DA2xIt_p1(void *item_pt , void *closure){
 }
 bool DA2xIt_p2(void *item_pt , void *closure){
   uint item = *(uint *)item_pt;
-  return item == 355;
+  return item == 248;
 }
 bool DA2xIt_p3(void *item_pt , void *closure){
+  uint item = *(uint *)item_pt;
+  return item == 355;
+}
+bool DA2xIt_p4(void *item_pt , void *closure){
   uint item = *(uint *)item_pt;
   return item == 356;
 }
@@ -71,7 +75,7 @@ bool DA2xIt_p3(void *item_pt , void *closure){
 DA2x_Result test_1(){
   size_t malloc_cnt = DA2x_malloc_cnt;
   size_t outstanding_cnt = DA2x_outstanding_cnt;
-  bool f[6];
+  bool f[7];
   uint i = 0;
 
   DA2x_Result r ,*rp; rp = &r;
@@ -87,10 +91,14 @@ DA2x_Result test_1(){
 
   f[i++] = DA2xIt_all(a0p ,DA2xIt_p0 ,NULL);
   f[i++] = !DA2xIt_all(a0p ,DA2xIt_p1 ,NULL);
-  uint *found_item_pt = DA2xIt_exists(a0p ,DA2xIt_p2 ,NULL);
-  f[i++] = found_item_pt && *found_item_pt == 355;
-  f[i++] = !DA2xIt_exists(a0p ,DA2xIt_p3 ,NULL);
+  f[i++] = DA2xIt_exists(a0p ,DA2xIt_p3 ,NULL);
+  f[i++] = !DA2xIt_exists(a0p ,DA2xIt_p4 ,NULL);
 
+  DA2xIt_Make(it ,a0p);
+  DA2xIt_find(it ,a0p ,DA2xIt_p2 ,NULL);
+  uint t0 = DA2xIt_Deref(it ,uint);
+  f[i++] = DA2xIt_inbound(it ,a0p) && t0 == 248;
+  
   DA2x_dealloc(a0p);
   f[i++] = malloc_cnt == DA2x_malloc_cnt;
   f[i++] = outstanding_cnt == DA2x_outstanding_cnt;

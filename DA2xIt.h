@@ -21,6 +21,8 @@
   DA2xIt_F_PREFIX void DA2xIt_init(DA2xIt *dipt ,DA2x *dap){
     dipt->element_pt = dap->byte_0_pt;
   }
+  #define DA2xIt_Make(it ,dap) DA2xIt DA2xIt_ ## it ,*it; it = &DA2xIt_  ## it; DA2xIt_init(it ,dap);
+
   DA2x_F_PREFIX void DA2xIt_data_dealloc(DA2x *dap){
   }
   DA2xIt_F_PREFIX void DA2xIt_inc(DA2xIt *dipt ,DA2x *dap){
@@ -32,8 +34,9 @@
   DA2xIt_F_PREFIX void *DA2xIt_deref(DA2xIt *dipt){
     return dipt->element_pt;
   }
+  #define DA2xIt_Deref(dipt ,type) *((type *)dipt->element_pt)
 
-  // convenience for dynamic allocation of iterators
+  // for dynamic allocation of iterators
   DA2xIt_F_PREFIX DA2xIt *DA2xIt_alloc(DA2x *dap){
     void *dipt = malloc(sizeof(DA2xIt));
     assert(dipt);
@@ -47,37 +50,41 @@
 //--------------------------------------------------------------------------------
 // quantifiers
 //
-  DA2xIt_F_PREFIX void DA2xIt_foreach(DA2x *dap, void f(void *, void *), void *closure){
+  DA2xIt_F_PREFIX void DA2xIt_foreach(DA2x *dap, void f(void *, void *), void *context){
     DA2xIt di ,*dipt; dipt = &di;
     DA2xIt_init(dipt, dap);
     while( DA2xIt_inbound(dipt ,dap) ){
-      f(DA2xIt_deref(dipt) ,closure);
+      f(DA2xIt_deref(dipt) ,context);
       DA2xIt_inc(dipt ,dap);
     }
   }
 
-  DA2xIt_F_PREFIX bool DA2xIt_all(DA2x *dap, bool pred(void *, void *), void *closure){
+  DA2xIt_F_PREFIX bool DA2xIt_all(DA2x *dap, bool pred(void *, void *), void *context){
     DA2xIt di ,*dipt; dipt = &di;
     DA2xIt_init(dipt, dap);
-    while( DA2xIt_inbound(dipt ,dap) && pred(DA2xIt_deref(dipt) ,closure) ) DA2xIt_inc(dipt ,dap);
+    while( DA2xIt_inbound(dipt ,dap) && pred(DA2xIt_deref(dipt) ,context) ) DA2xIt_inc(dipt ,dap);
     return !DA2xIt_inbound(dipt ,dap);
   }
 
-  // returns pointer to first item found
-  // should pass in iterator so that the search can be called again after finding the first one
-  DA2xIt_F_PREFIX void *DA2xIt_exists(DA2x *dap, bool pred(void *, void *), void *closure){
+  DA2xIt_F_PREFIX bool DA2xIt_exists(DA2x *dap, bool pred(void *, void *), void *context){
     DA2xIt di ,*dipt; dipt = &di;
     DA2xIt_init(dipt, dap);
-    while( DA2xIt_inbound(dipt ,dap) && !pred(DA2xIt_deref(dipt) ,closure) ) DA2xIt_inc(dipt ,dap);
-    return DA2xIt_inbound(dipt ,dap)?DA2xIt_deref(dipt):NULL;
+    while( DA2xIt_inbound(dipt ,dap) && !pred(DA2xIt_deref(dipt) ,context) ) DA2xIt_inc(dipt ,dap);
+    return DA2xIt_inbound(dipt ,dap);
   }
+
+  // version of exists that works with an iterator so that it may be called multiple times
+  DA2xIt_F_PREFIX void DA2xIt_find(DA2xIt *dipt ,DA2x *dap, bool pred(void *, void *), void *context){
+    while( DA2xIt_inbound(dipt ,dap) && !pred(DA2xIt_deref(dipt) ,context) ) DA2xIt_inc(dipt ,dap);
+  }
+
 
 //--------------------------------------------------------------------------------
 // useful functions for quantifiers
 //
 
   // each element is a pointer to dynamic memory, and that memory is to be freed:
-  DA2xIt_F_PREFIX void DA2xIt_f_free(void *item_pt ,void *closure){
+  DA2xIt_F_PREFIX void DA2xIt_f_free(void *item_pt ,void *context){
     free(item_pt);
   }
 

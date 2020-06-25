@@ -1,3 +1,0 @@
-
-2020-06-24T19:44:19Z
-add a flag so that static/auto class complains if deallocated like a dynamic class.

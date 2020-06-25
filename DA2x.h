@@ -48,6 +48,7 @@
     dap->byte_np1_pt = dap->byte_0_pt; 
     return dap;
   }
+  #define DA2x_Make(da ,type) DA2x DA2x_ ## da ,*da; da = &DA2x_ ## da; DA2x_init(da ,sizeof(type));
 
   // after data_dallocation, the DA2x may be re-initialized and used again
   DA2x_F_PREFIX void DA2x_data_dealloc(DA2x *dap){
