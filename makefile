@@ -2,26 +2,26 @@
 
 CC= gcc
 CFLAGS= -Wall -g
-TARGETS= libDA2x.a DA2x_test DA2xHd_test
+TARGETS= libTM2x.a TM2x_test TM2xHd_test
 
 .PHONY: all
 all: $(TARGETS)
 
-DA2x.o: DA2x.c
-	$(CC) -c DA2x.c
+TM2x.o: TM2x.c
+	$(CC) -c TM2x.c
 
-libDA2x.a: DA2x.o
-	ar rcs libDA2x.a DA2x.o
+libTM2x.a: TM2x.o
+	ar rcs libTM2x.a TM2x.o
 
-DA2x_test: DA2x_test.c DA2x.o DA2x.h DA2x_malloc_counter.h
-	$(CC) $(CFLAGS) -o DA2x_test DA2x.o DA2x_test.c 
+TM2x_test: TM2x_test.c TM2x.o TM2x.h TM2x_malloc_counter.h
+	$(CC) $(CFLAGS) -o TM2x_test TM2x.o TM2x_test.c 
 
-DA2xHd_test: DA2xHd_test.c DA2xHd.h DA2x_malloc_counter.h
-	$(CC) $(CFLAGS) -o DA2xHd_test DA2x.o DA2xHd_test.c
+TM2xHd_test: TM2xHd_test.c TM2xHd.h TM2x_malloc_counter.h
+	$(CC) $(CFLAGS) -o TM2xHd_test TM2x.o TM2xHd_test.c
 
 .PHONY: test
-test: DA2x_test DA2xHd_test
-	./DA2x_test && ./DA2xHd_test
+test: TM2x_test TM2xHd_test
+	./TM2x_test && ./TM2xHd_test
 
 .PHONY: clean
 clean:

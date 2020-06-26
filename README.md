@@ -54,30 +54,30 @@ Hence the name, Tape Machine 2x.
   collapse the allocation to half its former byte length; however, we never make the array
   smaller than the initial heap allocation.
 
-  Arrays will expanded as a result of using `DA2x_push_alloc` or one of the routines that
-  call it, and, except for the minimum case, will collapse after a `DA2x_pop` cause the
+  Arrays will expanded as a result of using `TM2x_push_alloc` or one of the routines that
+  call it, and, except for the minimum case, will collapse after a `TM2x_pop` cause the
   data to shrink to less than 1/4 of the allocation's byte length.
 
 ## Files
 
-  The main array code is a set of inline functions defined in `DA2x.h`.
+  The main array code is a set of inline functions defined in `TM2x.h`.
   
-  An iterator and quantifiers are defined in `DA2xHd.h`
+  An iterator and quantifiers are defined in `TM2xHd.h`
   
-  The file `DA2x.c`, which makes to `DA2x.o` defines a counter that may be used 
-  to check the balance between `DA2x_init` and `DA2x_data_dealloc` calls. 
+  The file `TM2x.c`, which makes to `TM2x.o` defines a counter that may be used 
+  to check the balance between `TM2x_init` and `TM2x_data_dealloc` calls. 
 
-  Eventually DA2x.c will also hold the non-linine definitions which the compiler will
-  fall back upon should the `DA2x_F_PREFIX` be changed to `extern inline` and the compiler
+  Eventually TM2x.c will also hold the non-linine definitions which the compiler will
+  fall back upon should the `TM2x_F_PREFIX` be changed to `extern inline` and the compiler
   opts not to use the inline definition.  Currently definitions are `static inline`.
   
 ## Array Usage
 
-  Either manually instantiate the `DA2x` struct statically, or dynamically.  Then use `DA2x_init`
-  on the instance.  When finished with the instance call `DA2x_data_dealloc` to release the heap data.
-  Or, alternatively, use the macro `DA2x_Make` to statically allocate and initialize in one step, or
-  call `DA2x_alloc` to make a `DA2x` struct instance on the heap and ot initialize it. The use 
-  `DA2x_dealloc` to free the data array and the `DA2x` struct.
+  Either manually instantiate the `TM2x` struct statically, or dynamically.  Then use `TM2x_init`
+  on the instance.  When finished with the instance call `TM2x_data_dealloc` to release the heap data.
+  Or, alternatively, use the macro `TM2x_Make` to statically allocate and initialize in one step, or
+  call `TM2x_alloc` to make a `TM2x` struct instance on the heap and ot initialize it. The use 
+  `TM2x_dealloc` to free the data array and the `TM2x` struct.
 
   Note the example usage in the test files.
 
