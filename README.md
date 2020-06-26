@@ -26,36 +26,40 @@ Dynamic Array 2x.  A doubling array in C.
   To the programmer an 'element' is a semantic unit.  When doing memory management in C
   everything is based on bytes.  This leads to a bit of a confusing situation where we
   have two length measures for an array, one for its length in elements, and one for its
-  length in bytes.  In order to disambiguate these two length measures it has become
-  conventional in C programming to use the term 'length' when counting elements, and the
-  term 'size' when counting bytes.
+  length in bytes.  Conventionally lengths in bytes are referred to as an object's *size*,
+  where as the number of elements in an array would remain the arrays *length*, but this
+  notation is limited because bytes are also made of bits, and sometimes we want to name
+  the element type.  Hence we will use the term 'length\_[bits|bytes|elements|..]'.  Hence an
+  array has a 'bit length', a 'byte length', and an 'element length'.  If the array
+  elements are characters the array will have a 'character length', etc..
 
-  A memory allocation must have the same size, or larger size, than the size of the array
-  being put in it.  Hence, we must distinguish between the size of the array we are storing
-  in memory and the size of the allocation that the array is stored in.  If the allocation size
-  is larger than the array size, there will be some allocated memory that goes unused.
+  A memory allocation must have the same byte length, or larger byte length, than the byte
+  length of the array being put in it.  Hence, we must distinguish between the byte length
+  of the array we are storing in memory and the byte length of the allocation that the
+  array is stored in.  If the allocation's byte length is larger than the array's byte
+  length, there will be some allocated memory that goes unused.
 
 ## Allocation Algorithm
 
   We are implementing a dynamic array, i.e. one that may grow in length when elements
   are added to the end of it.  This in turn leads to a dynamic memory allocation problem.
-  The apporach we use here is that when an array grows in size beyond that of the current
-  allocation, we make a new allocation of twice the size of the original, and then copy
+  The apporach we use here is that when an array grows in byte length beyond that of the current
+  allocation, we make a new allocation of twice the byte length of the original, and then copy
   the contents of the original array into this newly allocated area.
 
   Conversely, when the array data becomes 1/4 or less than the heap allocation, we 
-  collapse the allocation to half its former size; however, we never make the array
+  collapse the allocation to half its former byte length; however, we never make the array
   smaller than the initial heap allocation.
 
   Arrays will expanded as a result of using `DA2x_push_alloc` or one of the routines that
   call it, and, except for the minimum case, will collapse after a `DA2x_pop` cause the
-  data to shrink to less than 1/4 of the allocation size.
+  data to shrink to less than 1/4 of the allocation's byte length.
 
 ## Files
 
   The main array code is a set of inline functions defined in `DA2x.h`.
   
-  An iterator and quantifiers are defined in `DA2xIt.h`
+  An iterator and quantifiers are defined in `DA2xHd.h`
   
   The file `DA2x.c`, which makes to `DA2x.o` defines a counter that may be used 
   to check the balance between `DA2x_init` and `DA2x_data_dealloc` calls. 
