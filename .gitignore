@@ -6,3 +6,4 @@ tmp/
 *.o
 DA2x_test
 DA2xIt_test
+libDA2x.a
