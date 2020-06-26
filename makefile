@@ -27,7 +27,11 @@ test: TM2x_test TM2xHd_test
 clean:
 	rm -f $(TARGETS)
 
-
+.PHONY: install
+install:
+	cp libTM2x.a ../env/lib
+	cp TM2x.h ../env/include 
+	cp TM2xHd.h ../env/include 
 
 
 
