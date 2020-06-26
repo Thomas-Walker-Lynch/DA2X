@@ -2,13 +2,16 @@
 
 CC= gcc
 CFLAGS= -Wall -g
-TARGETS= DA2x.o DA2x_test DA2xIt_test
+TARGETS= libDA2x.a DA2x_test DA2xIt_test
 
 .PHONY: all
 all: $(TARGETS)
 
 DA2x.o: DA2x.c
 	$(CC) -c DA2x.c
+
+libDA2x.a: DA2x.o
+	ar rcs libDA2x.a DA2x.o
 
 DA2x_test: DA2x_test.c DA2x.o DA2x.h DA2x_malloc_counter.h
 	$(CC) $(CFLAGS) -o DA2x_test DA2x.o DA2x_test.c 
