@@ -3,6 +3,7 @@
 CC= gcc
 CFLAGS= -Wall -g
 TARGETS= libTM2x.a TM2x_test TM2xHd_test
+INSTALL= libTM2x.a TM2x.h TM2xHd.h
 
 .PHONY: all
 all: $(TARGETS)
@@ -25,10 +26,10 @@ test: TM2x_test TM2xHd_test
 
 .PHONY: clean
 clean:
-	rm -f $(TARGETS)
+	rm -f $(TARGETS) *.o
 
 .PHONY: install
-install:
+install: $(INSTALL)
 	cp libTM2x.a ../env/lib
 	cp TM2x.h ../env/include 
 	cp TM2xHd.h ../env/include 
