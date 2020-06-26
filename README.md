@@ -1,7 +1,10 @@
-# DA2x
+# TM2x
 
-Dynamic Array 2x.  A doubling array in C.
+This is just a dynamic array for C along with an iterator.  The 2x refers to
+the fact that the allocation is doubled each time the array expands.
 
+This is a version of the expanding tape as described in the tm library also in this repo.
+Hence the name, Tape Machine 2x.
 
 ## Fundamentals
 
