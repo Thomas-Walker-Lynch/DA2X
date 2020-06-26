@@ -4,6 +4,6 @@ tmp/
 !.gitignore
 *~
 *.o
-DA2x_test
-DA2xIt_test
-libDA2x.a
+TM2x_test
+TM2xIt_test
+libTM2x.a
