@@ -1,7 +1,7 @@
 # TM2x
 
-This is just a dynamic array for C along with an iterator.  The 2x refers to
-the fact that the allocation is doubled each time the array expands.
+This is a dynamic array for C, along with an iterator.  The 2x refers to
+the feature that the allocation is doubled each time the array expands.
 
 This is a version of the expanding tape as described in the tm library also in this repo.
 Hence the name, Tape Machine 2x.
@@ -81,5 +81,37 @@ Hence the name, Tape Machine 2x.
 
   Note the example usage in the test files.
 
+## Small Memories
+
+  At the time of this writing, attotw, 2020-06-27T14:57:19Z, our array implementaiton uses
+  `byte_0_pt` to locate the first byte in the array, and `byte_np1_pt` (np1 == n + 1) to
+  bound data in the array.  It uses `allocation_np1_pt` to bound the allocation. A nice
+  property that this model has is that when `byte_np1_pt` is equal to `byte_0_pt` we know
+  the array is zero length.  Though our name `byte_0_pt` is a misnomer in that case, as
+  there is no byte 0.
+
+  I would like to change this implementation so that this dynamic array implementation may
+  work on a page of memory, on a very small machine, or even over a small memory buffer.
+
+  So as to model this small problem, suppose there are 16 bytes of memory, that a pointer
+  is 4 bits. Say an element is a byte. With so little memory we do not want to waste a
+  single byte. Suppose further that we do not allow overflows when performing arithmetic.
+  Hence adding one to a pointer can be a problem.
+
+  Note that the approach attotw violates these small memory representation constraints,
+  so I would like to change the implementation.
   
+  Suppose instead we used `byte_0_pt` to locate the base, and then keep `byte_length_data`
+  and `byte_length_allocation` instead of `byte_np1_pt` and `allocation_np1_pt`. This also
+  makes it possible to represent a zero length array, but it also violates our small memory
+  representation constraints.
   
+  Suppose then, that we use inclusive bounds on our data and allocation intervals.  We
+  would lose the ability to represent a zero length array.  Instead the smallest array
+  would have a minimum of one element when `byte_0_pt` equals `byte_n_pt`.  Though then,
+  at least, the term `byte_0_pt` would always be semantically accurate.  The array existing
+  would also correspond to the array have non-zero length, so we do not have to ask the
+  question what the existence of a zero length array means.
+  
+  However, with this approach, is it always possible to do the arithmetic for mainting the
+  array without overflows in a clean manner?  Lets find out ..

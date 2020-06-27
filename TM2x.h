@@ -21,7 +21,7 @@
   //#define TM2x_F_PREFIX extern inline
   #define TM2x_F_PREFIX static inline
 
-  // We guarantee that the array byte_length is always an non-negative integer multiple of the
+  // We guarantee that the array byte_length is always a non-negative integer multiple of the
   // element_byte_length.  
   //
     #define TM2x_INITIAL_ALLOCATION_ELEMENT_LENGTH 4 
