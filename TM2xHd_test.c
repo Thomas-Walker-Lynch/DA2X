@@ -95,9 +95,9 @@ TM2x_Result test_1(){
   f[i++] = !TM2xHd_exists(NULL ,a0p ,TM2xHd_p4);
 
   TM2xHd_Mount(a0p ,hd);
-  TM2xHd_find(NULL ,a0p ,hd ,TM2xHd_p2);
+  TM2xHd_find(NULL ,hd ,TM2xHd_p2);
   uint t0 = TM2xHd_Read(hd ,uint);
-  f[i++] = TM2xHd_is_on_tape(a0p ,hd) && t0 == 248;
+  f[i++] = TM2xHd_is_on_tape(hd) && t0 == 248;
   
   TM2x_dealloc(a0p);
   f[i++] = malloc_cnt == TM2x_malloc_cnt;
