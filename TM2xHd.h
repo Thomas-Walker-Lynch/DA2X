@@ -58,38 +58,39 @@
   // calls f one time for each element of dap, in order
   TM2xHd_F_PREFIX void TM2xHd_foreach
   (
-   TM2x *dap 
-   ,void f(void *el ,void *context)
-   ,void *context
+   void *context
+   ,TM2x *dap 
+   ,void f(void *context ,void *el)
    ){
     TM2xHd hd ,*hdpt; hdpt = &hd;
     TM2xHd_rewind(hdpt, dap);
     while( TM2xHd_is_on_tape(hdpt ,dap) ){
-      f(TM2xHd_read(hdpt) ,context);
+      f(context ,TM2xHd_read(hdpt));
       TM2xHd_step(hdpt ,dap ,1);
     }
   }
 
   TM2xHd_F_PREFIX bool TM2xHd_all
-  (TM2x *dap
-   ,bool pred(void *el, void *context)
-   ,void *context
+  (
+   void *context
+   ,TM2x *dap
+   ,bool pred(void *context ,void *el)
    ){
     TM2xHd hd ,*hdpt; hdpt = &hd;
     TM2xHd_rewind(hdpt, dap);
-    while( TM2xHd_is_on_tape(hdpt ,dap) && pred(TM2xHd_read(hdpt) ,context) ) TM2xHd_step(hdpt ,dap ,1);
+    while( TM2xHd_is_on_tape(hdpt ,dap) && pred(context ,TM2xHd_read(hdpt)) ) TM2xHd_step(hdpt ,dap ,1);
     return !TM2xHd_is_on_tape(hdpt ,dap);
   }
 
   TM2xHd_F_PREFIX bool TM2xHd_exists
   (
-   TM2x *dap
-   ,bool pred(void *el, void *context)
-   ,void *context
+   void *context
+   ,TM2x *dap
+   ,bool pred(void *context ,void *el)
    ){
     TM2xHd hd ,*hdpt; hdpt = &hd;
     TM2xHd_rewind(hdpt, dap);
-    while( TM2xHd_is_on_tape(hdpt ,dap) && !pred(TM2xHd_read(hdpt) ,context) ) TM2xHd_step(hdpt ,dap ,1);
+    while( TM2xHd_is_on_tape(hdpt ,dap) && !pred(context ,TM2xHd_read(hdpt)) ) TM2xHd_step(hdpt ,dap ,1);
     return TM2xHd_is_on_tape(hdpt ,dap);
   }
 
@@ -97,12 +98,12 @@
   // makes pred true. 2) hd may be called multiple times to find all the elements where pred is true
   TM2xHd_F_PREFIX void TM2xHd_find
   (
-   TM2xHd *hdpt
+   void *context
+   ,TM2xHd *hdpt
    ,TM2x *dap
-   ,bool pred(void *el, void *context)
-   ,void *context
+   ,bool pred(void *context ,void *el)
    ){
-    while( TM2xHd_is_on_tape(hdpt ,dap) && !pred(TM2xHd_read(hdpt) ,context) ) TM2xHd_step(hdpt ,dap ,1);
+    while( TM2xHd_is_on_tape(hdpt ,dap) && !pred(context ,TM2xHd_read(hdpt)) ) TM2xHd_step(hdpt ,dap ,1);
   }
 
   // all src elements that pred says are true are pushed on to the dst array
@@ -110,7 +111,7 @@
   (
    TM2x *src_dap
    ,TM2x *dst_dap 
-   ,bool pred(void *el, void *context)
+   ,bool pred(void *context ,void *el)
    ){
     TM2xHd_Mount(hd ,src_dap);
     while( TM2xHd_is_on_tape(hd ,src_dap) ){
@@ -126,12 +127,13 @@
     char *elpt;
     size_t byte_length;
   }TM2x_sized_el;
-  TM2xHd_F_PREFIX bool TM2xHd_pred_bytes_eq( void *e0 ,void *context ){
+
+  TM2xHd_F_PREFIX bool TM2xHd_pred_bytes_eq(void *context ,void *e0){
     char *opa_pt = e0;
     TM2x_sized_el *opb_pt = context;
     return memcmp(opa_pt ,opb_pt->elpt ,opb_pt->byte_length) == 0;
   }
-  TM2xHd_F_PREFIX bool TM2xHd_pred_cstring_eq( void *cs0 ,void *context ){
+TM2xHd_F_PREFIX bool TM2xHd_pred_cstring_eq(void *context ,void *cs0){
     char *opa_pt = cs0;
     TM2x_sized_el *opb_pt = context;
     return strncmp(opa_pt ,opb_pt->elpt ,opb_pt->byte_length) == 0;
@@ -167,7 +169,7 @@
   TM2xHd_F_PREFIX bool TM2xHd_push_accumulate_unique
   (TM2x *acc_dap 
    ,TM2x *src_dap 
-   ,bool pred(void *el, void *context)
+   ,bool pred(void *context ,void *el)
    ){
     TM2x_qualified_da qd = {acc_dep ,pred};
     TM2xHd_foreach(src_dap ,TM2xHD_push_write_unique ,
@@ -189,7 +191,7 @@
   }
 
   // each element is a pointer to dynamic memory, and that memory is to be freed:
-  TM2xHd_F_PREFIX void TM2xHd_f_free(void *item_pt ,void *context){
+  TM2xHd_F_PREFIX void TM2xHd_f_free(void *context ,void *item_pt){
     free(item_pt);
   }
 

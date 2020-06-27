@@ -12,11 +12,11 @@
 typedef struct {
   uint ref;
   uint result;
-} TM2xHdClosure;
+} TM2xHdContext;
 
-void TM2xHd_f0(void *item_pt , void *closure){
+void TM2xHd_f0(void *context ,void *item_pt){
   uint item = *(uint *)item_pt;
-  TM2xHdClosure *cpt = closure; 
+  TM2xHdContext *cpt = context; 
   cpt->result = cpt->result && (item == cpt->ref++);
 }
 
@@ -37,10 +37,10 @@ TM2x_Result test_0(){
     ++j;
   }
 
-  TM2xHdClosure c;
+  TM2xHdContext c;
   c.ref = 10;
   c.result = true;
-  TM2xHd_foreach(a0p ,TM2xHd_f0 ,&c);
+  TM2xHd_foreach(&c ,a0p ,TM2xHd_f0);
   f[i++] = c.result;
 
   TM2x_dealloc(a0p);
@@ -51,23 +51,23 @@ TM2x_Result test_0(){
   return r;
 }
 
-bool TM2xHd_p0(void *item_pt , void *closure){
+bool TM2xHd_p0(void *context ,void *item_pt){
   uint item = *(uint *)item_pt;
   return item >= 100 && item < 356;
 }
-bool TM2xHd_p1(void *item_pt , void *closure){
+bool TM2xHd_p1(void *context ,void *item_pt){
   uint item = *(uint *)item_pt;
   return item >= 100 && item < 355;
 }
-bool TM2xHd_p2(void *item_pt , void *closure){
+bool TM2xHd_p2(void *context ,void *item_pt){
   uint item = *(uint *)item_pt;
   return item == 248;
 }
-bool TM2xHd_p3(void *item_pt , void *closure){
+bool TM2xHd_p3(void *context ,void *item_pt){
   uint item = *(uint *)item_pt;
   return item == 355;
 }
-bool TM2xHd_p4(void *item_pt , void *closure){
+bool TM2xHd_p4(void *context ,void *item_pt){
   uint item = *(uint *)item_pt;
   return item == 356;
 }
@@ -89,13 +89,13 @@ TM2x_Result test_1(){
     ++j;
   }
 
-  f[i++] = TM2xHd_all(a0p ,TM2xHd_p0 ,NULL);
-  f[i++] = !TM2xHd_all(a0p ,TM2xHd_p1 ,NULL);
-  f[i++] = TM2xHd_exists(a0p ,TM2xHd_p3 ,NULL);
-  f[i++] = !TM2xHd_exists(a0p ,TM2xHd_p4 ,NULL);
+  f[i++] = TM2xHd_all(NULL ,a0p ,TM2xHd_p0);
+  f[i++] = !TM2xHd_all(NULL ,a0p ,TM2xHd_p1);
+  f[i++] = TM2xHd_exists(NULL ,a0p ,TM2xHd_p3);
+  f[i++] = !TM2xHd_exists(NULL ,a0p ,TM2xHd_p4);
 
   TM2xHd_Mount(hd ,a0p);
-  TM2xHd_find(hd ,a0p ,TM2xHd_p2 ,NULL);
+  TM2xHd_find(NULL ,hd ,a0p ,TM2xHd_p2);
   uint t0 = TM2xHd_Read(hd ,uint);
   f[i++] = TM2xHd_is_on_tape(hd ,a0p) && t0 == 248;
   
