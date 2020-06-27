@@ -122,13 +122,13 @@
     dap->byte_np1_pt += push_byte_length;
     return element_pt;
   }
-  TM2x_F_PREFIX char *TM2x_push_write(TM2x *dap, void *src_element_pt){
+  TM2x_F_PREFIX char *TM2x_push_write(TM2x *dap ,void *src_element_pt){
     char *dst_element_pt = TM2x_push_alloc(dap ,1);
     memcpy(dst_element_pt, src_element_pt, TM2x_element_byte_length(dap));
     return dst_element_pt;
   }
 
-  TM2x_F_PREFIX bool TM2x_pop_read(TM2x *dap, void *dst_element_pt){
+  TM2x_F_PREFIX bool TM2x_pop_read(TM2x *dap ,void *dst_element_pt){
     if( TM2x_empty(dap) ) return false;
     char *src_element_pt = dap->byte_np1_pt - TM2x_element_byte_length(dap);
     if( dst_element_pt ) memcpy(dst_element_pt, src_element_pt, TM2x_element_byte_length(dap));

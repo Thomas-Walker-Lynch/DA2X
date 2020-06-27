@@ -55,7 +55,13 @@
 //--------------------------------------------------------------------------------
 // quantifiers
 //
-  TM2xHd_F_PREFIX void TM2xHd_foreach(TM2x *dap, void f(void *, void *), void *context){
+  // calls f one time for each element of dap, in order
+  TM2xHd_F_PREFIX void TM2xHd_foreach
+  (
+   TM2x *dap 
+   ,void f(void *el ,void *context)
+   ,void *context
+   ){
     TM2xHd hd ,*hdpt; hdpt = &hd;
     TM2xHd_rewind(hdpt, dap);
     while( TM2xHd_is_on_tape(hdpt ,dap) ){
@@ -64,14 +70,23 @@
     }
   }
 
-  TM2xHd_F_PREFIX bool TM2xHd_all(TM2x *dap, bool pred(void *, void *), void *context){
+  TM2xHd_F_PREFIX bool TM2xHd_all
+  (TM2x *dap
+   ,bool pred(void *el, void *context)
+   ,void *context
+   ){
     TM2xHd hd ,*hdpt; hdpt = &hd;
     TM2xHd_rewind(hdpt, dap);
     while( TM2xHd_is_on_tape(hdpt ,dap) && pred(TM2xHd_read(hdpt) ,context) ) TM2xHd_step(hdpt ,dap ,1);
     return !TM2xHd_is_on_tape(hdpt ,dap);
   }
 
-  TM2xHd_F_PREFIX bool TM2xHd_exists(TM2x *dap, bool pred(void *, void *), void *context){
+  TM2xHd_F_PREFIX bool TM2xHd_exists
+  (
+   TM2x *dap
+   ,bool pred(void *el, void *context)
+   ,void *context
+   ){
     TM2xHd hd ,*hdpt; hdpt = &hd;
     TM2xHd_rewind(hdpt, dap);
     while( TM2xHd_is_on_tape(hdpt ,dap) && !pred(TM2xHd_read(hdpt) ,context) ) TM2xHd_step(hdpt ,dap ,1);
@@ -80,7 +95,13 @@
 
   // version of exists that works whdh an hderator so that 1) hd may be used to find the element that
   // makes pred true. 2) hd may be called multiple times to find all the elements where pred is true
-  TM2xHd_F_PREFIX void TM2xHd_find(TM2xHd *hdpt ,TM2x *dap, bool pred(void *, void *), void *context){
+  TM2xHd_F_PREFIX void TM2xHd_find
+  (
+   TM2xHd *hdpt
+   ,TM2x *dap
+   ,bool pred(void *el, void *context)
+   ,void *context
+   ){
     while( TM2xHd_is_on_tape(hdpt ,dap) && !pred(TM2xHd_read(hdpt) ,context) ) TM2xHd_step(hdpt ,dap ,1);
   }
 
@@ -89,7 +110,7 @@
   (
    TM2x *src_dap
    ,TM2x *dst_dap 
-   ,bool pred(void *, void *)
+   ,bool pred(void *el, void *context)
    ){
     TM2xHd_Mount(hd ,src_dap);
     while( TM2xHd_is_on_tape(hd ,src_dap) ){
@@ -99,22 +120,82 @@
   }
 
 //--------------------------------------------------------------------------------
-// useful functions for mapping over arrays
+// some useful predicates
 //
+  typedef struct{
+    char *elpt;
+    size_t byte_length;
+  }TM2x_sized_el;
+  TM2xHd_F_PREFIX bool TM2xHd_pred_bytes_eq( void *e0 ,void *context ){
+    char *opa_pt = e0;
+    TM2x_sized_el *opb_pt = context;
+    return memcmp(opa_pt ,opb_pt->elpt ,opb_pt->byte_length) == 0;
+  }
+  TM2xHd_F_PREFIX bool TM2xHd_pred_cstring_eq( void *cs0 ,void *context ){
+    char *opa_pt = cs0;
+    TM2x_sized_el *opb_pt = context;
+    return strncmp(opa_pt ,opb_pt->elpt ,opb_pt->byte_length) == 0;
+  }
+
+//--------------------------------------------------------------------------------
+// set
+//
+#if 0
+  // Adds a constraint on to a dynamic array. Typically this is to say that
+  // the elements in the array will satistfy the constraint.
+  typdef struct{
+    char *dap;
+    ,bool pred(void *el, void *context)
+  }TM2x_contstrained_da;
+
+
+
+  // push_write src_elmeent on array if pred not exists over dap
+  // when pred is a comparison can be used to force order
+  // when pred is equality can be used to get set behavior
+  TM2xHd_F_PREFIX bool TM2xHd_push_write_unique
+  (
+   void *src_element_pt 
+   TM2x_constrained_da qd
+   ){
+    TM2x_sized_el elb;
+    elb.elpt = src_element_pt;
+    elb.byte_length = TM2x_element_byte_length(qd.dap);
+    if( !TM2xHD_exists(dap ,qd.pred ,&elb) ) TM2x_push_write(qd.dap ,src_element_pt);
+  }
+
+  TM2xHd_F_PREFIX bool TM2xHd_push_accumulate_unique
+  (TM2x *acc_dap 
+   ,TM2x *src_dap 
+   ,bool pred(void *el, void *context)
+   ){
+    TM2x_qualified_da qd = {acc_dep ,pred};
+    TM2xHd_foreach(src_dap ,TM2xHD_push_write_unique ,
+  }
+#endif
+
+
+//--------------------------------------------------------------------------------
+// utilities
+//
+  // elements are integers
+  TM2xHd_F_PREFIX void TM2xHd_f_print_int(void *element_pt, void *sep){
+    fprintf(stderr ,"%s%d" ,(char *)sep ,*(int *)element_pt);
+  }
+
+  // elements are char *
+  TM2xHd_F_PREFIX void TM2xHd_f_print_string(void *element_pt, void *sep){
+    fprintf(stderr ,"%s%s" ,(char *)sep ,(char *)element_pt);
+  }
 
   // each element is a pointer to dynamic memory, and that memory is to be freed:
   TM2xHd_F_PREFIX void TM2xHd_f_free(void *item_pt ,void *context){
     free(item_pt);
   }
 
-  // elements are integers
-  TM2xHd_F_PREFIX void TM2xHd_f_print_int(void *element_pt, char *sep){
-    fprintf(stderr ,"%s%d" ,sep ,*(int *)element_pt);
+  TM2xHd_F_PREFIX void TM2xHd_f_string_eq(void *element_pt, void *sep){
+    fprintf(stderr ,"%s%s" ,(char *)sep ,(char *)element_pt);
   }
 
-  // elements are char *
-  TM2xHd_F_PREFIX void TM2xHd_f_print_string(void *element_pt, char *sep){
-    fprintf(stderr ,"%s%s" ,sep ,(char *)element_pt);
-  }
 
 #endif
