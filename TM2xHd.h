@@ -6,6 +6,8 @@
 #include <string.h>
 #include "TM2x.h"
 
+// in general, arg order:  context ,dap ,hd ,..
+
 //#define TM2xHd_F_PREFIX
 //#define TM2xHd_F_PREFIX extern inline
 #define TM2xHd_F_PREFIX static inline
@@ -18,34 +20,40 @@
     char *element_pt;
   } TM2xHd;
 
-  TM2xHd_F_PREFIX void TM2xHd_rewind(TM2xHd *hdpt ,TM2x *dap){
+  TM2xHd_F_PREFIX void TM2xHd_rewind(TM2x *dap ,TM2xHd *hdpt){
     hdpt->element_pt = dap->byte_0_pt;
   }
-  #define TM2xHd_Mount(hd ,dap) TM2xHd TM2xHd_ ## hd ,*hd; hd = &TM2xHd_  ## hd; TM2xHd_rewind(hd ,dap);
+  // the made hd will be a pointer to an TM2xHd struct, this makes stepping possible
+  #define TM2xHd_Mount(dap ,hd) TM2xHd TM2xHd_ ## hd ,*hd; hd = &TM2xHd_  ## hd; TM2xHd_rewind(dap ,hd);
 
-  TM2xHd_F_PREFIX void TM2xHd_step(TM2xHd *hdpt ,TM2x *dap ,byte_length_t distance){
+  TM2xHd_F_PREFIX void TM2xHd_step(TM2x *dap ,TM2xHd *hdpt ,byte_length_t distance){
     hdpt->element_pt += distance * dap->element_byte_length;
   }
-  TM2xHd_F_PREFIX bool TM2xHd_is_on_tape(TM2xHd *hdpt ,TM2x *dap){
+
+  TM2xHd_F_PREFIX bool TM2xHd_is_on_tape(TM2x *dap ,TM2xHd *hdpt){
     return hdpt->element_pt < dap->byte_np1_pt && hdpt->element_pt >= dap->byte_0_pt;
   }
-  TM2xHd_F_PREFIX void *TM2xHd_read(TM2xHd *hdpt){
+  
+  TM2xHd_F_PREFIX void *TM2xHd_readpt(TM2xHd *hdpt){
     return hdpt->element_pt;
+  }
+  TM2xHd_F_PREFIX void TM2xHd_read(TM2x *dap ,TM2xHd *hdpt ,void *dst_pt){
+    memcpy(dst_pt, hdpt->element_pt, TM2x_element_byte_length(dap));
   }
   #define TM2xHd_Read(hd ,type) *((type *)hd->element_pt)
 
-  TM2xHd_F_PREFIX void TM2xHd_write(TM2xHd *hdpt ,TM2x *dap ,void *src_element_pt){
+  TM2xHd_F_PREFIX void TM2xHd_write(TM2x *dap ,TM2xHd *hdpt ,void *src_element_pt){
     char *dst_element_pt = (char *)(hdpt->element_pt);
     memcpy(dst_element_pt, src_element_pt, TM2x_element_byte_length(dap));
   }
   #define TM2xHd_Write(hd ,item) *((typeof(item) *)hd->element_pt) = item;
 
 
-  // for dynamic allocation of hderators
+  // for dynamic allocation of heads
   TM2xHd_F_PREFIX TM2xHd *TM2xHd_dynamic_mount(TM2x *dap){
     void *hdpt = malloc(byte_length_of(TM2xHd));
     assert(hdpt);
-    TM2xHd_rewind(hdpt ,dap);
+    TM2xHd_rewind(dap ,hdpt);
     return hdpt;
   }
   TM2xHd_F_PREFIX void TM2xHd_dynamic_unmount(TM2xHd *hdpt){
@@ -63,10 +71,10 @@
    ,void f(void *context ,void *el)
    ){
     TM2xHd hd ,*hdpt; hdpt = &hd;
-    TM2xHd_rewind(hdpt, dap);
-    while( TM2xHd_is_on_tape(hdpt ,dap) ){
-      f(context ,TM2xHd_read(hdpt));
-      TM2xHd_step(hdpt ,dap ,1);
+    TM2xHd_rewind(dap ,hdpt);
+    while( TM2xHd_is_on_tape(dap ,hdpt) ){
+      f(context ,TM2xHd_readpt(hdpt));
+      TM2xHd_step(dap ,hdpt ,1);
     }
   }
 
@@ -77,9 +85,9 @@
    ,bool pred(void *context ,void *el)
    ){
     TM2xHd hd ,*hdpt; hdpt = &hd;
-    TM2xHd_rewind(hdpt, dap);
-    while( TM2xHd_is_on_tape(hdpt ,dap) && pred(context ,TM2xHd_read(hdpt)) ) TM2xHd_step(hdpt ,dap ,1);
-    return !TM2xHd_is_on_tape(hdpt ,dap);
+    TM2xHd_rewind(dap ,hdpt);
+    while( TM2xHd_is_on_tape(dap ,hdpt) && pred(context ,TM2xHd_readpt(hdpt)) ) TM2xHd_step(dap ,hdpt ,1);
+    return !TM2xHd_is_on_tape(dap ,hdpt);
   }
 
   TM2xHd_F_PREFIX bool TM2xHd_exists
@@ -89,21 +97,21 @@
    ,bool pred(void *context ,void *el)
    ){
     TM2xHd hd ,*hdpt; hdpt = &hd;
-    TM2xHd_rewind(hdpt, dap);
-    while( TM2xHd_is_on_tape(hdpt ,dap) && !pred(context ,TM2xHd_read(hdpt)) ) TM2xHd_step(hdpt ,dap ,1);
-    return TM2xHd_is_on_tape(hdpt ,dap);
+    TM2xHd_rewind(dap ,hdpt);
+    while( TM2xHd_is_on_tape(dap ,hdpt) && !pred(context ,TM2xHd_readpt(hdpt)) ) TM2xHd_step(dap ,hdpt ,1);
+    return TM2xHd_is_on_tape(dap ,hdpt);
   }
 
-  // version of exists that works whdh an hderator so that 1) hd may be used to find the element that
+  // version of exists that works with a head so that 1) hd may be used to find the element that
   // makes pred true. 2) hd may be called multiple times to find all the elements where pred is true
   TM2xHd_F_PREFIX void TM2xHd_find
   (
    void *context
-   ,TM2xHd *hdpt
    ,TM2x *dap
+   ,TM2xHd *hdpt
    ,bool pred(void *context ,void *el)
    ){
-    while( TM2xHd_is_on_tape(hdpt ,dap) && !pred(context ,TM2xHd_read(hdpt)) ) TM2xHd_step(hdpt ,dap ,1);
+    while( TM2xHd_is_on_tape(dap ,hdpt) && !pred(context ,TM2xHd_readpt(hdpt)) ) TM2xHd_step(dap ,hdpt ,1);
   }
 
   // all src elements that pred says are true are pushed on to the dst array
@@ -113,10 +121,10 @@
    ,TM2x *dst_dap 
    ,bool pred(void *context ,void *el)
    ){
-    TM2xHd_Mount(hd ,src_dap);
-    while( TM2xHd_is_on_tape(hd ,src_dap) ){
-      if( pred(TM2xHd_read(hd) ,NULL) ) TM2x_push_write(dst_dap , TM2xHd_read(hd));
-      TM2xHd_step(hd ,src_dap ,1);
+    TM2xHd_Mount(src_dap ,hd);
+    while( TM2xHd_is_on_tape(src_dap ,hd) ){
+      if( pred(TM2xHd_readpt(hd) ,NULL) ) TM2x_push_write(dst_dap , TM2xHd_readpt(hd));
+      TM2xHd_step(src_dap ,hd  ,1);
     }
   }
 
