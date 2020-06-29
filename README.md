@@ -16,97 +16,94 @@ Hence the name, Tape Machine 2x.
   of the sequence. 
 
   We would like to mimic this structure in our computer programs.  Hence we introduce a
-  data type called an 'array'.  An array is a compact allocation of 'elements' in memory.
-  The elements form a sequence, so each element has a natural number index. n+1 is
-  the length of the element sequence, so we also say that n+1 is the length of the
-  array.
+  data type called an 'array'.  The elements form a sequence, so each element has a
+  natural number index. n+1 is the length of the element sequence, so we also say that n+1
+  is the length of the array.
+
+  A computer processor works by pulling all data from system memory. System memory is
+  an array of elements, where the elements are bytes, and the indexes are called 'addresses'.
   
-  An 'element' in turn is a compact allocation of 'bytes'. The element itself is a sort of
-  array where the elements are bytes.  As an array is a sequence of elements, and elements
-  are sequences of bytes, it follows that an array is also a sequence of bytes.  Hence,
-  an array is both a sequence of elements, and a sequence of bytes.
+  Elements in an array are actually little arrays themselves. Elements are arrays of memory bytes.
+  Hence, while each element has an index from the base of the array, each byte in the elements
+  also has an address in memory.
 
-  To the programmer an 'element' is a semantic unit.  When doing memory management in C
-  everything is based on bytes.  This leads to a bit of a confusing situation where we
-  have two length measures for an array, one for its length in elements, and one for its
-  length in bytes.  Conventionally lengths in bytes are referred to as an object's *size*,
-  where as the number of elements in an array would remain the arrays *length*, but this
-  notation is limited because bytes are also made of bits, and sometimes we want to name
-  the element type.  Hence we will use the term 'length\_[bits|bytes|elements|..]'.  Hence an
-  array has a 'bit length', a 'byte length', and an 'element length'.  If the array
-  elements are characters the array will have a 'character length', etc..
+  The recursive nature of memory type leads to a bit of a confusing situation. For
+  example, we have three lengths measures for an array of the type we declare in our
+  program.  One for its length in elements, another for its length in bytes. Bytes in the
+  array can be indexes from 0 to n within the array, but those same bytes will have
+  indexes ranging from 0 being the first byte in memory to n being the last byte in
+  memory.
 
-  A memory allocation must have the same byte length, or larger byte length, than the byte
-  length of the array being put in it.  Hence, we must distinguish between the byte length
-  of the array we are storing in memory and the byte length of the allocation that the
-  array is stored in.  If the allocation's byte length is larger than the array's byte
-  length, there will be some allocated memory that goes unused.
-
-  Then according to our nomenclature we start with the container, then name the element type,
-  give the subscript, then give the type.
+  So as to try and keep all this straight, I have introduced the following nomenclature for
+  naming indexes. Note indexes are natural numbers. Here we are talking about the indexes on
+  the elements, be they bytes or something else, not the elements themselves.
   
-  ```
+  A variable that holds an index value will consists of a series of words separated by
+  underscores.  The first word is the object we are talking about. The second word is the
+  semantic concept for an element in that object, and the third is a number that
+  identifies the index relative to the object.  I then allow for a suffix.  If the suffix
+  is `_pt`, the value is relative to the start of memory rather than relative to the start
+  of the object.
+
+  Here are two examples:
+    ```
+          array_byte_n
+          array_element_n_pt
+    ```
+
+  Here the variable `array_byte_n` will hold a natural number that is the subscript of the last
+  byte in the array. We do not know in advance as to the value of `n` here, because we do not know
+  in advance how long the array is.
+
+  In contrast, the variable `array_byte_n_pt` will hold the natural number that is the subscript
+  for the byte in memory that corresponds to the first byte of the last element in the array.
+  This is also known as a 'last element pointer'.
+
+  Consider another example,
+    ```
+          array_byte_0
           array_byte_0_pt
-          memory_byte_0_pt
-  ```
+    ```
 
-   `array_byte_0_pt` is a pointer to the first byte in an array.  `memory_byte_n_pt` is a pointer
-   to the last byte in memory.  Where the container context is clear we leave that off.  In 
-   most of our array implementation the container is clearly the array.  Hence,
-   
-  ```
-          element_n_pt
-  ```
+   We would expect that the value of the variable `array_byte_0` is zero.  The variable belongs
+   to the array object, and it is array relative index for the first byte.  The second variable,
+   `array_byte_0_pt` is more interesting. This will be the address of the first byte of the array
+   relative to the start of memory.  This may be called the 'array's location in memory' or a 'pointer
+   to the first byte in the array', or even 'the array base'.  It will also be a pointer to the first
+   element in the array, and to the start of the memory alloction for the array.  The array base is a 
+   busy concept.
 
-   in the array implementation `element_n_pt` would be a pointer to the last element in the array.
-   
-   When the subscript is given as a variable we are asking about that variable's value. Hence,
-   
-   ```
-       array_byte_n
-       byte_n
-   ```
-   for a 16 byte array these both would have the value 15.  In the second one the array container is implied.
-   Suppose this same array had elements that were 4 byte integers, then 
-   
-   ```
-       array_element_n
-   ```
-   Would have the value of 3.
-   
-   Note that to get the nth byte we would have
+   If the object is obvious, we will drop it from the variable name.
+
+   To access the nth byte in the array we write:
 
    ```
        byte_0_pt[byte_n]
    ```
    
-   Note and to get the nth element:
+   And to access the ith element when that element is an 'int':
    
    ```
-       ((int *)byte_0_pt)[element_n]
+       ((int *)byte_0_pt)[element_i]
    ```
    
    Or even:
    
    ```
-       *((int *)byte_0_pt element_n)
+       *((int *)byte_0_pt + element_i)
    ```
+
 
 ## Allocation Algorithm
 
-  We are implementing a dynamic array, i.e. one that may grow in length when elements
-  are added to the end of it.  This in turn leads to a dynamic memory allocation problem.
-  The apporach we use here is that when an array grows in byte length beyond that of the current
-  allocation, we make a new allocation of twice the byte length of the original, and then copy
-  the contents of the original array into this newly allocated area.
+  We allocate in the smallest power of 2 sizes that the data set fits in.
+  
+  Attempting to push on a full allocation will cause the allocation to double, then
+  the push will occur.
+  
+  If after pop byte_n is equal to the inclusive upper bound of a binary interval,
+  the array contracts to that size.
 
-  Conversely, when the array data becomes 1/4 or less than the heap allocation, we 
-  collapse the allocation to half its former byte length; however, we never make the array
-  smaller than the initial heap allocation.
-
-  Arrays will expanded as a result of using `TM2x_push_alloc` or one of the routines that
-  call it, and, except for the minimum case, will collapse after a `TM2x_pop` cause the
-  data to shrink to less than 1/4 of the allocation's byte length.
 
 ## Files
 
@@ -123,11 +120,17 @@ Hence the name, Tape Machine 2x.
   
 ## Array Usage
 
-  Either manually instantiate the `TM2x` struct statically, or dynamically.  Then use `TM2x_init`
-  on the instance.  When finished with the instance call `TM2x_data_dealloc` to release the heap data.
-  Or, alternatively, use the macro `TM2x_Make` to statically allocate and initialize in one step, or
-  call `TM2x_alloc` to make a `TM2x` struct instance on the heap and ot initialize it. The use 
-  `TM2x_dealloc` to free the data array and the `TM2x` struct.
+  1. Manually instantiate a `TM2x` struct statically, or dynamically.  Then use
+     `TM2x_init` on the instance.  When finished with the instance call
+     `TM2x_data_dealloc` to release the heap data.  If the TM2x struct was manually
+     instatiated on the heap, free it.
+  
+  2. Use the macro `TM2x_Make` to statically allocate and initialize in one step. When
+     finished with the instance call `TM2x_data_dealloc` to release the heap data.
+
+  3. Call `TM2x_alloc` to make a `TM2x` struct instance on the heap and to initialize it
+     all in one step. When finished call `TM2x_dealloc` to free both the data
+     array and the `TM2x` struct.
 
   Note the example usage in the test files.
 
@@ -138,24 +141,25 @@ Hence the name, Tape Machine 2x.
   the pointer `byte_0_pt` locates the first byte in the array, and the pointer
   `byte_np1_pt`, where np1 stands for n plus 1, is used to bound the data in the array,
   and `allocation_np1_pt` is used to bound the allocation.  We also use a doubling algorithm
-  on expansion, and hystersis on collapse with a 1/4 size threshold.
+  on expansion, with hystersis and collapse on a 1/4 size threshold.
   
-  With this dynamic array algorithm the `allocation_np1_pt` value is always a simple power
-  of two, or a bound on the memory as a whole.  If we collapsed immediately instead of
-  using hysterisis and the 1/4 threshold rule, we would not need the `allocation_np1_pt`
-  pointer at all, because it would point to either the end of memory or to the top of the
-  binade of `byte_np1_pt` value.  Eg.  when `byte_np1_pt` is 4, 5, or 6, 7, `allocation_np1_pt`
-  would be 8.  I.e. 100, 101, 110, 111 would be bound by 1000. Etc.
+  The exclusive allocation bound pointer, `allocation_np1_pt`, minus the base pointer,
+  i.e. the allocation size, will either extend to the end of memory, or will be a power of
+  two.  If we collapsed immediately instead of using current hysterisis rule,
+  `allocation_np1_pt` pointer could be computed from the memory size and the `byte_np1_pt`
+  value.  Eg.  when `byte_np1` is 4, 5, or 6, 7, `allocation_np1` would be 8.
+  I.e. `byte_np1` values of 100, 101, 110, 111 are all bounded to a binade with the
+  value 1000. Etc.
 
-  A nice property of 'np1' bounding pointers the ability to represent zero length objects.
-  Hence when `byte_np1_pt` is equal to `byte_0_pt` we know the array is zero length.
-  Philosophically, in the computation theory sense, the zero length array is an
-  interesting object.  With the zero length array, the name of the pointer we called
-  `byte_0_pt` becomes a misnomer, because there is no byte 0 in an empty array.  Another
-  thing that is a bit funny is that though the array exists, and we know it exists because
-  the base pointer is not null, it has no members. It is not entirely clear what that
-  means for an array with no members to 'exist'.  But this next thing is the most
-  consequential:
+  A nice property of using exclusive, 'np1', style bounding pointers is the ability to
+  represent zero length objects.  Hence when `byte_np1_pt` is equal to `byte_0_pt` we know
+  the array is zero length.  Philosophically, in the computation theory sense, the zero
+  length array is an interesting object.  With the zero length array, the name of the
+  pointer we called `byte_0_pt` becomes a misnomer, because there is no byte 0 in an empty
+  array.  Another thing that is a bit funny is that though the array exists, and we know
+  it exists because the base pointer is not null, it has no members. It is not entirely
+  clear what that means for an array with no members to 'exist'.  But this next thing is
+  the most consequential:
 
   For a memory between `2^(n-1) + 1` to `2^n` in size, we must implement n bit pointers.
   However for the end case of `2^n` sized memory, to be able to use exclusive upper bound
@@ -200,3 +204,30 @@ Hence the name, Tape Machine 2x.
   before using it as an array. Arguably then, the new approach is cleaner.
   
 
+## Cheats for Representing an Empty Array
+
+   We know from the theoretical analysis in TTCA that another bit is needed to represent
+   an empty array here.  However, there are a few options for 'cheats' by sacrificing
+   uneeded functionality.  Though any such option might be a gotchya in a special use
+   case.
+
+   The current array implementation, apart from some C library mods that would be needed,
+   will happily base an array at address 0.  Of coruse in C that would be a null pointer.
+   Hence base_pt == 0 could be used to represent an empty array rather than an array based
+   at address 0. If we have special hardware, swizzled pointers, or other scenarios, this 
+   could be a gotchya.
+   
+   We could reduce the probability that this become a gotchya for someone by being more
+   specific.  We could say that a one byte array, based at address zero in memory, _and_
+   having a 1 byte element size - is actually an empty array.
+
+   We allow that an element might be as big as the address space itself.  Apparently that
+   would be the case where the entirty of a buffer is holding one element.  In most
+   applications that is not a very useful use case for an array.  Hence, instead of
+   supporting very large element sizes, we could instead use very large element sizes
+   to flag varous conditions, such as the array being empty.
+   
+   Though, it might be easier to just have a dedicated, 'hey it is empty' flag kept by 
+   the programmer if he or she needs to keep track of empty dynamic arrays.
+   
+   
