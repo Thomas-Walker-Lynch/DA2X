@@ -220,7 +220,7 @@
   TM2x_F_PREFIX bool TM2x_read(TM2x *dap ,address_t index ,void *dst_element_pt){
     void *src_element_pt = TM2x_element_i_pt(dap ,index);
     if( src_element_pt > TM2x_element_n_pt(dap) ) return false;
-    memcpyn(dst_element_pt, src_element_pt, TM2x_element_n(dap));
+    memcpyn(dst_element_pt, src_element_pt, TM2x_element_byte_n(dap));
     return true;
   }
   #define TM2x_Read(dap ,index ,x) assert(TM2x_read ,index ,&x))
@@ -228,7 +228,7 @@
   TM2x_F_PREFIX bool TM2x_write(TM2x *dap ,address_t index ,void *src_element_pt){
     void *dst_element_pt = TM2x_element_i_pt(dap ,index);
     if( dst_element_pt > TM2x_element_n_pt(dap) ) return false;
-    memcpyn(dst_element_pt, src_element_pt, TM2x_element_n(dap));
+    memcpyn(dst_element_pt, src_element_pt, TM2x_element_byte_n(dap));
     return true;
   }
   #define TM2x_Write(dap ,index ,x) assert(TM2x_write ,index ,&x))
