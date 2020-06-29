@@ -1,7 +1,0 @@
-2020-06-25T17:19:14Z
-
-  Some ideas for future features:
-  Embed some flags over pointers so we can know if a dynamic deallocation is tried on a
-  static allocated array and vice versa.  Add an allocation threshold after which growth
-  becomes linear.  Add a allocation maximum boundary. Make the overhead pointers inclusive
-  so as to avoid uncessary page wraps, or even memory wraps on microcontrollers.
