@@ -15,21 +15,19 @@
   In this sections I provide some mockups.  The implementations of these mockups
   might not respect inclusive bound math.
 
-
   There are three options for the inlining style for the interface: no-inlining, 'extern
   inline', and 'static inilne'.  No inlining is the simplest, but there is no performance
-  advantage.  The compiler can ignore requests to inline, and it looks
-  like gcc is doing so when the debugging flag is turned on and optimization is turned
-  off. 'static inline' generates file scope code if it is needed.  This is simplest inlining
-  approach for development because there is only declaration of the function to edit.
-  'extern line' will only generate one version of functions that are not inlined, and share
-  it everywhere it is needed. The non-inline versions of the functions have to be compiled
+  advantage.  The compiler can ignore requests to inline, and it looks like gcc is doing
+  so when the debugging flag is turned on and optimization is turned off. 'static inline'
+  generates file scope code if it is needed.  This is simplest inlining approach for
+  development because there is only one declaration of each function to edit.  'extern
+  line' will only generate one version of functions that are not inlined, and share it
+  everywhere it is needed. The non-inline versions of the functions have to be compiled
   separately and made available for linking.
 
   memory_byte_n is the largest address that may be used to access a byte from memory.
   If this array is implemented over virtual memory, that migth be the largest virtual memory
-  address.  That is what I have put here.  That is address UINT64_MAX.  I depend upon the 
-  fact that malloc never issues an address greater than this.
+  address, i.e. UINT64_MAX.  That is what I have put here.
 
 */
 
@@ -95,7 +93,7 @@
     dap->base_pt = mallocn(allocation_byte_n);
     return true;
   }
-  #define TM2x_Make(da ,element_n ,type) TM2x TM2x_ ## da ,*da; da = &TM2x_ ## da; TM2x_init(da ,element_n ,byte_n_of(type));
+  #define TM2x_Make(da ,element_n ,type) TM2x TM2x_ ## da ,*da; da = &TM2x_ ## da; assert(TM2x_init(da ,element_n ,byte_n_of(type)));
 
   // after data_deallocation, the TM2x may be re-initialized and used again
   TM2x_F_PREFIX void TM2x_data_dealloc(TM2x *dap){
@@ -108,7 +106,7 @@
   }
 
   // for dynammic allocation of TM2xs:
-TM2x_F_PREFIX TM2x *TM2x_alloc(address_t element_n ,address_t element_byte_n){
+  TM2x_F_PREFIX TM2x *TM2x_alloc(address_t element_n ,address_t element_byte_n){
     TM2x *dap = mallocn(byte_n_of(TM2x));
     assert(TM2x_init(dap ,element_n, element_byte_n));
     return dap;
@@ -119,8 +117,14 @@ TM2x_F_PREFIX TM2x *TM2x_alloc(address_t element_n ,address_t element_byte_n){
   }
 
   // size limit issues, not other comments in this file on this topic
+  #ifdef TM2x_TEST
+    extern address_t TM2x_test_after_allocation_n;
+  #endif
   TM2x_F_PREFIX bool TM2x_resize(TM2x *dap ,address_t after_allocation_n){
     char *after_base_pt = mallocn( after_allocation_n );
+    #ifdef TM2x_TEST
+      TM2x_test_after_allocation_n = after_allocation_n;
+    #endif
     char *before_base_pt = dap->base_pt;
     memcpyn( after_base_pt ,before_base_pt ,dap->byte_n);
     free(before_base_pt);
@@ -175,6 +179,7 @@ TM2x_F_PREFIX TM2x *TM2x_alloc(address_t element_n ,address_t element_byte_n){
     address_t before_byte_n = TM2x_byte_n(dap);
     address_t before_allocation_n = binary_interval_inclusive_upper_bound(before_byte_n);
     address_t after_byte_n = before_byte_n + requested_expansion_byte_n + 1;
+    dap->byte_n = after_byte_n;
     address_t after_allocation_n = binary_interval_inclusive_upper_bound(after_byte_n);
     if( after_allocation_n > before_allocation_n ) TM2x_resize(dap ,after_allocation_n);
     return true;
@@ -182,12 +187,11 @@ TM2x_F_PREFIX TM2x *TM2x_alloc(address_t element_n ,address_t element_byte_n){
   #define TM2x_Push_Alloc(dap ,expansion_element_n ,type) TM2x_push_alloc(dap, expansion_element_n ,byte_n_of(type))
 
   TM2x_F_PREFIX bool TM2x_push_write(TM2x *dap ,void *src_element_pt ,address_t element_byte_n){
-    char *byte_n_pt = TM2x_byte_n_pt(dap);
     if( !TM2x_push_alloc(dap ,0 ,element_byte_n) )return false;
-    memcpyn(byte_n_pt + 1, src_element_pt, element_byte_n);
+    memcpyn(TM2x_element_n_pt(dap ,element_byte_n) ,src_element_pt ,element_byte_n);
     return true;
   }
-  #define TM2x_Pop_Write(dap ,src_element) TM2x_pop_write(dap ,&src_element ,byte_n_of(typeof(src_element)))
+  #define TM2x_Push_Write(dap ,src_element) TM2x_push_write(dap ,&src_element ,byte_n_of(typeof(src_element)))
 
   // should make a version to pop off n elements .. in general I need to add array to array ops
   // the read always succeeds, but the pop might not
@@ -200,6 +204,7 @@ TM2x_F_PREFIX TM2x *TM2x_alloc(address_t element_n ,address_t element_byte_n){
 
     address_t before_allocation_n = binary_interval_inclusive_upper_bound(before_byte_n);
     address_t after_byte_n = before_byte_n - element_byte_n - 1;
+    dap->byte_n = after_byte_n;
     address_t after_allocation_n = binary_interval_inclusive_upper_bound(after_byte_n);
     if( after_allocation_n < before_allocation_n ) TM2x_resize(dap ,after_allocation_n);
     return true;
@@ -234,7 +239,7 @@ TM2x_F_PREFIX TM2x *TM2x_alloc(address_t element_n ,address_t element_byte_n){
     memcpyn(dst_element_pt, src_element_pt, element_byte_n);
     return true;
   }
-  #define TM2x_Write(dap ,index ,x) TM2x_write(dap ,index ,&x ,byte_n_of(typeof(x)))
+  #define TM2x_Write(dap ,index ,x) TM2x_write(dap ,index ,&(x) ,byte_n_of(typeof(x)))
 
 
 #endif
