@@ -74,7 +74,6 @@
   typedef struct {
     char *base_pt;
     address_t byte_n;
-    address_t element_byte_n; // length of an element - 1
   } TM2x;
 
 //------------------------o--------------------------------------------------------
@@ -86,17 +85,17 @@
   }
 
   // Need to add limit checks because an init sized array might fail to fit in memory.
+  // element_n is the maximum index for the initial data array
   // returns true when initialization succeeds
-  TM2x_F_PREFIX bool TM2x_init(TM2x *dap ,address_t element_byte_n ,address_t element_n){
+  TM2x_F_PREFIX bool TM2x_init(TM2x *dap ,address_t element_n, address_t element_byte_n ){
     TM2x_outstanding_cnt++;
-    dap->element_byte_n = element_byte_n;
     address_t byte_n = TM2x_mulns(element_byte_n ,element_n);
     dap->byte_n = byte_n;
     address_t allocation_byte_n = binary_interval_inclusive_upper_bound(byte_n);
     dap->base_pt = mallocn(allocation_byte_n);
     return true;
   }
-  #define TM2x_Make(da ,type) TM2x TM2x_ ## da ,*da; da = &TM2x_ ## da; TM2x_init(da ,byte_length_of(type)-1);
+  #define TM2x_Make(da ,element_n ,type) TM2x TM2x_ ## da ,*da; da = &TM2x_ ## da; TM2x_init(da ,element_n ,byte_n_of(type));
 
   // after data_deallocation, the TM2x may be re-initialized and used again
   TM2x_F_PREFIX void TM2x_data_dealloc(TM2x *dap){
@@ -109,9 +108,9 @@
   }
 
   // for dynammic allocation of TM2xs:
-  TM2x_F_PREFIX TM2x *TM2x_alloc(address_t element_byte_n ,address_t element_n){
+TM2x_F_PREFIX TM2x *TM2x_alloc(address_t element_n ,address_t element_byte_n){
     TM2x *dap = mallocn(byte_n_of(TM2x));
-    assert(TM2x_init(dap ,element_byte_n ,element_n));
+    assert(TM2x_init(dap ,element_n, element_byte_n));
     return dap;
   }
   TM2x_F_PREFIX void TM2x_dealloc(TM2x *dap){
@@ -144,25 +143,24 @@
   }
 
   // max offsets
-  TM2x_F_PREFIX address_t TM2x_element_byte_n(TM2x *dap){
-    return dap->element_byte_n;
-  }
   TM2x_F_PREFIX address_t TM2x_byte_n(TM2x *dap){
     return dap->byte_n;
   }
   // The index of the last element in the array.  Note that the
   // (element_byte_n + 1) in the denominator must be representable:
-  TM2x_F_PREFIX address_t TM2x_element_n(TM2x *dap){
-    return dap->byte_n/(dap->element_byte_n + 1);
+  TM2x_F_PREFIX address_t TM2x_element_n(TM2x *dap ,address_t element_byte_n){
+    return dap->byte_n/(element_byte_n + 1);
   }
 
   // nth pointers
   TM2x_F_PREFIX char *TM2x_byte_n_pt(TM2x *dap){
     return dap->base_pt + dap->byte_n;
   }
-  TM2x_F_PREFIX void *TM2x_element_n_pt(TM2x *dap){
-    return TM2x_byte_n_pt(dap) - dap->element_byte_n;
+  TM2x_F_PREFIX void *TM2x_element_n_pt(TM2x *dap ,address_t element_byte_n){
+    return TM2x_byte_n_pt(dap) - element_byte_n;
   }
+  #define TM2x_Element_N_Pt(dap ,type) TM2x_element_n_pt(dap ,byte_n_of(type))
+
 
 //--------------------------------------------------------------------------------
 // change allocation size
@@ -172,8 +170,8 @@
   // If the current allocation is not large enough we make a new larger allocation.  If that
   // is not possible, then we return false.  Otherwise we return true.
   // If you need the before expansion top of the array, save that before calling this.
-  TM2x_F_PREFIX bool TM2x_push_alloc(TM2x *dap ,address_t requested_expansion_element_n){
-    address_t requested_expansion_byte_n = TM2x_mulns(requested_expansion_element_n ,TM2x_element_byte_n(dap));
+  TM2x_F_PREFIX bool TM2x_push_alloc(TM2x *dap ,address_t requested_expansion_element_n ,address_t element_byte_n){
+    address_t requested_expansion_byte_n = TM2x_mulns(requested_expansion_element_n ,element_byte_n);
     address_t before_byte_n = TM2x_byte_n(dap);
     address_t before_allocation_n = binary_interval_inclusive_upper_bound(before_byte_n);
     address_t after_byte_n = before_byte_n + requested_expansion_byte_n + 1;
@@ -181,18 +179,20 @@
     if( after_allocation_n > before_allocation_n ) TM2x_resize(dap ,after_allocation_n);
     return true;
   }
-  TM2x_F_PREFIX bool TM2x_push_write(TM2x *dap ,void *src_element_pt){
+  #define TM2x_Push_Alloc(dap ,expansion_element_n ,type) TM2x_push_alloc(dap, expansion_element_n ,byte_n_of(type))
+
+  TM2x_F_PREFIX bool TM2x_push_write(TM2x *dap ,void *src_element_pt ,address_t element_byte_n){
     char *byte_n_pt = TM2x_byte_n_pt(dap);
-    if( !TM2x_push_alloc(dap ,0) )return false;
-    memcpyn(byte_n_pt + 1, src_element_pt, TM2x_element_byte_n(dap));
+    if( !TM2x_push_alloc(dap ,0 ,element_byte_n) )return false;
+    memcpyn(byte_n_pt + 1, src_element_pt, element_byte_n);
     return true;
   }
+  #define TM2x_Pop_Write(dap ,src_element) TM2x_pop_write(dap ,&src_element ,byte_n_of(typeof(src_element)))
 
   // should make a version to pop off n elements .. in general I need to add array to array ops
   // the read always succeeds, but the pop might not
-  TM2x_F_PREFIX bool TM2x_pop_read(TM2x *dap ,void *dst_element_pt){
-    address_t element_byte_n = TM2x_element_byte_n(dap);
-    if(dst_element_pt) memcpyn(dst_element_pt, TM2x_element_n_pt(dap) ,element_byte_n);
+  TM2x_F_PREFIX bool TM2x_pop_read(TM2x *dap ,void *dst_element_pt ,address_t element_byte_n){
+    if(dst_element_pt) memcpyn(dst_element_pt, TM2x_element_n_pt(dap ,element_byte_n) ,element_byte_n);
 
     // we should never have partial elements, could make this a zero test..
     address_t before_byte_n = TM2x_byte_n(dap);
@@ -204,34 +204,37 @@
     if( after_allocation_n < before_allocation_n ) TM2x_resize(dap ,after_allocation_n);
     return true;
   }
+  #define TM2x_Pop_Read(dap ,dst_element) TM2x_pop_read(dap ,&dst_element ,byte_n_of(typeof(dst_element)))
+
   // need to add pop and throw away for n elements ...
-  TM2x_F_PREFIX bool TM2x_pop(TM2x *dap){
-    return TM2x_pop_read(dap, NULL);
+  TM2x_F_PREFIX bool TM2x_pop(TM2x *dap ,address_t element_byte_n){
+    return TM2x_pop_read(dap, NULL ,element_byte_n);
   }
+  #define TM2x_Pop(dap ,type) TM2x_pop(dap ,byte_n_of(type))
 
 //--------------------------------------------------------------------------------
 // indexing
 //
   // returns pointer to element at given index
-  TM2x_F_PREFIX void *TM2x_element_i_pt(TM2x *dap ,address_t index){
-    return TM2x_byte_0_pt(dap) + TM2x_element_byte_n(dap) * index + index;
+  TM2x_F_PREFIX void *TM2x_element_i_pt(TM2x *dap ,address_t index ,address_t element_byte_n){
+    return TM2x_byte_0_pt(dap) + element_byte_n * index + index;
   }
 
-  TM2x_F_PREFIX bool TM2x_read(TM2x *dap ,address_t index ,void *dst_element_pt){
-    void *src_element_pt = TM2x_element_i_pt(dap ,index);
-    if( src_element_pt > TM2x_element_n_pt(dap) ) return false;
-    memcpyn(dst_element_pt, src_element_pt, TM2x_element_byte_n(dap));
+  TM2x_F_PREFIX bool TM2x_read(TM2x *dap ,address_t index ,void *dst_element_pt ,address_t element_byte_n){
+    void *src_element_pt = TM2x_element_i_pt(dap ,index ,element_byte_n);
+    if( src_element_pt > TM2x_element_n_pt(dap ,element_byte_n) ) return false;
+    memcpyn(dst_element_pt, src_element_pt, element_byte_n);
     return true;
   }
-  #define TM2x_Read(dap ,index ,x) assert(TM2x_read ,index ,&x))
+  #define TM2x_Read(dap ,index ,x) TM2x_read(dap ,index ,&x ,byte_n_of(typeof(x)))
 
-  TM2x_F_PREFIX bool TM2x_write(TM2x *dap ,address_t index ,void *src_element_pt){
-    void *dst_element_pt = TM2x_element_i_pt(dap ,index);
-    if( dst_element_pt > TM2x_element_n_pt(dap) ) return false;
-    memcpyn(dst_element_pt, src_element_pt, TM2x_element_byte_n(dap));
+  TM2x_F_PREFIX bool TM2x_write(TM2x *dap ,address_t index ,void *src_element_pt ,address_t element_byte_n){
+    void *dst_element_pt = TM2x_element_i_pt(dap ,index ,element_byte_n);
+    if( dst_element_pt > TM2x_element_n_pt(dap ,element_byte_n) ) return false;
+    memcpyn(dst_element_pt, src_element_pt, element_byte_n);
     return true;
   }
-  #define TM2x_Write(dap ,index ,x) assert(TM2x_write ,index ,&x))
+  #define TM2x_Write(dap ,index ,x) TM2x_write(dap ,index ,&x ,byte_n_of(typeof(x)))
 
 
 #endif

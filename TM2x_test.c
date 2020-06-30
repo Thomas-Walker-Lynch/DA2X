@@ -11,21 +11,19 @@
 TM2x_Result test_0(){
   address_t malloc_cnt = TM2x_malloc_cnt;
   address_t outstanding_cnt = TM2x_outstanding_cnt;
-  bool f[7];
+  bool f[6];
   uint i = 0;
 
   TM2x_Result r ,*rp; rp = &r;
   TM2x_Result_init(rp);
 
-  TM2x a0 ,*a0p; a0p=&a0;
-  TM2x_init(a0p ,byte_n_of(int32_t) ,0);
+  TM2x_Make(a0p ,0 ,int32_t);
   int32_t j = -5;
   int32_t k;
 
-  f[i++] = TM2x_element_byte_n(a0p) == byte_n_of(int);
   f[i++] = TM2x_byte_n(a0p) == 3;
-  f[i++] = TM2x_write(a0p ,0 ,&j);
-  f[i++] = TM2x_read(a0p ,0 ,&k);
+  f[i++] = TM2x_Write(a0p ,0 ,j);
+  f[i++] = TM2x_Read(a0p ,0 ,k);
   f[i++] = k == -5;
 
   TM2x_data_dealloc(a0p);
@@ -45,8 +43,7 @@ TM2x_Result test_1(){
   bool f[11];
   uint i = 0;
 
-  TM2x a0 ,*a0p; a0p=&a0;
-  TM2x_init(a0p ,byte_n_of(int) ,0);
+  TM2x_Make(a0p ,0 ,int32_t);
 
   // push 1 ,2 ,3 ,4
   //

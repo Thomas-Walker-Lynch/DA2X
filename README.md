@@ -203,15 +203,28 @@ Hence the name, Tape Machine 2x.
   always checking for that case separately, i.e. using the array in an anomolous manner
   before using it as an array. Arguably then, the new approach is cleaner.
   
+## Removing the `element_byte_n` field from the dynamic array header
+
+  C compiler always knows how big the element is when it reads or writes an array.  Yet,
+  attotw, 2020-06-30T11:15:57Z, the dynamic arrays keeps an `element_byte_n` field.  This
+  is a convenience for development.  Rather than always having to pass the element size
+  into functions, it is there with the array pointers.  It was not clear when the code was
+  started that the C compiler might leave us in a situation where we could not get to the
+  element type.  Such a situation never came up.  Function calls are inlined so there is
+  no overhead passing it in, but it does add a word of memory to the dynamic array
+  headers.  Hence I am taking it out. I will add some macros to make it a little cleaner.
+
 
 ## Empty Array
 
-   Currently we hold an `element_byte_n` field that says how large elements in the array
-   are.  We allow that an element might be as big as the address space itself. If an
-   element were this large, and as the array must have at least one element, that would
-   mean that `base_pt` and `base_n` would have to be zero.  We could then use the case of
-   a maximum size element and a non-zero `base_pt` or `base_n` to enumerate status about
-   the array, such as it being empty.
+   We no longer keep `element_byte_n` as is redundant in C
+
+     Currently we hold an `element_byte_n` field that says how large elements in the array
+     are.  We allow that an element might be as big as the address space itself. If an
+     element were this large, and as the array must have at least one element, that would
+     mean that `base_pt` and `base_n` would have to be zero.  We could then use the case of
+     a maximum size element and a non-zero `base_pt` or `base_n` to enumerate status about
+     the array, such as it being empty.
    
    As another way to represent and empty array, note that the current array
    implementation, apart from some C library mods that would be needed, will happily base
