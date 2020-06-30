@@ -204,30 +204,20 @@ Hence the name, Tape Machine 2x.
   before using it as an array. Arguably then, the new approach is cleaner.
   
 
-## Cheats for Representing an Empty Array
+## Empty Array
 
-   We know from the theoretical analysis in TTCA that another bit is needed to represent
-   an empty array here.  However, there are a few options for 'cheats' by sacrificing
-   uneeded functionality.  Though any such option might be a gotchya in a special use
-   case.
-
-   The current array implementation, apart from some C library mods that would be needed,
-   will happily base an array at address 0.  Of coruse in C that would be a null pointer.
-   Hence base_pt == 0 could be used to represent an empty array rather than an array based
-   at address 0. If we have special hardware, swizzled pointers, or other scenarios, this 
-   could be a gotchya.
+   Currently we hold an `element_byte_n` field that says how large elements in the array
+   are.  We allow that an element might be as big as the address space itself. If an
+   element were this large, and as the array must have at least one element, that would
+   mean that `base_pt` and `base_n` would have to be zero.  We could then use the case of
+   a maximum size element and a non-zero `base_pt` or `base_n` to enumerate status about
+   the array, such as it being empty.
    
-   We could reduce the probability that this become a gotchya for someone by being more
-   specific.  We could say that a one byte array, based at address zero in memory, _and_
-   having a 1 byte element size - is actually an empty array.
-
-   We allow that an element might be as big as the address space itself.  Apparently that
-   would be the case where the entirty of a buffer is holding one element.  In most
-   applications that is not a very useful use case for an array.  Hence, instead of
-   supporting very large element sizes, we could instead use very large element sizes
-   to flag varous conditions, such as the array being empty.
+   As another way to represent and empty array, note that the current array
+   implementation, apart from some C library mods that would be needed, will happily base
+   an array at address 0. This could be useful for special hardware, when pointers are to
+   be swizzled, or other scenarios; however, general purpose computing in C uses address
+   zero as a null pointer.  Hence `base_pt == 0` could be used to flag an empty array.
    
-   Though, it might be easier to just have a dedicated, 'hey it is empty' flag kept by 
-   the programmer if he or she needs to keep track of empty dynamic arrays.
    
    
