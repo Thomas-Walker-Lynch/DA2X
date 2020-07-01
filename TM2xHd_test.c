@@ -10,40 +10,42 @@
 #include "TM2x_Result.h"
 
 typedef struct {
-  uint ref;
-  uint result;
-} TM2xHdContext;
+  uint ref; // reference value
+  uint result; // results of applying the function to the list
+} TM2xHdTestContext1;
 
+// checks for equivalence between item and reference value, then increments the referece value.
 void TM2xHd_f0(void *context ,void *item_pt){
   uint item = *(uint *)item_pt;
-  TM2xHdContext *cpt = context; 
+  TM2xHdTestContext1 *cpt = context; 
   cpt->result = cpt->result && (item == cpt->ref++);
 }
 
 TM2x_Result test_0(){
-  byte_length_t malloc_cnt = TM2x_malloc_cnt;
-  byte_length_t outstanding_cnt = TM2x_outstanding_cnt;
+  address_t malloc_cnt = TM2x_malloc_cnt;
+  address_t outstanding_cnt = TM2x_outstanding_cnt;
   bool f[3];
-  uint i = 0;
+  uint32_t i = 0;
 
   TM2x_Result r ,*rp; rp = &r;
   TM2x_Result_init(rp);
-  TM2x *a0p = TM2x_alloc(byte_length_of(int));
+  TM2x *a0 = TM2x_alloc(0 ,byte_n_of(uint32_t));
 
-  // make an array of data
-  uint j=10;
-  while(j < 100){
-    TM2x_push_write(a0p ,&j);    
-    ++j;
+  uint32_t j=10;
+  TM2x_Write(a0 ,0 ,j);
+  while( j < 99 ){
+    j++;
+    TM2x_Push_Write(a0 ,j);    
   }
+  
+  TM2xHdTestContext1 c_instance, *c; c = &c_instance;
+  c->ref = 10;
+  c->result = true;
+  TM2xHd_Mount(a0 ,hd);
+  TM2xHd_to_each(a0 ,hd ,c ,TM2xHd_f0 ,byte_n_of(uint32_t));
+  f[i++] = c->result; // should be true because f0 increments c->ref also starting from 10.
 
-  TM2xHdContext c;
-  c.ref = 10;
-  c.result = true;
-  TM2xHd_foreach(&c ,a0p ,TM2xHd_f0);
-  f[i++] = c.result;
-
-  TM2x_dealloc(a0p);
+  TM2x_dealloc(a0);
   f[i++] = malloc_cnt == TM2x_malloc_cnt;
   f[i++] = outstanding_cnt == TM2x_outstanding_cnt;
   TM2x_Result_tally(rp ,f ,i);
@@ -73,37 +75,42 @@ bool TM2xHd_p4(void *context ,void *item_pt){
 }
 
 TM2x_Result test_1(){
-  byte_length_t malloc_cnt = TM2x_malloc_cnt;
-  byte_length_t outstanding_cnt = TM2x_outstanding_cnt;
+  address_t malloc_cnt = TM2x_malloc_cnt;
+  address_t outstanding_cnt = TM2x_outstanding_cnt;
   bool f[7];
-  uint i = 0;
+  uint32_t i = 0;
 
   TM2x_Result r ,*rp; rp = &r;
   TM2x_Result_init(rp);
-  TM2x *a0p = TM2x_alloc(byte_length_of(int));
+  TM2x *a0 = TM2x_alloc(0 ,byte_n_of(uint32_t));
 
   // make an array of data
   uint j=100;
-  while(j < 356){
-    TM2x_push_write(a0p ,&j);    
+  TM2x_Write(a0 ,0 ,j);
+  while(j < 355){
     ++j;
+    TM2x_Push_Write(a0 ,j);    
   }
 
-  f[i++] = TM2xHd_all(NULL ,a0p ,TM2xHd_p0);
-  f[i++] = !TM2xHd_all(NULL ,a0p ,TM2xHd_p1);
-  f[i++] = TM2xHd_exists(NULL ,a0p ,TM2xHd_p3);
-  f[i++] = !TM2xHd_exists(NULL ,a0p ,TM2xHd_p4);
+  TM2xHd_Mount(a0 ,hd);
+  f[i++] = TM2xHd_all(a0 ,hd ,NULL ,TM2xHd_p0 ,byte_n_of(uint32_t));
+  TM2xHd_rewind(a0 ,hd);
+  f[i++] = !TM2xHd_all(a0 ,hd ,NULL ,TM2xHd_p1 ,byte_n_of(uint32_t));
+  TM2xHd_rewind(a0 ,hd);
+  f[i++] = TM2xHd_exists(a0 ,hd ,NULL ,TM2xHd_p3 ,byte_n_of(uint32_t));
+  TM2xHd_rewind(a0 ,hd);
+  f[i++] = !TM2xHd_exists(a0 ,hd ,NULL ,TM2xHd_p4 ,byte_n_of(uint32_t));
 
-  TM2xHd_Mount(a0p ,hd);
-  TM2xHd_find(NULL ,hd ,TM2xHd_p2);
-  uint t0 = TM2xHd_Read(hd ,uint);
-  f[i++] = TM2xHd_is_on_tape(hd) && t0 == 248;
+  TM2xHd_Mount(a0 ,hd1);
+  TM2xHd_exists(a0 ,hd1 ,NULL ,TM2xHd_p2 ,byte_n_of(uint32_t));
+  uint t0 = TM2xHd_Read_Expr(hd1 ,uint32_t);
+  f[i++] = TM2xHd_is_on_tape(a0 ,hd1) && t0 == 248;
   
-  TM2x_dealloc(a0p);
+  TM2x_dealloc(a0);
   f[i++] = malloc_cnt == TM2x_malloc_cnt;
   f[i++] = outstanding_cnt == TM2x_outstanding_cnt;
   TM2x_Result_tally(rp ,f ,i);
-  if( r.failed > 0 ) TM2x_Result_print(&r ,"test_0 ");
+  if( r.failed > 0 ) TM2x_Result_print(&r ,"test_1 ");
   return r;
 }
 

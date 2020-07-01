@@ -219,6 +219,7 @@
 
 //--------------------------------------------------------------------------------
 // indexing
+//   consider using the iterator TM2xHd.h instead of indexes
 //
   // returns pointer to element at given index
   TM2x_F_PREFIX void *TM2x_element_i_pt(TM2x *dap ,address_t index ,address_t element_byte_n){
