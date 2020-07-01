@@ -15,7 +15,7 @@ typedef struct {
 } TM2xHdTestContext1;
 
 // checks for equivalence between item and reference value, then increments the referece value.
-void TM2xHd_f0(void *context ,void *item_pt){
+void TM2xHd_f0(void *context ,void *item_pt ,address_t element_byte_n){
   uint item = *(uint *)item_pt;
   TM2xHdTestContext1 *cpt = context; 
   cpt->result = cpt->result && (item == cpt->ref++);
@@ -42,7 +42,7 @@ TM2x_Result test_0(){
   c->ref = 10;
   c->result = true;
   TM2xHd_Mount(a0 ,hd);
-  TM2xHd_to_each(a0 ,hd ,c ,TM2xHd_f0 ,byte_n_of(uint32_t));
+  TM2xHd_apply_to_each(a0 ,hd ,byte_n_of(uint32_t) ,c ,TM2xHd_f0);
   f[i++] = c->result; // should be true because f0 increments c->ref also starting from 10.
 
   TM2x_dealloc(a0);
@@ -53,23 +53,23 @@ TM2x_Result test_0(){
   return r;
 }
 
-bool TM2xHd_p0(void *context ,void *item_pt){
+bool TM2xHd_p0(void *context ,void *item_pt ,address_t element_byte_n){
   uint item = *(uint *)item_pt;
   return item >= 100 && item < 356;
 }
-bool TM2xHd_p1(void *context ,void *item_pt){
+bool TM2xHd_p1(void *context ,void *item_pt ,address_t element_byte_n){
   uint item = *(uint *)item_pt;
   return item >= 100 && item < 355;
 }
-bool TM2xHd_p2(void *context ,void *item_pt){
+bool TM2xHd_p2(void *context ,void *item_pt ,address_t element_byte_n){
   uint item = *(uint *)item_pt;
   return item == 248;
 }
-bool TM2xHd_p3(void *context ,void *item_pt){
+bool TM2xHd_p3(void *context ,void *item_pt ,address_t element_byte_n){
   uint item = *(uint *)item_pt;
   return item == 355;
 }
-bool TM2xHd_p4(void *context ,void *item_pt){
+bool TM2xHd_p4(void *context ,void *item_pt ,address_t element_byte_n){
   uint item = *(uint *)item_pt;
   return item == 356;
 }
@@ -93,16 +93,16 @@ TM2x_Result test_1(){
   }
 
   TM2xHd_Mount(a0 ,hd);
-  f[i++] = TM2xHd_all(a0 ,hd ,NULL ,TM2xHd_p0 ,byte_n_of(uint32_t));
+  f[i++] = TM2xHd_all(a0 ,hd ,byte_n_of(uint32_t) ,NULL ,TM2xHd_p0);
   TM2xHd_rewind(a0 ,hd);
-  f[i++] = !TM2xHd_all(a0 ,hd ,NULL ,TM2xHd_p1 ,byte_n_of(uint32_t));
+  f[i++] = !TM2xHd_all(a0 ,hd ,byte_n_of(uint32_t) ,NULL ,TM2xHd_p1);
   TM2xHd_rewind(a0 ,hd);
-  f[i++] = TM2xHd_exists(a0 ,hd ,NULL ,TM2xHd_p3 ,byte_n_of(uint32_t));
+  f[i++] = TM2xHd_exists(a0 ,hd ,byte_n_of(uint32_t) ,NULL ,TM2xHd_p3);
   TM2xHd_rewind(a0 ,hd);
-  f[i++] = !TM2xHd_exists(a0 ,hd ,NULL ,TM2xHd_p4 ,byte_n_of(uint32_t));
+  f[i++] = !TM2xHd_exists(a0 ,hd ,byte_n_of(uint32_t) ,NULL ,TM2xHd_p4);
 
   TM2xHd_Mount(a0 ,hd1);
-  TM2xHd_exists(a0 ,hd1 ,NULL ,TM2xHd_p2 ,byte_n_of(uint32_t));
+  TM2xHd_exists(a0 ,hd1 ,byte_n_of(uint32_t) ,NULL ,TM2xHd_p2);
   uint t0 = TM2xHd_Read_Expr(hd1 ,uint32_t);
   f[i++] = TM2xHd_is_on_tape(a0 ,hd1) && t0 == 248;
   

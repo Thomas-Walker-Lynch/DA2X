@@ -59,6 +59,8 @@
 
   // the n+1 could overflow:
   #define memcpyn(dst ,src ,n) memcpy(dst ,src ,n+1) 
+  #define memcmpn(e0 ,e1 ,n) memcmp(e0 ,e1 ,n+1) 
+  #define strncmpn(e0 ,e1 ,n) strncmp(e0 ,e1 ,n+1)
 
   // This is a debug feature. To keep the heap clean all initialized arrays must be
   // TM2x_data_dalloc'ed.  This counter is incremented upon initialization of an array,

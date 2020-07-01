@@ -8,6 +8,10 @@
 
 /*
   element_pt is always element aligned and pointing to the base of an element.
+
+  operand order:
+    context just before pred or function
+    element_byte_n  just after hd, and if not hd, just after tape
  
 */
 
@@ -44,14 +48,14 @@
     return hd->element_pt;
   }
 
-  TM2xHd_F_PREFIX void TM2xHd_read(TM2xHd *hd ,void *dst_pt ,address_t element_byte_n){
+  TM2xHd_F_PREFIX void TM2xHd_read(TM2xHd *hd ,address_t element_byte_n ,void *dst_pt){
     memcpyn(dst_pt, hd->element_pt, element_byte_n);
   }
-  #define TM2xHd_Read(hd ,item) TM2xHd_read(hd ,&item ,byte_no_of(type_of(item)))
+  #define TM2xHd_Read(hd ,item) TM2xHd_read(hd ,byte_no_of(type_of(item)) ,&item)
   #define TM2xHd_Read_Expr(hd ,type) *((type *)hd->element_pt)
 
-  TM2xHd_F_PREFIX void TM2xHd_write(TM2xHd *hd ,void *src_element_pt ,address_t element_byte_n){
-    memcpyn(hd->element_pt, src_element_pt, element_byte_n);
+  TM2xHd_F_PREFIX void TM2xHd_write(TM2xHd *hd ,address_t element_byte_n ,void *src_element_pt){
+    memcpyn(hd->element_pt ,src_element_pt ,element_byte_n);
   }
   #define TM2xHd_Write(hd ,item) *((typeof(item) *)hd->element_pt) = item
   #define TM2xHd_Write_Lval(hd ,item) *((typeof(item) *)hd->element_pt)
@@ -60,17 +64,30 @@
 //--------------------------------------------------------------------------------
 // quantifiers
 //
+  // shallow copy tape_src elements to the end of tape_acc
+  TM2xHd_F_PREFIX void TM2x_cat
+  (
+   TM2x *tape_acc
+   ,TM2x *tape_src
+   ,address_t element_byte_n
+   ){
+    TM2xHd_Mount(tape_src, hd_src);
+    do{
+      TM2x_push_write(tape_acc ,TM2xHd_pt(hd_src) ,element_byte_n);
+    }while( TM2xHd_step(tape_src ,hd_src ,element_byte_n) );
+  }
+
   // applies f to each element, in order starting at the current hd position, until reaching the end of the tape
-  TM2xHd_F_PREFIX void TM2xHd_to_each
+  TM2xHd_F_PREFIX void TM2xHd_apply_to_each
   (
    TM2x *tape
    ,TM2xHd *hd
-   ,void *context
-   ,void f(void *context ,void *el)
    ,address_t element_byte_n
+   ,void *context
+   ,void f(void *context ,void *el ,address_t element_byte_n)
    ){
     do{
-      f(context ,TM2xHd_pt(hd));
+      f(context ,TM2xHd_pt(hd) ,element_byte_n);
     }while( TM2xHd_step(tape ,hd ,element_byte_n) );
   }
 
@@ -79,12 +96,12 @@
   (
    TM2x *tape
    ,TM2xHd *hd
-   ,void *context
-   ,bool pred(void *context ,void *el)
    ,address_t element_byte_n
+   ,void *context
+   ,bool pred(void *context ,void *el ,address_t element_byte_n)
    ){
     do{
-      if( !pred(context ,TM2xHd_pt(hd)) ) return false;
+      if( !pred(context ,TM2xHd_pt(hd) ,element_byte_n) ) return false;
     }while( TM2xHd_step(tape ,hd ,element_byte_n) );
     return true;
   }
@@ -93,76 +110,103 @@
   (
    TM2x *tape
    ,TM2xHd *hd
-   ,void *context
-   ,bool pred(void *context ,void *el)
    ,address_t element_byte_n
+   ,void *context
+   ,bool pred(void *context ,void *el ,address_t element_byte_n)
    ){
     do{
-      if( pred(context ,TM2xHd_pt(hd)) ) return true;
+      if( pred(context ,TM2xHd_pt(hd) ,element_byte_n) ) return true;
     }while( TM2xHd_step(tape ,hd ,element_byte_n) );
     return false;
   }
 
-#if 0
-
-
 //--------------------------------------------------------------------------------
 // set
 //
-  // Adds a constraint on to a dynamic array. Typically this is to say that
-  // the elements in the array will satistfy the constraint.
-  typdef struct{
-    char *tape;
-    ,bool pred(void *el, void *context)
-  }TM2x_contstrained_da;
-
-
-
-
   // push_write src_elmeent on array if pred not exists over tape
   // when pred is a comparison can be used to force order
   // when pred is equality can be used to get set behavior
-  TM2xHd_F_PREFIX bool TM2xHd_push_write_unique
+  TM2xHd_F_PREFIX bool TM2xHd_push_write_if
   (
-   void *src_element_pt 
-   TM2x_constrained_da qd
+   TM2x *tape_dst
+   ,void *src_element_pt 
+   ,address_t element_byte_n
+   ,void *context
+   ,bool pred(void *context ,void *el ,address_t element_byte_n)
    ){
-    TM2x_sized_el elb;
-    elb.elpt = src_element_pt;
-    elb.byte_length = TM2x_element_byte_length(qd.tape);
-    if( !TM2xHd_exists(tape ,qd.pred ,&elb) ) TM2x_push_write(qd.tape ,src_element_pt);
+    TM2xHd_Mount(tape_dst ,hd);
+    if( !TM2xHd_exists(tape_dst ,hd ,element_byte_n ,context ,pred) ){
+      TM2x_push_write(tape_dst ,src_element_pt ,element_byte_n);
+      return true;
+    }
+    return false;
   }
 
-  TM2xHd_F_PREFIX bool TM2xHd_push_accumulate_unique
-  (TM2x *acc_tape 
-   ,TM2x *src_tape 
-   ,bool pred(void *context ,void *el)
+
+  // -accumulates copies of elements from set_src into set_acc
+  // -returns whether the set_src was a subset of set_acc before the union
+  // -context given to the pred is a pointer to the src element
+  TM2xHd_F_PREFIX bool TM2xHd_accumulate_union
+  (
+   TM2x *set_acc
+   ,TM2x *set_src
+   ,address_t element_byte_n
+   ,bool pred(void *context ,void *el ,address_t element_byte_n)
    ){
-    TM2x_qualified_da qd = {acc_dep ,pred};
-    TM2xHd_foreach(src_tape ,TM2xHd_push_write_unique ,
+    bool subset = true;
+    TM2xHd_Mount(set_acc ,hd_acc);
+    TM2xHd_Mount(set_src ,hd_src);
+    do{
+      void *src_element_pt = TM2xHd_pt(hd_src);
+      if( !TM2xHd_exists(set_acc ,hd_acc ,element_byte_n ,src_element_pt ,pred) ){
+        TM2x_push_write(set_acc ,src_element_pt ,element_byte_n);      
+        subset = false;
+      }
+      TM2xHd_rewind(set_acc ,hd_acc);
+    }while( TM2xHd_step(set_src ,hd_src ,element_byte_n) );
+    return subset;
+  }
+
+  // -pushes the itnerection of set a and b onto set_acc
+  // -returns whether the sets were found to be distinct
+  // -context given to the pred is a_element, the src element is the b_element
+  TM2xHd_F_PREFIX bool TM2xHd_intersection
+  (
+   TM2x *set_acc
+   ,TM2x *set_a
+   ,TM2x *set_b
+   ,address_t element_byte_n
+   ,bool pred(void *context ,void *el ,address_t element_byte_n)
+   ){
+    bool distinct = true;
+    TM2xHd_Mount(set_a ,hd_a);
+    TM2xHd_Mount(set_b ,hd_b);
+    do{
+      void *a_element_pt = TM2xHd_pt(hd_a);
+      if( TM2xHd_exists(set_b ,hd_b ,element_byte_n ,a_element_pt ,pred) ){
+        TM2x_push_write(set_acc ,a_element_pt ,element_byte_n);      
+        distinct = false;
+      }
+      TM2xHd_rewind(set_b ,hd_b);
+    }while( TM2xHd_step(set_a ,hd_a ,element_byte_n) );
+    return distinct;
   }
 
 //--------------------------------------------------------------------------------
 // some useful predicates
 //
-  typedef struct{
-    char *elpt;
-    size_t byte_length;
-  }TM2x_sized_el;
-
-  TM2xHd_F_PREFIX bool TM2xHd_pred_bytes_eq(void *context ,void *e0){
-    char *opa_pt = e0;
-    TM2x_sized_el *opb_pt = context;
-    return memcmp(opa_pt ,opb_pt->elpt ,opb_pt->byte_length) == 0;
+  TM2xHd_F_PREFIX bool TM2xHd_pred_bytes_eq(void *context ,void *a_e0 ,address_t element_byte_n){
+    char *e0 = a_e0;
+    char *e1 = context;
+    return memcmpn(e0 ,e1 ,element_byte_n) == 0;
   }
-  TM2xHd_F_PREFIX bool TM2xHd_pred_cstring_eq(void *context ,void *cs0){
-    char *opa_pt = cs0;
-    TM2x_sized_el *opb_pt = context;
-    return strncmp(opa_pt ,opb_pt->elpt ,opb_pt->byte_length) == 0;
+  TM2xHd_F_PREFIX bool TM2xHd_pred_cstring_eq(void *context ,void *a_e0 ,address_t element_byte_n){
+    char *e0 = a_e0;
+    char *e1 = context;
+    return strncmpn(e0 ,e1 ,element_byte_n) == 0;
   }
 
-
-
+#if 0
 //--------------------------------------------------------------------------------
 // utilities
 //
