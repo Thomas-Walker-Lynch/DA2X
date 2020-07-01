@@ -142,7 +142,6 @@
     return false;
   }
 
-
   // -accumulates copies of elements from set_src into set_acc
   // -returns whether the set_src was a subset of set_acc before the union
   // -context given to the pred is a pointer to the src element
@@ -167,12 +166,12 @@
     return subset;
   }
 
-  // -pushes the itnerection of set a and b onto set_acc
+  // -pushes the intersection of set a and b onto array_acc, if array_acc is initially empty, it will be the intersection.
   // -returns whether the sets were found to be distinct
   // -context given to the pred is a_element, the src element is the b_element
   TM2xHd_F_PREFIX bool TM2xHd_intersection
   (
-   TM2x *set_acc
+   TM2x *array_acc
    ,TM2x *set_a
    ,TM2x *set_b
    ,address_t element_byte_n
@@ -184,7 +183,7 @@
     do{
       void *a_element_pt = TM2xHd_pt(hd_a);
       if( TM2xHd_exists(set_b ,hd_b ,element_byte_n ,a_element_pt ,pred) ){
-        TM2x_push_write(set_acc ,a_element_pt ,element_byte_n);      
+        TM2x_push_write(array_acc ,a_element_pt ,element_byte_n);      
         distinct = false;
       }
       TM2xHd_rewind(set_b ,hd_b);
@@ -206,29 +205,24 @@
     return strncmpn(e0 ,e1 ,element_byte_n) == 0;
   }
 
-#if 0
 //--------------------------------------------------------------------------------
-// utilities
+// some utility functions typically be used with apply_to_each
 //
-  // elements are integers
-  TM2xHd_F_PREFIX void TM2xHd_f_print_int(void *element_pt, void *sep){
-    fprintf(stderr ,"%s%d" ,(char *)sep ,*(int *)element_pt);
+  // each element is a pointer to dynamic memory, and that memory is to be freed:
+  TM2xHd_F_PREFIX void TM2xHd_f_free(void *context ,void *element_pt ,address_t element_byte_n){
+    free(element_pt);
+  }
+
+  // elements are integers to be printed
+  // could improve this by getting the integer size from element_byte_n
+  TM2xHd_F_PREFIX void TM2xHd_f_print_int(void *context ,void *element_pt ,address_t element_byte_n){
+    fprintf(stderr ,"%s%d" ,(char *)context ,*(int *)element_pt);
   }
 
   // elements are char *
-  TM2xHd_F_PREFIX void TM2xHd_f_print_string(void *element_pt, void *sep){
-    fprintf(stderr ,"%s%s" ,(char *)sep ,(char *)element_pt);
-  }
-
-  // each element is a pointer to dynamic memory, and that memory is to be freed:
-  TM2xHd_F_PREFIX void TM2xHd_f_free(void *context ,void *item_pt){
-    free(item_pt);
-  }
-
-  TM2xHd_F_PREFIX void TM2xHd_f_string_eq(void *element_pt, void *sep){
-    fprintf(stderr ,"%s%s" ,(char *)sep ,(char *)element_pt);
+  TM2xHd_F_PREFIX void TM2xHd_f_print_cstring(void *context ,void *element_pt ,address_t element_byte_n){
+    fprintf(stderr ,"%s%s" ,(char *)context ,(char *)element_pt);
   }
 
 
-#endif
 #endif

@@ -114,12 +114,43 @@ TM2x_Result test_1(){
   return r;
 }
 
+TM2x_Result test_2(){
+  address_t malloc_cnt = TM2x_malloc_cnt;
+  address_t outstanding_cnt = TM2x_outstanding_cnt;
+  TM2x_Result r ,*rp; rp = &r;
+  TM2x_Result_init(rp);
+  bool f[7];
+  uint32_t i = 0;
+
+  TM2x *a0 = TM2x_alloc(0 ,byte_n_of(uint32_t));
+  uint j=100;
+  TM2x_Write(a0 ,0 ,j);
+  while(j < 110){
+    ++j;
+    TM2x_Push_Write(a0 ,j);    
+  }
+
+  // prints: 
+  TM2xHd_Mount(a0 ,hd);
+  TM2xHd_apply_to_each(a0 ,hd ,byte_n_of(uint32_t) ," " ,TM2xHd_f_print_int);
+  fputc('\n' ,stderr);
+
+
+  TM2x_dealloc(a0);
+  f[i++] = malloc_cnt == TM2x_malloc_cnt;
+  f[i++] = outstanding_cnt == TM2x_outstanding_cnt;
+  TM2x_Result_tally(rp ,f ,i);
+  if( r.failed > 0 ) TM2x_Result_print(&r ,"test_1 ");
+  return r;
+}
+
 int main(){
   TM2x_Result r ,acc ,*accp; accp=&acc;
   TM2x_Result_init(accp);
 
   r = test_0(); TM2x_Result_accumulate(accp ,&r);
   r = test_1(); TM2x_Result_accumulate(accp ,&r);
+  r = test_2(); TM2x_Result_accumulate(accp ,&r);
 
   TM2x_Result_print(accp ,"TM2xHd_test results: ");
   return acc.failed;
