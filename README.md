@@ -2,9 +2,9 @@
 
 This is a dynamic array for C, along with an iterator.  The 2x refers to
 the feature that the allocation is doubled each time the array expands.
-
-This is a version of the expanding tape as described in the tm library also in this repo.
 Hence the name, Tape Machine 2x.
+
+This array is kind of expanding tape as described in the tm library.
 
 ## Fundamentals
 
@@ -205,32 +205,56 @@ Hence the name, Tape Machine 2x.
   
 ## Removing the `element_byte_n` field from the dynamic array header
 
-  C compiler always knows how big the element is when it reads or writes an array.  Yet,
   attotw, 2020-06-30T11:15:57Z, the dynamic arrays keeps an `element_byte_n` field.  This
-  is a convenience for development.  Rather than always having to pass the element size
-  into functions, it is there with the array pointers.  It was not clear when the code was
-  started that the C compiler might leave us in a situation where we could not get to the
-  element type.  Such a situation never came up.  Function calls are inlined so there is
-  no overhead passing it in, but it does add a word of memory to the dynamic array
-  headers.  Hence I am taking it out. I will add some macros to make it a little cleaner.
+  field is convenient for development.  
+  
+  The C compiler always knows how big the element is when it reads or writes an array. The 
+  problem comes when we pass an element address through a void pointer. Within such a 
+  function we have no way to call '`sizeof`' (or '`byte_n_of`') when calling memcpy or
+  other routines than need to know how many bytes are in an element.  We are left with 
+  two choices, one is to pass the element size into all functions on the dynamic array
+  that might need it, or to add the element size to the array header struct.
+
+  Function calls are inlined so there is no overhead passing in `element_byte_n`.  In
+  contrast keeping `element_byte_n` in the array header costs another word of memory for
+  each header.  There are also optimization issues.  The compiler might be confused by the
+  same information, which is a constant at run time, being held in two places.
+  Furthermore the optimizer is unlikely to reduce the size of the struct and use the
+  sizeof information it already has.
+  
+  Hence I have modified the code to pass `element_byte_n` (the size of the elements) though
+  the interface.
+  
+## Empty arrays
+
+  Often times dynamic arrays are used as stacks.  Code that pushes an element on to a stack
+  typically does not consider and empty stack to be a special case.  But the way the code
+  is attotw, the first element must be written to the stack base, then further elements
+  may be pushed, so push code has to treat an nearly initialized stack differently.
+  
+  Actually, if the array could be empty, the special code for treating the empty case does not
+  go away, rather it just moves to the other side of the dynamic array interface.  Moving
+  it into the library code would be better because then the programmer does not have to spin
+  it fresh each time he or she uses the array.
+  
+  In this array implementation we do not use inclusive arithmetic with no overflows, and
+  we allow that all memory, including address 0, can be addressed. Hence, should we follow
+  these constraints, we do not have address 0 to use as a NULL valued flag.  I am sorely
+  tempted to use `base_pt == NULL` to indicate the array is empty, but so much work has
+  been put into the inclusive arithmetic I will not do this now.
+
+  There is another thing we can do to flag special cases. Note that if an array takes up
+  the whole of memory, then it must be based at `memory_byte_0`. This is because we do not
+  wrap the array around the buffer, and we do not wrap around the buffer because we did
+  not specify an overflow behavior for the arithmetic. Hence, we could enumerate special
+  states for the array, including that it is empty, by setting `byte_n` in the header
+  struct to `memory_byte_n` and then enumerate alternative states using a non-zero `base_pt`
+  value.  However, if we do this, then our code will not be able later implement an array with
+  wrap around.  Wrap around is probbly would not work for other reasons also.
+  
+  As this is the first version, just to keep things simple, I will add an empty flag. It will
+  make for clean code.
 
 
-## Empty Array
-
-   We no longer keep `element_byte_n` as is redundant in C
-
-     Currently we hold an `element_byte_n` field that says how large elements in the array
-     are.  We allow that an element might be as big as the address space itself. If an
-     element were this large, and as the array must have at least one element, that would
-     mean that `base_pt` and `base_n` would have to be zero.  We could then use the case of
-     a maximum size element and a non-zero `base_pt` or `base_n` to enumerate status about
-     the array, such as it being empty.
-   
-   As another way to represent and empty array, note that the current array
-   implementation, apart from some C library mods that would be needed, will happily base
-   an array at address 0. This could be useful for special hardware, when pointers are to
-   be swizzled, or other scenarios; however, general purpose computing in C uses address
-   zero as a null pointer.  Hence `base_pt == 0` could be used to flag an empty array.
-   
    
    
