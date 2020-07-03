@@ -8,21 +8,21 @@ code examples are at the bottom
   If we implement arrays that can be empty, the special code for treating the empty case
   does not go away, rather it just moves to the other side of the interface, i.e. into our
   library functions.  Moving this end case code into the library functions would have the
-  advantages of taking it out of the application programmer's hands, and it would only
-  have to be put in one place instead of every place the libraries are used.  However, on
-  the other hand, the end case code would run for every affected function call even when
-  it is not needed.  The empty tests would run redundantly, and when there are multiple
-  arrays or objects that are written to in parallel, that same redundent code would run
-  independently for each of them while resolving the same one essential question about
-  emptyness.  All of that happens even when the emptiness question has already been
+  advantages of taking it out of the application programmer's hands, and such code would
+  only have to be put in one place instead of every place the libraries are used.
+  However, on the other hand, the end case code would run for every affected function call
+  even when it is not needed.  The empty tests would run redundantly, and when there are
+  multiple arrays or objects that are written to in parallel, that same redundent code
+  would run independently for each of them while resolving the same one essential question
+  about emptyness.  All of that happens even when the emptiness question has already been
   resolved via some external knowledge about the problem. Perhaps the compiler optimizer
   can help with this situation because our library functions are called inline.
 
-  Given the code is as it is, attotw, when a dynamic array is used as a stack, the first
+  Given the code as it is attotw when a dynamic array is used as a stack, the first
   element must be written to the base using a plain write.  The space was already
-  allocated and is waiting. Only after the first write may further elements be
-  pushed. So an programmer's push code has to treat 'a just initialized' stack
-  differently.  Treating a just initialized array differently is typically not difficult
+  allocated and is waiting. Only after the first write may further elements be pushed. So
+  a programmer's code making use of stack pushes must treat 'a just initialized' stack
+  differently.  Treating a just initialized stack differently is typically not difficult
   when the array is declared and used in the same scope.  The problem comes with function
   calls.
   
@@ -30,20 +30,23 @@ code examples are at the bottom
   memory alloction static/heap implications and affects argument passing.  In particular,
   C static allocations for return data must be created by the caller, and can not be
   created inside of a called function (because its stack frame will be popped upon
-  return).  Thus, the empty==nonexists model can only work with library functions that
-  create arrays when we allocate those arrays on the heap.
+  return).  However, functions can create new dynamic array on the heap and returns a
+  pointer to it.
 
     Consider the case of functions returning result arrays. Consider the `TM2xHd_intersection`
     function (below).  It accepts three arrays, two as source operands, one as the
     result. These might be statically allocated, but right now if we do so, the array to
-    serve as accumulator must already have one value on it.  Instead the result array should
+    serve as accumulator must already have one value in it.  Instead the result array should
     be created within the function, but a C function can not create static data in the
     caller.  If we statically allocate the header struct, but do not finish the initialization
     and put an element in it, the called function, here TM2xHd_intersection will have to
     be able to tell the difference between an array passed in which it must call `TM2x_init`
     on, and one which it can immediately use.  I.e. there must be an 'empty flag'.
-    This sor of thing was also a problem in C++ for years until a constructor was invented for
+    This sort of thing was also a problem in C++ for years until a constructor was invented for
     lvalues. It has not been a problem in LISP because all objects are dyanamically allocated.
+
+    I have replaced `TM2xHd_intersection` with `TM2xHd_init_intersection` which always initializes
+    the result array before using it.  This function is now an 'initializer'.
 
   The static model is already partially broken for our dynamic arrays, because, unlike
   C++, there is no destructor call when leaving scope, so the programmer already has to
@@ -55,7 +58,9 @@ code examples are at the bottom
   So it appears that I have two options. Either put the dynamic arrays header struct on the
   heap, or embed an empty flag with the header structs.  In the later case called functions
   could see that an array is empty and then treat it differently, or the end case code should
-  be moved into the library.
+  be moved into the library. No actually there is a third option, and that is to have initializer
+  calls for functions that initialize data.  The programmer must then pick the correct routine
+  for the situation.
 
 ## Empty Flag
 
@@ -68,16 +73,14 @@ code examples are at the bottom
   a NULL valued flag.
 
   There is another thing we can do to flag special cases. Note that if an array takes up
-  the whole of memory, then it must be based at `memory_byte_0`. This is because we do not
-  wrap the array around the buffer, and we do not wrap around the buffer because we did
-  not specify an overflow behavior for the arithmetic. Hence, we could enumerate special
-  states for the array, including that it is empty, by setting `byte_n` in the header
-  struct to `memory_byte_n` and then enumerate alternative states using a non-zero `base_pt`
-  value.  However, if we do this, then our code will not be able later implement an array with
-  wrap around.  Wrap around is probbly would not work for other reasons also.
-  
-  A alternative that leads to clean code is to keep things simple and add an empty flag to
-  the header struct.
+  the whole of memory, then it must be based at `memory_byte_0`. Hence, we could enumerate
+  special states for the array, including that it is empty, by setting `byte_n` in the
+  header struct to `memory_byte_n` and then enumerate alternative states using a non-zero
+  `base_pt` values. 
+
+  However, this approach to an empty flag only works when we assume that memory is finite,
+  and that the address space does not wrap. With our continuing number types and the 'expanding'
+  tape of the TTCA, the memory bound as a constant goes away.
 
   Here is hybrid approach that would work with compiler optimization: On interface
   routines that might need to know about emptiness, pass the empty flag in. As these are

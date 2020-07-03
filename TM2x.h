@@ -75,10 +75,13 @@
     char *base_pt;
     address_t byte_n;
   } TM2x;
+  // da becomes a pointer to a static allocation of a TM2x struct
+  #define TM2x_Alloc_Static(da) TM2x TM2x_ ## da ,*da; da = &TM2x_ ## da;
 
 //--------------------------------------------------------------------------------
 // alloc/init/dealloc
 //
+
   // change unit of measure
   TM2x_F_PREFIX address_t TM2x_mulns(address_t a_n , address_t b_n){
     return a_n * b_n + a_n + b_n;
@@ -87,24 +90,26 @@
   // Need to add limit checks because an init sized array might fail to fit in memory.
   // element_n is the maximum index for the initial data array
   // returns true when initialization succeeds
-  TM2x_F_PREFIX bool __TM2x_init(TM2x *tape ,address_t byte_n ){
+  TM2x_F_PREFIX bool __TM2x_format(TM2x *tape ,address_t byte_n ){
     TM2x_initialized_cnt++; // to assist with debugging
     tape->byte_n = byte_n;
     address_t allocation_byte_n = binary_interval_inclusive_upper_bound(byte_n);
     tape->base_pt = mallocn(allocation_byte_n);
     return true;
   }
-  TM2x_F_PREFIX bool TM2x_init(TM2x *tape ,address_t element_n, address_t element_byte_n ){
+  TM2x_F_PREFIX bool TM2x_format(TM2x *tape ,address_t element_n, address_t element_byte_n ){
     address_t byte_n = TM2x_mulns(element_byte_n ,element_n);
-    return __TM2x_init(tape ,byte_n );
+    return __TM2x_format(tape ,byte_n );
   }
-  #define TM2x_Make(da ,element_n ,type) TM2x TM2x_ ## da ,*da; da = &TM2x_ ## da; assert(TM2x_init(da ,element_n ,byte_n_of(type)));
+  // makes a pointer to 
+  #define TM2x_Make(da ,element_n ,type) TM2x_Alloc_Static(da); assert(TM2x_format(da ,element_n ,byte_n_of(type)));
 
   TM2x_F_PREFIX bool TM2x_init_write(TM2x *tape ,void *element_pt, address_t element_byte_n ){
-    TM2x_init(tape ,0 ,element_byte_n );
+    TM2x_format(tape ,0 ,element_byte_n );
     memcpyn(tape->base_pt, element_pt, element_byte_n);
     return true;
   }
+  #define TM2x_Make_Write(da ,item) TM2x_Alloc_Static(da); assert(TM2x_init_write(da ,&item ,byte_n_of(typeof(item))));
 
   // tape_new is a raw TM2x struct
   // shallow copy tape_src elements to tape_new
@@ -116,13 +121,13 @@
    ,address_t element_byte_n
    ){
     address_t byte_n = tape_src->byte_n;
-    bool alloc_success = __TM2x_init(tape ,byte_n);
+    bool alloc_success = __TM2x_format(tape ,byte_n);
     if( alloc_success ) memcpyn(tape->base_pt ,tape_src->base_pt ,byte_n);
     return alloc_success;
   }
 
   // after data_deallocation, the TM2x may be re-initialized and used again
-  TM2x_F_PREFIX void TM2x_data_dealloc(TM2x *tape){
+  TM2x_F_PREFIX void TM2x_dealloc_static(TM2x *tape){
     free(tape->base_pt);
     TM2x_initialized_cnt--;
   }
@@ -132,13 +137,13 @@
   }
 
   // for dynammic allocation of TM2xs:
-  TM2x_F_PREFIX TM2x *TM2x_alloc(address_t element_n ,address_t element_byte_n){
+  TM2x_F_PREFIX TM2x *TM2x_alloc_heap(address_t element_n ,address_t element_byte_n){
     TM2x *tape = mallocn(byte_n_of(TM2x));
-    assert(TM2x_init(tape ,element_n, element_byte_n));
+    assert(TM2x_format(tape ,element_n, element_byte_n));
     return tape;
   }
-  TM2x_F_PREFIX void TM2x_dealloc(TM2x *tape){
-    TM2x_data_dealloc(tape);
+  TM2x_F_PREFIX void TM2x_dealloc_heap(TM2x *tape){
+    TM2x_dealloc_static(tape);
     free(tape);
   }
 

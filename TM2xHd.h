@@ -28,7 +28,7 @@
     char *element_pt;
   } TM2xHd;
 
-  #define TM2xHd_Mount(tape ,hd) TM2xHd TM2xHd_ ## hd ,*hd; hd = &TM2xHd_ ## hd; TM2xHd_rewind(tape ,hd);
+  #define TM2xHd_Make(tape ,hd) TM2xHd TM2xHd_ ## hd ,*hd; hd = &TM2xHd_ ## hd; TM2xHd_rewind(tape ,hd);
 
   TM2xHd_F_PREFIX bool TM2xHd_is_on_tape(TM2x *tape ,TM2xHd *hd){
     return hd->element_pt <= TM2x_byte_n_pt(tape) && hd->element_pt >= TM2x_byte_0_pt(tape);
@@ -73,7 +73,7 @@
    ,TM2x *tape_src
    ,address_t element_byte_n
    ){
-    TM2xHd_Mount(tape_src, hd_src);
+    TM2xHd_Make(tape_src, hd_src);
     do{
       TM2x_push_write(tape_acc ,TM2xHd_pt(hd_src) ,element_byte_n);
     }while( TM2xHd_step(tape_src ,hd_src ,element_byte_n) );
@@ -128,21 +128,21 @@
   // push_write src_elmeent on array if pred not exists over tape
   // when pred is a comparison can be used to force order
   // when pred is equality can be used for set behavior
-  TM2xHd_F_PREFIX bool TM2xHd_push_write_if
+  TM2xHd_F_PREFIX bool TM2xHd_push_write_not_exists
   (
    TM2x *tape_dst
    ,void *src_element_pt 
    ,address_t element_byte_n
-   ,void *context
    ,bool pred(void *context ,void *el ,address_t element_byte_n)
    ){
-    TM2xHd_Mount(tape_dst ,hd);
-    if( !TM2xHd_exists(tape_dst ,hd ,element_byte_n ,context ,pred) ){
+    TM2xHd_Make(tape_dst ,hd);
+    if( !TM2xHd_exists(tape_dst ,hd ,element_byte_n ,src_element_pt ,pred) ){
       TM2x_push_write(tape_dst ,src_element_pt ,element_byte_n);
       return true;
     }
     return false;
   }
+  #define TM2xHd_Push_Write_Not_Exists(tape_dst ,item ,pred) TM2xHd_push_write_not_exists(tape_dst ,item ,byte_n_of(type_of(item)) ,pred)
 
   // -accumulates copies of elements from set_src into set_acc
   // -returns whether the set_src was a subset of set_acc before the union
@@ -155,12 +155,11 @@
    ,bool pred(void *context ,void *el ,address_t element_byte_n)
    ){
     bool subset = true;
-    TM2xHd_Mount(set_acc ,hd_acc);
-    TM2xHd_Mount(set_src ,hd_src);
+    TM2xHd_Make(set_acc ,hd_acc);
+    TM2xHd_Make(set_src ,hd_src);
     do{
       void *src_element_pt = TM2xHd_pt(hd_src);
-      if( !TM2xHd_exists(set_acc ,hd_acc ,element_byte_n ,src_element_pt ,pred) ){
-        TM2x_push_write(set_acc ,src_element_pt ,element_byte_n);      
+      if( TM2xHd_push_write_not_exists(set_acc ,src_element_pt ,element_byte_n ,pred) ){
         subset = false;
       }
       TM2xHd_rewind(set_acc ,hd_acc);
@@ -179,28 +178,22 @@
    ,address_t element_byte_n
    ,bool pred(void *context ,void *el ,address_t element_byte_n)
    ){
-    TM2xHd_Mount(set_a ,hd_a);
-    TM2xHd_Mount(set_b ,hd_b);
-    bool found_first = false;
-    // search for first, nested extension
+    TM2xHd_Make(set_a ,hd_a);
+    TM2xHd_Make(set_b ,hd_b);
+    // look for first
     do{
-      void *a_element_pt = TM2xHd_pt(hd_a);
-      found_first = TM2xHd_exists(set_b ,hd_b ,element_byte_n ,a_element_pt ,pred);
-      if( found_first ){
-        TM2x_init_write(set_c ,a_element_pt ,element_byte_n);      
-        // extend
-        while(TM2xHd_step(set_a ,hd_a ,element_byte_n)){
-          if(TM2xHd_exists(set_b ,hd_b ,element_byte_n ,a_element_pt ,pred)){
-            TM2x_push_write(set_c ,a_element_pt ,element_byte_n);      
-          }
-        }
-        break;
-      }
-      if( !TM2xHd_step(set_a ,hd_a ,element_byte_n) )
-        break;
+      if( TM2xHd_exists(set_b ,hd_b ,element_byte_n ,TM2xHd_pt(hd_a) ,pred) ) break; // found first
+      if( !TM2xHd_step(set_a ,hd_a ,element_byte_n) ) return false; // never found first
       TM2xHd_rewind(set_b ,hd_b);
     }while(true);
-    return found_first;
+    TM2x_init_write(set_c ,TM2xHd_pt(hd_a) ,element_byte_n);           
+    //extend
+    while(TM2xHd_step(set_a ,hd_a ,element_byte_n)){
+      TM2xHd_rewind(set_b ,hd_b);
+      if(TM2xHd_exists(set_b ,hd_b ,element_byte_n ,TM2xHd_pt(hd_a) ,pred)){
+        TM2x_push_write(set_c ,TM2xHd_pt(hd_a) ,element_byte_n);      
+      }}
+    return true;
   }
 
 //--------------------------------------------------------------------------------

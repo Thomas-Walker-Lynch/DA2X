@@ -29,7 +29,7 @@ TM2x_Result test_0(){
   f[i++] = TM2x_Read(a0p ,0 ,k);
   f[i++] = k == -5;
 
-  TM2x_data_dealloc(a0p);
+  TM2x_dealloc_static(a0p);
   f[i++] = malloc_cnt == TM2x_malloc_cnt;
   f[i++] = initialized_cnt == TM2x_initialized_cnt;
   TM2x_Result_tally(rp ,f ,i);
@@ -47,7 +47,7 @@ TM2x_Result test_1(){
   uint i = 0;
 
   TM2x a0,*a0p; a0p = &a0;
-  f[i++] = TM2x_init(a0p ,1 ,byte_n_of(int32_t));
+  f[i++] = TM2x_format(a0p ,1 ,byte_n_of(int32_t));
   f[i++] = a0p->byte_n == 7;
   f[i++] = TM2x_Push_Alloc(a0p ,1 ,int32_t);
   f[i++] = a0p->byte_n == 15;
@@ -74,7 +74,7 @@ TM2x_Result test_1(){
     f[i++] = !TM2x_Pop_Read(a0p ,y) && y == 1;
     f[i++] = a0p->byte_n == 3;
 
-  TM2x_data_dealloc(a0p);
+  TM2x_dealloc_static(a0p);
   f[i++] =  malloc_cnt == TM2x_malloc_cnt;
   f[i++] = initialized_cnt == TM2x_initialized_cnt;
   TM2x_Result_tally(rp ,f ,i);
@@ -129,7 +129,7 @@ TM2x_Result test_2(){
   f[i++] = y == 1;  
   f[i++] = TM2x_test_after_allocation_n == 3;
 
-  TM2x_data_dealloc(a0);
+  TM2x_dealloc_static(a0);
   f[i++] = malloc_cnt == TM2x_malloc_cnt;
   f[i++] = initialized_cnt == TM2x_initialized_cnt;
   // printf("test_2 'i': %u" ,i);

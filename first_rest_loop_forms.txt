@@ -19,6 +19,8 @@ this comes from TM2xHd_init_intersection
 
     // extend
     while(TM2xHd_step(set_a ,hd_a ,element_byte_n)){
+      a_element_pt = TM2xHd_pt(hd_a);
+      TM2xHd_rewind(set_b ,hd_b);
       if(TM2xHd_exists(set_b ,hd_b ,element_byte_n ,a_element_pt ,pred)){
         TM2x_push_write(set_c ,a_element_pt ,element_byte_n);      
       }
@@ -27,7 +29,7 @@ this comes from TM2xHd_init_intersection
 
 // process first then a nested extension
 
-    // search for first, nested extend
+    // search for first, nested extension
     do{
       void *a_element_pt = TM2xHd_pt(hd_a);
       found_first = TM2xHd_exists(set_b ,hd_b ,element_byte_n ,a_element_pt ,pred);
@@ -35,6 +37,8 @@ this comes from TM2xHd_init_intersection
         TM2x_init_write(set_c ,a_element_pt ,element_byte_n);      
         // extend
         while(TM2xHd_step(set_a ,hd_a ,element_byte_n)){
+          a_element_pt = TM2xHd_pt(hd_a);
+          TM2xHd_rewind(set_b ,hd_b);
           if(TM2xHd_exists(set_b ,hd_b ,element_byte_n ,a_element_pt ,pred)){
             TM2x_push_write(set_c ,a_element_pt ,element_byte_n);      
           }
@@ -46,6 +50,7 @@ this comes from TM2xHd_init_intersection
       TM2xHd_rewind(set_b ,hd_b);
     }while(true);
     return found_first;
+  }
 
 Both forms are similar.  The major difference is that in the nested form the extension
 code appears where the first break appears in the serial form.
@@ -53,3 +58,75 @@ code appears where the first break appears in the serial form.
 Both forms have two calls to TM2xHd_exists. If only TM2x_init_write and TM2x_push_write
 were identical, we would only need the one loop and one call to TM2xHd_exists.
 
+----------------------
+
+from the tranche options loop:
+
+    char **pt = argv + 1; // skip the command name
+    bool found_first = false;
+    while(*pt){
+      if(found_first_arg = !is_option(pt)) break;
+      process_option(&pt ,&err);
+      pt++;
+    }
+    if( found_first_arg ){
+      TM2x_write(srcs ,0 ,*pt);
+      // extend
+      pt++;
+      while(*pt){
+        if( is_option(pt) ) process_option(&pt ,&err ,tdir);
+        else TM2x_Push_Write_Not_Exists(srcs ,*pt ,TM2xHd_pred_cstring_eq);
+        pt++;
+      }
+      break;
+    }
+    if(err){
+      fprintf(stderr, "usage: %s [<src_file_path>].. [-tdir <dir>]\n", argv[0]);
+      return err;
+    }
+    // not an error, but without source files there is nothing to do, so we just return
+    if(!found_first_arg){
+      return 0;
+    }
+
+could have shorted this a bit but wanted to report option errors even if there were no
+source files given,
+
+    char **pt = argv + 1; // skip the command name
+    bool found_first = false;
+    while(*pt){
+      if(is_option(pt)){
+        process_option(&pt ,&err);
+        pt++;
+      }else
+        break;
+    }
+    if( !*pt ) return 0;
+    TM2x_write(srcs ,0 ,*pt);
+    // extend
+    pt++;
+    while(*pt){
+      if( is_option(pt) ) process_option(&pt ,&err ,tdir);
+      else TM2x_Push_Write_Not_Exists(srcs ,*pt ,TM2xHd_pred_cstring_eq);
+      pt++;
+    }
+
+
+--------
+wonder if intersection can serialized in a prettier manner:
+
+    // look for first
+    do{
+      if( TM2xHd_exists(set_b ,hd_b ,element_byte_n ,TM2xHd_pt(hd_a) ,pred) ) break; // found first
+      if( !TM2xHd_step(set_a ,hd_a ,element_byte_n) ) return false; // never found first
+      TM2xHd_rewind(set_b ,hd_b);
+    }while(true);
+    TM2x_init_write(set_c ,TM2xHd_pt(hd_a) ,element_byte_n);           
+
+    //extend
+    while(TM2xHd_step(set_a ,hd_a ,element_byte_n)){
+      TM2xHd_rewind(set_b ,hd_b);
+      if(TM2xHd_exists(set_b ,hd_b ,element_byte_n ,TM2xHd_pt(hd_a) ,pred)){
+        TM2x_push_write(set_c ,TM2xHd_pt(hd_a) ,element_byte_n);      
+      }}
+    return true;

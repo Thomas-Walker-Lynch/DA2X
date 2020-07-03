@@ -34,6 +34,8 @@ This array is kind of expanding tape as described in the tm library.
   indexes ranging from 0 being the first byte in memory to n being the last byte in
   memory.
 
+## Address and index variable naming convention
+
   So as to try and keep all this straight, I have introduced the following nomenclature for
   naming indexes. Note indexes are natural numbers. Here we are talking about the indexes on
   the elements, be they bytes or something else, not the elements themselves.
@@ -94,7 +96,7 @@ This array is kind of expanding tape as described in the tm library.
    ```
 
 
-## Allocation Algorithm
+## Allocation algorithm
 
   We allocate in the smallest power of 2 sizes that the data set fits in.
   
@@ -104,6 +106,24 @@ This array is kind of expanding tape as described in the tm library.
   If after pop byte_n is equal to the inclusive upper bound of a binary interval,
   the array contracts to that size.
 
+## Allocation nomenclature
+
+   alloc   - reserves memory large enough to hold a TM2x struct
+   format  - sets field values for TM2x struct, allocates space for data.
+   make    - allocates and formats a TM2x struct
+   init    - gives allocated contained data programmer supplied values
+
+  alloc can be either static or on the stack, `alloc_static`; or it can be on the heap, `alloc_heap`;
+
+  All Tm2x structs must go through alloc, format, and init before being read.
+
+  When the words 'read' or 'write' appear in a function name, the read destination, or
+  the write source is a pointer to a location and one element is copied.  For reads the 
+  copy source is in the array.  For writes the copy destination is in the array. Otherwise
+  both operations are just copies.
+
+  When the word 'copy' appears in a function name, the read destination, or the write source
+  is another array rather than just one element.
 
 ## Files
 
