@@ -64,6 +64,8 @@
 //--------------------------------------------------------------------------------
 // quantifiers
 //
+
+  // nah .. better to implement this with memcpyn, see TM2x_init_copy
   // shallow copy tape_src elements to the end of tape_acc
   TM2xHd_F_PREFIX void TM2x_cat
   (
@@ -125,7 +127,7 @@
 //
   // push_write src_elmeent on array if pred not exists over tape
   // when pred is a comparison can be used to force order
-  // when pred is equality can be used to get set behavior
+  // when pred is equality can be used for set behavior
   TM2xHd_F_PREFIX bool TM2xHd_push_write_if
   (
    TM2x *tape_dst
@@ -166,29 +168,39 @@
     return subset;
   }
 
-  // -pushes the intersection of set a and b onto array_acc, if array_acc is initially empty, it will be the intersection.
-  // -returns whether the sets were found to be distinct
-  // -context given to the pred is a_element, the src element is the b_element
-  TM2xHd_F_PREFIX bool TM2xHd_intersection
+  // -initialize set_c with the intersection of sets a and b
+  // -returns whether the sets set_a and set_b were not found to be distinct, i.e. if initialization occurred
+  // -context given to the pred is a_element, the pred src element is the b_element
+  TM2xHd_F_PREFIX bool TM2xHd_init_intersection
   (
-   TM2x *array_acc
+   TM2x *set_c
    ,TM2x *set_a
    ,TM2x *set_b
    ,address_t element_byte_n
    ,bool pred(void *context ,void *el ,address_t element_byte_n)
    ){
-    bool distinct = true;
     TM2xHd_Mount(set_a ,hd_a);
     TM2xHd_Mount(set_b ,hd_b);
+    bool found_first = false;
+    // search for first, nested extension
     do{
       void *a_element_pt = TM2xHd_pt(hd_a);
-      if( TM2xHd_exists(set_b ,hd_b ,element_byte_n ,a_element_pt ,pred) ){
-        TM2x_push_write(array_acc ,a_element_pt ,element_byte_n);      
-        distinct = false;
+      found_first = TM2xHd_exists(set_b ,hd_b ,element_byte_n ,a_element_pt ,pred);
+      if( found_first ){
+        TM2x_init_write(set_c ,a_element_pt ,element_byte_n);      
+        // extend
+        while(TM2xHd_step(set_a ,hd_a ,element_byte_n)){
+          if(TM2xHd_exists(set_b ,hd_b ,element_byte_n ,a_element_pt ,pred)){
+            TM2x_push_write(set_c ,a_element_pt ,element_byte_n);      
+          }
+        }
+        break;
       }
+      if( !TM2xHd_step(set_a ,hd_a ,element_byte_n) )
+        break;
       TM2xHd_rewind(set_b ,hd_b);
-    }while( TM2xHd_step(set_a ,hd_a ,element_byte_n) );
-    return distinct;
+    }while(true);
+    return found_first;
   }
 
 //--------------------------------------------------------------------------------

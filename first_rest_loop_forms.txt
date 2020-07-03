@@ -1,0 +1,55 @@
+this comes from TM2xHd_init_intersection
+
+// process first followed by an extension
+
+    // process first
+    bool found_first = false;
+    do{
+      void *a_element_pt = TM2xHd_pt(hd_a);
+      found_first = TM2xHd_exists(set_b ,hd_b ,element_byte_n ,a_element_pt ,pred);
+      if( found_first ){
+        TM2x_init_write(set_c ,a_element_pt ,element_byte_n);
+        break;
+      }
+      if( !TM2xHd_step(set_a ,hd_a ,element_byte_n) )
+        break;
+      TM2xHd_rewind(set_b ,hd_b);
+    }while(true);
+    if( !found_first ) return false;
+
+    // extend
+    while(TM2xHd_step(set_a ,hd_a ,element_byte_n)){
+      if(TM2xHd_exists(set_b ,hd_b ,element_byte_n ,a_element_pt ,pred)){
+        TM2x_push_write(set_c ,a_element_pt ,element_byte_n);      
+      }
+    }
+    return true;
+
+// process first then a nested extension
+
+    // search for first, nested extend
+    do{
+      void *a_element_pt = TM2xHd_pt(hd_a);
+      found_first = TM2xHd_exists(set_b ,hd_b ,element_byte_n ,a_element_pt ,pred);
+      if( found_first ){
+        TM2x_init_write(set_c ,a_element_pt ,element_byte_n);      
+        // extend
+        while(TM2xHd_step(set_a ,hd_a ,element_byte_n)){
+          if(TM2xHd_exists(set_b ,hd_b ,element_byte_n ,a_element_pt ,pred)){
+            TM2x_push_write(set_c ,a_element_pt ,element_byte_n);      
+          }
+        }
+        break;
+      }
+      if( !TM2xHd_step(set_a ,hd_a ,element_byte_n) )
+        break;
+      TM2xHd_rewind(set_b ,hd_b);
+    }while(true);
+    return found_first;
+
+Both forms are similar.  The major difference is that in the nested form the extension
+code appears where the first break appears in the serial form.
+
+Both forms have two calls to TM2xHd_exists. If only TM2x_init_write and TM2x_push_write
+were identical, we would only need the one loop and one call to TM2xHd_exists.
+

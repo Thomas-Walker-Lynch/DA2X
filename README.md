@@ -225,36 +225,3 @@ This array is kind of expanding tape as described in the tm library.
   Hence I have modified the code to pass `element_byte_n` (the size of the elements) though
   the interface.
   
-## Empty arrays
-
-  Often times dynamic arrays are used as stacks.  Code that pushes an element on to a stack
-  typically does not consider and empty stack to be a special case.  But the way the code
-  is attotw, the first element must be written to the stack base, then further elements
-  may be pushed, so push code has to treat an nearly initialized stack differently.
-  
-  Actually, if the array could be empty, the special code for treating the empty case does not
-  go away, rather it just moves to the other side of the dynamic array interface.  Moving
-  it into the library code would be better because then the programmer does not have to spin
-  it fresh each time he or she uses the array.
-  
-  In this array implementation we do not use inclusive arithmetic with no overflows, and
-  we allow that all memory, including address 0, can be addressed. Hence, should we follow
-  these constraints, we do not have address 0 to use as a NULL valued flag.  I am sorely
-  tempted to use `base_pt == NULL` to indicate the array is empty, but so much work has
-  been put into the inclusive arithmetic I will not do this now.
-
-  There is another thing we can do to flag special cases. Note that if an array takes up
-  the whole of memory, then it must be based at `memory_byte_0`. This is because we do not
-  wrap the array around the buffer, and we do not wrap around the buffer because we did
-  not specify an overflow behavior for the arithmetic. Hence, we could enumerate special
-  states for the array, including that it is empty, by setting `byte_n` in the header
-  struct to `memory_byte_n` and then enumerate alternative states using a non-zero `base_pt`
-  value.  However, if we do this, then our code will not be able later implement an array with
-  wrap around.  Wrap around is probbly would not work for other reasons also.
-  
-  As this is the first version, just to keep things simple, I will add an empty flag. It will
-  make for clean code.
-
-
-   
-   

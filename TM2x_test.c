@@ -13,7 +13,7 @@ address_t TM2x_test_after_allocation_n = 0;
 
 TM2x_Result test_0(){
   address_t malloc_cnt = TM2x_malloc_cnt;
-  address_t outstanding_cnt = TM2x_outstanding_cnt;
+  address_t initialized_cnt = TM2x_initialized_cnt;
   bool f[6];
   uint i = 0;
 
@@ -31,7 +31,7 @@ TM2x_Result test_0(){
 
   TM2x_data_dealloc(a0p);
   f[i++] = malloc_cnt == TM2x_malloc_cnt;
-  f[i++] = outstanding_cnt == TM2x_outstanding_cnt;
+  f[i++] = initialized_cnt == TM2x_initialized_cnt;
   TM2x_Result_tally(rp ,f ,i);
   if( r.failed > 0 ) TM2x_Result_print(&r ,"test_0 ");
   return r;
@@ -39,7 +39,7 @@ TM2x_Result test_0(){
 
 TM2x_Result test_1(){
   address_t malloc_cnt = TM2x_malloc_cnt;
-  address_t outstanding_cnt = TM2x_outstanding_cnt;
+  address_t initialized_cnt = TM2x_initialized_cnt;
   TM2x_Result r ,*rp; rp = &r;
   TM2x_Result_init(rp);
 
@@ -76,7 +76,7 @@ TM2x_Result test_1(){
 
   TM2x_data_dealloc(a0p);
   f[i++] =  malloc_cnt == TM2x_malloc_cnt;
-  f[i++] = outstanding_cnt == TM2x_outstanding_cnt;
+  f[i++] = initialized_cnt == TM2x_initialized_cnt;
   TM2x_Result_tally(rp ,f ,i);
   if( r.failed > 0 ) TM2x_Result_print(&r ,"test_1 ");
   return r;
@@ -84,7 +84,7 @@ TM2x_Result test_1(){
 
 TM2x_Result test_2(){
   address_t malloc_cnt = TM2x_malloc_cnt;
-  address_t outstanding_cnt = TM2x_outstanding_cnt;
+  address_t initialized_cnt = TM2x_initialized_cnt;
   bool f[256];
   uint i = 0;
 
@@ -131,7 +131,7 @@ TM2x_Result test_2(){
 
   TM2x_data_dealloc(a0);
   f[i++] = malloc_cnt == TM2x_malloc_cnt;
-  f[i++] = outstanding_cnt == TM2x_outstanding_cnt;
+  f[i++] = initialized_cnt == TM2x_initialized_cnt;
   // printf("test_2 'i': %u" ,i);
   TM2x_Result_tally(rp ,f ,i);
   if( r.failed > 0 ) TM2x_Result_print(&r ,"test_2 ");
