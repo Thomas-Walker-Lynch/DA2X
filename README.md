@@ -110,12 +110,13 @@ This array is kind of expanding tape as described in the tm library.
 
    alloc   - reserves memory large enough to hold a TM2x struct
    format  - sets field values for TM2x struct, allocates space for data.
-   make    - allocates and formats a TM2x struct
    init    - gives allocated contained data programmer supplied values
 
-  alloc can be either static or on the stack, `alloc_static`; or it can be on the heap, `alloc_heap`;
-
-  All Tm2x structs must go through alloc, format, and init before being read.
+   static  - allocation on the stack or a static page
+   heap    - allocation on the heap
+   
+  All Tm2x structs must go through allocation and formatting before being written.
+  All Tm2x structs must be written before being red.
 
   When the words 'read' or 'write' appear in a function name, the read destination, or
   the write source is a pointer to a location and one element is copied.  For reads the 

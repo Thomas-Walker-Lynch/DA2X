@@ -20,7 +20,7 @@ TM2x_Result test_0(){
   TM2x_Result r ,*rp; rp = &r;
   TM2x_Result_init(rp);
 
-  TM2x_Make(a0p ,0 ,int32_t);
+  TM2x_AllocStaticFormat(a0p ,0 ,int32_t);
   int32_t j = -5;
   int32_t k;
 
@@ -91,7 +91,7 @@ TM2x_Result test_2(){
   TM2x_Result r ,*rp; rp = &r;
   TM2x_Result_init(rp);
 
-  TM2x_Make(a0 ,0 ,int32_t);
+  TM2x_AllocStaticFormat(a0 ,0 ,int32_t);
   f[i++] = a0->byte_n == 3;
 
   int32_t x=1; f[i++] = TM2x_Write(a0 ,0 ,x); 

@@ -28,7 +28,7 @@
     char *element_pt;
   } TM2xHd;
 
-  #define TM2xHd_Make(tape ,hd) TM2xHd TM2xHd_ ## hd ,*hd; hd = &TM2xHd_ ## hd; TM2xHd_rewind(tape ,hd);
+  #define TM2xHd_AllocStaticInit(tape ,hd) TM2xHd TM2xHd_ ## hd ,*hd; hd = &TM2xHd_ ## hd; TM2xHd_rewind(tape ,hd);
 
   TM2xHd_F_PREFIX bool TM2xHd_is_on_tape(TM2x *tape ,TM2xHd *hd){
     return hd->element_pt <= TM2x_byte_n_pt(tape) && hd->element_pt >= TM2x_byte_0_pt(tape);
@@ -65,7 +65,7 @@
 // quantifiers
 //
 
-  // nah .. better to implement this with memcpyn, see TM2x_init_copy
+  // nah .. better to implement this with memcpyn, see TM2x_format_copy
   // shallow copy tape_src elements to the end of tape_acc
   TM2xHd_F_PREFIX void TM2x_cat
   (
@@ -73,7 +73,7 @@
    ,TM2x *tape_src
    ,address_t element_byte_n
    ){
-    TM2xHd_Make(tape_src, hd_src);
+    TM2xHd_AllocStaticInit(tape_src, hd_src);
     do{
       TM2x_push_write(tape_acc ,TM2xHd_pt(hd_src) ,element_byte_n);
     }while( TM2xHd_step(tape_src ,hd_src ,element_byte_n) );
@@ -135,7 +135,7 @@
    ,address_t element_byte_n
    ,bool pred(void *context ,void *el ,address_t element_byte_n)
    ){
-    TM2xHd_Make(tape_dst ,hd);
+    TM2xHd_AllocStaticInit(tape_dst ,hd);
     if( !TM2xHd_exists(tape_dst ,hd ,element_byte_n ,src_element_pt ,pred) ){
       TM2x_push_write(tape_dst ,src_element_pt ,element_byte_n);
       return true;
@@ -155,8 +155,8 @@
    ,bool pred(void *context ,void *el ,address_t element_byte_n)
    ){
     bool subset = true;
-    TM2xHd_Make(set_acc ,hd_acc);
-    TM2xHd_Make(set_src ,hd_src);
+    TM2xHd_AllocStaticInit(set_acc ,hd_acc);
+    TM2xHd_AllocStaticInit(set_src ,hd_src);
     do{
       void *src_element_pt = TM2xHd_pt(hd_src);
       if( TM2xHd_push_write_not_exists(set_acc ,src_element_pt ,element_byte_n ,pred) ){
@@ -178,15 +178,15 @@
    ,address_t element_byte_n
    ,bool pred(void *context ,void *el ,address_t element_byte_n)
    ){
-    TM2xHd_Make(set_a ,hd_a);
-    TM2xHd_Make(set_b ,hd_b);
+    TM2xHd_AllocStaticInit(set_a ,hd_a);
+    TM2xHd_AllocStaticInit(set_b ,hd_b);
     // look for first
     do{
       if( TM2xHd_exists(set_b ,hd_b ,element_byte_n ,TM2xHd_pt(hd_a) ,pred) ) break; // found first
       if( !TM2xHd_step(set_a ,hd_a ,element_byte_n) ) return false; // never found first
       TM2xHd_rewind(set_b ,hd_b);
     }while(true);
-    TM2x_init_write(set_c ,TM2xHd_pt(hd_a) ,element_byte_n);           
+    TM2x_format_write(set_c ,TM2xHd_pt(hd_a) ,element_byte_n);           
     //extend
     while(TM2xHd_step(set_a ,hd_a ,element_byte_n)){
       TM2xHd_rewind(set_b ,hd_b);

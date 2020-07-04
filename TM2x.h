@@ -49,10 +49,10 @@
     return (1 << (address_bit_length - __builtin_clz(byte_n))) - 1;
   }
 
-  TM2x_F_PREFIX void *mallocn(address_t n){
-    void *pt = malloc(n+1); // n+1 might overflow
-    assert(pt); // in our model we can not use null pointers because address 0 can hold an element ..
-    return pt;
+  TM2x_F_PREFIX bool mallocn(void **pt ,address_t n){
+    if( n == memory_byte_n ) return false;
+    *pt = malloc(n+1);
+    return !!pt;
   }
   // without the assert
   // #define mallocn(n) malloc(n+1)
@@ -67,54 +67,96 @@
   // and it is decremented upon TM2x_data_dalloc.
   extern address_t TM2x_initialized_cnt;
 
-
-//--------------------------------------------------------------------------------
-// dynamic array instance 
-//    
-  typedef struct {
-    char *base_pt;
-    address_t byte_n;
-  } TM2x;
-  // da becomes a pointer to a static allocation of a TM2x struct
-  #define TM2x_Alloc_Static(da) TM2x TM2x_ ## da ,*da; da = &TM2x_ ## da;
-
-//--------------------------------------------------------------------------------
-// alloc/init/dealloc
-//
-
   // change unit of measure
   TM2x_F_PREFIX address_t TM2x_mulns(address_t a_n , address_t b_n){
     return a_n * b_n + a_n + b_n;
   }
 
-  // Need to add limit checks because an init sized array might fail to fit in memory.
+//--------------------------------------------------------------------------------
+// dynamic array instance type
+//    
+  typedef struct {
+    char *base_pt;
+    address_t byte_n;
+  } TM2x;
+
+//--------------------------------------------------------------------------------
+// allocation
+//
+  // tape becomes a pointer to a static allocation of a TM2x struct
+  #define TM2x_AllocStatic(tape) TM2x TM2x_ ## tape ,*tape; tape = &TM2x_ ## tape;
+
+  // after data_deallocation, the TM2x may be re-initialized and used again
+  TM2x_F_PREFIX void TM2x_dealloc_static(TM2x *tape){
+    free(tape->base_pt);
+    TM2x_initialized_cnt--;
+  }
+
+  // for dynammic allocation of TM2xs:
+  TM2x_F_PREFIX bool TM2x_alloc_heap(TM2x **tape ,address_t element_n ,address_t element_byte_n){
+    return mallocn((void **)tape ,byte_n_of(TM2x));
+  }
+  TM2x_F_PREFIX void TM2x_dealloc_heap(TM2x *tape){
+    TM2x_dealloc_static(tape);
+    free(tape);
+  }
+
+  // need to check memory limit
+  #ifdef TM2x_TEST
+    extern address_t TM2x_test_after_allocation_n;
+  #endif
+  TM2x_F_PREFIX bool TM2x_resize(TM2x *tape ,address_t after_allocation_n){
+    char *after_base_pt;
+    if( !mallocn((void **)&after_base_pt ,after_allocation_n) ) return false;
+    #ifdef TM2x_TEST
+      TM2x_test_after_allocation_n = after_allocation_n;
+    #endif
+    char *before_base_pt = tape->base_pt;
+    memcpyn( after_base_pt ,before_base_pt ,tape->byte_n);
+    free(before_base_pt);
+    tape->base_pt = after_base_pt;
+    return true;
+  }
+
+  TM2x_F_PREFIX address_t TM2x_initialized(TM2x *tape){
+    return TM2x_initialized_cnt;
+  }
+
+//--------------------------------------------------------------------------------
+// formatting / formatting and initializing
+//
+
+  // Need to add limit check against our upper address bound
   // element_n is the maximum index for the initial data array
-  // returns true when initialization succeeds
+  // returns true when formatting succeeds
   TM2x_F_PREFIX bool __TM2x_format(TM2x *tape ,address_t byte_n ){
     TM2x_initialized_cnt++; // to assist with debugging
     tape->byte_n = byte_n;
     address_t allocation_byte_n = binary_interval_inclusive_upper_bound(byte_n);
-    tape->base_pt = mallocn(allocation_byte_n);
-    return true;
+    return mallocn( (void **)&(tape->base_pt) ,allocation_byte_n);
   }
   TM2x_F_PREFIX bool TM2x_format(TM2x *tape ,address_t element_n, address_t element_byte_n ){
     address_t byte_n = TM2x_mulns(element_byte_n ,element_n);
     return __TM2x_format(tape ,byte_n );
   }
-  // makes a pointer to 
-  #define TM2x_Make(da ,element_n ,type) TM2x_Alloc_Static(da); assert(TM2x_format(da ,element_n ,byte_n_of(type)));
+  // makes a pointer to a tape
+  #define TM2x_AllocStaticFormat(tape ,element_n ,type) TM2x_AllocStatic(tape); assert(TM2x_format(tape ,element_n ,byte_n_of(type)));
 
-  TM2x_F_PREFIX bool TM2x_init_write(TM2x *tape ,void *element_pt, address_t element_byte_n ){
+  TM2x_F_PREFIX bool TM2x_alloc_heap_format(TM2x **tape ,address_t element_n ,address_t element_byte_n){
+    return mallocn((void **)tape ,byte_n_of(TM2x)) && TM2x_format(*tape ,element_n ,element_byte_n);
+  }
+
+  TM2x_F_PREFIX bool TM2x_format_write(TM2x *tape ,void *element_pt, address_t element_byte_n ){
     TM2x_format(tape ,0 ,element_byte_n );
     memcpyn(tape->base_pt, element_pt, element_byte_n);
     return true;
   }
-  #define TM2x_Make_Write(da ,item) TM2x_Alloc_Static(da); assert(TM2x_init_write(da ,&item ,byte_n_of(typeof(item))));
+  #define TM2x_AllocStaticFormat_Write(tape ,item) TM2x_AllocStatic(tape); assert(TM2x_format_write(tape ,&item ,byte_n_of(typeof(item))));
 
-  // tape_new is a raw TM2x struct
+  // tape_new has been allocated. This routine formats and intitializes it.
   // shallow copy tape_src elements to tape_new
   // need a version of this where the second argument is an hd, takes the tail from another list == drop
-  TM2x_F_PREFIX bool TM2x_init_copy
+  TM2x_F_PREFIX bool TM2x_format_copy
   (
    TM2x *tape
    ,TM2x *tape_src
@@ -126,47 +168,11 @@
     return alloc_success;
   }
 
-  // after data_deallocation, the TM2x may be re-initialized and used again
-  TM2x_F_PREFIX void TM2x_dealloc_static(TM2x *tape){
-    free(tape->base_pt);
-    TM2x_initialized_cnt--;
-  }
-
-  TM2x_F_PREFIX address_t TM2x_initialized(TM2x *tape){
-    return TM2x_initialized_cnt;
-  }
-
-  // for dynammic allocation of TM2xs:
-  TM2x_F_PREFIX TM2x *TM2x_alloc_heap(address_t element_n ,address_t element_byte_n){
-    TM2x *tape = mallocn(byte_n_of(TM2x));
-    assert(TM2x_format(tape ,element_n, element_byte_n));
-    return tape;
-  }
-  TM2x_F_PREFIX void TM2x_dealloc_heap(TM2x *tape){
-    TM2x_dealloc_static(tape);
-    free(tape);
-  }
-
-  // size limit issues, not other comments in this file on this topic
-  #ifdef TM2x_TEST
-    extern address_t TM2x_test_after_allocation_n;
-  #endif
-  TM2x_F_PREFIX bool TM2x_resize(TM2x *tape ,address_t after_allocation_n){
-    char *after_base_pt = mallocn( after_allocation_n );
-    #ifdef TM2x_TEST
-      TM2x_test_after_allocation_n = after_allocation_n;
-    #endif
-    char *before_base_pt = tape->base_pt;
-    memcpyn( after_base_pt ,before_base_pt ,tape->byte_n);
-    free(before_base_pt);
-    tape->base_pt = after_base_pt;
-    return true;
-  }
 
 
 //--------------------------------------------------------------------------------
-// instance interface use this interface for the rest of the code. Do not refer to the
-// instance directly.  This frees us to change the instance implementation later.
+// instance interface Use this interface for the rest of the code rather than to directly 
+// to instance fields.  This abstracts the instance implementation.
 //
 
   // base pointers
@@ -196,9 +202,33 @@
   }
   #define TM2x_Element_N_Pt(tape ,type) TM2x_element_n_pt(tape ,byte_n_of(type))
 
+//--------------------------------------------------------------------------------
+// indexing
+//   consider using the iterator TM2xHd.h instead of indexes
+//
+  // returns pointer to element at given index
+  TM2x_F_PREFIX void *TM2x_element_i_pt(TM2x *tape ,address_t index ,address_t element_byte_n){
+    return TM2x_byte_0_pt(tape) + element_byte_n * index + index;
+  }
+
+  TM2x_F_PREFIX bool TM2x_read(TM2x *tape ,address_t index ,void *dst_element_pt ,address_t element_byte_n){
+    void *src_element_pt = TM2x_element_i_pt(tape ,index ,element_byte_n);
+    if( src_element_pt > TM2x_element_n_pt(tape ,element_byte_n) ) return false;
+    memcpyn(dst_element_pt, src_element_pt, element_byte_n);
+    return true;
+  }
+  #define TM2x_Read(tape ,index ,x) TM2x_read(tape ,index ,&x ,byte_n_of(typeof(x)))
+
+  TM2x_F_PREFIX bool TM2x_write(TM2x *tape ,address_t index ,void *src_element_pt ,address_t element_byte_n){
+    void *dst_element_pt = TM2x_element_i_pt(tape ,index ,element_byte_n);
+    if( dst_element_pt > TM2x_element_n_pt(tape ,element_byte_n) ) return false;
+    memcpyn(dst_element_pt, src_element_pt, element_byte_n);
+    return true;
+  }
+  #define TM2x_Write(tape ,index ,x) TM2x_write(tape ,index ,&(x) ,byte_n_of(typeof(x)))
 
 //--------------------------------------------------------------------------------
-// change allocation size
+// stack
 //
   // Need to add limit checks because an expanded array might fail to fit in memory.
   // Attempts to expands the data portion of the array to accomodate np1 more elements.
@@ -247,31 +277,6 @@
     return TM2x_pop_read(tape, NULL ,element_byte_n);
   }
   #define TM2x_Pop(tape ,type) TM2x_pop(tape ,byte_n_of(type))
-
-//--------------------------------------------------------------------------------
-// indexing
-//   consider using the iterator TM2xHd.h instead of indexes
-//
-  // returns pointer to element at given index
-  TM2x_F_PREFIX void *TM2x_element_i_pt(TM2x *tape ,address_t index ,address_t element_byte_n){
-    return TM2x_byte_0_pt(tape) + element_byte_n * index + index;
-  }
-
-  TM2x_F_PREFIX bool TM2x_read(TM2x *tape ,address_t index ,void *dst_element_pt ,address_t element_byte_n){
-    void *src_element_pt = TM2x_element_i_pt(tape ,index ,element_byte_n);
-    if( src_element_pt > TM2x_element_n_pt(tape ,element_byte_n) ) return false;
-    memcpyn(dst_element_pt, src_element_pt, element_byte_n);
-    return true;
-  }
-  #define TM2x_Read(tape ,index ,x) TM2x_read(tape ,index ,&x ,byte_n_of(typeof(x)))
-
-  TM2x_F_PREFIX bool TM2x_write(TM2x *tape ,address_t index ,void *src_element_pt ,address_t element_byte_n){
-    void *dst_element_pt = TM2x_element_i_pt(tape ,index ,element_byte_n);
-    if( dst_element_pt > TM2x_element_n_pt(tape ,element_byte_n) ) return false;
-    memcpyn(dst_element_pt, src_element_pt, element_byte_n);
-    return true;
-  }
-  #define TM2x_Write(tape ,index ,x) TM2x_write(tape ,index ,&(x) ,byte_n_of(typeof(x)))
 
 
 #endif
