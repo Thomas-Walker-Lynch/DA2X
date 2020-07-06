@@ -29,12 +29,17 @@
   If this array is implemented over virtual memory, that migth be the largest virtual memory
   address, i.e. UINT64_MAX.  That is what I have put here.
 
-*/
+*/  
 
   //
   //#define TM2x_F_PREFIX static
   //#define TM2x_F_PREFIX extern inline
   #define TM2x_F_PREFIX static inline
+
+  // continuations by trampoline
+  #define continue_from return
+  typedef void **continuation;
+
 
   // this particular machine has 64 bit addresses (bit indexed 0 to 63)
   #define address_t uint64_t
@@ -49,13 +54,12 @@
     return (1 << (address_bit_length - __builtin_clz(byte_n))) - 1;
   }
 
-  TM2x_F_PREFIX bool mallocn(void **pt ,address_t n){
-    if( n == memory_byte_n ) return false;
+  continuation mallocn(void **pt ,address_t n ,continuation nominal ,continuation fail){
+    if( n == memory_byte_n ) continue_from fail;
     *pt = malloc(n+1);
-    return !!pt;
+    if(!*pt) continue_from fail;
+    continue_from nominal;
   }
-  // without the assert
-  // #define mallocn(n) malloc(n+1)
 
   // the n+1 could overflow:
   #define memcpyn(dst ,src ,n) memcpy(dst ,src ,n+1) 
@@ -93,8 +97,14 @@
   }
 
   // for dynammic allocation of TM2xs:
-  TM2x_F_PREFIX bool TM2x_alloc_heap(TM2x **tape ,address_t element_n ,address_t element_byte_n){
-    return mallocn((void **)tape ,byte_n_of(TM2x));
+  TM2x_F_PREFIX continuation TM2x_alloc_heap
+  ( TM2x **tape 
+   ,address_t element_n 
+   ,address_t element_byte_n
+   ,continuation nominal
+   ,continuation fail
+   ){
+    continue_from mallocn((void **)tape ,byte_n_of(TM2x) ,nominal ,fail);
   }
   TM2x_F_PREFIX void TM2x_dealloc_heap(TM2x *tape){
     TM2x_dealloc_static(tape);
@@ -105,17 +115,24 @@
   #ifdef TM2x_TEST
     extern address_t TM2x_test_after_allocation_n;
   #endif
-  TM2x_F_PREFIX bool TM2x_resize(TM2x *tape ,address_t after_allocation_n){
+  TM2x_F_PREFIX continuation TM2x_resize
+  ( TM2x *tape 
+   ,address_t after_allocation_n
+   ,continuation resize_nominal
+   ,continuation allocation_fail
+   ){
     char *after_base_pt;
-    if( !mallocn((void **)&after_base_pt ,after_allocation_n) ) return false;
-    #ifdef TM2x_TEST
-      TM2x_test_after_allocation_n = after_allocation_n;
-    #endif
-    char *before_base_pt = tape->base_pt;
-    memcpyn( after_base_pt ,before_base_pt ,tape->byte_n);
-    free(before_base_pt);
-    tape->base_pt = after_base_pt;
-    return true;
+    goto *mallocn((void **)&after_base_pt ,after_allocation_n ,&&malloc_nominal ,&&malloc_fail);
+      malloc_fail: continue_from allocation_fail;
+      malloc_nominal:
+        #ifdef TM2x_TEST
+          TM2x_test_after_allocation_n = after_allocation_n;
+        #endif
+        char *before_base_pt = tape->base_pt;
+        memcpyn( after_base_pt ,before_base_pt ,tape->byte_n);
+        free(before_base_pt);
+        tape->base_pt = after_base_pt;
+        continue_from resize_nominal;
   }
 
   TM2x_F_PREFIX address_t TM2x_initialized(TM2x *tape){
@@ -129,50 +146,89 @@
   // Need to add limit check against our upper address bound
   // element_n is the maximum index for the initial data array
   // returns true when formatting succeeds
-  TM2x_F_PREFIX bool __TM2x_format(TM2x *tape ,address_t byte_n ){
+  TM2x_F_PREFIX continuation __TM2x_format
+  ( TM2x *tape 
+   ,address_t byte_n 
+   ,continuation format_nominal
+   ,continuation format_alloc_fail
+   ){
     TM2x_initialized_cnt++; // to assist with debugging
     tape->byte_n = byte_n;
     address_t allocation_byte_n = binary_interval_inclusive_upper_bound(byte_n);
-    return mallocn( (void **)&(tape->base_pt) ,allocation_byte_n);
+    goto *mallocn( (void **)&(tape->base_pt) ,allocation_byte_n ,&&mallocn_nominal ,&&mallocn_fail);
+      mallocn_nominal: continue_from format_nominal;
+      mallocn_fail: continue_from format_alloc_fail;
   }
-  TM2x_F_PREFIX bool TM2x_format(TM2x *tape ,address_t element_n, address_t element_byte_n ){
+  TM2x_F_PREFIX continuation TM2x_format
+  ( TM2x *tape
+   ,address_t element_n, address_t element_byte_n 
+    ,continuation nominal
+    ,continuation alloc_fail
+    ){
     address_t byte_n = TM2x_mulns(element_byte_n ,element_n);
-    return __TM2x_format(tape ,byte_n );
+    goto *__TM2x_format(tape ,byte_n ,&&format_nominal ,&&format_alloc_fail);
+      format_nominal: continue_from nominal;
+      format_alloc_fail: continue_from alloc_fail;
   }
   // makes a pointer to a tape
-  #define TM2x_AllocStaticFormat(tape ,element_n ,type) TM2x_AllocStatic(tape); assert(TM2x_format(tape ,element_n ,byte_n_of(type)));
+  #define TM2x_AllocStaticFormat(tape ,element_n ,type ,cont_nominal ,cont_fail) \
+    TM2x_AllocStatic(tape);\
+    goto *TM2x_format(tape ,element_n ,byte_n_of(type), cont_nominal ,cont_fail);
 
-  TM2x_F_PREFIX bool TM2x_alloc_heap_format(TM2x **tape ,address_t element_n ,address_t element_byte_n){
-    return mallocn((void **)tape ,byte_n_of(TM2x)) && TM2x_format(*tape ,element_n ,element_byte_n);
-  }
+  TM2x_F_PREFIX bool TM2x_alloc_heap_format
+  ( TM2x **tape 
+    ,address_t element_n 
+    ,address_t element_byte_n
+    ,continuation nominal
+    ,continuation fail
+    ){
+    goto *mallocn((void **)tape ,byte_n_of(TM2x) ,&&mallocn_nominal ,&&mallocn_fail);
+      mallocn_fail: continue_from fail;
+      mallocn_nominal:
+      goto *TM2x_format(*tape ,element_n ,element_byte_n ,&&format_nominal ,&&format_fail);
+        format_fail: continue_from fail;
+        format_nominal: continue_from nominal;
+    }
 
-  TM2x_F_PREFIX bool TM2x_format_write(TM2x *tape ,void *element_pt, address_t element_byte_n ){
-    TM2x_format(tape ,0 ,element_byte_n );
-    memcpyn(tape->base_pt, element_pt, element_byte_n);
-    return true;
+  TM2x_F_PREFIX bool TM2x_format_write
+  ( TM2x *tape 
+    ,void *element_pt 
+    ,address_t element_byte_n 
+    ,continuation nominal
+    ,continuation fail
+    ){
+    goto *TM2x_format(tape ,0 ,element_byte_n ,&&format_nominal ,&&format_fail);
+      format_fail: continue_from fail;
+      format_nominal:
+        memcpyn(tape->base_pt, element_pt, element_byte_n);
+        continue_from nominal;
   }
-  #define TM2x_AllocStaticFormat_Write(tape ,item) TM2x_AllocStatic(tape); assert(TM2x_format_write(tape ,&item ,byte_n_of(typeof(item))));
+  #define TM2x_AllocStaticFormat_Write(tape ,item ,cont_nominal ,cont_fail)\
+    TM2x_AllocStatic(tape);\
+    goto *TM2x_format_write(tape ,&item ,byte_n_of(typeof(item)) ,cont_nominal ,cont_fail);
 
   // tape_new has been allocated. This routine formats and intitializes it.
   // shallow copy tape_src elements to tape_new
   // need a version of this where the second argument is an hd, takes the tail from another list == drop
   TM2x_F_PREFIX bool TM2x_format_copy
-  (
-   TM2x *tape
-   ,TM2x *tape_src
-   ,address_t element_byte_n
-   ){
+  ( TM2x *tape
+    ,TM2x *tape_src
+    ,address_t element_byte_n
+    ,continuation nominal
+    ,continuation fail
+    ){
     address_t byte_n = tape_src->byte_n;
-    bool alloc_success = __TM2x_format(tape ,byte_n);
-    if( alloc_success ) memcpyn(tape->base_pt ,tape_src->base_pt ,byte_n);
-    return alloc_success;
+    goto *__TM2x_format(tape ,byte_n ,&&format_nominal ,&&format_fail);
+      format_fail: continue_from fail;
+      format_nominal: 
+        memcpyn(tape->base_pt ,tape_src->base_pt ,byte_n);
+        continue_from nominal;
   }
 
-
-
 //--------------------------------------------------------------------------------
-// instance interface Use this interface for the rest of the code rather than to directly 
-// to instance fields.  This abstracts the instance implementation.
+// adjectives
+//
+// Use these adjectives rather than accessing the TM2x struct directly.
 //
 
   // base pointers
@@ -211,19 +267,15 @@
     return TM2x_byte_0_pt(tape) + element_byte_n * index + index;
   }
 
-  TM2x_F_PREFIX bool TM2x_read(TM2x *tape ,address_t index ,void *dst_element_pt ,address_t element_byte_n){
+  TM2x_F_PREFIX void TM2x_read(TM2x *tape ,address_t index ,void *dst_element_pt ,address_t element_byte_n){
     void *src_element_pt = TM2x_element_i_pt(tape ,index ,element_byte_n);
-    if( src_element_pt > TM2x_element_n_pt(tape ,element_byte_n) ) return false;
     memcpyn(dst_element_pt, src_element_pt, element_byte_n);
-    return true;
   }
   #define TM2x_Read(tape ,index ,x) TM2x_read(tape ,index ,&x ,byte_n_of(typeof(x)))
 
-  TM2x_F_PREFIX bool TM2x_write(TM2x *tape ,address_t index ,void *src_element_pt ,address_t element_byte_n){
+  TM2x_F_PREFIX void TM2x_write(TM2x *tape ,address_t index ,void *src_element_pt ,address_t element_byte_n){
     void *dst_element_pt = TM2x_element_i_pt(tape ,index ,element_byte_n);
-    if( dst_element_pt > TM2x_element_n_pt(tape ,element_byte_n) ) return false;
     memcpyn(dst_element_pt, src_element_pt, element_byte_n);
-    return true;
   }
   #define TM2x_Write(tape ,index ,x) TM2x_write(tape ,index ,&(x) ,byte_n_of(typeof(x)))
 
@@ -235,48 +287,84 @@
   // If the current allocation is not large enough we make a new larger allocation.  If that
   // is not possible, then we return false.  Otherwise we return true.
   // If you need the before expansion top of the array, save that before calling this.
-  TM2x_F_PREFIX bool TM2x_push_alloc(TM2x *tape ,address_t requested_expansion_element_n ,address_t element_byte_n){
+  TM2x_F_PREFIX continuation TM2x_push_alloc
+  ( TM2x *tape 
+    ,address_t requested_expansion_element_n
+    ,address_t element_byte_n
+    ,continuation nominal
+    ,continuation fail
+    ){
     address_t requested_expansion_byte_n = TM2x_mulns(requested_expansion_element_n ,element_byte_n);
     address_t before_byte_n = TM2x_byte_n(tape);
     address_t before_allocation_n = binary_interval_inclusive_upper_bound(before_byte_n);
     address_t after_byte_n = before_byte_n + requested_expansion_byte_n + 1;
     tape->byte_n = after_byte_n;
     address_t after_allocation_n = binary_interval_inclusive_upper_bound(after_byte_n);
-    if( after_allocation_n > before_allocation_n ) TM2x_resize(tape ,after_allocation_n);
-    return true;
+    if( after_allocation_n <= before_allocation_n ) continue_from nominal;
+    goto *TM2x_resize(tape ,after_allocation_n ,&&resize_nominal ,&&resize_fail);
+      resize_nominal: continue_from nominal;
+      resize_fail: continue_from fail;
   }
-  #define TM2x_Push_Alloc(tape ,expansion_element_n ,type) TM2x_push_alloc(tape, expansion_element_n ,byte_n_of(type))
+  #define TM2x_Push_Alloc(tape ,expansion_element_n ,type ,cont_nominal ,cont_fail) \
+    goto *TM2x_push_alloc(tape, expansion_element_n ,byte_n_of(type) ,cont_nominal ,cont_fail)
 
-  TM2x_F_PREFIX bool TM2x_push_write(TM2x *tape ,void *src_element_pt ,address_t element_byte_n){
-    if( !TM2x_push_alloc(tape ,0 ,element_byte_n) )return false;
-    memcpyn(TM2x_element_n_pt(tape ,element_byte_n) ,src_element_pt ,element_byte_n);
-    return true;
+  TM2x_F_PREFIX continuation TM2x_push_write
+  ( TM2x *tape 
+    ,void *src_element_pt 
+    ,address_t element_byte_n
+    ,continuation nominal
+    ,continuation allocation_failed
+    ){
+    goto *TM2x_push_alloc(tape ,0 ,element_byte_n ,&&push_alloc_nominal ,&&push_alloc_fail);
+      push_alloc_fail: continue_from allocation_failed;
+      push_alloc_nominal:
+        memcpyn(TM2x_element_n_pt(tape ,element_byte_n) ,src_element_pt ,element_byte_n);
+        continue_from nominal;
   }
-  #define TM2x_Push_Write(tape ,src_element) TM2x_push_write(tape ,&src_element ,byte_n_of(typeof(src_element)))
+  #define TM2x_Push_Write(tape ,src_element ,cont_nominal ,cont_allocation_failed)\
+    goto *TM2x_push_write(tape ,&src_element ,byte_n_of(typeof(src_element)) ,cont_nominal ,cont_allocation_failed)
 
-  // should make a version to pop off n elements .. in general I need to add array to array ops
-  // the read always succeeds, but the pop might not
-  TM2x_F_PREFIX bool TM2x_pop_read(TM2x *tape ,void *dst_element_pt ,address_t element_byte_n){
-    if(dst_element_pt) memcpyn(dst_element_pt, TM2x_element_n_pt(tape ,element_byte_n) ,element_byte_n);
+  // need to add pop for n elements ...
+  TM2x_F_PREFIX continuation TM2x_pop
+  ( TM2x *tape
+    ,address_t element_byte_n
+    ,continuation nominal
+    ,continuation pop_last
+    ){
 
-    // we should never have partial elements, could make this a zero test..
     address_t before_byte_n = TM2x_byte_n(tape);
-    if( before_byte_n <= element_byte_n ) return false;
-
-    address_t before_allocation_n = binary_interval_inclusive_upper_bound(before_byte_n);
+    if( before_byte_n <= element_byte_n ) continue_from pop_last;
     address_t after_byte_n = before_byte_n - element_byte_n - 1;
-    tape->byte_n = after_byte_n;
-    address_t after_allocation_n = binary_interval_inclusive_upper_bound(after_byte_n);
-    if( after_allocation_n < before_allocation_n ) TM2x_resize(tape ,after_allocation_n);
-    return true;
-  }
-  #define TM2x_Pop_Read(tape ,dst_element) TM2x_pop_read(tape ,&dst_element ,byte_n_of(typeof(dst_element)))
+    tape->byte_n = after_byte_n; 
 
-  // need to add pop and throw away for n elements ...
-  TM2x_F_PREFIX bool TM2x_pop(TM2x *tape ,address_t element_byte_n){
-    return TM2x_pop_read(tape, NULL ,element_byte_n);
+    // attempt to reduce the allocation
+    // If we attempt but fail to reduce the allocation size, the extra space on this tape will never be used,
+    // but otherwise the stack will continue to function.
+    address_t before_allocation_n = binary_interval_inclusive_upper_bound(before_byte_n);
+    address_t after_allocation_n = binary_interval_inclusive_upper_bound(after_byte_n);
+    if( after_allocation_n < before_allocation_n ) TM2x_resize(tape ,after_allocation_n ,NULL ,NULL);
+
+    continue_from nominal;
   }
-  #define TM2x_Pop(tape ,type) TM2x_pop(tape ,byte_n_of(type))
+  #define TM2x_Pop(tape ,type ,cont_nominal ,cont_pop_last)\
+    goto *TM2x_pop(tape ,byte_n_of(type) ,cont_nominal ,cont_pop_last )
+
+  // should make a version to pop off n elements 
+  TM2x_F_PREFIX continuation TM2x_read_pop
+  ( TM2x *tape 
+    ,void *dst_element_pt 
+    ,address_t element_byte_n
+    ,continuation nominal
+    ,continuation pop_last
+    ){
+    memcpyn(dst_element_pt, TM2x_element_n_pt(tape ,element_byte_n) ,element_byte_n);
+    goto *TM2x_pop(tape ,element_byte_n ,&&pop_nominal ,&&pop_pop_last);
+      pop_pop_last: continue_from pop_last;
+      pop_nominal: continue_from nominal;
+  }
+  #define TM2x_Read_Pop(tape ,dst_element ,cont_nominal ,cont_pop_last)\
+    goto *TM2x_read_pop(tape ,&dst_element ,byte_n_of(typeof(dst_element)) ,cont_nominal ,cont_pop_last)
+
 
 
 #endif

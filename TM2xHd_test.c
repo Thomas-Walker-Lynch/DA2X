@@ -42,7 +42,7 @@ TM2x_Result test_0(){
   TM2xHdTestContext1 c_instance, *c; c = &c_instance;
   c->ref = 10;
   c->result = true;
-  TM2xHd_AllocStaticInit(a0 ,hd);
+  TM2xHd_AllocStaticRewind(a0 ,hd);
   TM2xHd_apply_to_each(a0 ,hd ,byte_n_of(uint32_t) ,c ,TM2xHd_f0);
   f[i++] = c->result; // should be true because f0 increments c->ref also starting from 10.
 
@@ -94,7 +94,7 @@ TM2x_Result test_1(){
     TM2x_Push_Write(a0 ,j);    
   }
 
-  TM2xHd_AllocStaticInit(a0 ,hd);
+  TM2xHd_AllocStaticRewind(a0 ,hd);
   f[i++] = TM2xHd_all(a0 ,hd ,byte_n_of(uint32_t) ,NULL ,TM2xHd_p0);
   TM2xHd_rewind(a0 ,hd);
   f[i++] = !TM2xHd_all(a0 ,hd ,byte_n_of(uint32_t) ,NULL ,TM2xHd_p1);
@@ -103,7 +103,7 @@ TM2x_Result test_1(){
   TM2xHd_rewind(a0 ,hd);
   f[i++] = !TM2xHd_exists(a0 ,hd ,byte_n_of(uint32_t) ,NULL ,TM2xHd_p4);
 
-  TM2xHd_AllocStaticInit(a0 ,hd1);
+  TM2xHd_AllocStaticRewind(a0 ,hd1);
   TM2xHd_exists(a0 ,hd1 ,byte_n_of(uint32_t) ,NULL ,TM2xHd_p2);
   uint t0 = TM2xHd_Read_Expr(hd1 ,uint32_t);
   f[i++] = TM2xHd_is_on_tape(a0 ,hd1) && t0 == 248;
@@ -135,7 +135,7 @@ TM2x_Result test_2(){
   }
 
   // prints: 
-  TM2xHd_AllocStaticInit(a0 ,hd);
+  TM2xHd_AllocStaticRewind(a0 ,hd);
   TM2xHd_apply_to_each(a0 ,hd ,byte_n_of(uint32_t) ," " ,TM2xHd_f_print_int);
   fputc('\n' ,stderr);
 
@@ -163,7 +163,7 @@ TM2x_Result test_3(){
   }
 
   fprintf(stderr, "a0:");
-  TM2xHd_AllocStaticInit(a0 ,hd);
+  TM2xHd_AllocStaticRewind(a0 ,hd);
   TM2xHd_apply_to_each(a0 ,hd ,byte_n_of(uint) ," " ,TM2xHd_f_print_int);
   fputc('\n' ,stderr);
 

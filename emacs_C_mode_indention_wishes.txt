@@ -1,0 +1,25 @@
+
+
+1. when a blank line comment occurs under other line comments, the code that follows
+should be indented 
+
+  // x is 4.
+  x = 4;
+
+  // this is a section
+  //
+    x = 5;
+
+
+2. labels should indent like code, code following a label should indent further
+
+    goto *__TM2x_format(tape ,byte_n ,&&format_success ,&&format_fail);
+    format_fail: 
+      continue_from fail;     
+    format_success: 
+      memcpyn(tape->base_pt ,tape_src->base_pt ,byte_n);
+      continue_from success;
+
+maybe wishe:
+better blocking for line by line arguments on functions
+

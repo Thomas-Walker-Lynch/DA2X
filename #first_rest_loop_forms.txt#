@@ -253,3 +253,5 @@ the intersection code:
        }
        until( TM2xHd_at_element_n(set_a ,hd_a ,element_byte_n) );
 
+I can adopt a trampoline style to support multiple continuations
+
