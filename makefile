@@ -17,7 +17,7 @@ libTM2x.a: TM2x.o
 TM2x_test: TM2x_test.c TM2x.o TM2x.h TM2x_malloc_counter.h
 	$(CC) $(CFLAGS) -o TM2x_test TM2x.o TM2x_test.c 
 
-TM2xHd_test: TM2xHd_test.c TM2xHd.h TM2x_malloc_counter.h
+TM2xHd_test: TM2x.o TM2xHd_test.c TM2xHd.h TM2x.h TM2x_malloc_counter.h 
 	$(CC) $(CFLAGS) -o TM2xHd_test TM2x.o TM2xHd_test.c
 
 .PHONY: test

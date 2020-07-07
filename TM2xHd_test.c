@@ -24,27 +24,43 @@ void TM2xHd_f0(void *context ,void *item_pt ,address_t element_byte_n){
 TM2x_Result test_0(){
   address_t malloc_cnt = TM2x_malloc_cnt;
   address_t initialized_cnt = TM2x_initialized_cnt;
-  bool f[4];
+  bool f[256];
   uint32_t i = 0;
 
   TM2x_Result r ,*rp; rp = &r;
   TM2x_Result_init(rp);
-  TM2x *a0; 
-  f[i++] = TM2x_alloc_heap_format(&a0 ,0 ,byte_n_of(uint32_t));
-  
+  TM2x *a0;
+  continue_into TM2x_alloc_heap_format(&a0 ,0 ,byte_n_of(uint32_t) ,&&nominal_0 ,&&fail_0);
+    nominal_0:
+      f[i] = true;
+      continue_from_local end_0;
+    fail_0:
+      f[i] = false;
+      continue_from_local end_0;
+    end_0:
+      i++;
+
+  f[i] = true;
   uint32_t j=10;
   TM2x_Write(a0 ,0 ,j);
   while( j < 99 ){
     j++;
-    TM2x_Push_Write(a0 ,j);    
+    continue_into TM2x_Push_Write(a0 ,j ,&&nominal_1 ,&&fail_1);    
+    fail_1:
+      f[i] = false;
+    nominal_1:
+      while(false){}; // labels need statements
   }
+  i++;
   
   TM2xHdTestContext1 c_instance, *c; c = &c_instance;
   c->ref = 10;
   c->result = true;
   TM2xHd_AllocStaticRewind(a0 ,hd);
   TM2xHd_apply_to_each(a0 ,hd ,byte_n_of(uint32_t) ,c ,TM2xHd_f0);
-  f[i++] = c->result; // should be true because f0 increments c->ref also starting from 10.
+  f[i++] = c->result;
+  f[i++] = c->ref == 100;
+  fprintf(stderr, "ref: %u\n" ,c->ref);
 
   TM2x_dealloc_heap(a0);
   f[i++] = malloc_cnt == TM2x_malloc_cnt;
@@ -53,7 +69,7 @@ TM2x_Result test_0(){
   if( r.failed > 0 ) TM2x_Result_print(&r ,"test_0 ");
   return r;
 }
-
+#if 0
 bool TM2xHd_p0(void *context ,void *item_pt ,address_t element_byte_n){
   uint item = *(uint *)item_pt;
   return item >= 100 && item < 356;
@@ -219,17 +235,18 @@ TM2x_Result test_3(){
   if( r.failed > 0 ) TM2x_Result_print(&r ,"test_1 ");
   return r;
 }
-
+#endif
 
 int main(){
   TM2x_Result r ,acc ,*accp; accp=&acc;
   TM2x_Result_init(accp);
 
   r = test_0(); TM2x_Result_accumulate(accp ,&r);
+  /*
   r = test_1(); TM2x_Result_accumulate(accp ,&r);
   r = test_2(); TM2x_Result_accumulate(accp ,&r);
   r = test_3(); TM2x_Result_accumulate(accp ,&r);
-
+  */
   TM2x_Result_print(accp ,"TM2xHd_test results: ");
   return acc.failed;
 }

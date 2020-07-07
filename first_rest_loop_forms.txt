@@ -253,3 +253,24 @@ the intersection code:
        }
        until( TM2xHd_at_element_n(set_a ,hd_a ,element_byte_n) );
 
+I can adopt a trampoline style to support multiple continuations
+
+Using a tampoline and labels for labmdas does relieves us from having to send in closures.  When
+the function returns with the continuation pointer, the trampoline is already in the callers
+scope and can see all the variables the caller could.  It is almost too natural.
+
+One drawback of the trampoline is that we can not launch a second etc. thread so as
+to follow multiple continuations out of the function.  Once one of the threads calls
+return the stack will pop the functions frame.
+
+I wonder if we can use labels in a more general way as lambdas instead
+of mixing them with function calls.  So then, how do we handle variable renaming
+for code being called from multiple places.  If we create a new thread in
+the continuation then it will need a copy of the non-read only variables in
+a thread specific frame from the continuation, and would then drop this or
+carry it along as a closure as it follows more continuations.
+
+
+
+
+

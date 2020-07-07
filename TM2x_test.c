@@ -23,7 +23,7 @@ TM2x_Result test_0(){
   TM2x_AllocStaticFormat(a0p ,0 ,int32_t ,&&nominal ,&&fail);
     nominal:
       f[i] = true;  
-      goto end;
+      continue_from_local end;
     fail:
       f[i] = false;
     end:
@@ -55,20 +55,20 @@ TM2x_Result test_1(){
   uint i = 0;
 
   TM2x a0,*a0p; a0p = &a0;
-  goto *TM2x_format(a0p ,1 ,byte_n_of(int32_t) ,&&format_nominal ,&&format_alloc_fail);
+  continue_into TM2x_format(a0p ,1 ,byte_n_of(int32_t) ,&&format_nominal ,&&format_alloc_fail);
     format_alloc_fail:
       f[i] = false;
-      goto format_end;
+      continue_from_local format_end;
     format_nominal:
       f[i] = true;
     format_end:
       i++;
 
   f[i++] = a0p->byte_n == 7;
-  TM2x_Push_Alloc(a0p ,1 ,int32_t ,&&push_alloc_nominal ,&&push_alloc_fail);
+  continue_into TM2x_Push_Alloc(a0p ,1 ,int32_t ,&&push_alloc_nominal ,&&push_alloc_fail);
     push_alloc_fail:
       f[i] = false;
-      goto push_alloc_end;
+      continue_from_local push_alloc_end;
     push_alloc_nominal:
       f[i] = true;
     push_alloc_end:
@@ -89,40 +89,40 @@ TM2x_Result test_1(){
     int32_t y;
     f[i++] = a0p->byte_n == 15;
 
-    TM2x_Read_Pop(a0p ,y ,&&read_pop_nominal_0 ,&&read_pop_pop_last_0);
+    continue_into TM2x_Read_Pop(a0p ,y ,&&read_pop_nominal_0 ,&&read_pop_pop_last_0);
       read_pop_pop_last_0:
         f[i] = false;
-        goto read_pop_end_0;
+        continue_from_local read_pop_end_0;
       read_pop_nominal_0:
         f[i] = true;
       read_pop_end_0:
         i++;
     f[i++] = y == 4;
 
-    TM2x_Read_Pop(a0p ,y ,&&read_pop_nominal_1 ,&&read_pop_pop_last_1);
+    continue_into TM2x_Read_Pop(a0p ,y ,&&read_pop_nominal_1 ,&&read_pop_pop_last_1);
       read_pop_pop_last_1:
         f[i] = false;
-        goto read_pop_end_1;
+        continue_from_local read_pop_end_1;
       read_pop_nominal_1:
         f[i] = true;
       read_pop_end_1:
         i++;
     f[i++] = y == 3;
 
-    TM2x_Read_Pop(a0p ,y ,&&read_pop_nominal_2 ,&&read_pop_pop_last_2);
+    continue_into TM2x_Read_Pop(a0p ,y ,&&read_pop_nominal_2 ,&&read_pop_pop_last_2);
       read_pop_pop_last_2:
         f[i] = false;
-        goto read_pop_end_2;
+        continue_from_local read_pop_end_2;
       read_pop_nominal_2:
         f[i] = true;
       read_pop_end_2:
         i++;
     f[i++] = y == 2;
 
-    TM2x_Read_Pop(a0p ,y ,&&read_pop_nominal_3 ,&&read_pop_pop_last_3);
+    continue_into TM2x_Read_Pop(a0p ,y ,&&read_pop_nominal_3 ,&&read_pop_pop_last_3);
       read_pop_pop_last_3:
         f[i] = true;
-        goto read_pop_end_3;
+        continue_from_local read_pop_end_3;
       read_pop_nominal_3:
         f[i] = false;
       read_pop_end_3:
@@ -151,7 +151,7 @@ TM2x_Result test_2(){
   TM2x_AllocStaticFormat(a0 ,0 ,int32_t ,&&nominal ,&&fail);
     nominal:
       f[i] = true;  
-      goto end;
+      continue_from_local end;
     fail:
       f[i] = false;
     end:
@@ -162,10 +162,10 @@ TM2x_Result test_2(){
   TM2x_Write(a0 ,0 ,x); 
 
   ++x;
-  TM2x_Push_Write(a0 ,x ,&&push_write_nominal_0 ,&&push_write_allocation_failed_0);
+  continue_into TM2x_Push_Write(a0 ,x ,&&push_write_nominal_0 ,&&push_write_allocation_failed_0);
     push_write_allocation_failed_0:
       f[i] = false;
-      goto push_write_end_0;
+      continue_from_local push_write_end_0;
     push_write_nominal_0:
       f[i] = true;
     push_write_end_0:
@@ -173,10 +173,10 @@ TM2x_Result test_2(){
   f[i++] = TM2x_test_after_allocation_n == 7;
 
   ++x; 
-  TM2x_Push_Write(a0 ,x ,&&push_write_nominal_1 ,&&push_write_allocation_failed_1);
+  continue_into TM2x_Push_Write(a0 ,x ,&&push_write_nominal_1 ,&&push_write_allocation_failed_1);
     push_write_allocation_failed_1:
       f[i] = false;
-      goto push_write_end_1;
+      continue_from_local push_write_end_1;
     push_write_nominal_1:
       f[i] = true;
     push_write_end_1:
@@ -184,10 +184,10 @@ TM2x_Result test_2(){
   f[i++] = TM2x_test_after_allocation_n == 15;
 
   ++x; 
-  TM2x_Push_Write(a0 ,x ,&&push_write_nominal_2 ,&&push_write_allocation_failed_2);
+  continue_into TM2x_Push_Write(a0 ,x ,&&push_write_nominal_2 ,&&push_write_allocation_failed_2);
     push_write_allocation_failed_2:
       f[i] = false;
-      goto push_write_end_2;
+      continue_from_local push_write_end_2;
     push_write_nominal_2:
       f[i] = true;
     push_write_end_2:
@@ -195,10 +195,10 @@ TM2x_Result test_2(){
   f[i++] = TM2x_test_after_allocation_n == 15;
 
   ++x; 
-  TM2x_Push_Write(a0 ,x ,&&push_write_nominal_3 ,&&push_write_allocation_failed_3);
+  continue_into TM2x_Push_Write(a0 ,x ,&&push_write_nominal_3 ,&&push_write_allocation_failed_3);
     push_write_allocation_failed_3:
       f[i] = false;
-      goto push_write_end_3;
+      continue_from_local push_write_end_3;
     push_write_nominal_3:
       f[i] = true;
     push_write_end_3:
@@ -206,10 +206,10 @@ TM2x_Result test_2(){
   f[i++] = TM2x_test_after_allocation_n == 31;
 
   int32_t y=111222;
-    TM2x_Read_Pop(a0 ,y ,&&read_pop_nominal_0 ,&&read_pop_pop_last_0);
+    continue_into TM2x_Read_Pop(a0 ,y ,&&read_pop_nominal_0 ,&&read_pop_pop_last_0);
       read_pop_pop_last_0:
         f[i] = false;
-        goto read_pop_end_0;
+        continue_from_local read_pop_end_0;
       read_pop_nominal_0:
         f[i] = true;
       read_pop_end_0:
@@ -217,10 +217,10 @@ TM2x_Result test_2(){
   f[i++] = y == 5;
   f[i++] = TM2x_test_after_allocation_n == 15;
   
-    TM2x_Read_Pop(a0 ,y ,&&read_pop_nominal_1 ,&&read_pop_pop_last_1);
+    continue_into TM2x_Read_Pop(a0 ,y ,&&read_pop_nominal_1 ,&&read_pop_pop_last_1);
       read_pop_pop_last_1:
         f[i] = false;
-        goto read_pop_end_1;
+        continue_from_local read_pop_end_1;
       read_pop_nominal_1:
         f[i] = true;
       read_pop_end_1:
@@ -228,10 +228,10 @@ TM2x_Result test_2(){
   f[i++] = y == 4;
   f[i++] = TM2x_test_after_allocation_n == 15;
   
-    TM2x_Read_Pop(a0 ,y ,&&read_pop_nominal_2 ,&&read_pop_pop_last_2);
+    continue_into TM2x_Read_Pop(a0 ,y ,&&read_pop_nominal_2 ,&&read_pop_pop_last_2);
       read_pop_pop_last_2:
         f[i] = false;
-        goto read_pop_end_2;
+        continue_from_local read_pop_end_2;
       read_pop_nominal_2:
         f[i] = true;
       read_pop_end_2:
@@ -239,10 +239,10 @@ TM2x_Result test_2(){
   f[i++] = y == 3;
   f[i++] = TM2x_test_after_allocation_n == 7;
   
-    TM2x_Read_Pop(a0 ,y ,&&read_pop_nominal_3 ,&&read_pop_pop_last_3);
+    continue_into TM2x_Read_Pop(a0 ,y ,&&read_pop_nominal_3 ,&&read_pop_pop_last_3);
       read_pop_pop_last_3:
         f[i] = false;
-        goto read_pop_end_3;
+        continue_from_local read_pop_end_3;
       read_pop_nominal_3:
         f[i] = true;
       read_pop_end_3:
@@ -250,10 +250,10 @@ TM2x_Result test_2(){
   f[i++] = y == 2;
   f[i++] = TM2x_test_after_allocation_n == 3;
   
-    TM2x_Read_Pop(a0 ,y ,&&read_pop_nominal_4 ,&&read_pop_pop_last_4);
+    continue_into TM2x_Read_Pop(a0 ,y ,&&read_pop_nominal_4 ,&&read_pop_pop_last_4);
       read_pop_pop_last_4:
         f[i] = true;
-        goto read_pop_end_4;
+        continue_from_local read_pop_end_4;
       read_pop_nominal_4:
         f[i] = false;
       read_pop_end_4:
