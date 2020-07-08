@@ -1,1 +1,19 @@
+
+  Note that the intersection is incorrect.
+
 ./TM2x_test && ./TM2xHd_test
+test_0: 5 flags ,5 passed. 0 failed.
+test_1: 16 flags ,16 passed. 0 failed.
+test_2: 27 flags ,27 passed. 0 failed.
+TM2x_test results: 48 passed. 0 failed.
+test_0: 6 flags ,6 passed. 0 failed.
+test_1: 8 flags ,8 passed. 0 failed.
+ 100 101 102 103 104 105 106 107 108 109 110
+test_2: 3 flags ,3 passed. 0 failed.
+a0: 0 3 6 9 12 15 18 21 24 27 30
+a1: 50 45 40 35 30 25 20 15 10
+a2: 30 57 15 59 15
+a3 = intersection a1 a0:  15
+a3 union a2:  15 30 57 59
+test_3: 20 flags ,20 passed. 0 failed.
+TM2xHd_test results: 37 passed. 0 failed.
