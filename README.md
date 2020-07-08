@@ -246,3 +246,22 @@ This array is kind of expanding tape as described in the tm library.
   Hence I have modified the code to pass `element_byte_n` (the size of the elements) though
   the interface.
   
+## Continuations
+
+  I have found a reasonable technique for doing continuations in C. What would be 
+  lambdas are code segments followed by a label. Instead of passing the lambdas into
+  the functions directly, instead a tampoline bounces the label backout.  Thus the 
+  code segment is at the same level in the code as the function call it was 'passed into'
+  and thus can see the context variables.
+  
+  There are a couple of disadvantages. The label scoping is a bit messed up, all code segments
+  can see all labels.  Another drawback is that labels can only be used on statements.  However
+  a loan semicolon is a statement, so I just follow all labels with ':;' instead of just ';',
+  then things such as declarations may follow the labels. We can not pass in functions like be(true)
+  and then easily turn a continuation function into a bool returning function. C mode gets
+  confused, and it is no fun to fight the electric indentation.
+  
+  `continuation` is the continuation type.
+  `continue_into` precedes functions that accept continuation arguments.
+  `confinue_from` causes a continuation to be taken by going through the trampoline
+  `contianue_local` invokes a continuation within the same scope

@@ -11,15 +11,16 @@ should be indented
     x = 5;
 
 
-2. labels should indent like code, code following a label should indent further
+2. label indention to support the format shown in the .h and .c files in this directory.
+  A little bit like switch statements. Right now labels outdent, and it is a constant fight
 
-    goto *__TM2x_format(tape ,byte_n ,&&format_success ,&&format_fail);
-    format_fail: 
-      continue_from fail;     
-    format_success: 
-      memcpyn(tape->base_pt ,tape_src->base_pt ,byte_n);
-      continue_from success;
-
-maybe wishe:
-better blocking for line by line arguments on functions
+  continue_into TM2x_alloc_heap_format(&a0 ,0 ,byte_n_of(uint32_t) ,&&nominal_0 ,&&fail_0);
+    nominal_0:
+      f[i] = true;
+      continue_from_local end_0;
+    fail_0:
+      f[i] = false;
+      continue_from_local end_0;
+    end_0:
+      i++;
 

@@ -134,7 +134,7 @@
     ,TM2xHd *hd
     ,address_t element_byte_n
     ,void *context
-    ,bool pred(void *context ,void *el ,address_t element_byte_n ,continuation pred_true ,continuation pred_false)
+    ,continuation pred(void *context ,void *el ,address_t element_byte_n ,continuation pred_true ,continuation pred_false)
     ,continuation true_for_all
     ,continuation an_exception
     ){
@@ -156,21 +156,21 @@
     ,TM2xHd *hd
     ,address_t element_byte_n
     ,void *context
-    ,bool pred(void *context ,void *el ,address_t element_byte_n ,continuation pred_true ,continuation pred_false)
+    ,continuation pred(void *context ,void *el ,address_t element_byte_n ,continuation pred_true ,continuation pred_false)
     ,continuation found_one
     ,continuation not_on_tape
     ){
     TM2xHd_exists:
       continue_into pred(context ,TM2xHd_pt(hd) ,element_byte_n ,&&pred_true ,&&pred_false );
         pred_true:
-          TM2xHd_at_element_n(tape ,hd ,element_byte_n ,&&hd_at_n , &&hd_not_at_n);
+          continue_from found_one;
+        pred_false:
+          continue_into TM2xHd_at_element_n(tape ,hd ,element_byte_n ,&&hd_at_n , &&hd_not_at_n);
             hd_at_n:
               continue_from not_on_tape;
             hd_not_at_n: 
               TM2xHd_step(hd ,element_byte_n);
               continue_from_local TM2xHd_exists;
-        pred_false:
-          continue_from found_one;
   }
 
 //--------------------------------------------------------------------------------
@@ -186,7 +186,7 @@
   ( TM2x *tape_dst
     ,void *src_element_pt 
     ,address_t element_byte_n
-    ,bool pred(void *context ,void *el ,address_t element_byte_n ,continuation pred_true ,continuation pred_false)
+    ,continuation pred(void *context ,void *el ,address_t element_byte_n ,continuation pred_true ,continuation pred_false)
     ,continuation wrote_it
     ,continuation already_on_tape_dst
     ,continuation allocate_failed
@@ -221,7 +221,7 @@
     ,TM2x *set_src
     ,TM2xHd *hd_src
     ,address_t element_byte_n
-    ,bool pred(void *context ,void *el ,address_t element_byte_n ,continuation pred_true ,continuation pred_false)
+    ,continuation pred(void *context ,void *el ,address_t element_byte_n ,continuation pred_true ,continuation pred_false)
     ,bool *subset
     ,continuation nominal
     ,continuation allocation_failed
@@ -260,7 +260,7 @@
     ,TM2x *set_a
     ,TM2x *set_b
     ,address_t element_byte_n
-    ,bool pred(void *context ,void *el ,address_t element_byte_n ,continuation pred_true ,continuation pred_false)
+    ,continuation pred(void *context ,void *el ,address_t element_byte_n ,continuation pred_true ,continuation pred_false)
     ,bool *distinct
     ,continuation nominal
     ,continuation allocation_failed
