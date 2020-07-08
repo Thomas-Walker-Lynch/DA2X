@@ -4,6 +4,7 @@ tmp/
 !.gitignore
 *~
 *.o
+libTM2x.a
 TM2x_test
 TM2xHd_test
-libTM2x.a
+trampoline_example
