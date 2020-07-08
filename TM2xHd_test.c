@@ -239,7 +239,7 @@ TM2x_Result test_2(){
   address_t initialized_cnt = TM2x_initialized_cnt;
   TM2x_Result r ,*rp; rp = &r;
   TM2x_Result_init(rp);
-  bool f[7];
+  bool f[256];
   uint32_t i = 0;
 
   TM2x *a0;
@@ -277,21 +277,35 @@ TM2x_Result test_2(){
   return r;
 }
 
-#if 0
 TM2x_Result test_3(){
   address_t malloc_cnt = TM2x_malloc_cnt;
   address_t initialized_cnt = TM2x_initialized_cnt;
   TM2x_Result r ,*rp; rp = &r;
   TM2x_Result_init(rp);
-  bool f[7];
+  bool f[256];
   uint32_t i = 0;
+  uint32_t j;
 
-  uint j=0;
-  TM2x_AllocStaticFormat_Write(a0 ,j);
-  while(j < 30){
+  j=0;
+  TM2x_AllocStaticFormat_Write(a0 ,j ,&&nominal_0 ,&&fail_0);
+    nominal_0:;
+      f[i] = true;
+      continue_from_local end_0;
+    fail_0:;
+      f[i] = false;
+      continue_from_local end_0;
+    end_0:;
+      i++;
+  f[i] = true; 
+  while( j < 30 ){
     j+=3;
-    TM2x_Push_Write(a0 ,j);    
+    continue_into TM2x_Push_Write(a0 ,j ,&&nominal_1 ,&&fail_1);    
+    fail_1:;
+      f[i] = false;
+    nominal_1:;
+      ;
   }
+  i++;
 
   fprintf(stderr, "a0:");
   TM2xHd_AllocStaticRewind(a0 ,hd);
@@ -299,10 +313,26 @@ TM2x_Result test_3(){
   fputc('\n' ,stderr);
 
   j=50;
-  TM2x_AllocStaticFormat_Write(a1 ,j);
-  while(j > 10){
+  TM2x_AllocStaticFormat_Write(a1 ,j ,&&nominal_2 ,&&fail_2);
+    nominal_2:;
+      f[i] = true;
+      continue_from_local end_2;
+    fail_2:;
+      f[i] = false;
+      continue_from_local end_2;
+    end_2:;
+      i++;
+  while( j > 10 ){
     j-=5;
-    TM2x_Push_Write(a1 ,j);    
+    continue_into TM2x_Push_Write(a1 ,j ,&&nominal_3 ,&&fail_3);    
+      nominal_3:;
+        f[i] = true;
+        continue_from_local end_3;
+      fail_3:;
+        f[i] = false;
+        continue_from_local end_3;
+      end_3:;
+        i++;
   }
 
   fprintf(stderr, "a1:");
@@ -311,15 +341,59 @@ TM2x_Result test_3(){
   fputc('\n' ,stderr);
 
   j=30;
-  TM2x_AllocStaticFormat_Write(a2 ,j);
+  TM2x_AllocStaticFormat_Write(a2 ,j ,&&nominal_4 ,&&fail_4);
+    nominal_4:;
+      f[i] = true;
+      continue_from_local end_4;
+    fail_4:;
+      f[i] = false;
+      continue_from_local end_4;
+    end_4:;
+      i++;
+
   j=57;
-  TM2x_Push_Write(a2 ,j);
+  continue_into TM2x_Push_Write(a2 ,j ,&&nominal_5 ,&&fail_5);    
+    nominal_5:;
+      f[i] = true;
+      continue_from_local end_5;
+    fail_5:;
+      f[i] = false;
+      continue_from_local end_5;
+    end_5:;
+      i++;
+
   j=15;
-  TM2x_Push_Write(a2 ,j);    
+  continue_into TM2x_Push_Write(a2 ,j ,&&nominal_6 ,&&fail_6);    
+    nominal_6:;
+      f[i] = true;
+      continue_from_local end_6;
+    fail_6:;
+      f[i] = false;
+      continue_from_local end_6;
+    end_6:;
+      i++;
+
   j=59;
-  TM2x_Push_Write(a2 ,j);    
+  continue_into TM2x_Push_Write(a2 ,j ,&&nominal_7 ,&&fail_7);    
+    nominal_7:;
+      f[i] = true;
+      continue_from_local end_7;
+    fail_7:;
+      f[i] = false;
+      continue_from_local end_7;
+    end_7:;
+      i++;
+
   j=15;
-  TM2x_Push_Write(a2 ,j);    
+  continue_into TM2x_Push_Write(a2 ,j ,&&nominal_8 ,&&fail_8);    
+    nominal_8:;
+      f[i] = true;
+      continue_from_local end_8;
+    fail_8:;
+      f[i] = false;
+      continue_from_local end_8;
+    end_8:;
+      i++;
 
   fprintf(stderr, "a2:");
   TM2xHd_rewind(a2 ,hd);
@@ -327,13 +401,51 @@ TM2x_Result test_3(){
   fputc('\n' ,stderr);
 
   TM2x_AllocStatic(a3);
-  TM2xHd_init_intersection(a3 ,a0 ,a1 ,byte_n_of(uint) ,TM2xHd_pred_bytes_eq);
+  bool distinct;
+  continue_into TM2xHd_init_intersection
+    ( a3 
+      ,a0 
+      ,a1
+      ,byte_n_of(uint) 
+      ,TM2xHd_pred_bytes_eq
+      ,&distinct
+      ,&&nominal_9 
+      ,&&fail_9
+      );
+    nominal_9:;
+      f[i] = true;
+      continue_from_local end_9;
+    fail_9:;
+      f[i] = false;
+      continue_from_local end_9;
+    end_9:;
+      i++;
+
   fprintf(stderr, "a3 = intersection a1 a0: ");
   TM2xHd_rewind(a3 ,hd);
   TM2xHd_apply_to_each(a3 ,hd ,byte_n_of(uint) ," " ,TM2xHd_f_print_int);
   fputc('\n' ,stderr);
 
-  TM2xHd_accumulate_union(a3 ,a2 ,byte_n_of(uint) ,TM2xHd_pred_bytes_eq);
+  bool subset;
+  TM2xHd_AllocStaticRewind(a2 ,a2_hd);
+  continue_into TM2xHd_accumulate_union
+    ( a3 
+      ,a2 
+      ,a2_hd
+      ,byte_n_of(uint) 
+      ,TM2xHd_pred_bytes_eq 
+      ,&subset
+      ,&&nominal_10 
+      ,&&fail_10
+      );
+    nominal_10:;
+      f[i] = true;
+      continue_from_local end_10;
+    fail_10:;
+      f[i] = false;
+      continue_from_local end_10;
+    end_10:;
+      i++;
 
   fprintf(stderr, "a3 union a2: ");
   TM2xHd_rewind(a3 ,hd);
@@ -349,7 +461,6 @@ TM2x_Result test_3(){
   TM2x_Result_tally("test_3" ,rp ,f ,i);
   return r;
 }
-#endif
 
 int main(){
   TM2x_Result r ,acc ,*accp; accp=&acc;
@@ -358,9 +469,8 @@ int main(){
   r = test_0(); TM2x_Result_accumulate(accp ,&r);
   r = test_1(); TM2x_Result_accumulate(accp ,&r);
   r = test_2(); TM2x_Result_accumulate(accp ,&r);
-  /*
   r = test_3(); TM2x_Result_accumulate(accp ,&r);
-  */
+
   TM2x_Result_print("TM2xHd_test results" ,accp);
   return acc.failed;
 }
