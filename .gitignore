@@ -5,5 +5,5 @@ tmp/
 *~
 *.o
 TM2x_test
-TM2xHD_test
+TM2xHd_test
 libTM2x.a

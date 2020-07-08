@@ -90,7 +90,7 @@ continuation TM2xHd_p1
   ,continuation pred_false
   ){
   uint item = *(uint *)item_pt;
-  if( item >= 100 && item < 355 )
+  if( item >= 100 && item <= 354 )
     continue_from pred_true;
   else 
     continue_from pred_false;
@@ -183,8 +183,7 @@ TM2x_Result test_1(){
       f[i] = false;
       continue_from_local end_2;
     an_exception_2:;
-// test hd to have the correct value
-      f[i] = true;
+      f[i] = TM2xHd_Read_Expr(hd ,uint32_t) == 355;
       continue_from_local end_2;
     end_2:;
       i++;
@@ -192,8 +191,7 @@ TM2x_Result test_1(){
   TM2xHd_rewind(a0 ,hd);
   continue_into TM2xHd_exists(a0 ,hd ,byte_n_of(uint32_t) ,NULL ,TM2xHd_p3 ,&&found_3 ,&&not_found_3);
     found_3:;
-// need to test that the right thing was found
-      f[i] = true;
+      f[i] = TM2xHd_Read_Expr(hd ,uint32_t) == 355;
       continue_from_local end_3;
     not_found_3:;
       f[i] = false;
@@ -235,8 +233,8 @@ TM2x_Result test_1(){
   TM2x_Result_tally("test_1" ,rp ,f ,i);
   return r;
 }
-#if 0
 
+#if 0
 TM2x_Result test_2(){
   address_t malloc_cnt = TM2x_malloc_cnt;
   address_t initialized_cnt = TM2x_initialized_cnt;
@@ -266,6 +264,7 @@ TM2x_Result test_2(){
   TM2x_Result_tally("test_2" ,rp ,f ,i);
   return r;
 }
+
 
 TM2x_Result test_3(){
   address_t malloc_cnt = TM2x_malloc_cnt;
