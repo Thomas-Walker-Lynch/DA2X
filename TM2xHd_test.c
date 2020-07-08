@@ -234,7 +234,6 @@ TM2x_Result test_1(){
   return r;
 }
 
-#if 0
 TM2x_Result test_2(){
   address_t malloc_cnt = TM2x_malloc_cnt;
   address_t initialized_cnt = TM2x_initialized_cnt;
@@ -244,13 +243,26 @@ TM2x_Result test_2(){
   uint32_t i = 0;
 
   TM2x *a0;
-  f[i++] = TM2x_alloc_heap_format(&a0 ,0 ,byte_n_of(uint32_t));
+  continue_into TM2x_alloc_heap_format(&a0 ,0 ,byte_n_of(uint32_t) ,&&nominal_0 ,&&fail_0);
+    nominal_0:;
+      f[i] = true;
+      continue_from_local end_0;
+    fail_0:;
+      f[i] = false;
+      continue_from_local end_0;
+    end_0:;
+      i++;
 
-  uint j=100;
+  // make an array of data
+  f[i] = true; // allocation failure flag
+  uint32_t j=100;
   TM2x_Write(a0 ,0 ,j);
-  while(j < 110){
+  while( j < 110){
     ++j;
-    TM2x_Push_Write(a0 ,j);    
+    continue_into TM2x_Push_Write(a0 ,j ,&&nominal_1 ,&&fail_1);    
+    fail_1:;
+      f[i] = false;
+    nominal_1:;
   }
 
   // prints: 
@@ -265,7 +277,7 @@ TM2x_Result test_2(){
   return r;
 }
 
-
+#if 0
 TM2x_Result test_3(){
   address_t malloc_cnt = TM2x_malloc_cnt;
   address_t initialized_cnt = TM2x_initialized_cnt;
@@ -345,8 +357,8 @@ int main(){
 
   r = test_0(); TM2x_Result_accumulate(accp ,&r);
   r = test_1(); TM2x_Result_accumulate(accp ,&r);
-  /*
   r = test_2(); TM2x_Result_accumulate(accp ,&r);
+  /*
   r = test_3(); TM2x_Result_accumulate(accp ,&r);
   */
   TM2x_Result_print("TM2xHd_test results" ,accp);
