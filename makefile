@@ -1,7 +1,12 @@
 
 
+# using gnu extensions:
+#  varaible value is a &&label
+#  nested functions
+#  statement expressions
+
 CC= gcc
-CFLAGS= -Wall -g
+CFLAGS= -std=gnu18 -Wall -g
 TARGETS= libTM2x.a TM2x_test TM2xHd_test
 INSTALL= libTM2x.a TM2x.h TM2xHd.h
 

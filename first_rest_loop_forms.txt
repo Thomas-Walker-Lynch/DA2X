@@ -22,7 +22,7 @@ this comes from TM2xHd_init_intersection
       a_element_pt = TM2xHd_pt(hd_a);
       TM2xHd_rewind(set_b ,hd_b);
       if(TM2xHd_exists(set_b ,hd_b ,element_byte_n ,a_element_pt ,pred)){
-        TM2x_push_write(set_c ,a_element_pt ,element_byte_n);      
+        TM2x_push_write(set_c ,a_element_pt ,element_byte_n);
       }
     }
     return true;
@@ -34,13 +34,13 @@ this comes from TM2xHd_init_intersection
       void *a_element_pt = TM2xHd_pt(hd_a);
       found_first = TM2xHd_exists(set_b ,hd_b ,element_byte_n ,a_element_pt ,pred);
       if( found_first ){
-        TM2x_init_write(set_c ,a_element_pt ,element_byte_n);      
+        TM2x_init_write(set_c ,a_element_pt ,element_byte_n);
         // extend
         while(TM2xHd_step(set_a ,hd_a ,element_byte_n)){
           a_element_pt = TM2xHd_pt(hd_a);
           TM2xHd_rewind(set_b ,hd_b);
           if(TM2xHd_exists(set_b ,hd_b ,element_byte_n ,a_element_pt ,pred)){
-            TM2x_push_write(set_c ,a_element_pt ,element_byte_n);      
+            TM2x_push_write(set_c ,a_element_pt ,element_byte_n);
           }
         }
         break;
@@ -121,13 +121,13 @@ wonder if intersection can serialized in a prettier manner:
       if( !TM2xHd_step(set_a ,hd_a ,element_byte_n) ) return false; // never found first
       TM2xHd_rewind(set_b ,hd_b);
     }while(true);
-    TM2x_init_write(set_c ,TM2xHd_pt(hd_a) ,element_byte_n);           
+    TM2x_init_write(set_c ,TM2xHd_pt(hd_a) ,element_byte_n);
 
     //extend
     while(TM2xHd_step(set_a ,hd_a ,element_byte_n)){
       TM2xHd_rewind(set_b ,hd_b);
       if(TM2xHd_exists(set_b ,hd_b ,element_byte_n ,TM2xHd_pt(hd_a) ,pred)){
-        TM2x_push_write(set_c ,TM2xHd_pt(hd_a) ,element_byte_n);      
+        TM2x_push_write(set_c ,TM2xHd_pt(hd_a) ,element_byte_n);
       }}
     return true;
 
@@ -143,12 +143,12 @@ wonder if that loop form can be generalized:
     is_one_init(hd);
     while(step(hd)){
        after_step_work(hd);
-       if( is_one(hd) ) is_one_extend(hd);       
+       if( is_one(hd) ) is_one_extend(hd);
     }
     end:
     no_initialization:
 
--------------------------
+--------------------------------------------------------------------------------
 2020-07-05T18:12:53Z
 
 I should unpack the step and test so that the loop structures are more clear.  Also in the
@@ -166,23 +166,23 @@ ok, now it looks like the following.  step(hd) includes the 'after_step_work' fr
     is_one_init(hd);
     while(!at_element_n(hd)){
        step(hd)
-       if( is_one(hd) ) is_one_extend(hd);       
+       if( is_one(hd) ) is_one_extend(hd);
     }
     end:
     no_initialization:
 
 
-or, the cleanest first-rest form yet:
+** or, the cleanest first-rest form yet:
 
     before_first_step_work(hd);
     do{
-       if( is_one(hd) ) init(hd); break;       
+       if( is_one(hd) ) init(hd); break;
        if( at_element_n(hd) ) goto no_initialization;
        step(hd)
     }while(true);
     while(!at_element_n(hd)){
        step(hd)
-       if( is_one(hd) ) extend(hd);        
+       if( is_one(hd) ) extend(hd);
     }
     end:
     no_initialization:
@@ -238,12 +238,12 @@ the intersection code:
 
      when( TM2xHd_exists(set_b ,hd_b ,element_byte_n ,TM2xHd_pt(hd_a) ,pred) )
        init{
-         TM2x_format_write(set_c ,TM2xHd_pt(hd_a) ,element_byte_n);           
+         TM2x_format_write(set_c ,TM2xHd_pt(hd_a) ,element_byte_n);
        }else{
          return false;
        }
        extend{
-         TM2x_push_write(set_c ,TM2xHd_pt(hd_a) ,element_byte_n);        
+         TM2x_push_write(set_c ,TM2xHd_pt(hd_a) ,element_byte_n);
        }else{
          return true;
        }
@@ -269,6 +269,121 @@ for code being called from multiple places.  If we create a new thread in
 the continuation then it will need a copy of the non-read only variables in
 a thread specific frame from the continuation, and would then drop this or
 carry it along as a closure as it follows more continuations.
+
+
+--------------------------------------------------------------------------------
+2020-07-08T16:19:13Z
+
+The code has now been converted to use continuations via labels and trampoline.
+The first-rest loop now looks like:
+
+  first:;
+    continue_into is_one(hd ,&&is_one ,&&not_one);
+      is_one:;
+        init(hd);
+        continue_from_local rest;
+      not_one:;
+        continue_into at_element_n(hd ,&&at_n  ,&&not_at_n);
+          at_n:;
+            continue_from <not_found>
+          not_at_n:;
+            step(hd);
+            continue_from_local first;
+
+  rest:;
+    continue_into at_element_n(hd ,&&at_n ,&&not_at_n);
+      at_n:;
+        continue_from <done>
+      not_at_n:;
+        step(hd);
+        continue_into is_one(hd ,&&is_one ,&&not_one);
+          is_one:;
+            extend(hd)
+          not_one:;
+        continue_from_local rest;
+
+
+----------
+
+   first is_one init rest at_n <done>
+         |                |
+         |                not_at_n step is_one extend rest
+         |                              |
+         |                              not_one rest
+         not_one at_n <not_found>
+                 |
+                 not_at_n step first
+
+--------------
+functions 
+
+   is_one
+
+   init
+   extend
+
+   at_elment_n
+   step
+
+form:
+
+   hd -> <not_found> ,<done>
+     if( is_one ) init ,extend;
+     if( !at_element_n ) step;
+
+   #define LP( is_one ,init ,extend ,at_element_n ,step, done ,not_found )
+
+---------------------------------------- 
+
+All the named code sequences have access to all variables in scope, and that scope might
+be a function where this sequence is found in. In this reguard the code sequences resemble
+lambdas with closures.  
+
+This approach passes return addresses through variables so it can only be single threaded.
+
+f_with_loop(){
+
+  is_one:;
+    continuation cont_is_one;
+    cotnainuation cont_not_one;
+    <code>
+
+  init:;
+    continunation cont_after_init;
+    <code>
+
+  extend:;
+    continuation cont_after_extend;
+    <code>
+
+  at_elment_n:;
+    continuation cont_at_n;
+    continuation cont_not_at_n;
+    <code>
+
+  step:;
+    continuation cont_after_step;
+    <code>
+
+  Generic code sequence that implements the loop:
+
+  first:;
+    cont_is_on = && first_is_one;
+    cont_not_one = && first_not_one;
+    continue_from is_one;
+
+  first_is_one:;
+    cont_after_init = first_after_init;
+    continue_from init;
+    first_after_init:;
+
+  ... etc.
+}
+
+gcc has a nested functions feature, so the named code sequences can be functions.  These nested functions
+will see all variables up to their point of definition.  Using nested functions instead of named code
+sequences will get operand passing through a stack and thus multiple threading will work, plus we
+do not need to write the parameter passing code.
 
 
 

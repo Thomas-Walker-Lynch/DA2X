@@ -6,6 +6,12 @@ Hence the name, Tape Machine 2x.
 
 This array is kind of expanding tape as described in the tm library.
 
+## Installation
+
+  `make share` places files needed for using the dynamic array into ../env/include  and ../env/lib
+   
+   The usual drill, include the header files in your program, and compile agains the library.
+
 ## Fundamentals
 
   In mathematics, a sequence consists of a series of indexable elements.
