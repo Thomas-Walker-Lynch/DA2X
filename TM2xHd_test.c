@@ -399,7 +399,7 @@ TM2x_Result test_3(){
   TM2xHd_rewind(a2 ,hd);
   TM2xHd_apply_to_each(a2 ,hd ,byte_n_of(uint) ," " ,TM2xHd_f_print_int);
   fputc('\n' ,stderr);
-
+  // add test distinct == false
   TM2x_AllocStatic(a3);
   bool distinct;
   continue_into TM2xHd_init_intersection

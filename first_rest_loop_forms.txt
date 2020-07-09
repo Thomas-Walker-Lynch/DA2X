@@ -385,7 +385,8 @@ will see all variables up to their point of definition.  Using nested functions 
 sequences will get operand passing through a stack and thus multiple threading will work, plus we
 do not need to write the parameter passing code.
 
-
+the 'first' form uses do{}while()  the 'rest' form starts with while(){}; It seems that programmers
+go through a lot of trouble so as to avoid the 'first' form.
 
 
 
