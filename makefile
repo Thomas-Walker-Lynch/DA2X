@@ -31,7 +31,7 @@ test: TM2x_test TM2xHd_test
 
 .PHONY: clean
 clean:
-	rm -f $(TARGETS) *.o
+	rm -f $(TARGETS) *.o  example_trampoline example_nested_functions
 
 .PHONY: share
 share: $(INSTALL)

@@ -1,7 +1,10 @@
 /*
-   gcc -g -o trampoline_example trampoline_example.c
-
    makes use of the trampoline technique, and a gcc extension to hold labels in variables
+
+   > gcc -g -o example_trampoline example_trampoline.c
+   > ./example_trampoline 
+      mallocn succeded 
+
 */
 
 #include <stdio.h>

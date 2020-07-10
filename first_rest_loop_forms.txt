@@ -1,14 +1,36 @@
-this comes from TM2xHd_init_intersection
 
-// process first followed by an extension
+This file is scratch notes on the first-rest loop form.  I use the terminology of
+first-extend, because the first code block adds a first item to an output list, and then
+the rest code block makes that output longer, i.e. it extends it.  This suggests that all
+values that we see are potentially extendable into lists.
 
-    // process first
+The C language already has this built in to pointers, as all pointers which point at
+values could be pointers that point at an array base.  Of course there are memory
+allocation issues related to extending a value into an array in C.  Typically a program
+would write over neighboring memory if the program was initially written in a manner that
+a pointed out value was just a single value, but then the program treated it instead like
+the first element of an array.  However, our dynamic array implementation takes care of
+that allocation issue, so the first-extend pattern is valid.
+
+//--------------------------------------------------------------------------------
+// basic first extend form example
+
+This example comes from an older version of the 'intersection' iterator of TM2xHd.
+
+All initialized tapes have at lest one value by this first-extend technique, so we
+enter the 'first' block uses do{}while().  We do not know if we will extend
+the output tape, so the 'extend' block uses while(){}; 
+
+When leaving the first-extend form, we must check the 'found_first' flag to know if the
+output tape (here 'set_c') was written.
+
+    // first
     bool found_first = false;
     do{
       void *a_element_pt = TM2xHd_pt(hd_a);
       found_first = TM2xHd_exists(set_b ,hd_b ,element_byte_n ,a_element_pt ,pred);
       if( found_first ){
-        TM2x_init_write(set_c ,a_element_pt ,element_byte_n);
+        TM2x_write_init(set_c ,a_element_pt ,element_byte_n);
         break;
       }
       if( !TM2xHd_step(set_a ,hd_a ,element_byte_n) )
@@ -27,14 +49,14 @@ this comes from TM2xHd_init_intersection
     }
     return true;
 
-// process first then a nested extension
+We could have instead nested the extension code.
 
     // search for first, nested extension
     do{
       void *a_element_pt = TM2xHd_pt(hd_a);
       found_first = TM2xHd_exists(set_b ,hd_b ,element_byte_n ,a_element_pt ,pred);
       if( found_first ){
-        TM2x_init_write(set_c ,a_element_pt ,element_byte_n);
+        TM2x_write_init(set_c ,a_element_pt ,element_byte_n);
         // extend
         while(TM2xHd_step(set_a ,hd_a ,element_byte_n)){
           a_element_pt = TM2xHd_pt(hd_a);
@@ -55,12 +77,10 @@ this comes from TM2xHd_init_intersection
 Both forms are similar.  The major difference is that in the nested form the extension
 code appears where the first break appears in the serial form.
 
-Both forms have two calls to TM2xHd_exists. If only TM2x_init_write and TM2x_push_write
-were identical, we would only need the one loop and one call to TM2xHd_exists.
+//--------------------------------------------------------------------------------
+//  first extend from the tranche options parser
 
-----------------------
-
-from the tranche options loop:
+This is another example from the tranche options parser.
 
     char **pt = argv + 1; // skip the command name
     bool found_first = false;
@@ -89,8 +109,8 @@ from the tranche options loop:
       return 0;
     }
 
-could have shorted this a bit but wanted to report option errors even if there were no
-source files given,
+I could have shorted this a bit but I wanted to report option errors even when there are no
+source files given:
 
     char **pt = argv + 1; // skip the command name
     bool found_first = false;
@@ -111,177 +131,98 @@ source files given,
       pt++;
     }
 
+//--------------------------------------------------------------------------------
+// generalizing the loop structure
+//
 
---------
-wonder if intersection can serialized in a prettier manner:
+Here hd is on the input tape, and we write our results to the output tape.
 
-    // look for first
+There are two main exits from the first-extend form:
+
+  1) never_one:  is_one(hd) never returned true before the input was exhausted. The
+     output tape was not initialized.
+
+  2) end: is_one(hd) was true at least once, the output was initialized and has at
+     least one value.
+
+In both cases the input iterator is left at the end of the tape.
+   
+    // first block
     do{
-      if( TM2xHd_exists(set_b ,hd_b ,element_byte_n ,TM2xHd_pt(hd_a) ,pred) ) break; // found first
-      if( !TM2xHd_step(set_a ,hd_a ,element_byte_n) ) return false; // never found first
-      TM2xHd_rewind(set_b ,hd_b);
-    }while(true);
-    TM2x_init_write(set_c ,TM2xHd_pt(hd_a) ,element_byte_n);
-
-    //extend
-    while(TM2xHd_step(set_a ,hd_a ,element_byte_n)){
-      TM2xHd_rewind(set_b ,hd_b);
-      if(TM2xHd_exists(set_b ,hd_b ,element_byte_n ,TM2xHd_pt(hd_a) ,pred)){
-        TM2x_push_write(set_c ,TM2xHd_pt(hd_a) ,element_byte_n);
-      }}
-    return true;
-
---------
-wonder if that loop form can be generalized:
-
-    before_first_step_work(hd);
-    do{
-       if( is_one(hd) ) break;
-       if( !step(hd)  ) goto no_initialization;
-       after_step_work(hd);
-    }while(true);
-    is_one_init(hd);
-    while(step(hd)){
-       after_step_work(hd);
-       if( is_one(hd) ) is_one_extend(hd);
-    }
-    end:
-    no_initialization:
-
---------------------------------------------------------------------------------
-2020-07-05T18:12:53Z
-
-I should unpack the step and test so that the loop structures are more clear.  Also in the
-current form loop unrolling will have redundant test code in it.  I might add such
-compound functions back in a separate header/section of convenience functions later.
-
-ok, now it looks like the following.  step(hd) includes the 'after_step_work' from before:
-
-    before_first_step_work(hd);
-    do{
-       if( is_one(hd) ) break;
-       if( at_element_n(hd) ) goto no_initialization;
+       if( is_one(hd) ) init(output ,hd); break;
+       if( at_element_n(hd) ) goto never_is_one;
        step(hd)
     }while(true);
-    is_one_init(hd);
-    while(!at_element_n(hd)){
-       step(hd)
-       if( is_one(hd) ) is_one_extend(hd);
-    }
-    end:
-    no_initialization:
 
-
-** or, the cleanest first-rest form yet:
-
-    before_first_step_work(hd);
-    do{
-       if( is_one(hd) ) init(hd); break;
-       if( at_element_n(hd) ) goto no_initialization;
-       step(hd)
-    }while(true);
+    // extend block
     while(!at_element_n(hd)){
        step(hd)
        if( is_one(hd) ) extend(hd);
     }
-    end:
-    no_initialization:
+    end:;
+    never_is_one:;
 
-is_one and step are used both by the first and reset blocks.  is_one_init is unique to the
-first block, and is_one_extend is unique to the rest block.
+The functions: is_one(), step(), and at_element_n() are used both by the first and extend blocks.  
 
-loop termination from init needs to follow a different continuation than loop termination from extend..
+The function init(output ,hd) is unique to the first block.
 
-    when( is_one )
-     init{
-     }
-     extend{
-     }
-     step{
-     }
-     until(at_element);
-
-    when( <is_one expression> )
-     init{
-        <statement> ..
-     }
-     extend{
-        <statement> ..
-     }
-     step{
-        <statement> ..
-     }
-     until( <at_element expression> );
+The function extend(output ,hd) is unique to the extend block.
 
 
-    when( <is_one expression> )
-     init{
-        <statement> ..
-     }else{
-        //exiting from init
-        <statement> ..
-     }
-     extend{
-        <statement> ..
-     }else{
-        //exiting from extend
-        <statement> ..
-     }
-     step{
-        <statement> ..
-     }
-     until( <at_element expression> );
+//--------------------------------------------------------------------------------
+// Using continuations instead of bool flags
+//
 
+With continuations as described in my book, we do not return from a function calls.  Instead
+we pass in as operands one or more continuation functions to be used. Then in a multithreading
+environment, we might enter the function and then take multiple continuations as exits.  In
+single threaded code we will always follow exactly one of the continuations as an exit.  We
+have no separate error processing system, rather error conditions cause the code to use
+different continuations.  Thus all functions and their behaviors are fully specified.  We
+often call the continuation functions passed in 'lambdas' as that is the language feature
+often used to create them.
 
-
-the intersection code:
-
-     when( TM2xHd_exists(set_b ,hd_b ,element_byte_n ,TM2xHd_pt(hd_a) ,pred) )
-       init{
-         TM2x_format_write(set_c ,TM2xHd_pt(hd_a) ,element_byte_n);
-       }else{
-         return false;
-       }
-       extend{
-         TM2x_push_write(set_c ,TM2xHd_pt(hd_a) ,element_byte_n);
-       }else{
-         return true;
-       }
-       step{
-         TM2xHd_step(hd_a ,element_byte_n);
-         TM2xHd_rewind(set_b ,hd_b);
-       }
-       until( TM2xHd_at_element_n(set_a ,hd_a ,element_byte_n) );
-
-I can adopt a trampoline style to support multiple continuations
+I can adopt a trampoline style to support multiple continuations in C by using trampolines.
 
 Using a tampoline and labels for labmdas does relieves us from having to send in closures.  When
 the function returns with the continuation pointer, the trampoline is already in the callers
 scope and can see all the variables the caller could.  It is almost too natural.
 
-One drawback of the trampoline is that we can not launch a second etc. thread so as
-to follow multiple continuations out of the function.  Once one of the threads calls
-return the stack will pop the functions frame.
-
-I wonder if we can use labels in a more general way as lambdas instead
-of mixing them with function calls.  So then, how do we handle variable renaming
-for code being called from multiple places.  If we create a new thread in
-the continuation then it will need a copy of the non-read only variables in
-a thread specific frame from the continuation, and would then drop this or
-carry it along as a closure as it follows more continuations.
-
+I wonder if we can use labels in a more general way as lambdas instead of mixing them with
+function calls. To do that we would need to have pack operands into a unique frame given
+upon the call. Actually gcc already has an extension for nested functions.  The only
+drawback with nested functions is that they can not be inlined.  I wonder if the optimizer
+is smart enough to split apart such reused code and make multiple copies.
 
 --------------------------------------------------------------------------------
 2020-07-08T16:19:13Z
 
-The code has now been converted to use continuations via labels and trampoline.
-The first-rest loop now looks like:
+All the labeled code sequences have access to all variables in scope. In this reguard labeled
+code sequences resemble lambdas with closures.  
+
+I add these definitions to gives us a continuation semantic:
+  #define continue_into goto *
+  #define continue_from return
+  #define continue_from_local goto
+  typedef void **continuation;
+
+I also replaced the boolean tests with functions that follow one of two continuations,
+one for the true case, another for the false case.
+
+C labels must always be followed by a statement.  The compiler throws errors if it sees
+such things as the common case where a declaration would naturally follow a label.  A
+single semicolon is a statement, so I just put both the colon and a semicolon after the
+labels.
+
+Now it looks like lambdas and continuations, but it is really labels and gotos.
+
+The first-extend loop now looks like:
 
   first:;
     continue_into is_one(hd ,&&is_one ,&&not_one);
       is_one:;
-        init(hd);
-        continue_from_local rest;
+        write_init(output ,hd);
+        continue_from_local extend;
       not_one:;
         continue_into at_element_n(hd ,&&at_n  ,&&not_at_n);
           at_n:;
@@ -290,7 +231,7 @@ The first-rest loop now looks like:
             step(hd);
             continue_from_local first;
 
-  rest:;
+  extend:;
     continue_into at_element_n(hd ,&&at_n ,&&not_at_n);
       at_n:;
         continue_from <done>
@@ -298,95 +239,134 @@ The first-rest loop now looks like:
         step(hd);
         continue_into is_one(hd ,&&is_one ,&&not_one);
           is_one:;
-            extend(hd)
+            write_extend(output ,hd)
           not_one:;
-        continue_from_local rest;
+            continue_from_local extend;
 
 
-----------
+Schematically it looks like this:
 
-   first is_one init rest at_n <done>
-         |                |
-         |                not_at_n step is_one extend rest
-         |                              |
-         |                              not_one rest
-         not_one at_n <not_found>
-                 |
-                 not_at_n step first
+   first:; is_one:; init extend:; at_n:; <done>
+           |                      |
+           |                      not_at_n:; step is_one:; write_extend extend
+           |                                      |
+           |                                      not_one:; extend
+           not_one:; at_n:; <not_found>
+                     |
+                     not_at_n:; step first
 
---------------
-functions 
+As of this date, I have converted the  dynamic array code to use continuations via labels and
+trampoline. 
 
-   is_one
-
-   init
-   extend
-
-   at_elment_n
-   step
-
-form:
+If we could have a language statement for this form, perhaps it would be something like:
 
    hd -> <not_found> ,<done>
      if( is_one ) init ,extend;
      if( !at_element_n ) step;
 
+or perhaps 
+
+   LP {
+     if( is_one() ) init(); extend();
+     if( at_element_n ) <done> else step();
+     <not_found>
+     }
+
+as a macro:
+
    #define LP( is_one ,init ,extend ,at_element_n ,step, done ,not_found )
 
----------------------------------------- 
+It would be awful to pass that much code as macro arguments. Perhaps I can add a this loop
+to the tranche macro pre-processor, but then we quickly get into the preprocessor having
+to be aware of contexts so as to make up namespaced labels that do not collide ...
 
-All the named code sequences have access to all variables in scope, and that scope might
-be a function where this sequence is found in. In this reguard the code sequences resemble
-lambdas with closures.  
+...
 
-This approach passes return addresses through variables so it can only be single threaded.
+  first: if( is_one(hd) ) write_init(output ,hd); else <not_found>
+  extend: if( is_one(hd) ) push_write(output ,hd);
+  iterator: if( at_element_n(input ,hd) ) <done> else step(hd);
 
-f_with_loop(){
+This is not a very good language statement because is_one appears twice, so we can not just have
+anonymous code in braces for it.
 
-  is_one:;
-    continuation cont_is_one;
-    cotnainuation cont_not_one;
-    <code>
+...
+  write_if: is_one(hd) | <not_found>
+  first: write_init(output ,hd)
+  extend: push_write(output ,hd)
+  iterator: if( at_element_n(input ,hd) ) <done> else step(hd);
 
-  init:;
-    continunation cont_after_init;
-    <code>
+  write: is_one(hd) | <not_found>
+  first: write_init(output ,hd)
+  extend: push_write(output ,hd)
+  iterator: at_element_n(input ,hd) && <done> | step(hd)
 
-  extend:;
-    continuation cont_after_extend;
-    <code>
 
-  at_elment_n:;
-    continuation cont_at_n;
-    continuation cont_not_at_n;
-    <code>
-
-  step:;
-    continuation cont_after_step;
-    <code>
-
-  Generic code sequence that implements the loop:
+--------------------------------------------------------------------------------
 
   first:;
-    cont_is_on = && first_is_one;
-    cont_not_one = && first_not_one;
-    continue_from is_one;
 
-  first_is_one:;
-    cont_after_init = first_after_init;
-    continue_from init;
-    first_after_init:;
+    continue_into is_one_q(hd ,&&is_one ,&&not_one);
 
-  ... etc.
-}
+      is_one:;
+        write_init(output ,hd);
+        continue_into at_element_n(hd ,&&at_n ,&&not_at_n);
+          at_n:;
+            continue_from <done>
+          not_at_n:;
+            step(hd);
+            continue_into is_one_q(hd ,&&is_one ,&&not_one);
+              is_one:;
+                write_extend(output ,hd)
+              not_one:;
+                continue_from_local extend;
 
-gcc has a nested functions feature, so the named code sequences can be functions.  These nested functions
-will see all variables up to their point of definition.  Using nested functions instead of named code
-sequences will get operand passing through a stack and thus multiple threading will work, plus we
-do not need to write the parameter passing code.
+      not_one:;
+        continue_into at_element_n(hd ,&&at_n  ,&&not_at_n);
+          at_n:;
+            continue_from <not_found>
+          not_at_n:;
+            step(hd);
+            continue_from_local first;
 
-the 'first' form uses do{}while()  the 'rest' form starts with while(){}; It seems that programmers
-go through a lot of trouble so as to avoid the 'first' form.
+
+//-------------------------------------------------------------------------------
+// instead of first-extend as separate loops, suppose they are one loop where
+// we simply change the write function:
 
 
+1. change the write function directly
 
+  write = write_init
+  loop:;
+      continue_into is_one_q(hd ,&&is_one ,&&not_one);
+      is_one:;
+        (*write)(output ,hd);
+        write = write_extend;
+      not_one:;
+        continue_into at_element_n(hd ,&&done  ,&&not_at_n);
+          not_at_n:;
+            step(hd);
+            continue_from_local loop;
+  done:;
+
+A possible drawback of changing the write function directly is that the write function
+is sometimes a simple piece of code, and we would be adding call overhead to it.  The
+use of the function pointer will assure that the compiler does not inline it.
+
+2. change the 'when_found' target.
+
+  when_found = &&is_one_init;           
+  loop:;
+      continue_into is_one_q(hd ,when_found ,&&step);
+      is_one_init:;
+        write_init(output ,hd);
+        when_found = &&is_one_extend;
+        goto step;
+      is_one_extend::
+        write_extend(output ,hd);
+      step:;
+        continue_into at_element_n(hd ,&&done  ,&&not_at_n);
+          not_at_n:;
+            step(hd);
+            continue_from_local loop;
+  done:;

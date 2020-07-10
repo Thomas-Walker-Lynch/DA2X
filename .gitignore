@@ -7,4 +7,6 @@ tmp/
 libTM2x.a
 TM2x_test
 TM2xHd_test
-trampoline_example
+example_trampoline
+example_nested_labels
+example_nested_functions
