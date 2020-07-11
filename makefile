@@ -6,9 +6,14 @@
 #  statement expressions
 
 CC= gcc
-CFLAGS= -std=gnu18 -Wall -g
-TARGETS= libTM2x.a TM2x_test TM2xHd_test
+CFLAGS= -std=gnu2x -Wall -g
+TARGETS= libTM2x.a TM2x·test TM2xHd·test
 INSTALL= libTM2x.a TM2x.h TM2xHd.h
+
+#Each example.c file has a comment at the top with the command for building it.  Hence
+#examples are not built here.  However, the clean: target will delete the all example
+#executables that exist.
+EXAMPLES= example·trampoline example·nested_functions example·nested_labeling example·utf8
 
 .PHONY: all
 all: $(TARGETS)
@@ -19,19 +24,19 @@ TM2x.o: TM2x.c
 libTM2x.a: TM2x.o
 	ar rcs libTM2x.a TM2x.o
 
-TM2x_test: TM2x_test.c TM2x.o TM2x.h TM2x_malloc_counter.h TM2x_Result.h
-	$(CC) $(CFLAGS) -o TM2x_test TM2x.o TM2x_test.c 
+TM2x·test: TM2x·test.c TM2x.o TM2x.h TM2x·malloc_counter.h TM2x·Result.h
+	$(CC) $(CFLAGS) -o TM2x·test TM2x.o TM2x·test.c 
 
-TM2xHd_test: TM2x.o TM2xHd_test.c TM2xHd.h TM2x.h TM2x_malloc_counter.h  TM2x_Result.h
-	$(CC) $(CFLAGS) -o TM2xHd_test TM2x.o TM2xHd_test.c
+TM2xHd·test: TM2x.o TM2xHd·test.c TM2xHd.h TM2x.h TM2x·malloc_counter.h  TM2x·Result.h
+	$(CC) $(CFLAGS) -o TM2xHd·test TM2x.o TM2xHd·test.c
 
 .PHONY: test
-test: TM2x_test TM2xHd_test
-	./TM2x_test && ./TM2xHd_test
+test: TM2x·test TM2xHd·test
+	./TM2x·test && ./TM2xHd·test
 
 .PHONY: clean
 clean:
-	rm -f $(TARGETS) *.o  example_trampoline example_nested_functions
+	rm -f $(TARGETS) *.o  $(EXAMPLES)
 
 .PHONY: share
 share: $(INSTALL)

@@ -5,8 +5,8 @@
   Yes they do, but redefinition at the same scope level is not allowed.
 
   2020-07-10T11:51:00Z
-  > gcc -g -o example_nested_functions example_nested_functions.c
-  > ./example_nested_functions
+  > gcc -g -o example·nested_functions example·nested_functions.c
+  > ./example·nested_functions
   1 outer a:;
   2 outer a:;
   3 first a:;
@@ -50,11 +50,11 @@ int main(){
 
   /* redefinition not allowed:
 
-       example_nested_functions.c: In function ‘main’:
-       example_nested_functions.c:61:8: error: redefinition of ‘a’
+       example·nested_functions.c: In function ‘main’:
+       example·nested_functions.c:61:8: error: redefinition of ‘a’
           61 |   void a(uint i){
              |        ^
-       example_nested_functions.c:30:8: note: previous definition of ‘a’ was here
+       example·nested_functions.c:30:8: note: previous definition of ‘a’ was here
           30 |   void a(uint i){
              |        ^
 

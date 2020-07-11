@@ -1,0 +1,57 @@
+75ba61f (HEAD -> master, origin/master, origin/HEAD) rm temp.txt
+1de996c branch for working continuations with unfolded loops
+cf94450 (origin/continunations-unfolded-loop, continunations-unfolded-loop) experiments
+a6f2146 fixes intersection
+c4b0c66 updateding test_result_expected
+e3c4f1f updateding test_result_expected
+af8aaee rm an executable
+b37ee0c test_3 with continuations
+2ab1636 converts test_2 to continuation style
+1895c20 checks exception/found values
+9befc7f TM2xHd_test test_1 now passing with continuations
+88b3011 WIP coverted TM2xHd to continuations now adding tests
+67f012b adds continuations (from my book) to TM2x.h
+9f66ca2 various function name updates
+f3b0e86 .gitignore update
+26de1e0 set development
+004de65 more clear understanding/organization of initialization code
+1034d9a thoughts on empty arrays
+b500c54 a couple of tests
+d3f01af adds some set functions
+4b35fa1 iterator tests passing
+f65ab1e TM2x_test passes on new array
+78a91b0 removes the element_byte_n field from the dynamic array header struct
+b1141c3 how to use element_byte_n base_pt or base_n to denote an empty array
+4799355 first inc bound test passes
+5fb00cd WIP inclusive bounds
+97227a5 prep work for inclusive upper bound
+3d232d8 checkpoint before using inclusive bound data and allocation intervals
+a610783 integrates dap into hd
+dd74e9d dap first passes
+4c6b416 before dap first mods checkpoint
+f70244a before context first mods checkpoint
+60f705a makefile fix
+da98648 .gitignore
+098c709 make install
+7bd78ba nomenclature
+b8f72de README update
+e7b8073 length size nomenclature
+ce23234 puts lib in gitignore
+469d0da makes libDA2x
+2b44d66 thoughts on future features
+3e58146 typing at README.md
+09afdcb typing at README.md
+9a6401d typing at README.md
+4838f64 Readme updates
+9fff1a7 adds some functionality updates iterator nomenclature
+3055cea adds DA2xIt_find, DA2xIt_make, and DA2x_make
+d010adf adds a DA2xIt test
+12aebd5 remove unusued file
+ca010b8 iterator running
+e166ebe DA2x.h first set of tests passing
+4c1296c Create README.md
+8762413 dunno
+906f143 initial checkin
+00f4136 Update README.md
+70f8978 Update README.md
+032356f Initial commit

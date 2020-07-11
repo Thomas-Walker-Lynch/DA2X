@@ -5,18 +5,18 @@
    on top of speghetti .. all covered with cheese ...
 
    2020-07-10T11:38:28Z
-   > gcc -g -o example_nested_labeling example_nested_labeling.c
-   example_nested_labeling.c: In function ‘main’:
-   example_nested_labeling.c:29:3: error: duplicate label ‘a’
+   > gcc -g -o example·nested_labeling example·nested_labeling.c
+   example·nested_labeling.c: In function ‘main’:
+   example·nested_labeling.c:29:3: error: duplicate label ‘a’
       29 |   a:;
          |   ^
-   example_nested_labeling.c:23:2: note: previous definition of ‘a’ was here
+   example·nested_labeling.c:23:2: note: previous definition of ‘a’ was here
       23 |  a:;
          |  ^
-   example_nested_labeling.c:36:3: error: duplicate label ‘a’
+   example·nested_labeling.c:36:3: error: duplicate label ‘a’
       36 |   a:;
          |   ^
-   example_nested_labeling.c:23:2: note: previous definition of ‘a’ was here
+   example·nested_labeling.c:23:2: note: previous definition of ‘a’ was here
       23 |  a:;
          |  ^
 

@@ -1,5 +1,5 @@
 
-This file is scratch notes on the first-rest loop form.  I use the terminology of
+This file contains scratch notes on the first-rest loop form.  I use the terminology of
 first-extend, because the first code block adds a first item to an output list, and then
 the rest code block makes that output longer, i.e. it extends it.  This suggests that all
 values that we see are potentially extendable into lists.
@@ -19,7 +19,7 @@ This example comes from an older version of the 'intersection' iterator of TM2xH
 
 All initialized tapes have at lest one value by this first-extend technique, so we
 enter the 'first' block uses do{}while().  We do not know if we will extend
-the output tape, so the 'extend' block uses while(){}; 
+the output tape, so the 'extend' block is guarded by a test with a while(){}; form.
 
 When leaving the first-extend form, we must check the 'found_first' flag to know if the
 output tape (here 'set_c') was written.
@@ -135,21 +135,21 @@ source files given:
 // generalizing the loop structure
 //
 
-Here hd is on the input tape, and we write our results to the output tape.
+Here hd is on the source tape, and we write our results to the destination tape.
 
 There are two main exits from the first-extend form:
 
-  1) never_one:  is_one(hd) never returned true before the input was exhausted. The
-     output tape was not initialized.
+  1) never_one:  is_one(hd) never returned true before the source was exhausted. The
+     destination tape was not initialized.
 
-  2) end: is_one(hd) was true at least once, the output was initialized and has at
+  2) end: is_one(hd) was true at least once, the destination was initialized and has at
      least one value.
 
-In both cases the input iterator is left at the end of the tape.
-   
+In both cases the source iterator is left at the end of the tape.
+
     // first block
     do{
-       if( is_one(hd) ) init(output ,hd); break;
+       if( is_one(hd) ) init(destination ,hd); break;
        if( at_element_n(hd) ) goto never_is_one;
        step(hd)
     }while(true);
@@ -162,18 +162,18 @@ In both cases the input iterator is left at the end of the tape.
     end:;
     never_is_one:;
 
-The functions: is_one(), step(), and at_element_n() are used both by the first and extend blocks.  
+The functions: is_one(), step(), and at_element_n() are used both by the first and extend blocks.
 
-The function init(output ,hd) is unique to the first block.
+The function init(destination ,hd) is unique to the first block.
 
-The function extend(output ,hd) is unique to the extend block.
+The function extend(destination ,hd) is unique to the extend block.
 
 
 //--------------------------------------------------------------------------------
 // Using continuations instead of bool flags
 //
 
-With continuations as described in my book, we do not return from a function calls.  Instead
+With continuations as described in my book, we do not return from function calls.  Instead
 we pass in as operands one or more continuation functions to be used. Then in a multithreading
 environment, we might enter the function and then take multiple continuations as exits.  In
 single threaded code we will always follow exactly one of the continuations as an exit.  We
@@ -184,7 +184,7 @@ often used to create them.
 
 I can adopt a trampoline style to support multiple continuations in C by using trampolines.
 
-Using a tampoline and labels for labmdas does relieves us from having to send in closures.  When
+Using a trampoline and labels for lambdas does relieves us from having to send in closures.  When
 the function returns with the continuation pointer, the trampoline is already in the callers
 scope and can see all the variables the caller could.  It is almost too natural.
 
@@ -197,8 +197,8 @@ is smart enough to split apart such reused code and make multiple copies.
 --------------------------------------------------------------------------------
 2020-07-08T16:19:13Z
 
-All the labeled code sequences have access to all variables in scope. In this reguard labeled
-code sequences resemble lambdas with closures.  
+All the labeled code sequences have access to all variables in scope. In this regard labeled
+code sequences resemble lambdas with closures.
 
 I add these definitions to gives us a continuation semantic:
   #define continue_into goto *
@@ -206,7 +206,7 @@ I add these definitions to gives us a continuation semantic:
   #define continue_from_local goto
   typedef void **continuation;
 
-I also replaced the boolean tests with functions that follow one of two continuations,
+I also replaced the Boolean tests with functions that follow one of two continuations,
 one for the true case, another for the false case.
 
 C labels must always be followed by a statement.  The compiler throws errors if it sees
@@ -256,7 +256,7 @@ Schematically it looks like this:
                      not_at_n:; step first
 
 As of this date, I have converted the  dynamic array code to use continuations via labels and
-trampoline. 
+trampoline.
 
 If we could have a language statement for this form, perhaps it would be something like:
 
@@ -264,7 +264,7 @@ If we could have a language statement for this form, perhaps it would be somethi
      if( is_one ) init ,extend;
      if( !at_element_n ) step;
 
-or perhaps 
+or perhaps
 
    LP {
      if( is_one() ) init(); extend();
@@ -341,7 +341,7 @@ anonymous code in braces for it.
       continue_into is_one_q(hd ,&&is_one ,&&not_one);
       is_one:;
         (*write)(output ,hd);
-        write = write_extend;
+        write = write_extend; // this assignment will be repeated redundantly
       not_one:;
         continue_into at_element_n(hd ,&&done  ,&&not_at_n);
           not_at_n:;
@@ -349,24 +349,239 @@ anonymous code in braces for it.
             continue_from_local loop;
   done:;
 
+  if(write == write_init) then not initialized
+
+
 A possible drawback of changing the write function directly is that the write function
 is sometimes a simple piece of code, and we would be adding call overhead to it.  The
 use of the function pointer will assure that the compiler does not inline it.
 
 2. change the 'when_found' target.
 
-  when_found = &&is_one_init;           
-  loop:;
+  when_found = &&is_one_init;
+
+  work:;
       continue_into is_one_q(hd ,when_found ,&&step);
+
       is_one_init:;
         write_init(output ,hd);
         when_found = &&is_one_extend;
-        goto step;
+        continue_from_local step;
+
       is_one_extend::
         write_extend(output ,hd);
-      step:;
-        continue_into at_element_n(hd ,&&done  ,&&not_at_n);
-          not_at_n:;
-            step(hd);
-            continue_from_local loop;
+        continue_from_local step;
+
+  step:;
+    continue_into at_element_n(hd ,&&done  ,&&not_at_n);
+      not_at_n:;
+        step(hd);
+        continue_from_local work;
+
   done:;
+  if(when_found == is_one_init) then not initialized
+
+This continuation tree has the advantage that each called function appears only once, so a
+program can type it out without having to type the same code twice.
+
+
+//-------------------------------------------------------------------------------
+// a real continuation tree ..
+//
+
+  The #defines and the trampoline make the loop form #2 above read like it is a
+  continuation tree. The functions and trampolines provide namespace partitioning for the
+  code. However they also incur call overhead.  C, nor gcc, allow an anonymous function to
+  be created from a code block and passed in, so the forced step of defining things such
+  as the is_one_q as a separate function is a bit awkward.
+
+  The function call with trampolines incur call overhead. The overhead is pretty high if the
+  is_one_q test ends up being something like an integer equality test.
+
+  We probably should not just pass continuations into functions because the stack will grow as
+  it would for recursive call code. That sort of thing might be expected in LISP, but it
+  runs counter to the point of our continuations.  I did this for the LISP examples, but then
+  again, that was LISP.
+
+  I wonder if the trampolines and functions could be removed from the above loop, and we
+  just use labels. Labels are also a bit messy, because they do not nest in scope.  Within
+  a single function their names must be unique.  That makes the function the namespace
+  entity.
+
+  Suppose that continue_from here is the same as continue_from_local above.  Suppose
+  that a continuation function is a label followed by code.  The closure consists
+  of the variables on the stack inside the function there this occurs.
+
+  when_found = &&init;
+
+  is_one:;
+    if( <is_one test> )
+      continue_from *when_found;
+    else
+      continue_from step;
+
+  init:;
+    <write_init code>
+    when_found = &&extend;
+    continue_from step;
+
+  extend::
+    <write_extend code>
+    continue_from step;
+
+  step:;
+    continue_into at_element_n(hd ,&&done  ,&&not_at_n);
+      not_at_n:;
+        step(hd);
+        continue_from is_one;
+
+  done:;
+  if(when_found == is_one_init) then not initialized
+
+----
+  is_one -> [when_found]
+  |             |
+  |             -----> init
+  |             |
+  |             -----> extend
+  |
+  -------------------> step
+
+  init -> step
+
+  step -> done
+  |
+  ------> is_one
+
+----
+  gcc has limitations on what it will inline. Inlining and computed goto
+  do not go together ...
+
+  continued lambda function is a label followed by some code then a continuation.
+
+  functions passed in can be inlined?
+
+  inline static first_extend_loop
+  ( input
+    ,hd
+    ,output 
+    ,void is_one_q(void **, void **) 
+    ,write_init(output ,hd) 
+    ,write_extend(output ,hd)
+    ,done
+    ,not_found
+    ){
+
+    void **when_found = &&init;
+
+    is_one:;
+      continue_into is_one_q( *when_found ,step);
+
+    init:;
+      write_init(output ,hd);
+      when_found = &&extend;
+      continue_from_local step;
+
+    extend::
+      write_extend(output ,hd);
+      continue_from_local step;
+
+    step:;
+      continue_into at_element_n(hd ,&&done_local  ,&&not_at_n);
+        not_at_n:;
+          step(hd);
+          continue_from_local is_one;
+
+    done_local:;
+      if(when_found == is_one_init) continue_from not_found;
+      continue_from done;
+
+  }  
+
+//-------------------------------------------------------------------------------
+// continuations and classes
+//
+
+  1. continued function is a code sequence
+
+  So in C I defined a continued function, or a 'continuation' for short as
+  a labeled sequence of instruction that exits through a continue_from call.
+  For example, the 'init' continuation:
+
+    init:;
+      write_init(output ,hd);
+      when_found = &&extend;
+      continue_from_local step;
+
+  Note that a continuation does not return to its caller.  Rather it continues with a
+  further continuation. There may be one or more possible further continuations. The
+  further continuation is chosen by the control structures of the code. In this
+  example we show only one futher continuation, and it is a constant. Each further
+  continuation is either built in as a constant, passed in as an operand, or
+  gotten from the context.
+
+  2. operand passing
+
+    Continuations can get their operands from the context, as is done in the example above,
+    and is done in the first_extend form - or from an operand structure. We may declare the
+    operand structure directly above the continuation. Continuations may also have local
+    data.  Here is a hypothetical 'is_one' continuation.
+
+      struct{
+        TM2xHd *hd;
+        continunation found;
+      }is_one_operands;
+
+      struct{
+      }init_data;
+
+      is_one_entry:;
+        if( TM2xHd_Read_Exp(is_one_operands.hd) > 10 ){
+          continue_from *(is_one_operands.found);
+        else
+          step_entry_operands.hd = hd;
+          continue_from step_entry;
+
+    Currently our is_one just takes the found operand from the context, but
+    it would more conceptually elegant if it were passed in as an opreand
+    as shown here.
+
+    Note, that a continuation does not have a return statement. A continuation always ends
+    with another continuation.  Because a continuation does not return, there is no reason
+    to preserve data for it on a dedicated stack frame. This also means that no data to be
+    used by the continuation in the future will be overwritten by reusing the operand
+    structure (of course unless that operand is still being used locally).  Hence we may
+    pass an operand simply by write it into the structure dedicated to operands found
+    just above the entry label.
+
+    Having structures dedicated to the continuation provides a namespace for the
+    operands and for local data.  This helps programmers read the code.  Logically,
+    however, apart from possible name collisions, the fields of those structures
+    could have been placed in the context (the outer scope).  
+
+  3. classes
+    
+    We may create a class from our continuations by placing them inside of a function
+    call.
+
+    continuation employee_info(continuation method ,void *data){
+
+      continue_from_local method;
+
+      continuation_methods ...
+
+    }
+
+    However, but then how do we make the method address available to the function caller?
+
+
+  4. multi-threading
+
+    Each thread has its own stack.  Hence if continuations are placed inside of a
+    function, then each thread will see its local copy of the operand and data structs,
+    so the multiple threads, even with multiple futher continuations taken, works.
+
+characters for C identifiers .. something for keeping namespaces separate
+getting addresses for gotos inside of functions, use switch statements?  Would the
+opimizer clean it up? .. maybe not because it would go across function call boundaries, but
+in cases everything is in one file?
