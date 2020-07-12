@@ -6,13 +6,49 @@ Hence the name, Tape Machine 2x.
 
 This array is kind of expanding tape as described in the tm library.
 
+## Faux Namespaces with a unicode character
+  
+  C doesn't have namespaces, so I do the conventional thing of prefixing all
+  identifiers on the interface with the namespace (the library name). Initially
+  this was followed by an underscore.  
+
+  Gosh I wish we could just use '::' in identifiers to separate the namepace part from the
+  rest of the identifier.  Since C99 some unicode has been allowed. There are other colon
+  like characters that work in identifiers, but using two different colons would be
+  confusing.  The central raised dot is allowed in identifiers, so I used that instead
+  of double colons.
+
+  For example:
+    wish for:  `TM2x::alloc_heap`
+       using:  `TM2x·alloc_heap`
+
+  Better yet would be a namespace facility for C.
+
+## Using Gcc extensions
+
+  The code makes use of these:
+  1. typeof
+  2. variable holds a &&label value
+  3. empty structures
+  4. declared labels ('local labels')
+
+  In the near future, will probably make use of 
+  3. nested functions
+
+  And this looks useful, but have used it yet:
+  4. statement expressions
+
 ## Installation
 
-  `make share` places files needed for using the dynamic array into ../env/include  and ../env/lib
+  The `make share` installs the dynamic array into ../env/include  and ../env/lib. 
+  
+  My projects are always embeded in a project directory that has an env directory for
+  releasing module code.  The modules are individual git projects.  See my git 'project'.
    
-   The usual drill, include the header files in your program, and compile agains the library.
+  After install, the usual drill, include the header files in your program, and compile agains the library.
 
-## Fundamentals
+
+## Array Fundamentals
 
   In mathematics, a sequence consists of a series of indexable elements.
 
@@ -26,8 +62,8 @@ This array is kind of expanding tape as described in the tm library.
   natural number index. n+1 is the length of the element sequence, so we also say that n+1
   is the length of the array.
 
-  A computer processor works by pulling all data from system memory. System memory is
-  an array of elements, where the elements are bytes, and the indexes are called 'addresses'.
+  A computer processor initially reads data from system memory. System memory is an array
+  of elements, where the elements are bytes, and the indexes are called 'addresses'.
   
   Elements in an array are actually little arrays themselves. Elements are arrays of memory bytes.
   Hence, while each element has an index from the base of the array, each byte in the elements

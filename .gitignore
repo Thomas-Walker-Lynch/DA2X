@@ -5,8 +5,8 @@ tmp/
 *~
 *.o
 libTM2x.a
-TM2x_test
-TM2xHd_test
-example_trampoline
-example_nested_labels
-example_nested_functions
+TM2x·test
+TM2xHd·test
+example·trampoline
+example·nested_labels
+example·nested_functions

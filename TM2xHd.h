@@ -85,9 +85,12 @@
 //--------------------------------------------------------------------------------
 // quantifiers
 //
-/*
+
+#if 0
+
+
 // need to add alocation fail continuation
-  TM2xHd·F_PREFIX continuation first_extend_loop
+  inline continuation TM2xHd·first_extend_loop
   ( TM2x *dst
     ,TM2x *src
     ,TM2xHd *hd_src
@@ -103,7 +106,7 @@
     continuation when_found = &&init;
 
     is_one:;
-      continue_into is_one_q(hd_src ,context ,*when_found ,&&step);
+    continue_into is_one_q(context ,src ,hd_src ,element_byte_n ,*when_found ,&&step);
 
     init:;
       write_init(dst ,hd_src ,context);
@@ -125,9 +128,8 @@
       continue_from done;
 
   }  
-*/
 
-#if 0
+
   // nah .. better to implement this with memcpyn, see TM2x·format_copy
   // shallow copy tape_src elements to the end of tape_acc
   TM2xHd·F_PREFIX continuation TM2x·cat

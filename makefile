@@ -1,10 +1,5 @@
 
 
-# using gnu extensions:
-#  varaible value is a &&label
-#  nested functions
-#  statement expressions
-
 CC= gcc
 CFLAGS= -std=gnu2x -Wall -g
 TARGETS= libTM2x.a TM2x·test TM2xHd·test
@@ -13,7 +8,8 @@ INSTALL= libTM2x.a TM2x.h TM2xHd.h
 #Each example.c file has a comment at the top with the command for building it.  Hence
 #examples are not built here.  However, the clean: target will delete the all example
 #executables that exist.
-EXAMPLES= example·trampoline example·nested_functions example·nested_labeling example·utf8
+EXAMPLES= example·trampoline example·nested_functions example·utf8 \
+example·nested_labeling_1 example·nested_labeling_2 example·nested_labeling_3
 
 .PHONY: all
 all: $(TARGETS)
