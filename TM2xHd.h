@@ -61,8 +61,23 @@
     hd->element_pt = TM2x·byte_0_pt(tape);
   }
 
-  TM2xHd·F_PREFIX void TM2xHd·step(TM2xHd *hd ,address_t element_byte_n){
+  TM2xHd·F_PREFIX void TM2xHd·unguarded_step(TM2xHd *hd ,address_t element_byte_n){
     hd->element_pt += element_byte_n + 1;
+  }
+
+  TM2xHd·F_PREFIX continuation TM2xHd·step
+  ( TM2x *tape 
+    ,TM2xHd *hd 
+    ,address_t element_byte_n
+    ,continuation nominal
+    ,continuation end_of_tape
+    ){
+    continue_into TM2xHd·at_element_n(tape ,hd ,element_byte_n ,&&at_n ,&&not_at_n);
+    at_n:;
+      continue_from end_of_tape;
+    not_at_n:;
+      TM2xHd·unguarded_step(hd ,element_byte_n);
+      continue_from nominal;
   }
   
   TM2xHd·F_PREFIX void *TM2xHd·pt(TM2xHd *hd){
@@ -86,50 +101,6 @@
 // quantifiers
 //
 
-#if 0
-
-
-// need to add alocation fail continuation
-  inline continuation TM2xHd·first_extend_loop
-  ( TM2x *dst
-    ,TM2x *src
-    ,TM2xHd *hd_src
-    ,address_t element_byte_n
-    ,void *context
-    ,continuation is_one_q(void *context ,TM2x *tape ,TM2xHd *hd ,address_t element_byte_n ,continuation found, continuation not_found) 
-    ,void write_init(TM2x *dst ,TM2xHd *hd_src ,address_t element_byte_n ,void *context) 
-    ,void write_extend(TM2x *dst ,TM2xHd *hd_src ,address_t element_byte_n ,void *context) 
-    ,continuation done
-    ,continuation not_found
-    ){
-
-    continuation when_found = &&init;
-
-    is_one:;
-    continue_into is_one_q(context ,src ,hd_src ,element_byte_n ,*when_found ,&&step);
-
-    init:;
-      write_init(dst ,hd_src ,context);
-      when_found = &&extend;
-      continue_from_local step;
-
-    extend:;
-      write_extend(dst ,hd_src ,context);
-      continue_from_local step;
-
-    step:;
-      continue_into TM2xHd·at_element_n(src ,hd_src ,element_byte_n ,&&end_of_tape  ,&&do_step);
-        do_step:;
-          TM2xHd·step(hd_src ,element_byte_n);
-          continue_from_local is_one;
-
-    end_of_tape:;
-      if(*when_found == &&init) continue_from not_found;
-      continue_from done;
-
-  }  
-
-
   // nah .. better to implement this with memcpyn, see TM2x·format_copy
   // shallow copy tape_src elements to the end of tape_acc
   TM2xHd·F_PREFIX continuation TM2x·cat
@@ -140,44 +111,15 @@
     ,continuation allocation_failed
     ){
     TM2xHd·AllocStaticRewind(tape_src, hd_src);
-
-    struct{
-      continuation allocation_failed;
-    } context;
-    context.allocation_failed = allocation_failed;
-
-    void write_init(TM2x *dst ,TM2xHd *hd_src ,address_t element_byte_n ,void *context){
-      TM2x·format_write
-        ( dst 
-          ,TM2xHd·Read_Expr(hd_src) 
-          ,eleement_byte_n 
-          ,&&nominal
-          ,context->allocation_failed
-    }
-
-    return first_extend_loop
-      ( tape_acc
-        ,tape_src
-        ,hd_src
-        ,element_byte_n
-        ,NULL
-        ,TM2xHd·pred_true
-        ,TM2x·format_write
-
-
     loop:
       continue_into TM2x·push_write(tape_acc ,TM2xHd·pt(hd_src) ,element_byte_n ,&&pw_nominal ,&&pw_allocation_failed);
       pw_nominal:
-        continue_into TM2xHd·at_element_n(tape_src ,hd_src ,element_byte_n ,&&at_n , &&not_at_n);
+        continue_into TM2xHd·step(tape_src ,hd_src ,element_byte_n ,&&loop ,&&at_n);
           at_n: 
             continue_from nominal;
-          not_at_n: 
-            TM2xHd·step(hd_src ,element_byte_n);
-            continue_from_local loop;
       pw_allocation_failed: 
         continue_from allocation_failed;
   }
-#endif
 
   // applies f to each element, in order starting at the current hd position, until reaching the end of the tape
   // should f accept/return continuations?  Should it take an hd instead of an element?
@@ -194,7 +136,7 @@
         hd_at_n:
           return;
         hd_not_at_n:
-          TM2xHd·step(hd ,element_byte_n);
+          TM2xHd·unguarded_step(hd ,element_byte_n);
           continue_from_local TM2xHd·apply_to_each;
   }
 
@@ -215,7 +157,7 @@
             at_n: 
               continue_from true_for_all;
             not_at_n: 
-              TM2xHd·step(hd ,element_byte_n);
+              TM2xHd·unguarded_step(hd ,element_byte_n);
               continue_from_local TM2xHd·all;
         pred_false:
           continue_from an_exception;
@@ -239,7 +181,7 @@
             hd_at_n:
               continue_from not_on_tape;
             hd_not_at_n: 
-              TM2xHd·step(hd ,element_byte_n);
+              TM2xHd·unguarded_step(hd ,element_byte_n);
               continue_from_local TM2xHd·exists;
   }
 
@@ -314,7 +256,7 @@
             at_n:
               continue_from nominal;
             not_at_n: 
-              TM2xHd·step(hd_src ,element_byte_n);
+              TM2xHd·unguarded_step(hd_src ,element_byte_n);
               continue_from_local TM2xHd·accumulate_union;
         pw_allocate_failed:
           continue_from allocation_failed;
@@ -354,7 +296,7 @@
         search_first_next:;
           continue_into TM2xHd·at_element_n(set_a ,hd_a ,element_byte_n ,&&end_of_tape , &&search_first_next_step);
             search_first_next_step:;
-              TM2xHd·step(hd_a ,element_byte_n);
+              TM2xHd·unguarded_step(hd_a ,element_byte_n);
               TM2xHd·rewind(set_b ,hd_b);
               continue_from_local search_first;
 
@@ -362,7 +304,7 @@
     extend:;  
       continue_into TM2xHd·at_element_n(set_a ,hd_a ,element_byte_n ,&&end_of_tape , &&extend_try_next);
         extend_try_next:;
-          TM2xHd·step(hd_a ,element_byte_n);
+          TM2xHd·unguarded_step(hd_a ,element_byte_n);
           TM2xHd·rewind(set_b ,hd_b);
           continue_into TM2xHd·exists(set_b ,hd_b ,element_byte_n ,TM2xHd·pt(hd_a) ,pred ,&&extend_try_next_write ,&&extend);
             extend_try_next_write:;

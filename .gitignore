@@ -1,9 +1,9 @@
 
-tmp/
 .*
 !.gitignore
 *~
 *.o
+tmp·*
 libTM2x.a
 TM2x·test
 TM2xHd·test

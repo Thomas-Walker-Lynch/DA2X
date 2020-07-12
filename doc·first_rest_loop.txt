@@ -33,14 +33,14 @@ output tape (here 'set_c') was written.
         TM2x_write_init(set_c ,a_element_pt ,element_byte_n);
         break;
       }
-      if( !TM2xHd_step(set_a ,hd_a ,element_byte_n) )
+      if( !TM2xHd_unguarded_step(set_a ,hd_a ,element_byte_n) )
         break;
       TM2xHd_rewind(set_b ,hd_b);
     }while(true);
     if( !found_first ) return false;
 
     // extend
-    while(TM2xHd_step(set_a ,hd_a ,element_byte_n)){
+    while(TM2xHd_unguarded_step(set_a ,hd_a ,element_byte_n)){
       a_element_pt = TM2xHd_pt(hd_a);
       TM2xHd_rewind(set_b ,hd_b);
       if(TM2xHd_exists(set_b ,hd_b ,element_byte_n ,a_element_pt ,pred)){
@@ -58,7 +58,7 @@ We could have instead nested the extension code.
       if( found_first ){
         TM2x_write_init(set_c ,a_element_pt ,element_byte_n);
         // extend
-        while(TM2xHd_step(set_a ,hd_a ,element_byte_n)){
+        while(TM2xHd_unguarded_step(set_a ,hd_a ,element_byte_n)){
           a_element_pt = TM2xHd_pt(hd_a);
           TM2xHd_rewind(set_b ,hd_b);
           if(TM2xHd_exists(set_b ,hd_b ,element_byte_n ,a_element_pt ,pred)){
@@ -67,7 +67,7 @@ We could have instead nested the extension code.
         }
         break;
       }
-      if( !TM2xHd_step(set_a ,hd_a ,element_byte_n) )
+      if( !TM2xHd_unguarded_step(set_a ,hd_a ,element_byte_n) )
         break;
       TM2xHd_rewind(set_b ,hd_b);
     }while(true);
@@ -151,18 +151,18 @@ In both cases the source iterator is left at the end of the tape.
     do{
        if( is_one(hd) ) init(destination ,hd); break;
        if( at_element_n(hd) ) goto never_is_one;
-       step(hd)
+       unguarded_step(hd)
     }while(true);
 
     // extend block
     while(!at_element_n(hd)){
-       step(hd)
+       unguarded_step(hd)
        if( is_one(hd) ) extend(hd);
     }
     end:;
     never_is_one:;
 
-The functions: is_one(), step(), and at_element_n() are used both by the first and extend blocks.
+The functions: is_one(), unguarded_step(), and at_element_n() are used both by the first and extend blocks.
 
 The function init(destination ,hd) is unique to the first block.
 
@@ -228,7 +228,7 @@ The first-extend loop now looks like:
           at_n:;
             continue_from <not_found>
           not_at_n:;
-            step(hd);
+            unguarded_step(hd);
             continue_from_local first;
 
   extend:;
@@ -236,7 +236,7 @@ The first-extend loop now looks like:
       at_n:;
         continue_from <done>
       not_at_n:;
-        step(hd);
+        unguarded_step(hd);
         continue_into is_one(hd ,&&is_one ,&&not_one);
           is_one:;
             write_extend(output ,hd)
@@ -268,7 +268,7 @@ or perhaps
 
    LP {
      if( is_one() ) init(); extend();
-     if( at_element_n ) <done> else step();
+     if( at_element_n ) <done> else unguarded_step();
      <not_found>
      }
 
@@ -284,7 +284,7 @@ to be aware of contexts so as to make up namespaced labels that do not collide .
 
   first: if( is_one(hd) ) write_init(output ,hd); else <not_found>
   extend: if( is_one(hd) ) push_write(output ,hd);
-  iterator: if( at_element_n(input ,hd) ) <done> else step(hd);
+  iterator: if( at_element_n(input ,hd) ) <done> else unguarded_step(hd);
 
 This is not a very good language statement because is_one appears twice, so we can not just have
 anonymous code in braces for it.
@@ -293,12 +293,12 @@ anonymous code in braces for it.
   write_if: is_one(hd) | <not_found>
   first: write_init(output ,hd)
   extend: push_write(output ,hd)
-  iterator: if( at_element_n(input ,hd) ) <done> else step(hd);
+  iterator: if( at_element_n(input ,hd) ) <done> else unguarded_step(hd);
 
   write: is_one(hd) | <not_found>
   first: write_init(output ,hd)
   extend: push_write(output ,hd)
-  iterator: at_element_n(input ,hd) && <done> | step(hd)
+  iterator: at_element_n(input ,hd) && <done> | unguarded_step(hd)
 
 
 --------------------------------------------------------------------------------
@@ -313,7 +313,7 @@ anonymous code in braces for it.
           at_n:;
             continue_from <done>
           not_at_n:;
-            step(hd);
+            unguarded_step(hd);
             continue_into is_one_q(hd ,&&is_one ,&&not_one);
               is_one:;
                 write_extend(output ,hd)
@@ -325,7 +325,7 @@ anonymous code in braces for it.
           at_n:;
             continue_from <not_found>
           not_at_n:;
-            step(hd);
+            unguarded_step(hd);
             continue_from_local first;
 
 
@@ -345,7 +345,7 @@ anonymous code in braces for it.
       not_one:;
         continue_into at_element_n(hd ,&&done  ,&&not_at_n);
           not_at_n:;
-            step(hd);
+            unguarded_step(hd);
             continue_from_local loop;
   done:;
 
@@ -375,7 +375,7 @@ use of the function pointer will assure that the compiler does not inline it.
   step:;
     continue_into at_element_n(hd ,&&done  ,&&not_at_n);
       not_at_n:;
-        step(hd);
+        unguarded_step(hd);
         continue_from_local work;
 
   done:;
@@ -430,13 +430,13 @@ program can type it out without having to type the same code twice.
     continue_from step;
 
   step:;
-    continue_into at_element_n(hd ,&&done  ,&&not_at_n);
-      not_at_n:;
-        step(hd);
-        continue_from is_one;
+    continue_into step(hd, &&done ,&&is_one)
 
   done:;
   if(when_found == is_one_init) then not initialized
+
+Now that there is no annoying duplicate code to type, it might be reasonable for a programmer
+to just type this loop form in directly.
 
 ----
   is_one -> [when_found]
@@ -449,54 +449,37 @@ program can type it out without having to type the same code twice.
 
   init -> step
 
-  step -> done
+  step -> is_one
   |
-  ------> is_one
+  ------> done
 
-----
-  gcc has limitations on what it will inline. Inlining and computed goto
-  do not go together ...
+-----
 
-  continued lambda function is a label followed by some code then a continuation.
+Step can be pulled back in:
 
-  functions passed in can be inlined?
+  when_found = &&init;
 
-  inline static first_extend_loop
-  ( input
-    ,hd
-    ,output 
-    ,void is_one_q(void **, void **) 
-    ,write_init(output ,hd) 
-    ,write_extend(output ,hd)
-    ,done
-    ,not_found
-    ){
+  is_one:;
+    if( <is_one test> )
+      continue_from *when_found;
+    else
+      continue_into step(hd, &&done ,&&is_one);
 
-    void **when_found = &&init;
+  init:;
+    <write_init code>
+    when_found = &&extend;
+    continue_into step(hd, &&done ,&&is_one);
 
-    is_one:;
-      continue_into is_one_q( *when_found ,step);
+  extend:;
+    <write_extend code>
+    continue_into step(hd, &&done ,&&is_one);
 
-    init:;
-      write_init(output ,hd);
-      when_found = &&extend;
-      continue_from_local step;
+  done:;
+  if(when_found == is_one_init) then not initialized
 
-    extend::
-      write_extend(output ,hd);
-      continue_from_local step;
 
-    step:;
-      continue_into at_element_n(hd ,&&done_local  ,&&not_at_n);
-        not_at_n:;
-          step(hd);
-          continue_from_local is_one;
 
-    done_local:;
-      if(when_found == is_one_init) continue_from not_found;
-      continue_from done;
 
-  }  
 
 //-------------------------------------------------------------------------------
 // continuations and classes
@@ -527,13 +510,13 @@ program can type it out without having to type the same code twice.
     operand structure directly above the continuation. Continuations may also have local
     data.  Here is a hypothetical 'is_one' continuation.
 
-      struct{
+      struct is_one_args{
         TM2xHd *hd;
         continunation found;
-      }is_one_operands;
+      }is_one_args;
 
-      struct{
-      }init_data;
+      struct is_one_data{
+      }is_one_data;
 
       is_one_entry:;
         if( TM2xHd_Read_Exp(is_one_operands.hd) > 10 ){
