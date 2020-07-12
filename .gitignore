@@ -8,5 +8,8 @@ libTM2x.a
 TM2x·test
 TM2xHd·test
 example·trampoline
-example·nested_labels
-example·nested_functions
+example·nested_functions 
+example·utf8
+example·nested_labeling_1 
+example·nested_labeling_2 
+example·nested_labeling_3
