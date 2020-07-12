@@ -164,7 +164,8 @@
   }
   TM2x·F_PREFIX continuation TM2x·format
   ( TM2x *tape
-   ,address_t element_n, address_t element_byte_n 
+    ,address_t element_n
+    ,address_t element_byte_n 
     ,continuation nominal
     ,continuation alloc_fail
     ){

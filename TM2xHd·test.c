@@ -287,25 +287,32 @@ TM2x·Result test_3(){
   uint32_t j;
 
   j=0;
-  TM2x·AllocStaticFormat_Write(a0 ,j ,&&nominal_0 ,&&fail_0);
-    nominal_0:;
-      f[i] = true;
-      continue_from_local end_0;
-    fail_0:;
-      f[i] = false;
-      continue_from_local end_0;
-    end_0:;
-      i++;
-  f[i] = true; 
-  while( j < 30 ){
-    j+=3;
-    continue_into TM2x·Push_Write(a0 ,j ,&&nominal_1 ,&&fail_1);    
-    fail_1:;
-      f[i] = false;
-    nominal_1:;
-      ;
+  TM2x·AllocStatic(a0);
+  {
+    __label__ nominal ,fail ,end;
+    TM2x·format_write(a0 ,&j ,byte_n_of(j) ,&&nominal ,&&fail);
+      nominal:;
+        f[i] = true;
+        continue_from_local end;
+      fail:;
+        f[i] = false;
+        continue_from_local end;
+      end:;
+        i++;
   }
-  i++;
+  {
+    __label__ nominal ,fail;
+    f[i] = true; 
+    while( j < 30 ){
+      j+=3;
+      continue_into TM2x·Push_Write(a0 ,j ,&&nominal ,&&fail);    
+      fail:;
+        f[i] = false;
+      nominal:;
+        ;
+    }
+    i++;
+  }
 
   fprintf(stderr, "a0:");
   TM2xHd·AllocStaticRewind(a0 ,hd);
@@ -401,61 +408,69 @@ TM2x·Result test_3(){
   fputc('\n' ,stderr);
   // add test distinct == false
   TM2x·AllocStatic(a3);
-  bool distinct;
-  continue_into TM2xHd·init_intersection
-    ( a3 
-      ,a0 
-      ,a1
-      ,byte_n_of(uint) 
-      ,TM2xHd·pred_bytes_eq
-      ,&distinct
-      ,&&nominal_9 
-      ,&&fail_9
-      );
-    nominal_9:;
-      f[i] = true;
-      continue_from_local end_9;
-    fail_9:;
-      f[i] = false;
-      continue_from_local end_9;
-    end_9:;
-      i++;
+  {
+    __label__ nominal ,fail ,end;
+    continue_into TM2xHd·init_intersection
+      ( a3 
+        ,a0 
+        ,a1
+        ,byte_n_of(uint) 
+        ,TM2xHd·pred_bytes_eq
+        ,&&nominal 
+        ,&&empty
+        ,&&fail
+        );
 
-  fprintf(stderr, "a3 = intersection a1 a0: ");
-  TM2xHd·rewind(a3 ,hd);
-  TM2xHd·apply_to_each(a3 ,hd ,byte_n_of(uint) ," " ,TM2xHd·f_print_int);
-  fputc('\n' ,stderr);
+      nominal:; // a3 is only formated and initialized if we travel down this path
+        f[i++] = true;
+        fprintf(stderr, "a3 = intersection a1 a0: ");
+        TM2xHd·rewind(a3 ,hd);
+        TM2xHd·apply_to_each(a3 ,hd ,byte_n_of(uint) ," " ,TM2xHd·f_print_int);
+        fputc('\n' ,stderr);
+        bool subset;
+        TM2xHd·AllocStaticRewind(a2 ,a2_hd);
+        {
+          __label__ nominal ,fail ,end;
+          continue_into TM2xHd·accumulate_union
+            ( a3 
+              ,a2 
+              ,a2_hd
+              ,byte_n_of(uint) 
+              ,TM2xHd·pred_bytes_eq 
+              ,&subset
+              ,&&nominal 
+              ,&&fail
+              );
+            nominal:;
+              f[i] = true;
+              continue_from_local end;
+            fail:;
+              f[i] = false;
+              continue_from_local end;
+            end:;
+              i++;
+        }
+        fprintf(stderr, "a3 union a2: ");
+        TM2xHd·rewind(a3 ,hd);
+        TM2xHd·apply_to_each(a3 ,hd ,byte_n_of(uint) ," " ,TM2xHd·f_print_int);
+        fputc('\n' ,stderr);
+        TM2x·dealloc_static(a3);
+        continue_from_local end;
 
-  bool subset;
-  TM2xHd·AllocStaticRewind(a2 ,a2_hd);
-  continue_into TM2xHd·accumulate_union
-    ( a3 
-      ,a2 
-      ,a2_hd
-      ,byte_n_of(uint) 
-      ,TM2xHd·pred_bytes_eq 
-      ,&subset
-      ,&&nominal_10 
-      ,&&fail_10
-      );
-    nominal_10:;
-      f[i] = true;
-      continue_from_local end_10;
-    fail_10:;
-      f[i] = false;
-      continue_from_local end_10;
-    end_10:;
-      i++;
+      empty:;
+        f[i++] = false;
+        continue_from_local end;
 
-  fprintf(stderr, "a3 union a2: ");
-  TM2xHd·rewind(a3 ,hd);
-  TM2xHd·apply_to_each(a3 ,hd ,byte_n_of(uint) ," " ,TM2xHd·f_print_int);
-  fputc('\n' ,stderr);
+      fail:;
+        f[i++] = false;
+        continue_from_local end;
+
+      end:;
+  }
 
   TM2x·dealloc_static(a0);
   TM2x·dealloc_static(a1);
   TM2x·dealloc_static(a2);
-  TM2x·dealloc_static(a3);
   f[i++] = malloc_cnt == TM2x·malloc_cnt;
   f[i++] = initialized_cnt == TM2x·initialized_cnt;
   TM2x·Result_tally("test_3" ,rp ,f ,i);

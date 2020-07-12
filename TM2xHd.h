@@ -273,49 +273,71 @@
     ,TM2x *set_b
     ,address_t element_byte_n
     ,continuation pred(void *context ,void *el ,address_t element_byte_n ,continuation pred_true ,continuation pred_false)
-    ,bool *distinct
-    ,continuation nominal
-    ,continuation allocation_failed
+    ,continuation init_intersection·nominal
+    ,continuation init_intersection·empty
+    ,continuation init_intersection·allocation_failed
     ){
     TM2xHd·AllocStaticRewind(set_a ,hd_a);
     TM2xHd·AllocStaticRewind(set_b ,hd_b);
 
-    if(distinct) *distinct = true;
+      // when_found is either &&init or &&extend
+    continuation do_when_found = &&init;
 
-    // uses a uniform namespace approach for keeping labels unique
-    // we look for a first common element between sets a and b.  If we fine one, we will initialize set_intersection
-    search_first:;
-      continue_into TM2xHd·exists(set_b ,hd_b ,element_byte_n ,TM2xHd·pt(hd_a) ,pred ,&&search_first_write ,&&search_first_next);
-        search_first_write:;
-          continue_into TM2x·format_write(set_intersection ,TM2xHd·pt(hd_a) ,element_byte_n ,&&search_first_write_nominal ,&&search_first_write_fail);
-            search_first_write_nominal:;
-              if(distinct) *distinct = false;
-              continue_from_local extend;
-            search_first_write_fail:;
-              continue_from allocation_failed;
-        search_first_next:;
-          continue_into TM2xHd·at_element_n(set_a ,hd_a ,element_byte_n ,&&end_of_tape , &&search_first_next_step);
-            search_first_next_step:;
-              TM2xHd·unguarded_step(hd_a ,element_byte_n);
-              TM2xHd·rewind(set_b ,hd_b);
-              continue_from_local search_first;
+    exists:;
+      continue_into TM2xHd·exists
+        ( set_b 
+          ,hd_b 
+          ,element_byte_n 
+          ,TM2xHd·pt(hd_a) 
+          ,pred 
+          ,do_when_found
+          ,&&next
+          );
 
-    // if there are more common elements between sets a and b, we use them to extend set_intersection
-    extend:;  
-      continue_into TM2xHd·at_element_n(set_a ,hd_a ,element_byte_n ,&&end_of_tape , &&extend_try_next);
-        extend_try_next:;
-          TM2xHd·unguarded_step(hd_a ,element_byte_n);
-          TM2xHd·rewind(set_b ,hd_b);
-          continue_into TM2xHd·exists(set_b ,hd_b ,element_byte_n ,TM2xHd·pt(hd_a) ,pred ,&&extend_try_next_write ,&&extend);
-            extend_try_next_write:;
-              continue_into TM2x·push_write(set_intersection ,TM2xHd·pt(hd_a) ,element_byte_n ,&&extend_try_next_write_nominal ,&&extend_try_next_write_fail);
-                extend_try_next_write_nominal:;
-                  continue_from_local extend;
-                extend_try_next_write_fail:;              
-                  continue_from allocation_failed;
+    init:;  
+      continue_into TM2x·format_write
+        ( set_intersection 
+          ,TM2xHd·pt(hd_a) 
+          ,element_byte_n 
+          ,&&init·nominal
+          ,&&init·alloc_fail
+          );
+        init·nominal:;
+          do_when_found = &&extend;
+          continue_from_local next;
+        init·alloc_fail:;
+          continue_from init_intersection·allocation_failed;
+        
+    extend:;
+      continue_into TM2x·push_write
+        ( set_intersection 
+          ,TM2xHd·pt(hd_a) 
+          ,element_byte_n 
+          ,&&extend·nominal 
+          ,&&extend·alloc_fail
+          );        
+        extend·nominal:;
+          continue_from_local next;
+        extend·alloc_fail:;
+          continue_from init_intersection·allocation_failed;
 
-    end_of_tape:;  
-      continue_from nominal;
+    next:;
+      TM2xHd·rewind(set_b ,hd_b);
+      continue_into TM2xHd·step
+        ( set_a
+          ,hd_a
+          ,element_byte_n
+          ,&&next·exists
+          ,&&next·end_of_tape
+          );
+        next·exists:;
+          continue_from_local exists;
+        next·end_of_tape:;
+          if( do_when_found == &&init )
+            continue_from init_intersection·empty;
+          else
+            continue_from init_intersection·nominal;
+
   }
 
 //--------------------------------------------------------------------------------

@@ -430,7 +430,7 @@ program can type it out without having to type the same code twice.
     continue_from step;
 
   step:;
-    continue_into step(hd, &&done ,&&is_one)
+    continue_into step(hd ,&&is_one, &&done)
 
   done:;
   if(when_found == is_one_init) then not initialized
