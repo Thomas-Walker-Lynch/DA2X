@@ -174,7 +174,7 @@
       format_nominal: continue_from nominal;
       format_alloc_fail: continue_from alloc_fail;
   }
-  // makes a pointer to a tape
+  // makes a pointer to an unitialized tape
   #define TM2x·AllocStaticFormat(tape ,element_n ,type ,cont_nominal ,cont_fail) \
     TM2x·AllocStatic(tape);\
     continue_into TM2x·format(tape ,element_n ,byte_n_of(type), cont_nominal ,cont_fail);

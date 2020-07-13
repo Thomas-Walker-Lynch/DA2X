@@ -225,8 +225,8 @@
   #define TM2xHd·Push_Write_Not_Exists(tape_dst ,item ,pred ,wrote_it ,already_on_tape ,allocate_failed) \
     continue_into TM2xHd·push_write_not_exists(tape_dst ,&item ,byte_n_of(type_of(item)) ,pred ,wrote_it ,already_on_tape ,allocate_failed)
 
-  // -accumulates copies of elements from set_src into set_acc
-  // -returns whether set_src was a subset of set_acc even before the union
+  // -accumulates elements from set_src which are not already in set_acc into set_acc.
+  // -returns whether set_src was a subset of set_acc even before the union (make this a separate continuation?)
   // -context given to the pred is a pointer to the src element
   TM2xHd·F_PREFIX continuation TM2xHd·accumulate_union
   ( TM2x *set_acc
@@ -262,7 +262,7 @@
           continue_from allocation_failed;
     }
 
-  // -> set_intersection -> set_a intersection set_b
+  // -> set_intersection = set_a intersection set_b
   // -> returns whether the sets set_a and set_b were found to be distinct,
   //    i.e. if initialization ever occurred on set_intersection
   // -> context given to the pred is a_element, the pred src element is the b_element
@@ -327,18 +327,18 @@
         ( set_a
           ,hd_a
           ,element_byte_n
-          ,&&next·exists
+          ,&&loop
           ,&&next·end_of_tape
           );
-        next·exists:;
+        loop:; // this little detour assists with debugging
           continue_from_local exists;
         next·end_of_tape:;
           if( do_when_found == &&init )
             continue_from init_intersection·empty;
           else
             continue_from init_intersection·nominal;
-
   }
+
 
 //--------------------------------------------------------------------------------
 // some useful predicates
