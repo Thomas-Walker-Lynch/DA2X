@@ -7,7 +7,7 @@
 
 */  
 
-continuation Chars·format_write
+continuation Chars·format_write_cstring
 ( TM2x *tape 
   ,char *pt
   ,address_t element_byte_n 

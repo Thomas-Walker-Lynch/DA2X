@@ -179,9 +179,45 @@
         continue_via_trampoline nominal;
       format_fail: continue_via_trampoline fail;
   }
+
+  TM2x·F_PREFIX continuation TM2x·format_write_cstring
+  ( TM2x *tape 
+    ,char *pt
+    ,continuation nominal
+    ,continuation null_pt
+    ,continuation alloc_fail
+    ){
+
+    if(!pt) continue_via_trampoline null_pt;
+    continuation do_write = &&init; 
+
+    is_char_q:;
+      if(*pt) continue_from do_write;
+      continue_via_trampoline nominal;
+
+    init:;
+      continue_into TM2x·format_write(tape ,pt ,byte_n_of(char) ,&&init·nominal ,&&alloc_fail_local);
+        init·nominal:;
+          do_write = &&extend;
+          continue_from next;
+
+    extend:;
+      continue_into TM2x·push_write(tape ,pt ,byte_n_of(char) ,&&next ,&&alloc_fail_local);
+
+    next:;
+      pt++;
+      continue_from is_char_q;
+
+    alloc_fail_local:;
+      continue_via_trampoline alloc_fail;
+
+  }
+
   #define TM2x·AllocStaticFormat_Write(tape ,item ,cont_nominal ,cont_fail)\
     TM2x·AllocStatic(tape);\
     continue_into TM2x·format_write(tape ,&item ,byte_n_of(typeof(item)) ,cont_nominal ,cont_fail);
+
+
 
   // tape_new has been allocated. This routine formats and intitializes it.
   // shallow copy tape_src elements to tape_new
