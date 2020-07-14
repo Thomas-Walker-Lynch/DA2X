@@ -24,7 +24,7 @@
 
 #define address_t_n UINT64_MAX
 #define address_t uint64_t
-#define continue_from return
+#define continue_via_trampoline return
 typedef void **continuation;
 
 int main(){

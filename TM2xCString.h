@@ -15,8 +15,8 @@
   // continuations by trampoline
   #define continuations __label__
   #define continue_into goto *
-  #define continue_from return
-  #define continue_from_local goto
+  #define continue_via_trampoline return
+  #define continue_from goto
   typedef void **continuation;
   
 
@@ -34,10 +34,10 @@
   }
 
   TM2x·F_PREFIX continuation mallocn(void **pt ,address_t n ,continuation nominal ,continuation fail){
-    if( n == address_t_n ) continue_from fail;
+    if( n == address_t_n ) continue_via_trampoline fail;
     *pt = malloc(n+1);
-    if(!*pt) continue_from fail;
-    continue_from nominal;
+    if(!*pt) continue_via_trampoline fail;
+    continue_via_trampoline nominal;
   }
 
   // the n+1 could overflow:
@@ -83,7 +83,7 @@
    ,continuation nominal
    ,continuation fail
    ){
-    continue_from mallocn((void **)tape ,byte_n_of(TM2x) ,nominal ,fail);
+    continue_via_trampoline mallocn((void **)tape ,byte_n_of(TM2x) ,nominal ,fail);
   }
   TM2x·F_PREFIX void TM2x·dealloc_heap(TM2x *tape){
     TM2x·dealloc_static(tape);
@@ -111,8 +111,8 @@
         memcpyn( after_base_pt ,before_base_pt ,tape->byte_n);
         free(before_base_pt);
         tape->base_pt = after_base_pt;
-        continue_from resize_nominal;
-      malloc_fail: continue_from allocation_fail;
+        continue_via_trampoline resize_nominal;
+      malloc_fail: continue_via_trampoline allocation_fail;
   }
 
   TM2x·F_PREFIX address_t TM2x·initialized(TM2x *tape){
@@ -136,8 +136,8 @@
     tape->byte_n = byte_n;
     address_t allocation_byte_n = binary_interval_inclusive_upper_bound(byte_n);
     continue_into mallocn( (void **)&(tape->base_pt) ,allocation_byte_n ,&&mallocn_nominal ,&&mallocn_fail);
-      mallocn_nominal: continue_from format_nominal;
-      mallocn_fail: continue_from format_alloc_fail;
+      mallocn_nominal: continue_via_trampoline format_nominal;
+      mallocn_fail: continue_via_trampoline format_alloc_fail;
   }
   TM2x·F_PREFIX continuation TM2x·format
   ( TM2x *tape
@@ -148,8 +148,8 @@
     ){
     address_t byte_n = TM2x·mulns(element_byte_n ,element_n);
     continue_into __TM2x·format(tape ,byte_n ,&&format_nominal ,&&format_alloc_fail);
-      format_nominal: continue_from nominal;
-      format_alloc_fail: continue_from alloc_fail;
+      format_nominal: continue_via_trampoline nominal;
+      format_alloc_fail: continue_via_trampoline alloc_fail;
   }
   // makes a pointer to an unitialized tape
   #define TM2x·AllocStaticFormat(tape ,element_n ,type ,cont_nominal ,cont_fail) \
@@ -166,9 +166,9 @@
     continue_into mallocn((void **)tape ,byte_n_of(TM2x) ,&&mallocn_nominal ,&&mallocn_fail);
       mallocn_nominal:
         continue_into TM2x·format(*tape ,element_n ,element_byte_n ,&&format_nominal ,&&format_fail);
-          format_fail: continue_from fail;
-          format_nominal: continue_from nominal;
-      mallocn_fail: continue_from fail;
+          format_fail: continue_via_trampoline fail;
+          format_nominal: continue_via_trampoline nominal;
+      mallocn_fail: continue_via_trampoline fail;
     }
 
   TM2x·F_PREFIX continuation TM2x·format_write
@@ -181,8 +181,8 @@
     continue_into TM2x·format(tape ,0 ,element_byte_n ,&&format_nominal ,&&format_fail);
       format_nominal:
         memcpyn(tape->base_pt, element_pt, element_byte_n);
-        continue_from nominal;
-      format_fail: continue_from fail;
+        continue_via_trampoline nominal;
+      format_fail: continue_via_trampoline fail;
   }
   #define TM2x·AllocStaticFormat_Write(tape ,item ,cont_nominal ,cont_fail)\
     TM2x·AllocStatic(tape);\
@@ -202,8 +202,8 @@
     continue_into __TM2x·format(tape ,byte_n ,&&format_nominal ,&&format_fail);
       format_nominal: 
         memcpyn(tape->base_pt ,tape_src->base_pt ,byte_n);
-        continue_from nominal;
-      format_fail: continue_from fail;
+        continue_via_trampoline nominal;
+      format_fail: continue_via_trampoline fail;
   }
 
 //--------------------------------------------------------------------------------
@@ -281,10 +281,10 @@
     address_t after_byte_n = before_byte_n + requested_expansion_byte_n + 1;
     tape->byte_n = after_byte_n;
     address_t after_allocation_n = binary_interval_inclusive_upper_bound(after_byte_n);
-    if( after_allocation_n <= before_allocation_n ) continue_from nominal;
+    if( after_allocation_n <= before_allocation_n ) continue_via_trampoline nominal;
     continue_into TM2x·resize(tape ,after_allocation_n ,&&resize_nominal ,&&resize_fail);
-      resize_nominal: continue_from nominal;
-      resize_fail: continue_from fail;
+      resize_nominal: continue_via_trampoline nominal;
+      resize_fail: continue_via_trampoline fail;
   }
   #define TM2x·Push_Alloc(tape ,expansion_element_n ,type ,cont_nominal ,cont_fail) \
     TM2x·push_alloc(tape, expansion_element_n ,byte_n_of(type) ,cont_nominal ,cont_fail)
@@ -299,9 +299,9 @@
     continue_into TM2x·push_alloc(tape ,0 ,element_byte_n ,&&push_alloc_nominal ,&&push_alloc_fail);
       push_alloc_nominal:
         memcpyn(TM2x·element_n_pt(tape ,element_byte_n) ,src_element_pt ,element_byte_n);
-        continue_from nominal;
+        continue_via_trampoline nominal;
       push_alloc_fail:
-        continue_from allocation_failed;
+        continue_via_trampoline allocation_failed;
   }
   #define TM2x·Push_Write(tape ,src_element ,cont_nominal ,cont_allocation_failed)\
     TM2x·push_write(tape ,&src_element ,byte_n_of(typeof(src_element)) ,cont_nominal ,cont_allocation_failed)
@@ -315,7 +315,7 @@
     ){
 
     address_t before_byte_n = TM2x·byte_n(tape);
-    if( before_byte_n <= element_byte_n ) continue_from pop_last;
+    if( before_byte_n <= element_byte_n ) continue_via_trampoline pop_last;
     address_t after_byte_n = before_byte_n - element_byte_n - 1;
     tape->byte_n = after_byte_n; 
 
@@ -326,7 +326,7 @@
     address_t after_allocation_n = binary_interval_inclusive_upper_bound(after_byte_n);
     if( after_allocation_n < before_allocation_n ) TM2x·resize(tape ,after_allocation_n ,NULL ,NULL);
 
-    continue_from nominal;
+    continue_via_trampoline nominal;
   }
   #define TM2x·Pop(tape ,type ,cont_nominal ,cont_pop_last)\
     TM2x·pop(tape ,byte_n_of(type) ,cont_nominal ,cont_pop_last )
@@ -341,8 +341,8 @@
     ){
     memcpyn(dst_element_pt, TM2x·element_n_pt(tape ,element_byte_n) ,element_byte_n);
     continue_into TM2x·pop(tape ,element_byte_n ,&&pop_nominal ,&&pop_pop_last);
-      pop_nominal: continue_from nominal;
-      pop_pop_last: continue_from pop_last;
+      pop_nominal: continue_via_trampoline nominal;
+      pop_pop_last: continue_via_trampoline pop_last;
   }
   #define TM2x·Read_Pop(tape ,dst_element ,cont_nominal ,cont_pop_last)\
     TM2x·read_pop(tape ,&dst_element ,byte_n_of(typeof(dst_element)) ,cont_nominal ,cont_pop_last)

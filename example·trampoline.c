@@ -13,14 +13,14 @@
 
 #define address_t_n UINT64_MAX
 #define address_t uint64_t
-#define continue_from return
+#define continue_via_trampoline return
 typedef void **continuation;
 
 continuation mallocn(void **pt ,address_t n ,continuation success ,continuation fail){
-  if( n == address_t_n ) continue_from fail;
+  if( n == address_t_n ) continue_via_trampoline fail;
   *pt = malloc(n+1);
-  if(!*pt) continue_from fail;
-  continue_from success;
+  if(!*pt) continue_via_trampoline fail;
+  continue_via_trampoline success;
 }
 
 int main(){

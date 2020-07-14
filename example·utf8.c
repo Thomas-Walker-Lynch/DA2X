@@ -22,7 +22,7 @@ https://en.cppreference.com/w/cpp/language/identifiers#Unicode_characters_in_ide
 
 #define address_t_n UINT64_MAX
 #define address_t uint64_t
-#define continue_from return
+#define continue_via_trampoline return
 typedef void **continuation;
 
 int main(){

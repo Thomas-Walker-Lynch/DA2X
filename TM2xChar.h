@@ -3,11 +3,11 @@
 #include "TM2xHd.h"
 
 /*--------------------------------------------------------------------------------
-  The array elements are UTF-8 chars.
+  The array elements are chars.
 
 */  
 
-continuation C_string·format_write
+continuation Chars·format_write
 ( TM2x *tape 
   ,char *pt
   ,address_t element_byte_n 
@@ -16,28 +16,28 @@ continuation C_string·format_write
   ,continuation alloc_fail
   ){
   
-  if(!pt) continue_from null_pt;
+  if(!pt) continue_via_trampoline null_pt;
   continuation do_write = &&init; 
 
   is_char_q:;
-    if(*pt) continue_from_local do_write;
-    continue_from nominal;
+    if(*pt) continue_from do_write;
+    continue_via_trampoline nominal;
 
   init:;
     continue_into TM2x·format_write(tape ,pt ,byte_n_of(char) ,&&init·nominal ,&&alloc_fail_local);
       init·nominal:;
         do_write = &&extend;
-        continue_from_local next;
+        continue_from next;
     
   extend:;
     continue_into TM2x·push_write(tape ,pt ,byte_n_of(char) ,&&next ,&&alloc_fail_local);
 
   next:;
     pt++;
-    continue_from_local is_char_q;
+    continue_from is_char_q;
 
   alloc_fail_local:;
-    continue_from alloc_fail;
+    continue_via_trampoline alloc_fail;
 
 }
 

@@ -39,8 +39,8 @@
     ,continuation is_true  
     ,continuation is_false
     ){
-    if( hd->element_pt <= TM2x·byte_n_pt(tape) && hd->element_pt >= TM2x·byte_0_pt(tape) ) continue_from is_true;
-    continue_from is_false;
+    if( hd->element_pt <= TM2x·byte_n_pt(tape) && hd->element_pt >= TM2x·byte_0_pt(tape) ) continue_via_trampoline is_true;
+    continue_via_trampoline is_false;
   }
   TM2xHd·F_PREFIX continuation TM2xHd·at_element_n
   ( TM2x *tape 
@@ -49,8 +49,8 @@
     ,continuation is_true  
     ,continuation is_false
     ){
-    if( hd->element_pt == TM2x·element_n_pt(tape ,element_byte_n) ) continue_from is_true;
-    continue_from is_false;
+    if( hd->element_pt == TM2x·element_n_pt(tape ,element_byte_n) ) continue_via_trampoline is_true;
+    continue_via_trampoline is_false;
   }
 
 //--------------------------------------------------------------------------------
@@ -74,10 +74,10 @@
     ){
     continue_into TM2xHd·at_element_n(tape ,hd ,element_byte_n ,&&at_n ,&&not_at_n);
     at_n:;
-      continue_from end_of_tape;
+      continue_via_trampoline end_of_tape;
     not_at_n:;
       TM2xHd·unguarded_step(hd ,element_byte_n);
-      continue_from nominal;
+      continue_via_trampoline nominal;
   }
   
   TM2xHd·F_PREFIX void *TM2xHd·pt(TM2xHd *hd){
@@ -116,9 +116,9 @@
       pw_nominal:
         continue_into TM2xHd·step(tape_src ,hd_src ,element_byte_n ,&&loop ,&&at_n);
           at_n: 
-            continue_from nominal;
+            continue_via_trampoline nominal;
       pw_allocation_failed: 
-        continue_from allocation_failed;
+        continue_via_trampoline allocation_failed;
   }
 
   // applies f to each element, in order starting at the current hd position, until reaching the end of the tape
@@ -137,7 +137,7 @@
           return;
         hd_not_at_n:
           TM2xHd·unguarded_step(hd ,element_byte_n);
-          continue_from_local TM2xHd·apply_to_each;
+          continue_from TM2xHd·apply_to_each;
   }
 
   // applies pred to each element until either pred is not true, or reaching the end of the tape
@@ -155,12 +155,12 @@
         pred_true:
           continue_into TM2xHd·at_element_n(tape ,hd ,element_byte_n ,&&at_n , &&not_at_n);
             at_n: 
-              continue_from true_for_all;
+              continue_via_trampoline true_for_all;
             not_at_n: 
               TM2xHd·unguarded_step(hd ,element_byte_n);
-              continue_from_local TM2xHd·all;
+              continue_from TM2xHd·all;
         pred_false:
-          continue_from an_exception;
+          continue_via_trampoline an_exception;
   }
 
   TM2xHd·F_PREFIX continuation TM2xHd·exists
@@ -175,14 +175,14 @@
     TM2xHd·exists:
       continue_into pred(context ,TM2xHd·pt(hd) ,element_byte_n ,&&pred_true ,&&pred_false );
         pred_true:
-          continue_from found_one;
+          continue_via_trampoline found_one;
         pred_false:
           continue_into TM2xHd·at_element_n(tape ,hd ,element_byte_n ,&&hd_at_n , &&hd_not_at_n);
             hd_at_n:
-              continue_from not_on_tape;
+              continue_via_trampoline not_on_tape;
             hd_not_at_n: 
               TM2xHd·unguarded_step(hd ,element_byte_n);
-              continue_from_local TM2xHd·exists;
+              continue_from TM2xHd·exists;
   }
 
 //--------------------------------------------------------------------------------
@@ -214,13 +214,13 @@
         ,&&not_found
         );
       found_one:
-        continue_from already_on_tape_dst;
+        continue_via_trampoline already_on_tape_dst;
       not_found:
         continue_into TM2x·push_write(tape_dst ,src_element_pt ,element_byte_n ,&&pw_wrote_it ,&&pw_alloc_failed);
           pw_wrote_it:
-            continue_from wrote_it;
+            continue_via_trampoline wrote_it;
           pw_alloc_failed:
-            continue_from allocate_failed;
+            continue_via_trampoline allocate_failed;
   }
   #define TM2xHd·Push_Write_Not_Exists(tape_dst ,item ,pred ,wrote_it ,already_on_tape ,allocate_failed) \
     continue_into TM2xHd·push_write_not_exists(tape_dst ,&item ,byte_n_of(type_of(item)) ,pred ,wrote_it ,already_on_tape ,allocate_failed)
@@ -254,12 +254,12 @@
         pw_already_on_tape:
           continue_into TM2xHd·at_element_n(set_src ,hd_src ,element_byte_n ,&&at_n , &&not_at_n);
             at_n:
-              continue_from nominal;
+              continue_via_trampoline nominal;
             not_at_n: 
               TM2xHd·unguarded_step(hd_src ,element_byte_n);
-              continue_from_local TM2xHd·accumulate_union;
+              continue_from TM2xHd·accumulate_union;
         pw_allocate_failed:
-          continue_from allocation_failed;
+          continue_via_trampoline allocation_failed;
     }
 
   // -> set_intersection = set_a intersection set_b
@@ -304,9 +304,9 @@
           );
         init·nominal:;
           do_when_found = &&extend;
-          continue_from_local next;
+          continue_from next;
         init·alloc_fail:;
-          continue_from init_intersection·allocation_failed;
+          continue_via_trampoline init_intersection·allocation_failed;
         
     extend:;
       continue_into TM2x·push_write
@@ -317,9 +317,9 @@
           ,&&extend·alloc_fail
           );        
         extend·nominal:;
-          continue_from_local next;
+          continue_from next;
         extend·alloc_fail:;
-          continue_from init_intersection·allocation_failed;
+          continue_via_trampoline init_intersection·allocation_failed;
 
     next:;
       TM2xHd·rewind(set_b ,hd_b);
@@ -331,12 +331,12 @@
           ,&&next·end_of_tape
           );
         loop:; // this little detour assists with debugging
-          continue_from_local exists;
+          continue_from exists;
         next·end_of_tape:;
           if( do_when_found == &&init )
-            continue_from init_intersection·empty;
+            continue_via_trampoline init_intersection·empty;
           else
-            continue_from init_intersection·nominal;
+            continue_via_trampoline init_intersection·nominal;
   }
 
 
@@ -352,7 +352,7 @@
     ,continuation pred_true
     ,continuation pred_false
     ){
-    continue_from pred_true;
+    continue_via_trampoline pred_true;
   }
 
   TM2xHd·F_PREFIX continuation TM2xHd·false
@@ -362,7 +362,7 @@
     ,continuation pred_true
     ,continuation pred_false
     ){
-    continue_from pred_false;
+    continue_via_trampoline pred_false;
   }
 
   TM2xHd·F_PREFIX continuation TM2xHd·pred_bytes_eq
@@ -375,9 +375,9 @@
     char *e0 = a_e0;
     char *e1 = context;
     if( memcmpn(e0 ,e1 ,element_byte_n) == 0 )
-      continue_from pred_true;
+      continue_via_trampoline pred_true;
     else
-      continue_from pred_false;
+      continue_via_trampoline pred_false;
   }
 
   TM2xHd·F_PREFIX continuation TM2xHd·pred_cstring_eq
@@ -390,9 +390,9 @@
     char *e0 = a_e0;
     char *e1 = context;
     if( strncmpn(e0 ,e1 ,element_byte_n) == 0 )
-      continue_from pred_true;
+      continue_via_trampoline pred_true;
     else
-      continue_from pred_false;
+      continue_via_trampoline pred_false;
   }
 
 //--------------------------------------------------------------------------------

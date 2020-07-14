@@ -23,7 +23,7 @@ TM2x·Result test_0(){
   TM2x·AllocStaticFormat(a0p ,0 ,int32_t ,&&nominal ,&&fail);
     nominal:;
       f[i] = true;  
-      continue_from_local end;
+      continue_from end;
     fail:;
       f[i] = false;
     end:;
@@ -57,7 +57,7 @@ TM2x·Result test_1(){
   continue_into TM2x·format(a0p ,1 ,byte_n_of(int32_t) ,&&format_nominal ,&&format_alloc_fail);
     format_alloc_fail:;
       f[i] = false;
-      continue_from_local format_end;
+      continue_from format_end;
     format_nominal:;
       f[i] = true;
     format_end:;
@@ -67,7 +67,7 @@ TM2x·Result test_1(){
   continue_into TM2x·Push_Alloc(a0p ,1 ,int32_t ,&&push_alloc_nominal ,&&push_alloc_fail);
     push_alloc_fail:;
       f[i] = false;
-      continue_from_local push_alloc_end;
+      continue_from push_alloc_end;
     push_alloc_nominal:;
       f[i] = true;
     push_alloc_end:;
@@ -91,7 +91,7 @@ TM2x·Result test_1(){
     continue_into TM2x·Read_Pop(a0p ,y ,&&read_pop_nominal_0 ,&&read_pop_pop_last_0);
       read_pop_pop_last_0:;
         f[i] = false;
-        continue_from_local read_pop_end_0;
+        continue_from read_pop_end_0;
       read_pop_nominal_0:;
         f[i] = true;
       read_pop_end_0:;
@@ -101,7 +101,7 @@ TM2x·Result test_1(){
     continue_into TM2x·Read_Pop(a0p ,y ,&&read_pop_nominal_1 ,&&read_pop_pop_last_1);
       read_pop_pop_last_1:;
         f[i] = false;
-        continue_from_local read_pop_end_1;
+        continue_from read_pop_end_1;
       read_pop_nominal_1:;
         f[i] = true;
       read_pop_end_1:;
@@ -111,7 +111,7 @@ TM2x·Result test_1(){
     continue_into TM2x·Read_Pop(a0p ,y ,&&read_pop_nominal_2 ,&&read_pop_pop_last_2);
       read_pop_pop_last_2:;
         f[i] = false;
-        continue_from_local read_pop_end_2;
+        continue_from read_pop_end_2;
       read_pop_nominal_2:;
         f[i] = true;
       read_pop_end_2:;
@@ -121,7 +121,7 @@ TM2x·Result test_1(){
     continue_into TM2x·Read_Pop(a0p ,y ,&&read_pop_nominal_3 ,&&read_pop_pop_last_3);
       read_pop_pop_last_3:;
         f[i] = true;
-        continue_from_local read_pop_end_3;
+        continue_from read_pop_end_3;
       read_pop_nominal_3:;
         f[i] = false;
       read_pop_end_3:;
@@ -149,7 +149,7 @@ TM2x·Result test_2(){
   TM2x·AllocStaticFormat(a0 ,0 ,int32_t ,&&nominal ,&&fail);
     nominal:;
       f[i] = true;  
-      continue_from_local end;
+      continue_from end;
     fail:;
       f[i] = false;
     end:;
@@ -163,7 +163,7 @@ TM2x·Result test_2(){
   continue_into TM2x·Push_Write(a0 ,x ,&&push_write_nominal_0 ,&&push_write_allocation_failed_0);
     push_write_allocation_failed_0:;
       f[i] = false;
-      continue_from_local push_write_end_0;
+      continue_from push_write_end_0;
     push_write_nominal_0:;
       f[i] = true;
     push_write_end_0:;
@@ -174,7 +174,7 @@ TM2x·Result test_2(){
   continue_into TM2x·Push_Write(a0 ,x ,&&push_write_nominal_1 ,&&push_write_allocation_failed_1);
     push_write_allocation_failed_1:;
       f[i] = false;
-      continue_from_local push_write_end_1;
+      continue_from push_write_end_1;
     push_write_nominal_1:;
       f[i] = true;
     push_write_end_1:;
@@ -185,7 +185,7 @@ TM2x·Result test_2(){
   continue_into TM2x·Push_Write(a0 ,x ,&&push_write_nominal_2 ,&&push_write_allocation_failed_2);
     push_write_allocation_failed_2:;
       f[i] = false;
-      continue_from_local push_write_end_2;
+      continue_from push_write_end_2;
     push_write_nominal_2:;
       f[i] = true;
     push_write_end_2:;
@@ -196,7 +196,7 @@ TM2x·Result test_2(){
   continue_into TM2x·Push_Write(a0 ,x ,&&push_write_nominal_3 ,&&push_write_allocation_failed_3);
     push_write_allocation_failed_3:;
       f[i] = false;
-      continue_from_local push_write_end_3;
+      continue_from push_write_end_3;
     push_write_nominal_3:;
       f[i] = true;
     push_write_end_3:;
@@ -207,7 +207,7 @@ TM2x·Result test_2(){
     continue_into TM2x·Read_Pop(a0 ,y ,&&read_pop_nominal_0 ,&&read_pop_pop_last_0);
       read_pop_pop_last_0:;
         f[i] = false;
-        continue_from_local read_pop_end_0;
+        continue_from read_pop_end_0;
       read_pop_nominal_0:;
         f[i] = true;
       read_pop_end_0:;
@@ -218,7 +218,7 @@ TM2x·Result test_2(){
     continue_into TM2x·Read_Pop(a0 ,y ,&&read_pop_nominal_1 ,&&read_pop_pop_last_1);
       read_pop_pop_last_1:;
         f[i] = false;
-        continue_from_local read_pop_end_1;
+        continue_from read_pop_end_1;
       read_pop_nominal_1:;
         f[i] = true;
       read_pop_end_1:;
@@ -229,7 +229,7 @@ TM2x·Result test_2(){
     continue_into TM2x·Read_Pop(a0 ,y ,&&read_pop_nominal_2 ,&&read_pop_pop_last_2);
       read_pop_pop_last_2:;
         f[i] = false;
-        continue_from_local read_pop_end_2;
+        continue_from read_pop_end_2;
       read_pop_nominal_2:;
         f[i] = true;
       read_pop_end_2:;
@@ -240,7 +240,7 @@ TM2x·Result test_2(){
     continue_into TM2x·Read_Pop(a0 ,y ,&&read_pop_nominal_3 ,&&read_pop_pop_last_3);
       read_pop_pop_last_3:;
         f[i] = false;
-        continue_from_local read_pop_end_3;
+        continue_from read_pop_end_3;
       read_pop_nominal_3:;
         f[i] = true;
       read_pop_end_3:;
@@ -251,7 +251,7 @@ TM2x·Result test_2(){
     continue_into TM2x·Read_Pop(a0 ,y ,&&read_pop_nominal_4 ,&&read_pop_pop_last_4);
       read_pop_pop_last_4:;
         f[i] = true;
-        continue_from_local read_pop_end_4;
+        continue_from read_pop_end_4;
       read_pop_nominal_4:;
         f[i] = false;
       read_pop_end_4:;

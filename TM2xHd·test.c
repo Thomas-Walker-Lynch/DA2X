@@ -33,10 +33,10 @@ TM2x·Result test_0(){
   continue_into TM2x·alloc_heap_format(&a0 ,0 ,byte_n_of(uint32_t) ,&&nominal_0 ,&&fail_0);
     nominal_0:;
       f[i] = true;
-      continue_from_local end_0;
+      continue_from end_0;
     fail_0:;
       f[i] = false;
-      continue_from_local end_0;
+      continue_from end_0;
     end_0:;
       i++;
 
@@ -78,9 +78,9 @@ continuation TM2xHd·p0
   ){
   uint item = *(uint *)item_pt;
   if( item >= 100 && item < 356 )
-    continue_from pred_true;
+    continue_via_trampoline pred_true;
   else 
-    continue_from pred_false;
+    continue_via_trampoline pred_false;
 }
 continuation TM2xHd·p1
 ( void *context 
@@ -91,9 +91,9 @@ continuation TM2xHd·p1
   ){
   uint item = *(uint *)item_pt;
   if( item >= 100 && item <= 354 )
-    continue_from pred_true;
+    continue_via_trampoline pred_true;
   else 
-    continue_from pred_false;
+    continue_via_trampoline pred_false;
 }
 continuation TM2xHd·p2
 ( void *context 
@@ -104,9 +104,9 @@ continuation TM2xHd·p2
   ){
   uint item = *(uint *)item_pt;
   if( item == 248 )
-    continue_from pred_true;
+    continue_via_trampoline pred_true;
   else 
-    continue_from pred_false;
+    continue_via_trampoline pred_false;
 }
 continuation TM2xHd·p3
 ( void *context 
@@ -117,9 +117,9 @@ continuation TM2xHd·p3
   ){
   uint item = *(uint *)item_pt;
   if( item == 355 )
-    continue_from pred_true;
+    continue_via_trampoline pred_true;
   else 
-    continue_from pred_false;
+    continue_via_trampoline pred_false;
 }
 continuation TM2xHd·p4
 ( void *context 
@@ -130,9 +130,9 @@ continuation TM2xHd·p4
   ){
   uint item = *(uint *)item_pt;
   if( item == 356 )
-    continue_from pred_true;
+    continue_via_trampoline pred_true;
   else 
-    continue_from pred_false;
+    continue_via_trampoline pred_false;
 }
 
 TM2x·Result test_1(){
@@ -147,10 +147,10 @@ TM2x·Result test_1(){
   continue_into TM2x·alloc_heap_format(&a0 ,0 ,byte_n_of(uint32_t) ,&&nominal_0 ,&&fail_0);
     nominal_0:;
       f[i] = true;
-      continue_from_local end_0;
+      continue_from end_0;
     fail_0:;
       f[i] = false;
-      continue_from_local end_0;
+      continue_from end_0;
     end_0:;
       i++;
 
@@ -170,10 +170,10 @@ TM2x·Result test_1(){
   continue_into TM2xHd·all(a0 ,hd ,byte_n_of(uint32_t) ,NULL ,TM2xHd·p0 ,&&true_for_all_1 ,&&an_exception_1);
     true_for_all_1:;
       f[i] = true;
-      continue_from_local end_1;
+      continue_from end_1;
     an_exception_1:;
       f[i] = false;
-      continue_from_local end_1;
+      continue_from end_1;
     end_1:;
       i++;
 
@@ -181,10 +181,10 @@ TM2x·Result test_1(){
   continue_into TM2xHd·all(a0 ,hd ,byte_n_of(uint32_t) ,NULL ,TM2xHd·p1 ,&&true_for_all_2 ,&&an_exception_2);
     true_for_all_2:;
       f[i] = false;
-      continue_from_local end_2;
+      continue_from end_2;
     an_exception_2:;
       f[i] = TM2xHd·Read_Expr(hd ,uint32_t) == 355;
-      continue_from_local end_2;
+      continue_from end_2;
     end_2:;
       i++;
 
@@ -192,10 +192,10 @@ TM2x·Result test_1(){
   continue_into TM2xHd·exists(a0 ,hd ,byte_n_of(uint32_t) ,NULL ,TM2xHd·p3 ,&&found_3 ,&&not_found_3);
     found_3:;
       f[i] = TM2xHd·Read_Expr(hd ,uint32_t) == 355;
-      continue_from_local end_3;
+      continue_from end_3;
     not_found_3:;
       f[i] = false;
-      continue_from_local end_3;
+      continue_from end_3;
     end_3:;
       i++;
 
@@ -203,10 +203,10 @@ TM2x·Result test_1(){
   continue_into TM2xHd·exists(a0 ,hd ,byte_n_of(uint32_t) ,NULL ,TM2xHd·p4 ,&&found_4 ,&&not_found_4);
     found_4:;
       f[i] = false;
-      continue_from_local end_4;
+      continue_from end_4;
     not_found_4:;
       f[i] = true;
-      continue_from_local end_4;
+      continue_from end_4;
     end_4:;
       i++;
 
@@ -217,13 +217,13 @@ TM2x·Result test_1(){
       continue_into TM2xHd·is_on_tape(a0 ,hd1 ,&&on_tape_51 ,&&not_on_tape_51);
         on_tape_51:;
           f[i] = t0 == 248;    
-          continue_from_local end_5;
+          continue_from end_5;
         not_on_tape_51:;
           f[i] = false;    
-          continue_from_local end_5;
+          continue_from end_5;
     not_found_5:;
       f[i] = false;
-      continue_from_local end_5;
+      continue_from end_5;
     end_5:;
       i++;
   
@@ -246,10 +246,10 @@ TM2x·Result test_2(){
   continue_into TM2x·alloc_heap_format(&a0 ,0 ,byte_n_of(uint32_t) ,&&nominal_0 ,&&fail_0);
     nominal_0:;
       f[i] = true;
-      continue_from_local end_0;
+      continue_from end_0;
     fail_0:;
       f[i] = false;
-      continue_from_local end_0;
+      continue_from end_0;
     end_0:;
       i++;
 
@@ -293,10 +293,10 @@ TM2x·Result test_3(){
     TM2x·format_write(a0 ,&j ,byte_n_of(j) ,&&nominal ,&&fail);
       nominal:;
         f[i] = true;
-        continue_from_local end;
+        continue_from end;
       fail:;
         f[i] = false;
-        continue_from_local end;
+        continue_from end;
       end:;
         i++;
   }
@@ -323,10 +323,10 @@ TM2x·Result test_3(){
   TM2x·AllocStaticFormat_Write(a1 ,j ,&&nominal_2 ,&&fail_2);
     nominal_2:;
       f[i] = true;
-      continue_from_local end_2;
+      continue_from end_2;
     fail_2:;
       f[i] = false;
-      continue_from_local end_2;
+      continue_from end_2;
     end_2:;
       i++;
   while( j > 10 ){
@@ -334,10 +334,10 @@ TM2x·Result test_3(){
     continue_into TM2x·Push_Write(a1 ,j ,&&nominal_3 ,&&fail_3);    
       nominal_3:;
         f[i] = true;
-        continue_from_local end_3;
+        continue_from end_3;
       fail_3:;
         f[i] = false;
-        continue_from_local end_3;
+        continue_from end_3;
       end_3:;
         i++;
   }
@@ -351,10 +351,10 @@ TM2x·Result test_3(){
   TM2x·AllocStaticFormat_Write(a2 ,j ,&&nominal_4 ,&&fail_4);
     nominal_4:;
       f[i] = true;
-      continue_from_local end_4;
+      continue_from end_4;
     fail_4:;
       f[i] = false;
-      continue_from_local end_4;
+      continue_from end_4;
     end_4:;
       i++;
 
@@ -362,10 +362,10 @@ TM2x·Result test_3(){
   continue_into TM2x·Push_Write(a2 ,j ,&&nominal_5 ,&&fail_5);    
     nominal_5:;
       f[i] = true;
-      continue_from_local end_5;
+      continue_from end_5;
     fail_5:;
       f[i] = false;
-      continue_from_local end_5;
+      continue_from end_5;
     end_5:;
       i++;
 
@@ -373,10 +373,10 @@ TM2x·Result test_3(){
   continue_into TM2x·Push_Write(a2 ,j ,&&nominal_6 ,&&fail_6);    
     nominal_6:;
       f[i] = true;
-      continue_from_local end_6;
+      continue_from end_6;
     fail_6:;
       f[i] = false;
-      continue_from_local end_6;
+      continue_from end_6;
     end_6:;
       i++;
 
@@ -384,10 +384,10 @@ TM2x·Result test_3(){
   continue_into TM2x·Push_Write(a2 ,j ,&&nominal_7 ,&&fail_7);    
     nominal_7:;
       f[i] = true;
-      continue_from_local end_7;
+      continue_from end_7;
     fail_7:;
       f[i] = false;
-      continue_from_local end_7;
+      continue_from end_7;
     end_7:;
       i++;
 
@@ -395,10 +395,10 @@ TM2x·Result test_3(){
   continue_into TM2x·Push_Write(a2 ,j ,&&nominal_8 ,&&fail_8);    
     nominal_8:;
       f[i] = true;
-      continue_from_local end_8;
+      continue_from end_8;
     fail_8:;
       f[i] = false;
-      continue_from_local end_8;
+      continue_from end_8;
     end_8:;
       i++;
 
@@ -443,10 +443,10 @@ TM2x·Result test_3(){
               );
             nominal:;
               f[i] = true;
-              continue_from_local end;
+              continue_from end;
             fail:;
               f[i] = false;
-              continue_from_local end;
+              continue_from end;
             end:;
               i++;
         }
@@ -455,15 +455,15 @@ TM2x·Result test_3(){
         TM2xHd·apply_to_each(a3 ,hd ,byte_n_of(uint) ," " ,TM2xHd·f_print_int);
         fputc('\n' ,stderr);
         TM2x·dealloc_static(a3);
-        continue_from_local end;
+        continue_from end;
 
       empty:;
         f[i++] = false;
-        continue_from_local end;
+        continue_from end;
 
       fail:;
         f[i++] = false;
-        continue_from_local end;
+        continue_from end;
 
       end:;
   }
