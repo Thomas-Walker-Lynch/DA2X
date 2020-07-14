@@ -20,7 +20,7 @@ https://en.cppreference.com/w/cpp/language/identifiers#Unicode_characters_in_ide
 #include <stdint.h>
 #include <string.h>
 
-#define memory_byte_n UINT64_MAX
+#define address_t_n UINT64_MAX
 #define address_t uint64_t
 #define continue_from return
 typedef void **continuation;

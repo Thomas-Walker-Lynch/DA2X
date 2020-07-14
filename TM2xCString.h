@@ -1,25 +1,9 @@
-#ifndef TM2x·LIB_H
-#define TM2x·LIB_H
-#include <stdlib.h> // size_t
-#include <string.h> // memcpy
-#include <stdbool.h>
-#include <assert.h>
-#include "nonstdint.h"
-#include "inclusive.h"
-#include "continuation.h"
+#ifndef TM2x·CString_H
+#define TM2x·CString_H
+#include "TM2xHd.h"
 
 /*--------------------------------------------------------------------------------
-   global stuff
-
-  There are three options for the inlining style for the interface: no-inlining, 'extern
-  inline', and 'static inilne'.  No inlining is the simplest, but there is no performance
-  advantage.  The compiler can ignore requests to inline, and it looks like gcc is doing
-  so when the debugging flag is turned on and optimization is turned off. 'static inline'
-  generates file scope code if it is needed.  This is simplest inlining approach for
-  development because there is only one declaration of each function to edit.  'extern
-  line' will only generate one version of functions that are not inlined, and share it
-  everywhere it is needed. The non-inline versions of the functions have to be compiled
-  separately and made available for linking.
+  The array is a CString
 
 */  
 
@@ -27,6 +11,22 @@
   //#define TM2x·F_PREFIX static
   //#define TM2x·F_PREFIX extern inline
   #define TM2x·F_PREFIX static inline
+
+  // continuations by trampoline
+  #define continuations __label__
+  #define continue_into goto *
+  #define continue_from return
+  #define continue_from_local goto
+  typedef void **continuation;
+  
+
+  // this particular machine has 64 bit addresses (bit indexed 0 to 63)
+  #define address_t uint64_t
+  #define address_bit_length 64
+  #define address_t_n UINT64_MAX
+
+  // if an instance of the given type is put in memory what is byte_n (offset of the last byte)?
+  #define byte_n_of(type) sizeof(type)-1
 
   TM2x·F_PREFIX address_t binary_interval_inclusive_upper_bound(address_t byte_n){
     if( byte_n == 0 ) return 1;
@@ -39,6 +39,11 @@
     if(!*pt) continue_from fail;
     continue_from nominal;
   }
+
+  // the n+1 could overflow:
+  #define memcpyn(dst ,src ,n) memcpy(dst ,src ,n+1) 
+  #define memcmpn(e0 ,e1 ,n) memcmp(e0 ,e1 ,n+1) 
+  #define strncmpn(e0 ,e1 ,n) strncmp(e0 ,e1 ,n+1)
 
   // This is a debug feature. To keep the heap clean all initialized arrays must be
   // TM2x·data_dalloc'ed.  This counter is incremented upon initialization of an array,

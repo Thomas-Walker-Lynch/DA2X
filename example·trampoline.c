@@ -11,13 +11,13 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#define memory_byte_n UINT64_MAX
+#define address_t_n UINT64_MAX
 #define address_t uint64_t
 #define continue_from return
 typedef void **continuation;
 
 continuation mallocn(void **pt ,address_t n ,continuation success ,continuation fail){
-  if( n == memory_byte_n ) continue_from fail;
+  if( n == address_t_n ) continue_from fail;
   *pt = malloc(n+1);
   if(!*pt) continue_from fail;
   continue_from success;

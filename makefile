@@ -37,9 +37,7 @@ clean:
 .PHONY: share
 share: $(INSTALL)
 	cp libTM2x.a ../env/lib
-	cp TM2x.h ../env/include 
-	cp TM2xHd.h ../env/include 
-
+	cp *.h ../env/include 
 
 
 

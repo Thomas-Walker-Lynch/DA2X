@@ -20,7 +20,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#define memory_byte_n UINT64_MAX
+#define address_t_n UINT64_MAX
 #define address_t uint64_t
 #define continue_from return
 typedef void **continuation;
