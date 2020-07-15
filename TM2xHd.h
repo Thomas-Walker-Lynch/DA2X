@@ -281,7 +281,7 @@
     TM2xHd·AllocStaticRewind(set_b ,hd_b);
 
       // when_found is either &&init or &&extend
-    continuation do_when_found = &&init;
+    continuation do_write = &&init;
 
     exists:;
       continue_into TM2xHd·exists
@@ -290,7 +290,7 @@
           ,element_byte_n 
           ,TM2xHd·pt(hd_a) 
           ,pred 
-          ,do_when_found
+          ,do_write
           ,&&next
           );
 
@@ -303,7 +303,7 @@
           ,&&init·alloc_fail
           );
         init·nominal:;
-          do_when_found = &&extend;
+          do_write = &&extend;
           continue_from next;
         init·alloc_fail:;
           continue_via_trampoline init_intersection·allocation_failed;
@@ -333,7 +333,7 @@
         loop:; // this little detour assists with debugging
           continue_from exists;
         next·end_of_tape:;
-          if( do_when_found == &&init )
+          if( do_write == &&init )
             continue_via_trampoline init_intersection·empty;
           else
             continue_via_trampoline init_intersection·nominal;
@@ -407,11 +407,6 @@
   // could improve this by getting the integer size from element_byte_n
   TM2xHd·F_PREFIX void TM2xHd·f_print_int(void *context ,void *element_pt ,address_t element_byte_n){
     fprintf(stderr ,"%s%d" ,(char *)context ,*(int *)element_pt);
-  }
-
-  // elements are char *
-  TM2xHd·F_PREFIX void TM2xHd·f_print_cstring(void *context ,void *element_pt ,address_t element_byte_n){
-    fprintf(stderr ,"%s%s" ,(char *)context ,(char *)element_pt);
   }
 
 

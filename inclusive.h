@@ -16,6 +16,6 @@
   #define memcpyn(dst ,src ,n) memcpy(dst ,src ,n+1) 
   #define memcmpn(e0 ,e1 ,n) memcmp(e0 ,e1 ,n+1) 
   #define strncmpn(e0 ,e1 ,n) strncmp(e0 ,e1 ,n+1)
-
+  #define str_octet_n(cstring) (strlen(cstring) - 1)
 
 #endif

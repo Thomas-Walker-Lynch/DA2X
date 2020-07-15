@@ -1,0 +1,22 @@
+
+
+2020-07-14T17:55:03Z
+  Named scopes, so that the entire stack can be referenced, particularly among
+  scopes within a function.
+
+   {name1
+      int x = 5;
+      }
+
+   {name2
+      int x = name1.x;
+      }
+
+   Then continuation arguments could be written through the scope name.
+
+   This would allow a scope to hold a group of continuations, i.e. a class
+   instance.  
+
+   It would make the scoped labels more useful.
+
+
