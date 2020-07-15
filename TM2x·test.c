@@ -64,13 +64,13 @@ TM2x·Result test_1(){
       i++;
 
   f[i++] = a0p->byte_n == 7;
-  continue_into TM2x·Push_Alloc(a0p ,1 ,int32_t ,&&push_alloc_nominal ,&&push_alloc_fail);
-    push_alloc_fail:;
+  continue_into TM2x·Expand(a0p ,1 ,int32_t ,&&expand_nominal ,&&expand_fail);
+    expand_fail:;
       f[i] = false;
-      continue_from push_alloc_end;
-    push_alloc_nominal:;
+      continue_from expand_end;
+    expand_nominal:;
       f[i] = true;
-    push_alloc_end:;
+    expand_end:;
       i++;
 
   f[i++] = a0p->byte_n == 15;

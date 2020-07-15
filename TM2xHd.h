@@ -101,7 +101,7 @@
 // quantifiers
 //
 
-  // nah .. better to implement this with memcpyn, see TM2x·format_copy
+  // nah .. better to implement this with memcpyn, see TM2x·format_write
   // shallow copy tape_src elements to the end of tape_acc
   TM2xHd·F_PREFIX continuation TM2x·cat
   ( TM2x *tape_acc
