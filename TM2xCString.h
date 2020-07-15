@@ -27,7 +27,7 @@
           continue_from next;
 
     extend:;
-      continue_into TM2x·push_write(tape ,pt ,byte_n_of(char) ,&&next ,&&alloc_fail_local);
+      continue_into TM2x·push(tape ,pt ,byte_n_of(char) ,&&next ,&&alloc_fail_local);
 
     next:;
       pt++;

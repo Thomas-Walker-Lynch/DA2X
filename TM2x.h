@@ -183,12 +183,12 @@
   // use this to block copy an array of bytes to a newly allocated TM2x
   TM2x·F_PREFIX continuation TM2x·format_write_bytes
   ( TM2x *tape 
-    ,void *base_pt
-    ,address_t byte_n 
+    ,void *source_base_pt
+    ,address_t source_byte_n 
     ,continuation nominal
     ,continuation fail
     ){
-    return TM2x·format_write(tape ,base_pt ,byte_n ,nominal  ,fail);
+    return TM2x·format_write(tape ,source_base_pt ,source_byte_n ,nominal  ,fail);
   }
 
   // use this to block copy an array to a newly allocated TM2x
@@ -301,24 +301,59 @@
   #define TM2x·Expand(tape ,expansion_element_n ,type ,cont_nominal ,cont_fail) \
     TM2x·expand(tape, expansion_element_n ,byte_n_of(type) ,cont_nominal ,cont_fail)
 
-  TM2x·F_PREFIX continuation TM2x·push_write
+  TM2x·F_PREFIX continuation TM2x·push
   ( TM2x *tape 
-    ,void *src_element_pt 
+    ,void *element_pt 
     ,address_t element_byte_n
     ,continuation nominal
-    ,continuation allocation_failed
+    ,continuation alloc_fail
     ){
     continue_into TM2x·expand(tape ,0 ,element_byte_n ,&&expand_nominal ,&&expand_fail);
       expand_nominal:
-        memcpyn(TM2x·element_n_pt(tape ,element_byte_n) ,src_element_pt ,element_byte_n);
+        memcpyn(TM2x·element_n_pt(tape ,element_byte_n) ,element_pt ,element_byte_n);
         continue_via_trampoline nominal;
       expand_fail:
-        continue_via_trampoline allocation_failed;
+        continue_via_trampoline alloc_fail;
   }
-  #define TM2x·Push_Write(tape ,src_element ,cont_nominal ,cont_allocation_failed)\
-    TM2x·push_write(tape ,&src_element ,byte_n_of(typeof(src_element)) ,cont_nominal ,cont_allocation_failed)
 
-  // need to add pop for n elements ...
+  // use this to block push an entire array of bytes 
+  TM2x·F_PREFIX continuation TM2x·push_bytes
+  ( TM2x *tape 
+    ,void *source_base_pt
+    ,address_t source_byte_n
+    ,continuation nominal
+    ,continuation alloc_fail
+    ){
+    return TM2x·push(tape ,source_base_pt ,source_byte_n ,nominal  ,alloc_fail);
+  }
+
+  // use this to block push an entire array of elements
+  TM2x·F_PREFIX continuation TM2x·push_array
+  ( TM2x *tape 
+    ,void *base_pt
+    ,address_t element_n 
+    ,address_t element_byte_n 
+    ,continuation nominal
+    ,continuation alloc_fail
+    ){
+    address_t byte_n = TM2x·mulns(element_n ,element_byte_n);
+    return TM2x·push(tape ,base_pt ,byte_n ,nominal  ,alloc_fail);
+  }
+
+  // use this to block push the contents of another TM2x
+  TM2x·F_PREFIX continuation TM2x·push_TM2x
+  ( TM2x *tape 
+    ,TM2x *tape_source
+    ,continuation nominal
+    ,continuation alloc_fail
+    ){
+    return TM2x·push(tape ,tape_source->base_pt ,tape_source->byte_n ,nominal  ,alloc_fail);
+  }
+
+  #define TM2x·Push(tape ,src_element ,nominal ,alloc_fail)\
+    TM2x·push(tape ,&src_element ,byte_n_of(typeof(src_element)) ,nominal ,alloc_fail)
+
+
   TM2x·F_PREFIX continuation TM2x·pop
   ( TM2x *tape
     ,address_t element_byte_n

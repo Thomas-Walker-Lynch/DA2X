@@ -160,46 +160,46 @@ TM2x·Result test_2(){
   TM2x·Write(a0 ,0 ,x); 
 
   ++x;
-  continue_into TM2x·Push_Write(a0 ,x ,&&push_write_nominal_0 ,&&push_write_allocation_failed_0);
-    push_write_allocation_failed_0:;
+  continue_into TM2x·Push(a0 ,x ,&&push_nominal_0 ,&&push_allocation_failed_0);
+    push_allocation_failed_0:;
       f[i] = false;
-      continue_from push_write_end_0;
-    push_write_nominal_0:;
+      continue_from push_end_0;
+    push_nominal_0:;
       f[i] = true;
-    push_write_end_0:;
+    push_end_0:;
       i++;
   f[i++] = TM2x·test_after_allocation_n == 7;
 
   ++x; 
-  continue_into TM2x·Push_Write(a0 ,x ,&&push_write_nominal_1 ,&&push_write_allocation_failed_1);
-    push_write_allocation_failed_1:;
+  continue_into TM2x·Push(a0 ,x ,&&push_nominal_1 ,&&push_allocation_failed_1);
+    push_allocation_failed_1:;
       f[i] = false;
-      continue_from push_write_end_1;
-    push_write_nominal_1:;
+      continue_from push_end_1;
+    push_nominal_1:;
       f[i] = true;
-    push_write_end_1:;
+    push_end_1:;
       i++;
   f[i++] = TM2x·test_after_allocation_n == 15;
 
   ++x; 
-  continue_into TM2x·Push_Write(a0 ,x ,&&push_write_nominal_2 ,&&push_write_allocation_failed_2);
-    push_write_allocation_failed_2:;
+  continue_into TM2x·Push(a0 ,x ,&&push_nominal_2 ,&&push_allocation_failed_2);
+    push_allocation_failed_2:;
       f[i] = false;
-      continue_from push_write_end_2;
-    push_write_nominal_2:;
+      continue_from push_end_2;
+    push_nominal_2:;
       f[i] = true;
-    push_write_end_2:;
+    push_end_2:;
       i++;
   f[i++] = TM2x·test_after_allocation_n == 15;
 
   ++x; 
-  continue_into TM2x·Push_Write(a0 ,x ,&&push_write_nominal_3 ,&&push_write_allocation_failed_3);
-    push_write_allocation_failed_3:;
+  continue_into TM2x·Push(a0 ,x ,&&push_nominal_3 ,&&push_allocation_failed_3);
+    push_allocation_failed_3:;
       f[i] = false;
-      continue_from push_write_end_3;
-    push_write_nominal_3:;
+      continue_from push_end_3;
+    push_nominal_3:;
       f[i] = true;
-    push_write_end_3:;
+    push_end_3:;
       i++;
   f[i++] = TM2x·test_after_allocation_n == 31;
 

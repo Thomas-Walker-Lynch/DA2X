@@ -46,7 +46,7 @@ TM2x·Result test_0(){
   TM2x·Write(a0 ,0 ,j);
   while( j < 99 ){
     j++;
-    continue_into TM2x·Push_Write(a0 ,j ,&&nominal_1 ,&&fail_1);    
+    continue_into TM2x·Push(a0 ,j ,&&nominal_1 ,&&fail_1);    
     fail_1:;
       f[i] = false;
     nominal_1:;
@@ -160,7 +160,7 @@ TM2x·Result test_1(){
   TM2x·Write(a0 ,0 ,j);
   while( j < 355){
     j++;
-    continue_into TM2x·Push_Write(a0 ,j ,&&nominal_1 ,&&fail_1);    
+    continue_into TM2x·Push(a0 ,j ,&&nominal_1 ,&&fail_1);    
     fail_1:;
       f[i] = false;
     nominal_1:;
@@ -259,7 +259,7 @@ TM2x·Result test_2(){
   TM2x·Write(a0 ,0 ,j);
   while( j < 110){
     ++j;
-    continue_into TM2x·Push_Write(a0 ,j ,&&nominal_1 ,&&fail_1);    
+    continue_into TM2x·Push(a0 ,j ,&&nominal_1 ,&&fail_1);    
     fail_1:;
       f[i] = false;
     nominal_1:;
@@ -305,7 +305,7 @@ TM2x·Result test_3(){
     f[i] = true; 
     while( j < 30 ){
       j+=3;
-      continue_into TM2x·Push_Write(a0 ,j ,&&nominal ,&&fail);    
+      continue_into TM2x·Push(a0 ,j ,&&nominal ,&&fail);    
       fail:;
         f[i] = false;
       nominal:;
@@ -331,7 +331,7 @@ TM2x·Result test_3(){
       i++;
   while( j > 10 ){
     j-=5;
-    continue_into TM2x·Push_Write(a1 ,j ,&&nominal_3 ,&&fail_3);    
+    continue_into TM2x·Push(a1 ,j ,&&nominal_3 ,&&fail_3);    
       nominal_3:;
         f[i] = true;
         continue_from end_3;
@@ -359,7 +359,7 @@ TM2x·Result test_3(){
       i++;
 
   j=57;
-  continue_into TM2x·Push_Write(a2 ,j ,&&nominal_5 ,&&fail_5);    
+  continue_into TM2x·Push(a2 ,j ,&&nominal_5 ,&&fail_5);    
     nominal_5:;
       f[i] = true;
       continue_from end_5;
@@ -370,7 +370,7 @@ TM2x·Result test_3(){
       i++;
 
   j=15;
-  continue_into TM2x·Push_Write(a2 ,j ,&&nominal_6 ,&&fail_6);    
+  continue_into TM2x·Push(a2 ,j ,&&nominal_6 ,&&fail_6);    
     nominal_6:;
       f[i] = true;
       continue_from end_6;
@@ -381,7 +381,7 @@ TM2x·Result test_3(){
       i++;
 
   j=59;
-  continue_into TM2x·Push_Write(a2 ,j ,&&nominal_7 ,&&fail_7);    
+  continue_into TM2x·Push(a2 ,j ,&&nominal_7 ,&&fail_7);    
     nominal_7:;
       f[i] = true;
       continue_from end_7;
@@ -392,7 +392,7 @@ TM2x·Result test_3(){
       i++;
 
   j=15;
-  continue_into TM2x·Push_Write(a2 ,j ,&&nominal_8 ,&&fail_8);    
+  continue_into TM2x·Push(a2 ,j ,&&nominal_8 ,&&fail_8);    
     nominal_8:;
       f[i] = true;
       continue_from end_8;

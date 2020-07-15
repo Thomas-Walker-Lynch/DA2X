@@ -112,7 +112,7 @@
     ){
     TM2xHd·AllocStaticRewind(tape_src, hd_src);
     loop:
-      continue_into TM2x·push_write(tape_acc ,TM2xHd·pt(hd_src) ,element_byte_n ,&&pw_nominal ,&&pw_allocation_failed);
+      continue_into TM2x·push(tape_acc ,TM2xHd·pt(hd_src) ,element_byte_n ,&&pw_nominal ,&&pw_allocation_failed);
       pw_nominal:
         continue_into TM2xHd·step(tape_src ,hd_src ,element_byte_n ,&&loop ,&&at_n);
           at_n: 
@@ -189,12 +189,12 @@
 // set
 //
 
-  // no push_write if pred exists on tape
-  // no push_write if cannot allocate space
-  // otherwise does a push_write
+  // no push if pred exists on tape
+  // no push if cannot allocate space
+  // otherwise does a push
   // when pred is a comparison can be used to force order
   // when pred is equality treats tape like a set
-  TM2xHd·F_PREFIX continuation TM2xHd·push_write_not_exists
+  TM2xHd·F_PREFIX continuation TM2xHd·push_not_exists
   ( TM2x *tape_dst
     ,void *src_element_pt 
     ,address_t element_byte_n
@@ -216,14 +216,14 @@
       found_one:
         continue_via_trampoline already_on_tape_dst;
       not_found:
-        continue_into TM2x·push_write(tape_dst ,src_element_pt ,element_byte_n ,&&pw_wrote_it ,&&pw_alloc_failed);
+        continue_into TM2x·push(tape_dst ,src_element_pt ,element_byte_n ,&&pw_wrote_it ,&&pw_alloc_failed);
           pw_wrote_it:
             continue_via_trampoline wrote_it;
           pw_alloc_failed:
             continue_via_trampoline allocate_failed;
   }
-  #define TM2xHd·Push_Write_Not_Exists(tape_dst ,item ,pred ,wrote_it ,already_on_tape ,allocate_failed) \
-    continue_into TM2xHd·push_write_not_exists(tape_dst ,&item ,byte_n_of(type_of(item)) ,pred ,wrote_it ,already_on_tape ,allocate_failed)
+  #define TM2xHd·Push_Not_Exists(tape_dst ,item ,pred ,wrote_it ,already_on_tape ,allocate_failed) \
+    continue_into TM2xHd·push_not_exists(tape_dst ,&item ,byte_n_of(type_of(item)) ,pred ,wrote_it ,already_on_tape ,allocate_failed)
 
   // -accumulates elements from set_src which are not already in set_acc into set_acc.
   // -returns whether set_src was a subset of set_acc even before the union (make this a separate continuation?)
@@ -240,7 +240,7 @@
     ){
     if(subset) *subset = true;
     TM2xHd·accumulate_union:
-      continue_into TM2xHd·push_write_not_exists
+      continue_into TM2xHd·push_not_exists
         ( set_acc 
           ,TM2xHd·pt(hd_src) 
           ,element_byte_n 
@@ -309,7 +309,7 @@
           continue_via_trampoline init_intersection·allocation_failed;
         
     extend:;
-      continue_into TM2x·push_write
+      continue_into TM2x·push
         ( set_intersection 
           ,TM2xHd·pt(hd_a) 
           ,element_byte_n 
