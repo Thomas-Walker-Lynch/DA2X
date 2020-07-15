@@ -54,7 +54,7 @@ TM2x·Result test_1(){
   uint i = 0;
 
   TM2x a0,*a0p; a0p = &a0;
-  continue_into TM2x·format(a0p ,1 ,byte_n_of(int32_t) ,&&format_nominal ,&&format_alloc_fail);
+  continue_into TM2x·format_elements(a0p ,1 ,byte_n_of(int32_t) ,&&format_nominal ,&&format_alloc_fail);
     format_alloc_fail:;
       f[i] = false;
       continue_from format_end;
