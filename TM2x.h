@@ -52,6 +52,7 @@
   extern address_t TM2x·initialized_cnt;
 
   // change unit of measure
+  // need to add an overflow continuation!
   TM2x·F_PREFIX address_t TM2x·mulns(address_t a_n , address_t b_n){
     return a_n * b_n + a_n + b_n;
   }
@@ -91,6 +92,7 @@
     free(tape);
   }
 
+  // similar to stdlib realloc
   #ifdef TM2x·TEST
     extern address_t TM2x·test_after_allocation_n;
   #endif
@@ -277,6 +279,7 @@
 // indexing
 //   consider using the iterator TM2xHd.h instead of indexes
 //
+
   // returns pointer to element at given index
   TM2x·F_PREFIX void *TM2x·element_i_pt(TM2x *tape ,address_t index ,address_t element_byte_n){
     return TM2x·byte_0_pt(tape) + element_byte_n * index + index;
@@ -293,6 +296,55 @@
     memcpyn(dst_element_pt, src_element_pt, element_byte_n);
   }
   #define TM2x·Write(tape ,index ,x) TM2x·write(tape ,index ,&(x) ,byte_n_of(typeof(x)))
+
+  TM2x·F_PREFIX continuation TM2x·copy_bytes
+  ( TM2x *src
+    ,address_t src_byte_i
+    ,TM2x *dst
+    ,address_t dst_byte_i
+    ,address_t byte_n
+    ,continuation nominal
+    ,continuation alloc_fail
+    ,continuation bad_src_index
+    ,continuation bad_dst_index
+    ){
+    if( src_byte_i + byte_n > TM2x·byte_n(src) ) continue_via_trampoline bad_src_index;
+    if( dst_byte_i + byte_n > TM2x·byte_n(dst) ) continue_via_trampoline bad_dst_index;
+    memcpyn(TM2x·byte_0_pt(dst) + dst_byte_i ,TM2x·byte_0_pt(dst) + src_byte_i ,byte_n);
+  }
+
+  // A bad index is either one that overlflows the address space for either source or
+  // destination, or one that is off the end of the source array.
+  TM2x·F_PREFIX continuation TM2x·copy_elements
+  ( TM2x *src
+    ,address_t src_element_i
+    ,TM2x *dst
+    ,address_t dst_element_i
+    ,address_t element_n  // index of nth element of the copy region
+    ,address_t element_byte_n
+    ,continuation nominal
+    ,continuation alloc_fail
+    ,continuation bad_src_index
+    ,continuation bad_dst_index
+    ){
+    address_t dst_byte_i = TM2x·mulns(dst_element_i ,element_byte_n);
+    address_t src_byte_i = TM2x·mulns(src_element_i ,element_byte_n);
+    address_t byte_n = TM2x·mulns(element_n ,element_byte_n);
+    return TM2x·copy_bytes
+      ( src
+        ,src_byte_i
+        ,dst
+        ,dst_byte_i
+        ,byte_n
+        ,nominal
+        ,alloc_fail
+        ,bad_src_index
+        ,bad_dst_index
+        );
+  }
+
+
+
 
 //--------------------------------------------------------------------------------
 // stack behavior
