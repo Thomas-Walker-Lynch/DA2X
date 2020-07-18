@@ -187,29 +187,29 @@
       mallocn_fail: continue_via_trampoline fail;
     }
 
-  TM2x·F_PREFIX continuation TM2x·format_write
+  TM2x·F_PREFIX continuation TM2x·format_write_bytes
   ( TM2x *tape 
-    ,void *element_pt 
-    ,address_t element_byte_n 
+    ,void *source_pt 
+    ,address_t source_byte_n 
     ,continuation nominal
     ,continuation fail
     ){
-    continue_into TM2x·format_elements(tape ,0 ,element_byte_n ,&&format_nominal ,&&format_fail);
+    continue_into TM2x·format_bytes(tape ,source_byte_n ,&&format_nominal ,&&format_fail);
       format_nominal:
-        memcpyn(tape->base_pt, element_pt, element_byte_n);
+        memcpyn(tape->base_pt, source_pt, source_byte_n);
         continue_via_trampoline nominal;
       format_fail: continue_via_trampoline fail;
   }
 
   // use this to block copy an array of bytes to a newly allocated TM2x
-  TM2x·F_PREFIX continuation TM2x·format_write_bytes
+  TM2x·F_PREFIX continuation TM2x·format_write
   ( TM2x *tape 
-    ,void *source_base_pt
-    ,address_t source_byte_n 
+    ,void *element_base_pt
+    ,address_t element_byte_n 
     ,continuation nominal
     ,continuation fail
     ){
-    return TM2x·format_write(tape ,source_base_pt ,source_byte_n ,nominal  ,fail);
+    return TM2x·format_write_bytes(tape ,element_base_pt ,element_byte_n ,nominal  ,fail);
   }
 
   // use this to block copy an array to a newly allocated TM2x
@@ -297,36 +297,36 @@
 //--------------------------------------------------------------------------------
 // stack behavior
 //
-  TM2x·F_PREFIX continuation TM2x·push
+  TM2x·F_PREFIX continuation TM2x·push_bytes
   ( TM2x *tape 
-    ,void *element_pt 
-    ,address_t element_byte_n
+    ,void *source_pt 
+    ,address_t source_byte_n
     ,continuation nominal
     ,continuation alloc_fail
     ){
     address_t push_pt = TM2x·byte_n(tape) + 1;
-    address_t after_byte_n = push_pt + element_byte_n;
+    address_t after_byte_n = push_pt + source_byte_n;
     continue_into TM2x·resize(tape ,after_byte_n ,&&resize_nominal ,&&resize_fail);
       resize_nominal:
-        memcpyn(TM2x·byte_0_pt(tape) + push_pt ,element_pt ,element_byte_n);
+        memcpyn(TM2x·byte_0_pt(tape) + push_pt ,source_pt ,source_byte_n);
         continue_via_trampoline nominal;
       resize_fail:
         continue_via_trampoline alloc_fail;
   }
 
   // use this to block push an entire array of bytes 
-  TM2x·F_PREFIX continuation TM2x·push_bytes
+  TM2x·F_PREFIX continuation TM2x·push
   ( TM2x *tape 
-    ,void *source_base_pt
-    ,address_t source_byte_n
+    ,void *element_base_pt
+    ,address_t element_byte_n
     ,continuation nominal
     ,continuation alloc_fail
     ){
-    return TM2x·push(tape ,source_base_pt ,source_byte_n ,nominal  ,alloc_fail);
+    return TM2x·push_bytes(tape ,element_base_pt ,element_byte_n ,nominal  ,alloc_fail);
   }
 
   // use this to block push an entire array of elements
-  TM2x·F_PREFIX continuation TM2x·push_array
+  TM2x·F_PREFIX continuation TM2x·push_elements
   ( TM2x *tape 
     ,void *base_pt
     ,address_t element_n 
