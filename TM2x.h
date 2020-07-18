@@ -4,7 +4,6 @@
 #include <string.h> // memcpy
 #include <stdbool.h>
 #include <assert.h>
-#include "nonstdint.h"
 #include "inclusive.h"
 #include "continuation.h"
 
@@ -36,6 +35,7 @@
 
   TM2x·F_PREFIX address_t binary_interval_inclusive_upper_bound(address_t byte_n){
     if( byte_n == 0 ) return 1;
+    // if( byte_n <= 15) return 15;
     return (1 << (address_bit_length - __builtin_clz(byte_n))) - 1;
   }
 
@@ -306,11 +306,27 @@
   }
   #define TM2x·Read(tape ,index ,x) TM2x·read(tape ,index ,&x ,byte_n_of(typeof(x)))
 
+  TM2x·F_PREFIX continuation TM2x·write_bytes
+  ( void *src_pt
+    ,TM2x *dst
+    ,address_t dst_byte_i
+    ,address_t byte_n
+    ,continuation nominal
+    ,continuation alloc_fail
+    ,continuation bad_src_index
+    ,continuation bad_dst_index
+    ){
+    if( (address_t)(src_pt + byte_n) < (address_t)src_pt  ) continue_via_trampoline bad_src_index;
+    if( dst_byte_i + byte_n > TM2x·byte_n(dst) ) continue_via_trampoline bad_dst_index;
+    memcpyn(TM2x·byte_0_pt(dst) + dst_byte_i ,src_pt ,byte_n);
+  }
+
   TM2x·F_PREFIX void TM2x·write(TM2x *tape ,address_t index ,void *src_element_pt ,address_t element_byte_n){
     void *dst_element_pt = TM2x·element_i_pt(tape ,index ,element_byte_n);
     memcpyn(dst_element_pt, src_element_pt, element_byte_n);
   }
   #define TM2x·Write(tape ,index ,x) TM2x·write(tape ,index ,&(x) ,byte_n_of(typeof(x)))
+
 
   TM2x·F_PREFIX continuation TM2x·copy_bytes
   ( TM2x *src

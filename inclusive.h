@@ -39,7 +39,7 @@
   inline static continuation mul_ib(address_t an ,address_t bn ,address_t *cn ,continuation nominal ,continuation overflow){
     uint128_t d_an = an, d_bn = bn, d_cn;
     d_cn = d_an * d_bn + d_an + d_bn;
-    if( d_cn > 0xFFFFFFFFFFFFFFFFull ) continue_via_trampoline overflow;
+    if( d_cn > address_t_n ) continue_via_trampoline overflow;
     *cn = d_cn;
     continue_via_trampoline nominal;
   }
