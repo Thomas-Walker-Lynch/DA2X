@@ -1,7 +1,7 @@
 ./TM2x·test && ./TM2xHd·test
 test_0: 5 flags ,5 passed. 0 failed.
-test_1: 16 flags ,16 passed. 0 failed.
-test_2: 27 flags ,27 passed. 0 failed.
+test_1: 15 flags ,15 passed. 0 failed.
+test_2: 28 flags ,28 passed. 0 failed.
 TM2x·test results: 48 passed. 0 failed.
 test_0: 6 flags ,6 passed. 0 failed.
 test_1: 8 flags ,8 passed. 0 failed.

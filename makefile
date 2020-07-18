@@ -5,9 +5,7 @@ CFLAGS= -std=gnu2x -Wall -g
 TARGETS= libTM2x.a TM2x·test TM2xHd·test
 INSTALL= libTM2x.a TM2x.h TM2xHd.h
 
-#Each example.c file has a comment at the top with the command for building it.  Hence
-#examples are not built here.  However, the clean: target will delete the all example
-#executables that exist.
+#Examples are not built here, but are cleaned.
 EXAMPLES= example·trampoline example·nested_functions example·utf8 \
 example·nested_labeling_1 example·nested_labeling_2 example·nested_labeling_3
 

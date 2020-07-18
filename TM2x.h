@@ -51,12 +51,6 @@
   // and it is decremented upon TM2x·data_dalloc.
   extern address_t TM2x·initialized_cnt;
 
-  // change unit of measure
-  // need to add an overflow continuation!
-  TM2x·F_PREFIX address_t TM2x·mulns(address_t a_n , address_t b_n){
-    return a_n * b_n + a_n + b_n;
-  }
-
 //--------------------------------------------------------------------------------
 // dynamic array instance type
 //    
@@ -96,27 +90,27 @@
   #ifdef TM2x·TEST
     extern address_t TM2x·test_after_allocation_n;
   #endif
-  TM2x·F_PREFIX continuation TM2x·resize
+  TM2x·F_PREFIX continuation TM2x·resize_bytes
   ( TM2x *tape 
    ,address_t after_byte_n
    ,continuation nominal
-   ,continuation allocation_fail
+   ,continuation alloc_fail
    ){
 
-    address_t before_allocation_n = binary_interval_inclusive_upper_bound(tape->byte_n);
-    address_t after_allocation_n = binary_interval_inclusive_upper_bound(after_byte_n);
+    address_t before_alloc_n = binary_interval_inclusive_upper_bound(tape->byte_n);
+    address_t after_alloc_n = binary_interval_inclusive_upper_bound(after_byte_n);
 
-    if( after_allocation_n == before_allocation_n ){
+    if( after_alloc_n == before_alloc_n ){
       tape->byte_n = after_byte_n;
       continue_via_trampoline nominal;
     }
 
     char *after_base_pt;
-    continue_into mallocn((void **)&after_base_pt ,after_allocation_n ,&&malloc_nominal ,&&malloc_fail);
+    continue_into mallocn((void **)&after_base_pt ,after_alloc_n ,&&malloc_nominal ,&&malloc_fail);
       malloc_nominal:
         {}
         #ifdef TM2x·TEST
-          TM2x·test_after_allocation_n = after_allocation_n;
+          TM2x·test_after_allocation_n = after_alloc_n;
         #endif
         address_t copy_n = after_byte_n <  tape->byte_n ? after_byte_n : tape->byte_n;
         memcpyn( after_base_pt ,tape->base_pt ,copy_n);
@@ -125,13 +119,24 @@
         tape->byte_n = after_byte_n;
         continue_via_trampoline nominal;
       malloc_fail:
-       continue_via_trampoline allocation_fail;
+       continue_via_trampoline alloc_fail;
   }
-  #define TM2x·Resize(tape ,expansion_element_n ,type ,cont_nominal ,cont_fail) \
-    ({                                                                      \
-      address_t VAR(TM2x·Resize·byte_n) = TM2x·mulns(expansion_element_n , byte_n_of(type) ); \
-      TM2x·resize(tape ,VAR(TM2x·Resize·byte_n) ,cont_nominal ,cont_fail); \
-        })
+
+  TM2x·F_PREFIX continuation TM2x·resize_elements
+  ( TM2x *tape 
+   ,address_t after_element_n
+   ,address_t element_byte_n
+   ,continuation nominal
+   ,continuation alloc_fail
+   ,continuation bad_index
+   ){
+   address_t after_byte_n;
+   continue_into mul_ib(after_element_n ,element_byte_n ,&after_byte_n ,&&mul_ib·nominal ,&&mul_ib·overflow);
+     mul_ib·nominal:;
+       continue_via_trampoline TM2x·resize_bytes(tape ,after_byte_n ,nominal ,alloc_fail);
+     mul_ib·overflow:;
+       continue_via_trampoline bad_index;
+  }
 
   TM2x·F_PREFIX address_t TM2x·initialized(TM2x *tape){
     return TM2x·initialized_cnt;
@@ -152,8 +157,8 @@
    ){
     TM2x·initialized_cnt++; // to assist with debugging
     tape->byte_n = byte_n;
-    address_t allocation_byte_n = binary_interval_inclusive_upper_bound(byte_n);
-    continue_into mallocn( (void **)&(tape->base_pt) ,allocation_byte_n ,&&mallocn_nominal ,&&mallocn_fail);
+    address_t alloc_byte_n = binary_interval_inclusive_upper_bound(byte_n);
+    continue_into mallocn( (void **)&(tape->base_pt) ,alloc_byte_n ,&&mallocn_nominal ,&&mallocn_fail);
       mallocn_nominal: continue_via_trampoline format_nominal;
       mallocn_fail: continue_via_trampoline format_alloc_fail;
   }
@@ -163,16 +168,19 @@
     ,address_t element_byte_n 
     ,continuation nominal
     ,continuation alloc_fail
+    ,continuation bad_index
     ){
-    address_t byte_n = TM2x·mulns(element_byte_n ,element_n);
-    continue_into TM2x·format_bytes(tape ,byte_n ,&&format_nominal ,&&format_alloc_fail);
-      format_nominal: continue_via_trampoline nominal;
-      format_alloc_fail: continue_via_trampoline alloc_fail;
+    address_t byte_n;
+    continue_into mul_ib(element_n ,element_byte_n ,&byte_n ,&&mul_ib·nominal ,&&mul_ib·overflow);
+      mul_ib·nominal:;
+        continue_via_trampoline TM2x·format_bytes(tape ,byte_n ,nominal ,alloc_fail);
+      mul_ib·overflow:;
+        continue_via_trampoline bad_index;
   }
   // makes a pointer to an unitialized tape
   #define TM2x·AllocStaticFormat(tape ,element_n ,type ,cont_nominal ,cont_fail) \
     TM2x·AllocStatic(tape);\
-    continue_into TM2x·format_elements(tape ,element_n ,byte_n_of(type), cont_nominal ,cont_fail);
+    continue_into TM2x·format_elements(tape ,element_n ,byte_n_of(type), cont_nominal ,cont_fail ,cont_fail);
 
   TM2x·F_PREFIX continuation TM2x·alloc_heap_format
   ( TM2x **tape 
@@ -180,12 +188,14 @@
     ,address_t element_byte_n
     ,continuation nominal
     ,continuation fail
+    ,continuation bad_index
     ){
     continue_into mallocn((void **)tape ,byte_n_of(TM2x) ,&&mallocn_nominal ,&&mallocn_fail);
       mallocn_nominal:
-        continue_into TM2x·format_elements(*tape ,element_n ,element_byte_n ,&&format_nominal ,&&format_fail);
+        continue_into TM2x·format_elements(*tape ,element_n ,element_byte_n ,&&format_nominal ,&&format_fail ,&&format_bad_index);
           format_fail: continue_via_trampoline fail;
           format_nominal: continue_via_trampoline nominal;
+          format_bad_index: continue_via_trampoline bad_index;
       mallocn_fail: continue_via_trampoline fail;
     }
 
@@ -211,7 +221,7 @@
     ,continuation nominal
     ,continuation fail
     ){
-    return TM2x·format_write_bytes(tape ,element_base_pt ,element_byte_n ,nominal  ,fail);
+    continue_via_trampoline TM2x·format_write_bytes(tape ,element_base_pt ,element_byte_n ,nominal  ,fail);
   }
 
   // use this to block copy an array to a newly allocated TM2x
@@ -222,9 +232,14 @@
     ,address_t element_byte_n 
     ,continuation nominal
     ,continuation fail
+    ,continuation bad_index
     ){
-    address_t byte_n = TM2x·mulns(element_n ,element_byte_n);
-    return TM2x·format_write(tape ,base_pt ,byte_n ,nominal  ,fail);
+    address_t byte_n;
+    continue_into mul_ib(element_n ,element_byte_n ,&byte_n ,&&mul_ib·nominal ,&&mul_ib·overflow);
+    mul_ib·nominal:;
+      continue_via_trampoline TM2x·format_write(tape ,base_pt ,byte_n ,nominal  ,fail);
+    mul_ib·overflow:;
+      continue_via_trampoline bad_index;
   }
 
   // use this to block copy another TM2x to a newly allocated TM2x
@@ -234,7 +249,7 @@
     ,continuation nominal
     ,continuation fail
     ){
-    return TM2x·format_write(tape ,tape_source->base_pt ,tape_source->byte_n ,nominal  ,fail);
+    continue_via_trampoline TM2x·format_write(tape ,tape_source->base_pt ,tape_source->byte_n ,nominal  ,fail);
   }
 
   #define TM2x·AllocStaticFormat_Write(tape ,item ,cont_nominal ,cont_fail)\
@@ -327,24 +342,45 @@
     ,continuation bad_src_index
     ,continuation bad_dst_index
     ){
-    address_t dst_byte_i = TM2x·mulns(dst_element_i ,element_byte_n);
-    address_t src_byte_i = TM2x·mulns(src_element_i ,element_byte_n);
-    address_t byte_n = TM2x·mulns(element_n ,element_byte_n);
-    return TM2x·copy_bytes
-      ( src
-        ,src_byte_i
-        ,dst
-        ,dst_byte_i
-        ,byte_n
-        ,nominal
-        ,alloc_fail
-        ,bad_src_index
-        ,bad_dst_index
-        );
+
+    __label__ nominal ,overflow;
+    address_t src_byte_i;
+    continue_into mul_ib(src_element_i ,element_byte_n ,&src_byte_i ,&&nominal ,&&overflow);
+      nominal:;
+
+        { __label__ nominal ,overflow;
+          address_t dst_byte_i;
+          continue_into mul_ib(dst_element_i ,element_byte_n ,&dst_byte_i ,&&nominal ,&&overflow);
+            nominal:;
+
+              { __label__ nominal ,overflow;
+                address_t byte_n;
+                continue_into mul_ib(element_n ,element_byte_n ,&byte_n ,&&nominal ,&&overflow);
+                  nominal:;
+                    continue_via_trampoline TM2x·copy_bytes
+                      ( src
+                        ,src_byte_i
+                        ,dst
+                        ,dst_byte_i
+                        ,byte_n
+                        ,nominal
+                        ,alloc_fail
+                        ,bad_src_index
+                        ,bad_dst_index
+                        );
+
+                  overflow:;
+                    continue_via_trampoline bad_src_index;
+                }
+
+            overflow:;
+              continue_via_trampoline bad_dst_index;
+          }
+
+      overflow:;
+        continue_via_trampoline bad_src_index;
+
   }
-
-
-
 
 //--------------------------------------------------------------------------------
 // stack behavior
@@ -358,7 +394,7 @@
     ){
     address_t push_pt = TM2x·byte_n(tape) + 1;
     address_t after_byte_n = push_pt + source_byte_n;
-    continue_into TM2x·resize(tape ,after_byte_n ,&&resize_nominal ,&&resize_fail);
+    continue_into TM2x·resize_bytes(tape ,after_byte_n ,&&resize_nominal ,&&resize_fail);
       resize_nominal:
         memcpyn(TM2x·byte_0_pt(tape) + push_pt ,source_pt ,source_byte_n);
         continue_via_trampoline nominal;
@@ -374,7 +410,7 @@
     ,continuation nominal
     ,continuation alloc_fail
     ){
-    return TM2x·push_bytes(tape ,element_base_pt ,element_byte_n ,nominal  ,alloc_fail);
+    continue_via_trampoline TM2x·push_bytes(tape ,element_base_pt ,element_byte_n ,nominal  ,alloc_fail);
   }
 
   // use this to block push an entire array of elements
@@ -385,9 +421,14 @@
     ,address_t element_byte_n 
     ,continuation nominal
     ,continuation alloc_fail
+    ,continuation bad_index
     ){
-    address_t byte_n = TM2x·mulns(element_n ,element_byte_n);
-    return TM2x·push(tape ,base_pt ,byte_n ,nominal  ,alloc_fail);
+    address_t byte_n;
+    continue_into mul_ib(element_n ,element_byte_n ,&byte_n ,&&mul_ib·nominal ,&&mul_ib·overflow);
+      mul_ib·nominal:;
+        continue_via_trampoline TM2x·push(tape ,base_pt ,byte_n ,nominal  ,alloc_fail);
+      mul_ib·overflow:;
+        continue_via_trampoline bad_index;
   }
 
   // use this to block push the contents of another TM2x
@@ -397,7 +438,7 @@
     ,continuation nominal
     ,continuation alloc_fail
     ){
-    return TM2x·push(tape ,tape_source->base_pt ,tape_source->byte_n ,nominal  ,alloc_fail);
+    continue_via_trampoline TM2x·push(tape ,tape_source->base_pt ,tape_source->byte_n ,nominal  ,alloc_fail);
   }
 
   #define TM2x·Push(tape ,src_element ,nominal ,alloc_fail)\
@@ -415,7 +456,7 @@
     address_t before_byte_n = TM2x·byte_n(tape);
     if( before_byte_n <= element_byte_n ) continue_via_trampoline pop_last;
     address_t after_byte_n = before_byte_n - element_byte_n - 1;
-    TM2x·resize(tape ,after_byte_n ,&&resize_nominal ,&&alloc_fail);
+    TM2x·resize_bytes(tape ,after_byte_n ,&&resize_nominal ,&&alloc_fail);
       resize_nominal:;
         continue_via_trampoline nominal;    
       alloc_fail:;

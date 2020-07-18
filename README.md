@@ -31,6 +31,7 @@ This array is kind of expanding tape as described in the tm library.
   2. variable holds a &&label value
   3. empty structures
   4. declared labels ('local labels')
+  5. 128 bit unsigned int
 
   In the near future, will probably make use of 
   3. nested functions

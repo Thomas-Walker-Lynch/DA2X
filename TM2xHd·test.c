@@ -30,7 +30,7 @@ TM2x·Result test_0(){
   TM2x·Result r ,*rp; rp = &r;
   TM2x·Result_init(rp);
   TM2x *a0;
-  continue_into TM2x·alloc_heap_format(&a0 ,0 ,byte_n_of(uint32_t) ,&&nominal_0 ,&&fail_0);
+  continue_into TM2x·alloc_heap_format(&a0 ,0 ,byte_n_of(uint32_t) ,&&nominal_0 ,&&fail_0 ,&&fail_0);
     nominal_0:;
       f[i] = true;
       continue_from end_0;
@@ -144,7 +144,7 @@ TM2x·Result test_1(){
   TM2x·Result r ,*rp; rp = &r;
   TM2x·Result_init(rp);
   TM2x *a0;
-  continue_into TM2x·alloc_heap_format(&a0 ,0 ,byte_n_of(uint32_t) ,&&nominal_0 ,&&fail_0);
+  continue_into TM2x·alloc_heap_format(&a0 ,0 ,byte_n_of(uint32_t) ,&&nominal_0 ,&&fail_0 ,&&fail_0);
     nominal_0:;
       f[i] = true;
       continue_from end_0;
@@ -243,7 +243,7 @@ TM2x·Result test_2(){
   uint32_t i = 0;
 
   TM2x *a0;
-  continue_into TM2x·alloc_heap_format(&a0 ,0 ,byte_n_of(uint32_t) ,&&nominal_0 ,&&fail_0);
+  continue_into TM2x·alloc_heap_format(&a0 ,0 ,byte_n_of(uint32_t) ,&&nominal_0 ,&&fail_0 ,&&fail_0);
     nominal_0:;
       f[i] = true;
       continue_from end_0;
