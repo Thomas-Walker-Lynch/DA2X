@@ -50,7 +50,7 @@ TM2x·Result test_1(){
   TM2x·Result r ,*rp; rp = &r;
   TM2x·Result_init(rp);
 
-  bool f[19];
+  bool f[256];
   uint i = 0;
 
   TM2x a0,*a0p; a0p = &a0;
@@ -64,13 +64,14 @@ TM2x·Result test_1(){
       i++;
 
   f[i++] = a0p->byte_n == 7;
-  continue_into TM2x·Expand(a0p ,1 ,int32_t ,&&expand_nominal ,&&expand_fail);
-    expand_fail:;
+
+  continue_into TM2x·Resize(a0p ,3 ,int32_t ,&&resize_nominal ,&&resize_fail);
+    resize_fail:;
       f[i] = false;
-      continue_from expand_end;
-    expand_nominal:;
+      continue_from resize_end;
+    resize_nominal:;
       f[i] = true;
-    expand_end:;
+    resize_end:;
       i++;
 
   f[i++] = a0p->byte_n == 15;
@@ -86,48 +87,44 @@ TM2x·Result test_1(){
   // pop 4 ,3 ,2 ,1
   //
     int32_t y;
-    f[i++] = a0p->byte_n == 15;
-
-    continue_into TM2x·Read_Pop(a0p ,y ,&&read_pop_nominal_0 ,&&read_pop_pop_last_0);
-      read_pop_pop_last_0:;
-        f[i] = false;
-        continue_from read_pop_end_0;
-      read_pop_nominal_0:;
-        f[i] = true;
-      read_pop_end_0:;
+    {
+      __label__ read_pop·nominal ,read_pop·pop_last ,read_pop·alloc_fail ,read_pop·end;
+      uint j = 4;
+      while( j > 1 ){
+        continue_into TM2x·Read_Pop(a0p ,y ,&&read_pop·nominal ,&&read_pop·pop_last ,&&read_pop·alloc_fail);
+          read_pop·nominal:;
+            f[i] = true;
+            continue_from read_pop·end;
+          read_pop·pop_last:;
+            f[i] = false;
+            continue_from read_pop·end;
+          read_pop·alloc_fail:;
+            f[i] = false;
+            continue_from read_pop·end;
+          read_pop·end:;
+            i++;
+        f[i] = y == j;
         i++;
-    f[i++] = y == 4;
+        --j;
+      }
+    }
 
-    continue_into TM2x·Read_Pop(a0p ,y ,&&read_pop_nominal_1 ,&&read_pop_pop_last_1);
-      read_pop_pop_last_1:;
-        f[i] = false;
-        continue_from read_pop_end_1;
-      read_pop_nominal_1:;
-        f[i] = true;
-      read_pop_end_1:;
-        i++;
-    f[i++] = y == 3;
-
-    continue_into TM2x·Read_Pop(a0p ,y ,&&read_pop_nominal_2 ,&&read_pop_pop_last_2);
-      read_pop_pop_last_2:;
-        f[i] = false;
-        continue_from read_pop_end_2;
-      read_pop_nominal_2:;
-        f[i] = true;
-      read_pop_end_2:;
-        i++;
-    f[i++] = y == 2;
-
-    continue_into TM2x·Read_Pop(a0p ,y ,&&read_pop_nominal_3 ,&&read_pop_pop_last_3);
-      read_pop_pop_last_3:;
-        f[i] = true;
-        continue_from read_pop_end_3;
-      read_pop_nominal_3:;
-        f[i] = false;
-      read_pop_end_3:;
-        i++;
-    f[i++] = y == 1;
-
+    {
+      __label__ read_pop·nominal ,read_pop·pop_last ,read_pop·alloc_fail ,read_pop·end;
+      continue_into TM2x·Read_Pop(a0p ,y ,&&read_pop·nominal ,&&read_pop·pop_last ,&&read_pop·alloc_fail);
+        read_pop·nominal:;
+          f[i] = false;
+          continue_from read_pop·end;
+        read_pop·pop_last:;
+          f[i] = true;
+          continue_from read_pop·end;
+        read_pop·alloc_fail:;
+          f[i] = false;
+          continue_from read_pop·end;
+        read_pop·end:;
+          i++;
+      f[i++] = y == 1;
+    }
     f[i++] = a0p->byte_n == 3;
 
   TM2x·dealloc_static(a0p);
@@ -156,7 +153,7 @@ TM2x·Result test_2(){
       i++;
   f[i++] = a0->byte_n == 3;
 
-  int32_t x=1; 
+  int32_t x=1,y=0; 
   TM2x·Write(a0 ,0 ,x); 
 
   ++x;
@@ -169,6 +166,8 @@ TM2x·Result test_2(){
     push_end_0:;
       i++;
   f[i++] = TM2x·test_after_allocation_n == 7;
+  TM2x·read(a0 ,1 ,&y ,3);
+  f[i++] = x==y;
 
   ++x; 
   continue_into TM2x·Push(a0 ,x ,&&push_nominal_1 ,&&push_allocation_failed_1);
@@ -203,59 +202,93 @@ TM2x·Result test_2(){
       i++;
   f[i++] = TM2x·test_after_allocation_n == 31;
 
-  int32_t y=111222;
-    continue_into TM2x·Read_Pop(a0 ,y ,&&read_pop_nominal_0 ,&&read_pop_pop_last_0);
-      read_pop_pop_last_0:;
-        f[i] = false;
-        continue_from read_pop_end_0;
-      read_pop_nominal_0:;
-        f[i] = true;
-      read_pop_end_0:;
-        i++;
+  y=111222;
+    {
+      __label__ read_pop·nominal ,read_pop·pop_last ,read_pop·alloc_fail ,read_pop·end;
+      continue_into TM2x·Read_Pop(a0 ,y ,&&read_pop·nominal ,&&read_pop·pop_last ,&&read_pop·alloc_fail);
+        read_pop·nominal:;
+          f[i] = true;
+          continue_from read_pop·end;
+        read_pop·pop_last:;
+          f[i] = false;
+          continue_from read_pop·end;
+        read_pop·alloc_fail:;
+          f[i] = false;
+          continue_from read_pop·end;
+        read_pop·end:;
+          i++;
+    }
   f[i++] = y == 5;
   f[i++] = TM2x·test_after_allocation_n == 15;
-  
-    continue_into TM2x·Read_Pop(a0 ,y ,&&read_pop_nominal_1 ,&&read_pop_pop_last_1);
-      read_pop_pop_last_1:;
-        f[i] = false;
-        continue_from read_pop_end_1;
-      read_pop_nominal_1:;
-        f[i] = true;
-      read_pop_end_1:;
-        i++;
+
+    {
+      __label__ read_pop·nominal ,read_pop·pop_last ,read_pop·alloc_fail ,read_pop·end;
+      continue_into TM2x·Read_Pop(a0 ,y ,&&read_pop·nominal ,&&read_pop·pop_last ,&&read_pop·alloc_fail);
+        read_pop·nominal:;
+          f[i] = true;
+          continue_from read_pop·end;
+        read_pop·pop_last:;
+          f[i] = false;
+          continue_from read_pop·end;
+        read_pop·alloc_fail:;
+          f[i] = false;
+          continue_from read_pop·end;
+        read_pop·end:;
+          i++;
+    }
   f[i++] = y == 4;
   f[i++] = TM2x·test_after_allocation_n == 15;
-  
-    continue_into TM2x·Read_Pop(a0 ,y ,&&read_pop_nominal_2 ,&&read_pop_pop_last_2);
-      read_pop_pop_last_2:;
-        f[i] = false;
-        continue_from read_pop_end_2;
-      read_pop_nominal_2:;
-        f[i] = true;
-      read_pop_end_2:;
-        i++;
+    {
+      __label__ read_pop·nominal ,read_pop·pop_last ,read_pop·alloc_fail ,read_pop·end;
+      continue_into TM2x·Read_Pop(a0 ,y ,&&read_pop·nominal ,&&read_pop·pop_last ,&&read_pop·alloc_fail);
+        read_pop·nominal:;
+          f[i] = true;
+          continue_from read_pop·end;
+        read_pop·pop_last:;
+          f[i] = false;
+          continue_from read_pop·end;
+        read_pop·alloc_fail:;
+          f[i] = false;
+          continue_from read_pop·end;
+        read_pop·end:;
+          i++;
+    }
   f[i++] = y == 3;
   f[i++] = TM2x·test_after_allocation_n == 7;
   
-    continue_into TM2x·Read_Pop(a0 ,y ,&&read_pop_nominal_3 ,&&read_pop_pop_last_3);
-      read_pop_pop_last_3:;
-        f[i] = false;
-        continue_from read_pop_end_3;
-      read_pop_nominal_3:;
-        f[i] = true;
-      read_pop_end_3:;
-        i++;
+    {
+      __label__ read_pop·nominal ,read_pop·pop_last ,read_pop·alloc_fail ,read_pop·end;
+      continue_into TM2x·Read_Pop(a0 ,y ,&&read_pop·nominal ,&&read_pop·pop_last ,&&read_pop·alloc_fail);
+        read_pop·nominal:;
+          f[i] = true;
+          continue_from read_pop·end;
+        read_pop·pop_last:;
+          f[i] = false;
+          continue_from read_pop·end;
+        read_pop·alloc_fail:;
+          f[i] = false;
+          continue_from read_pop·end;
+        read_pop·end:;
+          i++;
+    }
   f[i++] = y == 2;
   f[i++] = TM2x·test_after_allocation_n == 3;
   
-    continue_into TM2x·Read_Pop(a0 ,y ,&&read_pop_nominal_4 ,&&read_pop_pop_last_4);
-      read_pop_pop_last_4:;
-        f[i] = true;
-        continue_from read_pop_end_4;
-      read_pop_nominal_4:;
-        f[i] = false;
-      read_pop_end_4:;
-        i++;
+    {
+      __label__ read_pop·nominal ,read_pop·pop_last ,read_pop·alloc_fail ,read_pop·end;
+      continue_into TM2x·Read_Pop(a0 ,y ,&&read_pop·nominal ,&&read_pop·pop_last ,&&read_pop·alloc_fail);
+        read_pop·nominal:;
+          f[i] = false;
+          continue_from read_pop·end;
+        read_pop·pop_last:;
+          f[i] = true;
+          continue_from read_pop·end;
+        read_pop·alloc_fail:;
+          f[i] = false;
+          continue_from read_pop·end;
+        read_pop·end:;
+          i++;
+    }
   f[i++] = y == 1;  
   f[i++] = TM2x·test_after_allocation_n == 3;
 

@@ -11,22 +11,28 @@
 /*--------------------------------------------------------------------------------
    global stuff
 
-  There are three options for the inlining style for the interface: no-inlining, 'extern
+  There are three options for the inlining style for the interface: 'static', none, 'extern
   inline', and 'static inilne'.  No inlining is the simplest, but there is no performance
   advantage.  The compiler can ignore requests to inline, and it looks like gcc is doing
   so when the debugging flag is turned on and optimization is turned off. 'static inline'
   generates file scope code if it is needed.  This is simplest inlining approach for
   development because there is only one declaration of each function to edit.  'extern
-  line' will only generate one version of functions that are not inlined, and share it
-  everywhere it is needed. The non-inline versions of the functions have to be compiled
-  separately and made available for linking.
+  line' will only use the one extern version of a given function when it is not
+  inlined. For 'extern inline', the non-inline versions of the functions have to be
+  compiled separately and made available for linking.  To make the C file for the extern
+  definitions simply define the prefix with a null value then include this header.
 
 */  
 
-  //
-  //#define TM2x·F_PREFIX static
-  //#define TM2x·F_PREFIX extern inline
-  #define TM2x·F_PREFIX static inline
+  #ifndef TM2x·F_PREFIX 
+    //#define TM2x·F_PREFIX static
+    //#define TM2x·F_PREFIX extern inline
+    #define TM2x·F_PREFIX static inline
+  #endif
+
+  #define CAT2(x ,y) x ## y
+  #define CAT(x ,y) CAT2(x ,y)
+  #define VAR(x) CAT(x, __LINE__)
 
   TM2x·F_PREFIX address_t binary_interval_inclusive_upper_bound(address_t byte_n){
     if( byte_n == 0 ) return 1;
@@ -85,16 +91,24 @@
     free(tape);
   }
 
-  // need to check memory limit
   #ifdef TM2x·TEST
     extern address_t TM2x·test_after_allocation_n;
   #endif
-  TM2x·F_PREFIX continuation TM2x·realloc
+  TM2x·F_PREFIX continuation TM2x·resize
   ( TM2x *tape 
-   ,address_t after_allocation_n
-   ,continuation realloc_nominal
+   ,address_t after_byte_n
+   ,continuation nominal
    ,continuation allocation_fail
    ){
+
+    address_t before_allocation_n = binary_interval_inclusive_upper_bound(tape->byte_n);
+    address_t after_allocation_n = binary_interval_inclusive_upper_bound(after_byte_n);
+
+    if( after_allocation_n == before_allocation_n ){
+      tape->byte_n = after_byte_n;
+      continue_via_trampoline nominal;
+    }
+
     char *after_base_pt;
     continue_into mallocn((void **)&after_base_pt ,after_allocation_n ,&&malloc_nominal ,&&malloc_fail);
       malloc_nominal:
@@ -102,13 +116,20 @@
         #ifdef TM2x·TEST
           TM2x·test_after_allocation_n = after_allocation_n;
         #endif
-        char *before_base_pt = tape->base_pt;
-        memcpyn( after_base_pt ,before_base_pt ,tape->byte_n);
-        free(before_base_pt);
+        address_t copy_n = after_byte_n <  tape->byte_n ? after_byte_n : tape->byte_n;
+        memcpyn( after_base_pt ,tape->base_pt ,copy_n);
+        free(tape->base_pt);
         tape->base_pt = after_base_pt;
-        continue_via_trampoline realloc_nominal;
-      malloc_fail: continue_via_trampoline allocation_fail;
+        tape->byte_n = after_byte_n;
+        continue_via_trampoline nominal;
+      malloc_fail:
+       continue_via_trampoline allocation_fail;
   }
+  #define TM2x·Resize(tape ,expansion_element_n ,type ,cont_nominal ,cont_fail) \
+    ({                                                                      \
+      address_t VAR(TM2x·Resize·byte_n) = TM2x·mulns(expansion_element_n , byte_n_of(type) ); \
+      TM2x·resize(tape ,VAR(TM2x·Resize·byte_n) ,cont_nominal ,cont_fail); \
+        })
 
   TM2x·F_PREFIX address_t TM2x·initialized(TM2x *tape){
     return TM2x·initialized_cnt;
@@ -274,33 +295,8 @@
   #define TM2x·Write(tape ,index ,x) TM2x·write(tape ,index ,&(x) ,byte_n_of(typeof(x)))
 
 //--------------------------------------------------------------------------------
-// stack
+// stack behavior
 //
-  // Need to add limit checks because an expanded array might fail to fit in memory.
-  // Attempts to expands the data portion of the array to accomodate np1 more elements.
-  // If the current allocation is not large enough we make a new larger allocation.  If that
-  // is not possible, then we return false.  Otherwise we return true.
-  TM2x·F_PREFIX continuation TM2x·expand
-  ( TM2x *tape 
-    ,address_t requested_expansion_element_n
-    ,address_t element_byte_n
-    ,continuation nominal
-    ,continuation fail
-    ){
-    address_t requested_expansion_byte_n = TM2x·mulns(requested_expansion_element_n ,element_byte_n);
-    address_t before_byte_n = TM2x·byte_n(tape);
-    address_t before_allocation_n = binary_interval_inclusive_upper_bound(before_byte_n);
-    address_t after_byte_n = before_byte_n + requested_expansion_byte_n + 1;
-    tape->byte_n = after_byte_n;
-    address_t after_allocation_n = binary_interval_inclusive_upper_bound(after_byte_n);
-    if( after_allocation_n <= before_allocation_n ) continue_via_trampoline nominal;
-    continue_into TM2x·realloc(tape ,after_allocation_n ,&&realloc_nominal ,&&realloc_fail);
-      realloc_nominal: continue_via_trampoline nominal;
-      realloc_fail: continue_via_trampoline fail;
-  }
-  #define TM2x·Expand(tape ,expansion_element_n ,type ,cont_nominal ,cont_fail) \
-    TM2x·expand(tape, expansion_element_n ,byte_n_of(type) ,cont_nominal ,cont_fail)
-
   TM2x·F_PREFIX continuation TM2x·push
   ( TM2x *tape 
     ,void *element_pt 
@@ -308,11 +304,13 @@
     ,continuation nominal
     ,continuation alloc_fail
     ){
-    continue_into TM2x·expand(tape ,0 ,element_byte_n ,&&expand_nominal ,&&expand_fail);
-      expand_nominal:
-        memcpyn(TM2x·element_n_pt(tape ,element_byte_n) ,element_pt ,element_byte_n);
+    address_t push_pt = TM2x·byte_n(tape) + 1;
+    address_t after_byte_n = push_pt + element_byte_n;
+    continue_into TM2x·resize(tape ,after_byte_n ,&&resize_nominal ,&&resize_fail);
+      resize_nominal:
+        memcpyn(TM2x·byte_0_pt(tape) + push_pt ,element_pt ,element_byte_n);
         continue_via_trampoline nominal;
-      expand_fail:
+      resize_fail:
         continue_via_trampoline alloc_fail;
   }
 
@@ -359,45 +357,38 @@
     ,address_t element_byte_n
     ,continuation nominal
     ,continuation pop_last
+    ,continuation alloc_fail
     ){
 
     address_t before_byte_n = TM2x·byte_n(tape);
     if( before_byte_n <= element_byte_n ) continue_via_trampoline pop_last;
     address_t after_byte_n = before_byte_n - element_byte_n - 1;
-    tape->byte_n = after_byte_n; 
+    TM2x·resize(tape ,after_byte_n ,&&resize_nominal ,&&alloc_fail);
+      resize_nominal:;
+        continue_via_trampoline nominal;    
+      alloc_fail:;
+        continue_via_trampoline alloc_fail;
 
-    // attempt to reduce the allocation
-    // If we attempt but fail to reduce the allocation size, the extra space on this tape will never be used,
-    // but otherwise the stack will continue to function.
-    address_t before_allocation_n = binary_interval_inclusive_upper_bound(before_byte_n);
-    address_t after_allocation_n = binary_interval_inclusive_upper_bound(after_byte_n);
-    if( after_allocation_n < before_allocation_n ) TM2x·realloc(tape ,after_allocation_n ,NULL ,NULL);
-
-    continue_via_trampoline nominal;
   }
   #define TM2x·Pop(tape ,type ,cont_nominal ,cont_pop_last)\
     TM2x·pop(tape ,byte_n_of(type) ,cont_nominal ,cont_pop_last )
 
-  // should make a version to pop off n elements 
   TM2x·F_PREFIX continuation TM2x·read_pop
   ( TM2x *tape 
     ,void *dst_element_pt 
     ,address_t element_byte_n
     ,continuation nominal
     ,continuation pop_last
+    ,continuation alloc_fail
     ){
     memcpyn(dst_element_pt, TM2x·element_n_pt(tape ,element_byte_n) ,element_byte_n);
-    continue_into TM2x·pop(tape ,element_byte_n ,&&pop_nominal ,&&pop_pop_last);
+    continue_into TM2x·pop(tape ,element_byte_n ,&&pop_nominal ,&&pop_pop_last ,&&pop_alloc_fail);
       pop_nominal: continue_via_trampoline nominal;
       pop_pop_last: continue_via_trampoline pop_last;
+      pop_alloc_fail: continue_via_trampoline alloc_fail;
   }
-  #define TM2x·Read_Pop(tape ,dst_element ,cont_nominal ,cont_pop_last)\
-    TM2x·read_pop(tape ,&dst_element ,byte_n_of(typeof(dst_element)) ,cont_nominal ,cont_pop_last)
-
-
-
-
-
+  #define TM2x·Read_Pop(tape ,dst_element ,nominal ,pop_last ,alloc_fail)           \
+    TM2x·read_pop(tape ,&dst_element ,byte_n_of(typeof(dst_element)) ,nominal ,pop_last ,alloc_fail)
 
 #endif
 
