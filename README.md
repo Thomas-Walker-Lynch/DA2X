@@ -41,12 +41,16 @@ This array is kind of expanding tape as described in the tm library.
 
 ## Installation
 
-  The `make share` installs the dynamic array into ../env/include  and ../env/lib. 
+  `make test` should buid and run the tests.  The output should be identical to the contents of the file
+  `test_results_expected.txt`. (In the future the tests should probably be modified so only the passed
+  failed results are needed.)
+
+  After the tests pass, `make share` installs the dynamic array into ../env/include  and ../env/lib. 
   
   My projects are always embeded in a project directory that has an env directory for
   releasing module code.  The modules are individual git projects.  See my git 'project'.
    
-  After install, the usual drill, include the header files in your program, and compile agains the library.
+  After install, the usual drill, include the header files in your program, and compile against the library.
 
 
 ## Array Fundamentals
