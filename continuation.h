@@ -7,6 +7,5 @@
   #define continue_via_trampoline return
   #define continue_from goto
   typedef void **continuation;
-  
 
 #endif

@@ -26,6 +26,7 @@ TM2x·Result test_0(){
       continue_from end;
     fail:;
       f[i] = false;
+      continue_from end;
     end:;
       i++;
 

@@ -568,3 +568,6 @@ characters for C identifiers .. something for keeping namespaces separate
 getting addresses for gotos inside of functions, use switch statements?  Would the
 opimizer clean it up? .. maybe not because it would go across function call boundaries, but
 in cases everything is in one file?
+
+2020-07-20T11:01:22Z
+
