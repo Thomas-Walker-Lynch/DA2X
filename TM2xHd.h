@@ -239,7 +239,7 @@
     ,continuation allocation_failed
     ){
     if(subset) *subset = true;
-    TM2xHd·accumulate_union:
+    TM2xHd·accumulate_union:;{
       continue_into TM2xHd·push_not_exists
         ( set_acc 
           ,TM2xHd·pt(hd_src) 
@@ -249,18 +249,27 @@
           ,&& pw_already_on_tape
           ,&& pw_allocate_failed
           );
-        pw_wrote_it:
-          if(subset) *subset = false;
-        pw_already_on_tape:
-          continue_into TM2xHd·at_element_n(set_src ,hd_src ,element_byte_n ,&&at_n , &&not_at_n);
-            at_n:
-              continue_via_trampoline nominal;
-            not_at_n: 
-              TM2xHd·unguarded_step(hd_src ,element_byte_n);
-              continue_from TM2xHd·accumulate_union;
-        pw_allocate_failed:
-          continue_via_trampoline allocation_failed;
-    }
+
+      pw_wrote_it:;{
+        if(subset) *subset = false;
+        continue_from pw_already_on_tape;
+      }
+
+      pw_already_on_tape:;{
+        continuations at_n ,not_at_n;
+        continue_into TM2xHd·at_element_n(set_src ,hd_src ,element_byte_n ,&&at_n , &&not_at_n);
+        at_n:{
+          continue_via_trampoline nominal;
+        }
+        not_at_n:;{
+          TM2xHd·unguarded_step(hd_src ,element_byte_n);
+          continue_from TM2xHd·accumulate_union;
+        }}
+      
+      pw_allocate_failed:;{
+        continue_via_trampoline allocation_failed;
+      }
+    }}
 
   // - set_intersection = set_a intersection set_b
   // - context given to the pred is a_element, the pred src element is the b_element
