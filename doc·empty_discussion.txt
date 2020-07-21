@@ -13,7 +13,7 @@ These are the operations we go through when using an array:
 
   3. Destruct
   4. Deallocate
-    
+
 Due to these operations an array may be found to be in one of the following states (*):
 
   1. Conceptual
@@ -28,36 +28,35 @@ Due to these operations an array may be found to be in one of the following stat
      fields have either not been initialized, or the array has been destructed.
 
   3. Constructed
-  
+
 
 Here is state diagram:
 
-   [Conceptual] --allocate--> [Partial] --construct--> [Constructed] 
-                                 ^                           |
-                                 |--------<--------destruct--.
+       |<---deallocate------------
+       |                          |
+   [Conceptual] --allocate--> [Partial] --construct--> [Constructed]
+                                 |                           |
+                                 |<-----------------destruct--
 
 
 An array in the Partial or Constructed state is also said to be Allocated. Conceptual and
-Partial arrays have 'not yet been constructed'.  Only arrays in the [Constructed] state
+Partial arrays have not been constructed yet. Only arrays in the [Constructed] state
 may be used.  After destruction our arrays can be constructed again and reused.
 
 So given this situation, what does it mean for an array to be 'empty'?  Perhaps you would
 like it to mean that the array has been constructed and is ready to use, but has zero
 elements of data allocated. I.e. if we checked the length of the array we would find it to
-be zero.  For an array in such a state it would make no sense to talk about its maximum
-index.
+be zero. As we found in the TTCA this sort of thing would be a second level construct. And
+note, for such an array it would be an error to talk about its maximum index.
 
-However, in our array, to initialize the last byte index field of the header, the array
-must have at least one element at the time of construction. In some implementations of
-malloc, it is also the case that the array must have at least one element in order for a
-block to be allocated on the heap for the array. Hence, construction for an empty array,
-if it was possible, would be completely different than that of construction of an array
-that has at least one element.  And furthermore, and this is the kicker, the normal
-construction would still be required when a first element is added. (**)
-
-Hence, there is no state that corresponds to the concept of constructed but with zero
-elements in the data allocation.  A nice property of our array is that it always has a
-maximum index.
+In our array, to initialize the last byte index field of the header, the array must have
+at least one element at the time of construction. In some implementations of malloc, it is
+also the case that the array must have at least one element in order for a block to be
+allocated on the heap for the array. Hence, construction for an empty array, if it was
+possible, would be completely different than that of construction of an array that has at
+least one element.  And furthermore, and this is the kicker, the normal construction would
+still be required when a first element is added. I.e. we can see in practice how we are
+forced to make emptiness a second level construct. (**)
 
 There are three states for our array: Conceptual, Partial, Constructed. A Constructed array
 has at least length of 1.  Both a Conceptual array and a Partial array have no elements,
@@ -74,18 +73,17 @@ programming style of lambda continuations.
 
 ---------------------------------------------------------------------------------------
 
-* 
-I toyed with calling Construct either 'Initialize', 'format', or even 'mount' instead.
-'Initialize' was intended to mean 'initialize the header struct'; however but we also have
-data fields to be initialized. It seems better to leave that term to apply to an first
-write to allocated memory.  'Format' and 'Mount' extend the tape machine analogy.
+*
+I toyed with calling Construct either 'Initialize', 'Format', or even 'Mount' instead.
+'Initialize' was intended to mean 'initialize the header struct'.  However, we also have
+data fields to be initialized. It seems better to leave this term to apply generally to a
+first write to allocated memory.  'Format' and 'Mount' extend the tape machine analogy.
 Mounting an empty tape is fairly common, and after mounting an empty tape one must format
 it.  Hence, 'Mount' is the Allocation operations not the construction operation.  'Format'
 is correct, and I had it in the code, but it does not have a nice inverse term.
 'Construct' means to format and possibly write some initial data, and that is what our
-constructor functions do.  
+constructor functions do.
 
 **
 There is a more detailed discussion of the implementation issues related to empty array
 implementation in the file doc·empty_discussion_empty_addendum.txt.
-
