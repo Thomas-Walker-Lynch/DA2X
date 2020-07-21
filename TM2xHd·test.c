@@ -484,43 +484,43 @@ TM2x·Result test_3(){
         );
 
     nominal:{ // a3 is only constructed if we travel down this path
-        f[i++] = true;
-        fprintf(stderr, "a3 = intersection a1 a0: ");
-        TM2xHd·rewind(a3 ,hd);
-        TM2xHd·apply_to_each(a3 ,hd ,byte_n_of(uint) ," " ,TM2xHd·f_print_int);
-        fputc('\n' ,stderr);
-        bool subset;
-        TM2xHd·AllocStaticRewind(a2 ,a2_hd);
-        {
-          continuations nominal ,fail ,end;
-          continue_into TM2xHd·accumulate_union
-            ( a3 
-              ,a2 
-              ,a2_hd
-              ,byte_n_of(uint) 
-              ,TM2xHd·pred_bytes_eq 
-              ,&subset
-              ,&&nominal 
-              ,&&fail
-              );
-          nominal:{
-            f[i] = true;
-            continue_from end;
-          }
-          fail:{
-            f[i] = false;
-            continue_from end;
-          }
-          end:{
-            i++;
-          }
+      f[i++] = true;
+      fprintf(stderr, "a3 = intersection a1 a0: ");
+      TM2xHd·rewind(a3 ,hd);
+      TM2xHd·apply_to_each(a3 ,hd ,byte_n_of(uint) ," " ,TM2xHd·f_print_int);
+      fputc('\n' ,stderr);
+      bool subset;
+      TM2xHd·AllocStaticRewind(a2 ,a2_hd);
+      {
+        continuations nominal ,fail ,end;
+        continue_into TM2xHd·accumulate_union
+          ( a3 
+            ,a2 
+            ,a2_hd
+            ,byte_n_of(uint) 
+            ,TM2xHd·pred_bytes_eq 
+            ,&subset
+            ,&&nominal 
+            ,&&fail
+            );
+        nominal:{
+          f[i] = true;
+          continue_from end;
         }
-        fprintf(stderr, "a3 union a2: ");
-        TM2xHd·rewind(a3 ,hd);
-        TM2xHd·apply_to_each(a3 ,hd ,byte_n_of(uint) ," " ,TM2xHd·f_print_int);
-        fputc('\n' ,stderr);
-        TM2x·destruct(a3);
-        continue_from end;
+        fail:{
+          f[i] = false;
+          continue_from end;
+        }
+        end:{
+          i++;
+        }
+      }
+      fprintf(stderr, "a3 union a2: ");
+      TM2xHd·rewind(a3 ,hd);
+      TM2xHd·apply_to_each(a3 ,hd ,byte_n_of(uint) ," " ,TM2xHd·f_print_int);
+      fputc('\n' ,stderr);
+      TM2x·destruct(a3);
+      continue_from end;
     }
 
     empty:{
