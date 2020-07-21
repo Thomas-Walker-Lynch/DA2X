@@ -20,7 +20,7 @@ TM2x·Result test_0(){
   TM2x·Result r ,*rp; rp = &r;
   TM2x·Result_init(rp);
 
-  TM2x·AllocStaticFormat(a0p ,0 ,int32_t ,&&nominal ,&&fail);
+  TM2x·AllocStaticConstruct(a0p ,0 ,int32_t ,&&nominal ,&&fail);
     nominal:;
       f[i] = true;  
       continue_from end;
@@ -38,7 +38,7 @@ TM2x·Result test_0(){
   TM2x·Read(a0p ,0 ,k);
   f[i++] = k == -5;
 
-  TM2x·dealloc_static(a0p);
+  TM2x·deconstruct(a0p);
   f[i++] = malloc_cnt == TM2x·malloc_cnt;
   f[i++] = initialized_cnt == TM2x·initialized_cnt;
   TM2x·Result_tally("test_0" ,rp ,f ,i);
@@ -128,7 +128,7 @@ TM2x·Result test_1(){
     }
     f[i++] = a0p->byte_n == 3;
 
-  TM2x·dealloc_static(a0p);
+  TM2x·deconstruct(a0p);
   f[i++] =  malloc_cnt == TM2x·malloc_cnt;
   f[i++] = initialized_cnt == TM2x·initialized_cnt;
   TM2x·Result_tally("test_1" ,rp ,f ,i);
@@ -144,7 +144,7 @@ TM2x·Result test_2(){
   TM2x·Result r ,*rp; rp = &r;
   TM2x·Result_init(rp);
 
-  TM2x·AllocStaticFormat(a0 ,0 ,int32_t ,&&nominal ,&&fail);
+  TM2x·AllocStaticConstruct(a0 ,0 ,int32_t ,&&nominal ,&&fail);
     nominal:;
       f[i] = true;  
       continue_from end;
@@ -293,7 +293,7 @@ TM2x·Result test_2(){
   f[i++] = y == 1;  
   f[i++] = TM2x·test_after_allocation_n == 3;
 
-  TM2x·dealloc_static(a0);
+  TM2x·deconstruct(a0);
   f[i++] = malloc_cnt == TM2x·malloc_cnt;
   f[i++] = initialized_cnt == TM2x·initialized_cnt;
   // printf("test_2 'i': %u" ,i);

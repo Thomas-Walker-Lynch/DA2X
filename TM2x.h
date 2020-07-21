@@ -66,7 +66,7 @@
   #define TM2x·AllocStatic(tape) TM2x TM2x· ## tape ,*tape; tape = &TM2x· ## tape;
 
   // after data_deallocation, the TM2x may be re-initialized and used again
-  TM2x·F_PREFIX void TM2x·dealloc_static(TM2x *tape){
+  TM2x·F_PREFIX void TM2x·deconstruct(TM2x *tape){
     free(tape->base_pt);
     TM2x·initialized_cnt--;
   }
@@ -82,7 +82,7 @@
     continue_via_trampoline mallocn((void **)tape ,byte_n_of(TM2x) ,nominal ,fail);
   }
   TM2x·F_PREFIX void TM2x·dealloc_heap(TM2x *tape){
-    TM2x·dealloc_static(tape);
+    TM2x·deconstruct(tape);
     free(tape);
   }
 
@@ -143,12 +143,12 @@
   }
 
 //--------------------------------------------------------------------------------
-// constructting / constructting and initializing
+// constructing / constructing and initializing
 //
 
   // Need to add limit check against our upper address bound
   // element_n is the maximum index for the initial data array
-  // returns true when constructting succeeds
+  // returns true when constructing succeeds
   TM2x·F_PREFIX continuation TM2x·construct_bytes
   ( TM2x *tape 
    ,address_t byte_n 
@@ -178,7 +178,7 @@
         continue_via_trampoline bad_index;
   }
   // makes a pointer to an unitialized tape
-  #define TM2x·AllocStaticFormat(tape ,element_n ,type ,cont_nominal ,cont_fail) \
+  #define TM2x·AllocStaticConstruct(tape ,element_n ,type ,cont_nominal ,cont_fail) \
     TM2x·AllocStatic(tape);\
     continue_into TM2x·construct_elements(tape ,element_n ,byte_n_of(type), cont_nominal ,cont_fail ,cont_fail);
 
@@ -252,7 +252,7 @@
     continue_via_trampoline TM2x·construct_write(tape ,tape_source->base_pt ,tape_source->byte_n ,nominal  ,fail);
   }
 
-  #define TM2x·AllocStaticFormat_Write(tape ,item ,cont_nominal ,cont_fail)\
+  #define TM2x·AllocStaticConstruct_Write(tape ,item ,cont_nominal ,cont_fail)\
     TM2x·AllocStatic(tape);\
     continue_into TM2x·construct_write(tape ,&item ,byte_n_of(typeof(item)) ,cont_nominal ,cont_fail);
 
