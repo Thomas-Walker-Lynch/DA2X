@@ -79,7 +79,7 @@ I toyed with calling Construct either 'Initialize', 'Format', or even 'Mount' in
 data fields to be initialized. It seems better to leave this term to apply generally to a
 first write to allocated memory.  'Format' and 'Mount' extend the tape machine analogy.
 Mounting an empty tape is fairly common, and after mounting an empty tape one must format
-it.  Hence, 'Mount' is the Allocation operations not the construction operation.  'Format'
+it.  Hence, 'Mount' is the Allocation operations not the Construct operation.  'Format'
 is correct, and I had it in the code, but it does not have a nice inverse term.
 'Construct' means to format and possibly write some initial data, and that is what our
 constructor functions do.
