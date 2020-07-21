@@ -31,14 +31,17 @@ TM2x·Result test_0(){
   TM2x·Result_init(rp);
   TM2x *a0;
   continue_into TM2x·alloc_heap_construct(&a0 ,0 ,byte_n_of(uint32_t) ,&&nominal_0 ,&&fail_0 ,&&fail_0);
-    nominal_0:;
-      f[i] = true;
-      continue_from end_0;
-    fail_0:;
-      f[i] = false;
-      continue_from end_0;
-    end_0:;
-      i++;
+  nominal_0:{
+    f[i] = true;
+    continue_from end_0;
+  }
+  fail_0:{
+    f[i] = false;
+    continue_from end_0;
+  }
+  end_0:{
+    i++;
+  }
 
   // make an array of data
   f[i] = true; // allocation failure flag
@@ -47,10 +50,12 @@ TM2x·Result test_0(){
   while( j < 99 ){
     j++;
     continue_into TM2x·Push(a0 ,j ,&&nominal_1 ,&&fail_1);    
-    fail_1:;
+    fail_1:{
       f[i] = false;
-    nominal_1:;
+    }
+    nominal_1:{
       ;
+    }
   }
   i++;
   
@@ -145,14 +150,17 @@ TM2x·Result test_1(){
   TM2x·Result_init(rp);
   TM2x *a0;
   continue_into TM2x·alloc_heap_construct(&a0 ,0 ,byte_n_of(uint32_t) ,&&nominal_0 ,&&fail_0 ,&&fail_0);
-    nominal_0:;
-      f[i] = true;
-      continue_from end_0;
-    fail_0:;
-      f[i] = false;
-      continue_from end_0;
-    end_0:;
-      i++;
+  nominal_0:{
+    f[i] = true;
+    continue_from end_0;
+  }
+  fail_0:{
+    f[i] = false;
+    continue_from end_0;
+  }
+  end_0:{
+    i++;
+  }
 
   // make an array of data
   f[i] = true; // allocation failure flag
@@ -161,71 +169,93 @@ TM2x·Result test_1(){
   while( j < 355){
     j++;
     continue_into TM2x·Push(a0 ,j ,&&nominal_1 ,&&fail_1);    
-    fail_1:;
+    fail_1:{
       f[i] = false;
-    nominal_1:;
+    }
+    nominal_1:{
+      ;
+    }
   }
 
   TM2xHd·AllocStaticRewind(a0 ,hd);
   continue_into TM2xHd·all(a0 ,hd ,byte_n_of(uint32_t) ,NULL ,TM2xHd·p0 ,&&true_for_all_1 ,&&an_exception_1);
-    true_for_all_1:;
-      f[i] = true;
-      continue_from end_1;
-    an_exception_1:;
-      f[i] = false;
-      continue_from end_1;
-    end_1:;
-      i++;
+  true_for_all_1:{
+    f[i] = true;
+    continue_from end_1;
+  }
+  an_exception_1:{
+    f[i] = false;
+    continue_from end_1;
+  }
+  end_1:{
+    i++;
+  }
 
   TM2xHd·rewind(a0 ,hd);
   continue_into TM2xHd·all(a0 ,hd ,byte_n_of(uint32_t) ,NULL ,TM2xHd·p1 ,&&true_for_all_2 ,&&an_exception_2);
-    true_for_all_2:;
-      f[i] = false;
-      continue_from end_2;
-    an_exception_2:;
-      f[i] = TM2xHd·Read_Expr(hd ,uint32_t) == 355;
-      continue_from end_2;
-    end_2:;
-      i++;
+  true_for_all_2:{
+    f[i] = false;
+    continue_from end_2;
+  }
+  an_exception_2:{
+    f[i] = TM2xHd·Read_Expr(hd ,uint32_t) == 355;
+    continue_from end_2;
+  }
+  end_2:{
+    i++;
+  }
 
   TM2xHd·rewind(a0 ,hd);
   continue_into TM2xHd·exists(a0 ,hd ,byte_n_of(uint32_t) ,NULL ,TM2xHd·p3 ,&&found_3 ,&&not_found_3);
-    found_3:;
-      f[i] = TM2xHd·Read_Expr(hd ,uint32_t) == 355;
-      continue_from end_3;
-    not_found_3:;
-      f[i] = false;
-      continue_from end_3;
-    end_3:;
-      i++;
+  found_3:{
+    f[i] = TM2xHd·Read_Expr(hd ,uint32_t) == 355;
+    continue_from end_3;
+  }
+  not_found_3:{
+    f[i] = false;
+    continue_from end_3;
+  }
+  end_3:{
+    i++;
+  }
 
   TM2xHd·rewind(a0 ,hd);
   continue_into TM2xHd·exists(a0 ,hd ,byte_n_of(uint32_t) ,NULL ,TM2xHd·p4 ,&&found_4 ,&&not_found_4);
-    found_4:;
-      f[i] = false;
-      continue_from end_4;
-    not_found_4:;
-      f[i] = true;
-      continue_from end_4;
-    end_4:;
-      i++;
+  found_4:{
+    f[i] = false;
+    continue_from end_4;
+  }
+  not_found_4:{
+    f[i] = true;
+    continue_from end_4;
+  }
+  end_4:{
+    i++;
+  }
 
   TM2xHd·AllocStaticRewind(a0 ,hd1);
   continue_into TM2xHd·exists(a0 ,hd1 ,byte_n_of(uint32_t) ,NULL ,TM2xHd·p2 ,&&found_5 ,&&not_found_5);
-    found_5:;
+  found_5:{
       uint t0 = TM2xHd·Read_Expr(hd1 ,uint32_t);
-      continue_into TM2xHd·is_on_tape(a0 ,hd1 ,&&on_tape_51 ,&&not_on_tape_51);
-        on_tape_51:;
+      {
+        continue_into TM2xHd·is_on_tape(a0 ,hd1 ,&&on_tape_51 ,&&not_on_tape_51);
+        on_tape_51:{
           f[i] = t0 == 248;    
           continue_from end_5;
-        not_on_tape_51:;
+        }
+        not_on_tape_51:{
           f[i] = false;    
           continue_from end_5;
-    not_found_5:;
-      f[i] = false;
-      continue_from end_5;
-    end_5:;
-      i++;
+        }
+      }
+  }
+  not_found_5:{
+    f[i] = false;
+    continue_from end_5;
+  }
+  end_5:{
+    i++;
+  }
   
   TM2x·dealloc_heap(a0);
   f[i++] = malloc_cnt == TM2x·malloc_cnt;
@@ -244,14 +274,17 @@ TM2x·Result test_2(){
 
   TM2x *a0;
   continue_into TM2x·alloc_heap_construct(&a0 ,0 ,byte_n_of(uint32_t) ,&&nominal_0 ,&&fail_0 ,&&fail_0);
-    nominal_0:;
-      f[i] = true;
-      continue_from end_0;
-    fail_0:;
-      f[i] = false;
-      continue_from end_0;
-    end_0:;
-      i++;
+  nominal_0:{
+    f[i] = true;
+    continue_from end_0;
+  }
+  fail_0:{
+    f[i] = false;
+    continue_from end_0;
+  }
+  end_0:{
+    i++;
+  }
 
   // make an array of data
   f[i] = true; // allocation failure flag
@@ -260,9 +293,12 @@ TM2x·Result test_2(){
   while( j < 110){
     ++j;
     continue_into TM2x·Push(a0 ,j ,&&nominal_1 ,&&fail_1);    
-    fail_1:;
+    fail_1:{
       f[i] = false;
-    nominal_1:;
+    }
+    nominal_1:{
+      ;
+    }
   }
 
   // prints: 
@@ -289,27 +325,32 @@ TM2x·Result test_3(){
   j=0;
   TM2x·AllocStatic(a0);
   {
-    __label__ nominal ,fail ,end;
+    continuations nominal ,fail ,end;
     TM2x·construct_write(a0 ,&j ,byte_n_of(j) ,&&nominal ,&&fail);
-      nominal:;
-        f[i] = true;
-        continue_from end;
-      fail:;
-        f[i] = false;
-        continue_from end;
-      end:;
-        i++;
+    nominal:{
+      f[i] = true;
+      continue_from end;
+    }
+    fail:{
+      f[i] = false;
+      continue_from end;
+    }
+    end:{
+      i++;
+    }
   }
   {
-    __label__ nominal ,fail;
+    continuations nominal ,fail;
     f[i] = true; 
     while( j < 30 ){
       j+=3;
       continue_into TM2x·Push(a0 ,j ,&&nominal ,&&fail);    
-      fail:;
+      fail:{
         f[i] = false;
-      nominal:;
+      }
+      nominal:{
         ;
+      }
     }
     i++;
   }
@@ -321,25 +362,31 @@ TM2x·Result test_3(){
 
   j=50;
   TM2x·AllocStaticConstruct_Write(a1 ,j ,&&nominal_2 ,&&fail_2);
-    nominal_2:;
-      f[i] = true;
-      continue_from end_2;
-    fail_2:;
-      f[i] = false;
-      continue_from end_2;
-    end_2:;
-      i++;
+  nominal_2:{
+    f[i] = true;
+    continue_from end_2;
+  }
+  fail_2:{
+    f[i] = false;
+    continue_from end_2;
+  }
+  end_2:{
+    i++;
+  }
   while( j > 10 ){
     j-=5;
     continue_into TM2x·Push(a1 ,j ,&&nominal_3 ,&&fail_3);    
-      nominal_3:;
-        f[i] = true;
-        continue_from end_3;
-      fail_3:;
-        f[i] = false;
-        continue_from end_3;
-      end_3:;
-        i++;
+    nominal_3:{
+      f[i] = true;
+      continue_from end_3;
+    }
+    fail_3:{
+      f[i] = false;
+      continue_from end_3;
+    }
+    end_3:{
+      i++;
+    }
   }
 
   fprintf(stderr, "a1:");
@@ -349,58 +396,73 @@ TM2x·Result test_3(){
 
   j=30;
   TM2x·AllocStaticConstruct_Write(a2 ,j ,&&nominal_4 ,&&fail_4);
-    nominal_4:;
-      f[i] = true;
-      continue_from end_4;
-    fail_4:;
-      f[i] = false;
-      continue_from end_4;
-    end_4:;
-      i++;
+  nominal_4:{
+    f[i] = true;
+    continue_from end_4;
+  }
+  fail_4:{
+    f[i] = false;
+    continue_from end_4;
+  }
+  end_4:{
+    i++;
+  }
 
   j=57;
   continue_into TM2x·Push(a2 ,j ,&&nominal_5 ,&&fail_5);    
-    nominal_5:;
-      f[i] = true;
-      continue_from end_5;
-    fail_5:;
-      f[i] = false;
-      continue_from end_5;
-    end_5:;
-      i++;
+  nominal_5:{
+    f[i] = true;
+    continue_from end_5;
+  }
+  fail_5:{
+    f[i] = false;
+    continue_from end_5;
+  }
+  end_5:{
+    i++;
+  }
 
   j=15;
   continue_into TM2x·Push(a2 ,j ,&&nominal_6 ,&&fail_6);    
-    nominal_6:;
-      f[i] = true;
-      continue_from end_6;
-    fail_6:;
-      f[i] = false;
-      continue_from end_6;
-    end_6:;
-      i++;
+  nominal_6:{
+    f[i] = true;
+    continue_from end_6;
+  }
+  fail_6:{
+    f[i] = false;
+    continue_from end_6;
+  }
+  end_6:{
+    i++;
+  }
 
   j=59;
   continue_into TM2x·Push(a2 ,j ,&&nominal_7 ,&&fail_7);    
-    nominal_7:;
-      f[i] = true;
-      continue_from end_7;
-    fail_7:;
-      f[i] = false;
-      continue_from end_7;
-    end_7:;
-      i++;
+  nominal_7:{
+    f[i] = true;
+    continue_from end_7;
+  }
+  fail_7:{
+    f[i] = false;
+    continue_from end_7;
+  }
+  end_7:{
+    i++;
+  }
 
   j=15;
   continue_into TM2x·Push(a2 ,j ,&&nominal_8 ,&&fail_8);    
-    nominal_8:;
-      f[i] = true;
-      continue_from end_8;
-    fail_8:;
-      f[i] = false;
-      continue_from end_8;
-    end_8:;
-      i++;
+  nominal_8:{
+    f[i] = true;
+    continue_from end_8;
+  }
+  fail_8:{
+    f[i] = false;
+    continue_from end_8;
+  }
+  end_8:{
+    i++;
+  }
 
   fprintf(stderr, "a2:");
   TM2xHd·rewind(a2 ,hd);
@@ -409,7 +471,7 @@ TM2x·Result test_3(){
   // add test distinct == false
   TM2x·AllocStatic(a3);
   {
-    __label__ nominal ,fail ,end;
+    continuations nominal ,fail ,end;
     continue_into TM2xHd·init_intersection
       ( a3 
         ,a0 
@@ -421,7 +483,7 @@ TM2x·Result test_3(){
         ,&&fail
         );
 
-      nominal:; // a3 is only constructed and constructed if we travel down this path
+    nominal:{ // a3 is only constructed if we travel down this path
         f[i++] = true;
         fprintf(stderr, "a3 = intersection a1 a0: ");
         TM2xHd·rewind(a3 ,hd);
@@ -430,7 +492,7 @@ TM2x·Result test_3(){
         bool subset;
         TM2xHd·AllocStaticRewind(a2 ,a2_hd);
         {
-          __label__ nominal ,fail ,end;
+          continuations nominal ,fail ,end;
           continue_into TM2xHd·accumulate_union
             ( a3 
               ,a2 
@@ -456,16 +518,21 @@ TM2x·Result test_3(){
         fputc('\n' ,stderr);
         TM2x·destruct(a3);
         continue_from end;
+    }
 
-      empty:;
-        f[i++] = false;
-        continue_from end;
+    empty:{
+      f[i++] = false;
+      continue_from end;
+    }
 
-      fail:;
-        f[i++] = false;
-        continue_from end;
+    fail:{
+      f[i++] = false;
+      continue_from end;
+    }
 
-      end:;
+    end:{
+      ;
+    }
   }
 
   TM2x·destruct(a0);
