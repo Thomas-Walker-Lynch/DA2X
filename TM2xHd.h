@@ -73,11 +73,13 @@
     ,continuation end_of_tape
     ){
     continue_into TM2xHd·at_element_n(tape ,hd ,element_byte_n ,&&at_n ,&&not_at_n);
-    at_n:;
+    at_n:;{
       continue_via_trampoline end_of_tape;
-    not_at_n:;
+    }
+    not_at_n:;{
       TM2xHd·unguarded_step(hd ,element_byte_n);
       continue_via_trampoline nominal;
+    }
   }
   
   TM2xHd·F_PREFIX void *TM2xHd·pt(TM2xHd *hd){
@@ -111,14 +113,18 @@
     ,continuation allocation_failed
     ){
     TM2xHd·AllocStaticRewind(tape_src, hd_src);
-    loop:
+    loop:{
       continue_into TM2x·push(tape_acc ,TM2xHd·pt(hd_src) ,element_byte_n ,&&pw_nominal ,&&pw_allocation_failed);
-      pw_nominal:
+      pw_nominal:;{
         continue_into TM2xHd·step(tape_src ,hd_src ,element_byte_n ,&&loop ,&&at_n);
-          at_n: 
-            continue_via_trampoline nominal;
-      pw_allocation_failed: 
+        at_n:;{
+          continue_via_trampoline nominal;
+        }
+      }
+      pw_allocation_failed:{
         continue_via_trampoline allocation_failed;
+      }
+    }
   }
 
   // applies f to each element, in order starting at the current hd position, until reaching the end of the tape
@@ -130,14 +136,17 @@
     ,void *context
     ,void f(void *context ,void *el ,address_t element_byte_n)
     ){
-    TM2xHd·apply_to_each:
+    TM2xHd·apply_to_each:;{
       f(context ,TM2xHd·pt(hd) ,element_byte_n);
       continue_into TM2xHd·at_element_n(tape ,hd ,element_byte_n ,&&hd_at_n ,&&hd_not_at_n);
-        hd_at_n:
-          return;
-        hd_not_at_n:
-          TM2xHd·unguarded_step(hd ,element_byte_n);
-          continue_from TM2xHd·apply_to_each;
+      hd_at_n:;{
+        return;
+      }
+      hd_not_at_n:;{
+        TM2xHd·unguarded_step(hd ,element_byte_n);
+        continue_from TM2xHd·apply_to_each;
+      }
+    }
   }
 
   // applies pred to each element until either pred is not true, or reaching the end of the tape
@@ -150,17 +159,22 @@
     ,continuation true_for_all
     ,continuation an_exception
     ){
-    TM2xHd·all:
+    TM2xHd·all:;{
       continue_into pred(context ,TM2xHd·pt(hd) ,element_byte_n ,&&pred_true ,&&pred_false);
-        pred_true:
-          continue_into TM2xHd·at_element_n(tape ,hd ,element_byte_n ,&&at_n , &&not_at_n);
-            at_n: 
-              continue_via_trampoline true_for_all;
-            not_at_n: 
-              TM2xHd·unguarded_step(hd ,element_byte_n);
-              continue_from TM2xHd·all;
-        pred_false:
-          continue_via_trampoline an_exception;
+      pred_true:;{
+        continue_into TM2xHd·at_element_n(tape ,hd ,element_byte_n ,&&at_n , &&not_at_n);
+        at_n:;{
+          continue_via_trampoline true_for_all;
+        }
+        not_at_n:;{
+          TM2xHd·unguarded_step(hd ,element_byte_n);
+          continue_from TM2xHd·all;
+        }
+      }
+      pred_false:;{
+        continue_via_trampoline an_exception;
+      }
+    }
   }
 
   TM2xHd·F_PREFIX continuation TM2xHd·exists
@@ -172,17 +186,22 @@
     ,continuation found_one
     ,continuation not_on_tape
     ){
-    TM2xHd·exists:
+    TM2xHd·exists:;{
       continue_into pred(context ,TM2xHd·pt(hd) ,element_byte_n ,&&pred_true ,&&pred_false );
-        pred_true:
-          continue_via_trampoline found_one;
-        pred_false:
-          continue_into TM2xHd·at_element_n(tape ,hd ,element_byte_n ,&&hd_at_n , &&hd_not_at_n);
-            hd_at_n:
-              continue_via_trampoline not_on_tape;
-            hd_not_at_n: 
-              TM2xHd·unguarded_step(hd ,element_byte_n);
-              continue_from TM2xHd·exists;
+      pred_true:;{
+        continue_via_trampoline found_one;
+      }
+      pred_false:;{
+        continue_into TM2xHd·at_element_n(tape ,hd ,element_byte_n ,&&hd_at_n , &&hd_not_at_n);
+        hd_at_n:;{
+          continue_via_trampoline not_on_tape;
+        }
+        hd_not_at_n:;{
+          TM2xHd·unguarded_step(hd ,element_byte_n);
+          continue_from TM2xHd·exists;
+        }
+      }
+    }
   }
 
 //--------------------------------------------------------------------------------
@@ -213,14 +232,18 @@
         ,&&found_one
         ,&&not_found
         );
-      found_one:
-        continue_via_trampoline already_on_tape_dst;
-      not_found:
-        continue_into TM2x·push(tape_dst ,src_element_pt ,element_byte_n ,&&pw_wrote_it ,&&pw_alloc_failed);
-          pw_wrote_it:
-            continue_via_trampoline wrote_it;
-          pw_alloc_failed:
-            continue_via_trampoline allocate_failed;
+    found_one:;{
+      continue_via_trampoline already_on_tape_dst;
+    }
+    not_found:;{
+      continue_into TM2x·push(tape_dst ,src_element_pt ,element_byte_n ,&&pw_wrote_it ,&&pw_alloc_failed);
+      pw_wrote_it:;{
+        continue_via_trampoline wrote_it;
+      }
+      pw_alloc_failed:;{
+        continue_via_trampoline allocate_failed;
+      }
+    }
   }
   #define TM2xHd·Push_Not_Exists(tape_dst ,item ,pred ,wrote_it ,already_on_tape ,allocate_failed) \
     continue_into TM2xHd·push_not_exists(tape_dst ,&item ,byte_n_of(type_of(item)) ,pred ,wrote_it ,already_on_tape ,allocate_failed)
