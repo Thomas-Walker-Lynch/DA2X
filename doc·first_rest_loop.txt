@@ -17,7 +17,7 @@ that allocation issue, so the first-extend pattern is valid.
 
 This example comes from an older version of the 'intersection' iterator of TM2xHd.
 
-All initialized tapes have at lest one value by this first-extend technique, so we
+All constructed tapes have at lest one value by this first-extend technique, so we
 enter the 'first' block uses do{}while().  We do not know if we will extend
 the output tape, so the 'extend' block is guarded by a test with a while(){}; form.
 
@@ -140,9 +140,9 @@ Here hd is on the source tape, and we write our results to the destination tape.
 There are two main exits from the first-extend form:
 
   1) never_one:  is_one(hd) never returned true before the source was exhausted. The
-     destination tape was not initialized.
+     destination tape was not constructed.
 
-  2) end: is_one(hd) was true at least once, the destination was initialized and has at
+  2) end: is_one(hd) was true at least once, the destination was constructed and has at
      least one value.
 
 In both cases the source iterator is left at the end of the tape.
@@ -349,7 +349,7 @@ anonymous code in braces for it.
             continue_from_local loop;
   done:;
 
-  if(write == write_init) then not initialized
+  if(write == write_init) then not constructed
 
 
 A possible drawback of changing the write function directly is that the write function
@@ -379,7 +379,7 @@ use of the function pointer will assure that the compiler does not inline it.
         continue_from_local work;
 
   done:;
-  if(when_found == is_one_init) then not initialized
+  if(when_found == is_one_init) then not constructed
 
 This continuation tree has the advantage that each called function appears only once, so a
 program can type it out without having to type the same code twice.
@@ -433,7 +433,7 @@ program can type it out without having to type the same code twice.
     continue_into step(hd ,&&is_one, &&done)
 
   done:;
-  if(when_found == is_one_init) then not initialized
+  if(when_found == is_one_init) then not constructed
 
 Now that there is no annoying duplicate code to type, it might be reasonable for a programmer
 to just type this loop form in directly.
@@ -475,7 +475,7 @@ Step can be pulled back in:
     continue_into step(hd, &&done ,&&is_one);
 
   done:;
-  if(when_found == is_one_init) then not initialized
+  if(when_found == is_one_init) then not constructed
 
 
 

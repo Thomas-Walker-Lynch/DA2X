@@ -23,7 +23,7 @@ void TM2xHd·f0(void *context ,void *item_pt ,address_t element_byte_n){
 
 TM2x·Result test_0(){
   address_t malloc_cnt = TM2x·malloc_cnt;
-  address_t initialized_cnt = TM2x·initialized_cnt;
+  address_t constructed_cnt = TM2x·constructed_cnt;
   bool f[256];
   uint32_t i = 0;
 
@@ -64,7 +64,7 @@ TM2x·Result test_0(){
 
   TM2x·dealloc_heap(a0);
   f[i++] = malloc_cnt == TM2x·malloc_cnt;
-  f[i++] = initialized_cnt == TM2x·initialized_cnt;
+  f[i++] = constructed_cnt == TM2x·constructed_cnt;
   TM2x·Result_tally("test_0" ,rp ,f ,i);
   return r;
 }
@@ -137,7 +137,7 @@ continuation TM2xHd·p4
 
 TM2x·Result test_1(){
   address_t malloc_cnt = TM2x·malloc_cnt;
-  address_t initialized_cnt = TM2x·initialized_cnt;
+  address_t constructed_cnt = TM2x·constructed_cnt;
   bool f[256];
   uint32_t i = 0;
 
@@ -229,14 +229,14 @@ TM2x·Result test_1(){
   
   TM2x·dealloc_heap(a0);
   f[i++] = malloc_cnt == TM2x·malloc_cnt;
-  f[i++] = initialized_cnt == TM2x·initialized_cnt;
+  f[i++] = constructed_cnt == TM2x·constructed_cnt;
   TM2x·Result_tally("test_1" ,rp ,f ,i);
   return r;
 }
 
 TM2x·Result test_2(){
   address_t malloc_cnt = TM2x·malloc_cnt;
-  address_t initialized_cnt = TM2x·initialized_cnt;
+  address_t constructed_cnt = TM2x·constructed_cnt;
   TM2x·Result r ,*rp; rp = &r;
   TM2x·Result_init(rp);
   bool f[256];
@@ -272,14 +272,14 @@ TM2x·Result test_2(){
 
   TM2x·dealloc_heap(a0);
   f[i++] = malloc_cnt == TM2x·malloc_cnt;
-  f[i++] = initialized_cnt == TM2x·initialized_cnt;
+  f[i++] = constructed_cnt == TM2x·constructed_cnt;
   TM2x·Result_tally("test_2" ,rp ,f ,i);
   return r;
 }
 
 TM2x·Result test_3(){
   address_t malloc_cnt = TM2x·malloc_cnt;
-  address_t initialized_cnt = TM2x·initialized_cnt;
+  address_t constructed_cnt = TM2x·constructed_cnt;
   TM2x·Result r ,*rp; rp = &r;
   TM2x·Result_init(rp);
   bool f[256];
@@ -421,7 +421,7 @@ TM2x·Result test_3(){
         ,&&fail
         );
 
-      nominal:; // a3 is only constructed and initialized if we travel down this path
+      nominal:; // a3 is only constructed and constructed if we travel down this path
         f[i++] = true;
         fprintf(stderr, "a3 = intersection a1 a0: ");
         TM2xHd·rewind(a3 ,hd);
@@ -472,7 +472,7 @@ TM2x·Result test_3(){
   TM2x·deconstruct(a1);
   TM2x·deconstruct(a2);
   f[i++] = malloc_cnt == TM2x·malloc_cnt;
-  f[i++] = initialized_cnt == TM2x·initialized_cnt;
+  f[i++] = constructed_cnt == TM2x·constructed_cnt;
   TM2x·Result_tally("test_3" ,rp ,f ,i);
   return r;
 }

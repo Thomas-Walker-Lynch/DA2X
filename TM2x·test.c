@@ -13,7 +13,7 @@ address_t TM2x·test_after_allocation_n = 0;
 
 TM2x·Result test_0(){
   address_t malloc_cnt = TM2x·malloc_cnt;
-  address_t initialized_cnt = TM2x·initialized_cnt;
+  address_t constructed_cnt = TM2x·constructed_cnt;
   bool f[5];
   uint i = 0;
 
@@ -40,14 +40,14 @@ TM2x·Result test_0(){
 
   TM2x·deconstruct(a0p);
   f[i++] = malloc_cnt == TM2x·malloc_cnt;
-  f[i++] = initialized_cnt == TM2x·initialized_cnt;
+  f[i++] = constructed_cnt == TM2x·constructed_cnt;
   TM2x·Result_tally("test_0" ,rp ,f ,i);
   return r;
 }
 
 TM2x·Result test_1(){
   address_t malloc_cnt = TM2x·malloc_cnt;
-  address_t initialized_cnt = TM2x·initialized_cnt;
+  address_t constructed_cnt = TM2x·constructed_cnt;
   TM2x·Result r ,*rp; rp = &r;
   TM2x·Result_init(rp);
 
@@ -130,14 +130,14 @@ TM2x·Result test_1(){
 
   TM2x·deconstruct(a0p);
   f[i++] =  malloc_cnt == TM2x·malloc_cnt;
-  f[i++] = initialized_cnt == TM2x·initialized_cnt;
+  f[i++] = constructed_cnt == TM2x·constructed_cnt;
   TM2x·Result_tally("test_1" ,rp ,f ,i);
   return r;
 }
 
 TM2x·Result test_2(){
   address_t malloc_cnt = TM2x·malloc_cnt;
-  address_t initialized_cnt = TM2x·initialized_cnt;
+  address_t constructed_cnt = TM2x·constructed_cnt;
   bool f[256];
   uint i = 0;
 
@@ -295,7 +295,7 @@ TM2x·Result test_2(){
 
   TM2x·deconstruct(a0);
   f[i++] = malloc_cnt == TM2x·malloc_cnt;
-  f[i++] = initialized_cnt == TM2x·initialized_cnt;
+  f[i++] = constructed_cnt == TM2x·constructed_cnt;
   // printf("test_2 'i': %u" ,i);
   TM2x·Result_tally("test_2" ,rp ,f ,i);
   return r;

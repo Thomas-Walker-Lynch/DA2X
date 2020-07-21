@@ -262,11 +262,10 @@
           continue_via_trampoline allocation_failed;
     }
 
-  // -> set_intersection = set_a intersection set_b
-  // -> returns whether the sets set_a and set_b were found to be distinct,
-  //    i.e. if initialization ever occurred on set_intersection
-  // -> context given to the pred is a_element, the pred src element is the b_element
-  // -> on allocation failure the intersection set might be partially created
+  // - set_intersection = set_a intersection set_b
+  // - context given to the pred is a_element, the pred src element is the b_element
+  // - on allocation failure the intersection set might be partially created
+  // - if the intersection is empty, we never construct set_intersection
   TM2xHd·F_PREFIX continuation TM2xHd·init_intersection
   ( TM2x *set_intersection
     ,TM2x *set_a

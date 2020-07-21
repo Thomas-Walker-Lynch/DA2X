@@ -155,9 +155,9 @@ This array is kind of expanding tape as described in the tm library.
 
 ## Allocation nomenclature
 
-   alloc   - reserves memory large enough to hold a TM2x struct
-   format  - sets field values for TM2x struct, allocates space for data.
-   init    - gives allocated contained data programmer supplied values
+   alloc     - reserves memory large enough to hold a TM2x struct
+   construct - sets field values for TM2x struct, allocates space for data on the heap, 
+               variations can take arguments and write some initial data
 
    static  - allocation on the stack or a static page
    heap    - allocation on the heap

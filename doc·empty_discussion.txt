@@ -1,159 +1,91 @@
-code examples are at the bottom
 
-## Empty arrays
+These are the operations we go through when using an array:
 
-  Often times dynamic arrays are used as stacks.  Code that pushes an element on to a stack
-  typically does not consider pushing to an empty stack to be a special case. 
+  1. Allocate
 
-  If we implement arrays that can be empty, the special code for treating the empty case
-  does not go away, rather it just moves to the other side of the interface, i.e. into our
-  library functions.  Moving this end case code into the library functions would have the
-  advantages of taking it out of the application programmer's hands, and such code would
-  only have to be put in one place instead of every place the libraries are used.
-  However, on the other hand, the end case code would run for every affected function call
-  even when it is not needed.  The empty tests would run redundantly, and when there are
-  multiple arrays or objects that are written to in parallel, that same redundent code
-  would run independently for each of them while resolving the same one essential question
-  about emptyness.  All of that happens even when the emptiness question has already been
-  resolved via some external knowledge about the problem. Perhaps the compiler optimizer
-  can help with this situation because our library functions are called inline.
+    Allocation of memory to be used for the header.  Attotw, our header structure consists
+    of two pointers, one to the base of the array, and one with the index to the last
+    byte.  After allocation these are uninitialized.
 
-  Given the code as it is attotw when a dynamic array is used as a stack, the first
-  element must be written to the base using a plain write.  The space was already
-  allocated and is waiting. Only after the first write may further elements be pushed. So
-  a programmer's code making use of stack pushes must treat 'a just initialized' stack
-  differently.  Treating a just initialized stack differently is typically not difficult
-  when the array is declared and used in the same scope.  The problem comes with function
-  calls.
+  2. Construct
+
+    Initializes the array header. Also, typically, sets the initial data.
+
+  3. Destruct
+  4. Deallocate
+    
+Due to these operations an array may be found to be in one of the following states (*):
+
+  1. Conceptual
+
+     A variable name exists, but it has not been allocated.
+
+  2. Partial
+
+     Allocated but not constructed. Waiting to be constructed so that it may be used.
+
+     The array header has been allocated, but its data pointer and max index
+     fields have either not been initialized, or the array has been destructed.
+
+  3. Constructed
   
-  Our desire was to have empty and non-existence to mean the same thing, but in C that has
-  memory alloction static/heap implications and affects argument passing.  In particular,
-  C static allocations for return data must be created by the caller, and can not be
-  created inside of a called function (because its stack frame will be popped upon
-  return).  However, functions can create new dynamic array on the heap and returns a
-  pointer to it.
 
-    Consider the case of functions returning result arrays. Consider the `TM2xHd_intersection`
-    function (below).  It accepts three arrays, two as source operands, one as the
-    result. These might be statically allocated, but right now if we do so, the array to
-    serve as accumulator must already have one value in it.  Instead the result array should
-    be created within the function, but a C function can not create static data in the
-    caller.  If we statically allocate the header struct, but do not finish the initialization
-    and put an element in it, the called function, here TM2xHd_intersection will have to
-    be able to tell the difference between an array passed in which it must call `TM2x_init`
-    on, and one which it can immediately use.  I.e. there must be an 'empty flag'.
-    This sort of thing was also a problem in C++ for years until a constructor was invented for
-    lvalues. It has not been a problem in LISP because all objects are dyanamically allocated.
+Here is state diagram:
 
-    I have replaced `TM2xHd_intersection` with `TM2xHd_init_intersection` which always initializes
-    the result array before using it.  This function is now an 'initializer'.
-
-  The static model is already partially broken for our dynamic arrays, because, unlike
-  C++, there is no destructor call when leaving scope, so the programmer already has to
-  make a manual deallocate call to free the element data.  Whether that deallocate routine
-  only freed data or freed data and the header struct would be immaterial to the
-  programmer.  Though, it would be too bad if every time we wanted an array, we had to
-  go to the heap twice, once for the struct header and once for the data portion.
-
-  So it appears that I have two options. Either put the dynamic arrays header struct on the
-  heap, or embed an empty flag with the header structs.  In the later case called functions
-  could see that an array is empty and then treat it differently, or the end case code should
-  be moved into the library. No actually there is a third option, and that is to have initializer
-  calls for functions that initialize data.  The programmer must then pick the correct routine
-  for the situation.
-
-## Empty Flag
-
-  Supposing we decide to implement the array being empty, how can we flag emptiness? 
-
-  In the C world we can use `base_pt == NULL` to indicate the array is empty.  However
-  this implementation is an experiment in the use of inclusive arithmetic with no
-  overflows, and while being able to address the entire interval, including the element at
-  address 0. Hence, should we follow these constraints, we do not have address 0 to use as
-  a NULL valued flag.
-
-  There is another thing we can do to flag special cases. Note that if an array takes up
-  the whole of memory, then it must be based at `memory_byte_0`. Hence, we could enumerate
-  special states for the array, including that it is empty, by setting `byte_n` in the
-  header struct to `memory_byte_n` and then enumerate alternative states using a non-zero
-  `base_pt` values. 
-
-  However, this approach to an empty flag only works when we assume that memory is finite,
-  and that the address space does not wrap. With our continuing number types and the 'expanding'
-  tape of the TTCA, the memory bound as a constant goes away.
-
-  Here is hybrid approach that would work with compiler optimization: On interface
-  routines that might need to know about emptiness, pass the empty flag in. As these are
-  inlined functions, if a constant is passed in, the optimizer will collapse out the
-  redundant code.
-   
-## Existance Flag
-   
-   Instead of signaling emptiness for an array, we can signal that an array does not
-   exist. This can be done through a null pointer to the array. It does not break our
-   inclusive arithmetic rules, because the pointers is in C land.  Though if I could
-   maintain the model at this layer by providing an existance or the result array flag to
-   calls that produce results.
-
-exists and empty == header struct allocated by fields not initialized == uninitialized
-
-so we have a state for uninitialized - we can not have a flag for it, because setting
-the flag would be a kind of initialization ...
-
-only some functions accept as an operand an uninitialized flag, say for example
-`TM2xHd_intersection` describing the result set
-
-still the big parm loop in tranche has a funny condition for the first parm ..
+   [Conceptual] --allocate--> [Partial] --construct--> [Constructed] 
+                                 ^                           |
+                                 |--------<--------destruct--.
 
 
-------
+An array in the Partial or Constructed state is also said to be Allocated. Conceptual and
+Partial arrays have 'not yet been constructed'.  Only arrays in the [Constructed] state
+may be used.  After destruction our arrays can be constructed again and reused.
 
-  // -accumulates copies of elements from set_src into set_acc
-  // -returns whether the set_src was a subset of set_acc before the union
-  // -context given to the pred is a pointer to the src element
-  TM2xHd_F_PREFIX bool TM2xHd_accumulate_union
-  (
-   TM2x *set_acc
-   ,TM2x *set_src
-   ,address_t element_byte_n
-   ,bool pred(void *context ,void *el ,address_t element_byte_n)
-   ){
-    bool subset = true;
-    TM2xHd_Mount(set_acc ,hd_acc);
-    TM2xHd_Mount(set_src ,hd_src);
-    do{
-      void *src_element_pt = TM2xHd_pt(hd_src);
-      if( !TM2xHd_exists(set_acc ,hd_acc ,element_byte_n ,src_element_pt ,pred) ){
-        TM2x_push_write(set_acc ,src_element_pt ,element_byte_n);      
-        subset = false;
-      }
-      TM2xHd_rewind(set_acc ,hd_acc);
-    }while( TM2xHd_step(set_src ,hd_src ,element_byte_n) );
-    return subset;
-  }
+So given this situation, what does it mean for an array to be 'empty'?  Perhaps you would
+like it to mean that the array has been constructed and is ready to use, but has zero
+elements of data allocated. I.e. if we checked the length of the array we would find it to
+be zero.  For an array in such a state it would make no sense to talk about its maximum
+index.
 
-  // -pushes the intersection of set a and b onto array_acc, if array_acc is initially empty, it will be the intersection.
-  // -returns whether the sets were found to be distinct
-  // -context given to the pred is a_element, the src element is the b_element
-  TM2xHd_F_PREFIX bool TM2xHd_intersection
-  (
-   TM2x *array_acc
-   ,TM2x *set_a
-   ,TM2x *set_b
-   ,address_t element_byte_n
-   ,bool pred(void *context ,void *el ,address_t element_byte_n)
-   ){
-    bool distinct = true;
-    TM2xHd_Mount(set_a ,hd_a);
-    TM2xHd_Mount(set_b ,hd_b);
-    do{
-      void *a_element_pt = TM2xHd_pt(hd_a);
-      if( TM2xHd_exists(set_b ,hd_b ,element_byte_n ,a_element_pt ,pred) ){
-        TM2x_push_write(array_acc ,a_element_pt ,element_byte_n);      
-        distinct = false;
-      }
-      TM2xHd_rewind(set_b ,hd_b);
-    }while( TM2xHd_step(set_a ,hd_a ,element_byte_n) );
-    return distinct;
-  }
+However, in our array, to initialize the last byte index field of the header, the array
+must have at least one element at the time of construction. In some implementations of
+malloc, it is also the case that the array must have at least one element in order for a
+block to be allocated on the heap for the array. Hence, construction for an empty array,
+if it was possible, would be completely different than that of construction of an array
+that has at least one element.  And furthermore, and this is the kicker, the normal
+construction would still be required when a first element is added. (**)
+
+Hence, there is no state that corresponds to the concept of constructed but with zero
+elements in the data allocation.  A nice property of our array is that it always has a
+maximum index.
+
+There are three states for our array: Conceptual, Partial, Constructed. A Constructed array
+has at least length of 1.  Both a Conceptual array and a Partial array have no elements,
+and in this sense, then, arrays in those states may be said to be Empty. Before an empty
+array may be used, it must be constructed.
+
+We already ran into this issue in the theoretical discussion on emptiness.  We noted the
+implications and the fundamental nature then of the first/extend loop structure.  We
+handle emptiness the same way here.  For example, when a dynamic array is used as a stack,
+the first push onto the array of the stack goes through 'first' code, and later pushes go
+through 'extend' code.  In order to facilitate first/extend patterns I have adopted a
+programming style of lambda continuations.
+
+
+---------------------------------------------------------------------------------------
+
+* 
+I toyed with calling Construct either 'Initialize', 'format', or even 'mount' instead.
+'Initialize' was intended to mean 'initialize the header struct'; however but we also have
+data fields to be initialized. It seems better to leave that term to apply to an first
+write to allocated memory.  'Format' and 'Mount' extend the tape machine analogy.
+Mounting an empty tape is fairly common, and after mounting an empty tape one must format
+it.  Hence, 'Mount' is the Allocation operations not the construction operation.  'Format'
+is correct, and I had it in the code, but it does not have a nice inverse term.
+'Construct' means to format and possibly write some initial data, and that is what our
+constructor functions do.  
+
+**
+There is a more detailed discussion of the implementation issues related to empty array
+implementation in the file doc·empty_discussion_empty_addendum.txt.
 

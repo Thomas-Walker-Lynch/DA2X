@@ -46,10 +46,10 @@
     continue_via_trampoline nominal;
   }
 
-  // This is a debug feature. To keep the heap clean all initialized arrays must be
-  // TM2x·data_dalloc'ed.  This counter is incremented upon initialization of an array,
-  // and it is decremented upon TM2x·data_dalloc.
-  extern address_t TM2x·initialized_cnt;
+  // This is a debug feature. To keep the heap clean all constructed arrays must be
+  // TM2x·data_dalloc'ed.  This counter is incremented upon construction of an array,
+  // and it is decremented upon destruction.
+  extern address_t TM2x·constructed_cnt;
 
 //--------------------------------------------------------------------------------
 // dynamic array instance type
@@ -65,10 +65,10 @@
   // tape becomes a pointer to a static allocation of a TM2x struct
   #define TM2x·AllocStatic(tape) TM2x TM2x· ## tape ,*tape; tape = &TM2x· ## tape;
 
-  // after data_deallocation, the TM2x may be re-initialized and used again
+  // after deconstruction, the TM2x may be re-constructed and used again
   TM2x·F_PREFIX void TM2x·deconstruct(TM2x *tape){
     free(tape->base_pt);
-    TM2x·initialized_cnt--;
+    TM2x·constructed_cnt--;
   }
 
   // for dynammic allocation of TM2xs:
@@ -138,8 +138,8 @@
        continue_via_trampoline bad_index;
   }
 
-  TM2x·F_PREFIX address_t TM2x·initialized(TM2x *tape){
-    return TM2x·initialized_cnt;
+  TM2x·F_PREFIX address_t TM2x·constructed(TM2x *tape){
+    return TM2x·constructed_cnt;
   }
 
 //--------------------------------------------------------------------------------
@@ -155,7 +155,7 @@
    ,continuation construct_nominal
    ,continuation construct_alloc_fail
    ){
-    TM2x·initialized_cnt++; // to assist with debugging
+    TM2x·constructed_cnt++; // to assist with debugging
     tape->byte_n = byte_n;
     address_t alloc_byte_n = binary_interval_inclusive_upper_bound(byte_n);
     continue_into mallocn( (void **)&(tape->base_pt) ,alloc_byte_n ,&&mallocn_nominal ,&&mallocn_fail);
