@@ -55,13 +55,13 @@ TM2x·Result test_1(){
   uint i = 0;
 
   TM2x a0,*a0p; a0p = &a0;
-  continue_into TM2x·format_elements(a0p ,1 ,byte_n_of(int32_t) ,&&format_nominal ,&&format_fail ,&&format_fail);
-    format_fail:;
+  continue_into TM2x·construct_elements(a0p ,1 ,byte_n_of(int32_t) ,&&construct_nominal ,&&construct_fail ,&&construct_fail);
+    construct_fail:;
       f[i] = false;
-      continue_from format_end;
-    format_nominal:;
+      continue_from construct_end;
+    construct_nominal:;
       f[i] = true;
-    format_end:;
+    construct_end:;
       i++;
 
   f[i++] = a0p->byte_n == 7;

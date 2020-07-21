@@ -143,26 +143,26 @@
   }
 
 //--------------------------------------------------------------------------------
-// formatting / formatting and initializing
+// constructting / constructting and initializing
 //
 
   // Need to add limit check against our upper address bound
   // element_n is the maximum index for the initial data array
-  // returns true when formatting succeeds
-  TM2x·F_PREFIX continuation TM2x·format_bytes
+  // returns true when constructting succeeds
+  TM2x·F_PREFIX continuation TM2x·construct_bytes
   ( TM2x *tape 
    ,address_t byte_n 
-   ,continuation format_nominal
-   ,continuation format_alloc_fail
+   ,continuation construct_nominal
+   ,continuation construct_alloc_fail
    ){
     TM2x·initialized_cnt++; // to assist with debugging
     tape->byte_n = byte_n;
     address_t alloc_byte_n = binary_interval_inclusive_upper_bound(byte_n);
     continue_into mallocn( (void **)&(tape->base_pt) ,alloc_byte_n ,&&mallocn_nominal ,&&mallocn_fail);
-      mallocn_nominal: continue_via_trampoline format_nominal;
-      mallocn_fail: continue_via_trampoline format_alloc_fail;
+      mallocn_nominal: continue_via_trampoline construct_nominal;
+      mallocn_fail: continue_via_trampoline construct_alloc_fail;
   }
-  TM2x·F_PREFIX continuation TM2x·format_elements
+  TM2x·F_PREFIX continuation TM2x·construct_elements
   ( TM2x *tape
     ,address_t element_n
     ,address_t element_byte_n 
@@ -173,16 +173,16 @@
     address_t byte_n;
     continue_into mul_ib(element_n ,element_byte_n ,&byte_n ,&&mul_ib·nominal ,&&mul_ib·overflow);
       mul_ib·nominal:;
-        continue_via_trampoline TM2x·format_bytes(tape ,byte_n ,nominal ,alloc_fail);
+        continue_via_trampoline TM2x·construct_bytes(tape ,byte_n ,nominal ,alloc_fail);
       mul_ib·overflow:;
         continue_via_trampoline bad_index;
   }
   // makes a pointer to an unitialized tape
   #define TM2x·AllocStaticFormat(tape ,element_n ,type ,cont_nominal ,cont_fail) \
     TM2x·AllocStatic(tape);\
-    continue_into TM2x·format_elements(tape ,element_n ,byte_n_of(type), cont_nominal ,cont_fail ,cont_fail);
+    continue_into TM2x·construct_elements(tape ,element_n ,byte_n_of(type), cont_nominal ,cont_fail ,cont_fail);
 
-  TM2x·F_PREFIX continuation TM2x·alloc_heap_format
+  TM2x·F_PREFIX continuation TM2x·alloc_heap_construct
   ( TM2x **tape 
     ,address_t element_n 
     ,address_t element_byte_n
@@ -192,40 +192,40 @@
     ){
     continue_into mallocn((void **)tape ,byte_n_of(TM2x) ,&&mallocn_nominal ,&&mallocn_fail);
       mallocn_nominal:
-        continue_into TM2x·format_elements(*tape ,element_n ,element_byte_n ,&&format_nominal ,&&format_fail ,&&format_bad_index);
-          format_fail: continue_via_trampoline fail;
-          format_nominal: continue_via_trampoline nominal;
-          format_bad_index: continue_via_trampoline bad_index;
+        continue_into TM2x·construct_elements(*tape ,element_n ,element_byte_n ,&&construct_nominal ,&&construct_fail ,&&construct_bad_index);
+          construct_fail: continue_via_trampoline fail;
+          construct_nominal: continue_via_trampoline nominal;
+          construct_bad_index: continue_via_trampoline bad_index;
       mallocn_fail: continue_via_trampoline fail;
     }
 
-  TM2x·F_PREFIX continuation TM2x·format_write_bytes
+  TM2x·F_PREFIX continuation TM2x·construct_write_bytes
   ( TM2x *tape 
     ,void *source_pt 
     ,address_t source_byte_n 
     ,continuation nominal
     ,continuation fail
     ){
-    continue_into TM2x·format_bytes(tape ,source_byte_n ,&&format_nominal ,&&format_fail);
-      format_nominal:
+    continue_into TM2x·construct_bytes(tape ,source_byte_n ,&&construct_nominal ,&&construct_fail);
+      construct_nominal:
         memcpyn(tape->base_pt, source_pt, source_byte_n);
         continue_via_trampoline nominal;
-      format_fail: continue_via_trampoline fail;
+      construct_fail: continue_via_trampoline fail;
   }
 
   // use this to block copy an array of bytes to a newly allocated TM2x
-  TM2x·F_PREFIX continuation TM2x·format_write
+  TM2x·F_PREFIX continuation TM2x·construct_write
   ( TM2x *tape 
     ,void *element_base_pt
     ,address_t element_byte_n 
     ,continuation nominal
     ,continuation fail
     ){
-    continue_via_trampoline TM2x·format_write_bytes(tape ,element_base_pt ,element_byte_n ,nominal  ,fail);
+    continue_via_trampoline TM2x·construct_write_bytes(tape ,element_base_pt ,element_byte_n ,nominal  ,fail);
   }
 
   // use this to block copy an array to a newly allocated TM2x
-  TM2x·F_PREFIX continuation TM2x·format_write_elements
+  TM2x·F_PREFIX continuation TM2x·construct_write_elements
   ( TM2x *tape 
     ,void *base_pt
     ,address_t element_n 
@@ -237,24 +237,24 @@
     address_t byte_n;
     continue_into mul_ib(element_n ,element_byte_n ,&byte_n ,&&mul_ib·nominal ,&&mul_ib·overflow);
     mul_ib·nominal:;
-      continue_via_trampoline TM2x·format_write(tape ,base_pt ,byte_n ,nominal  ,fail);
+      continue_via_trampoline TM2x·construct_write(tape ,base_pt ,byte_n ,nominal  ,fail);
     mul_ib·overflow:;
       continue_via_trampoline bad_index;
   }
 
   // use this to block copy another TM2x to a newly allocated TM2x
-  TM2x·F_PREFIX continuation TM2x·format_write_TM2x
+  TM2x·F_PREFIX continuation TM2x·construct_write_TM2x
   ( TM2x *tape 
     ,TM2x *tape_source
     ,continuation nominal
     ,continuation fail
     ){
-    continue_via_trampoline TM2x·format_write(tape ,tape_source->base_pt ,tape_source->byte_n ,nominal  ,fail);
+    continue_via_trampoline TM2x·construct_write(tape ,tape_source->base_pt ,tape_source->byte_n ,nominal  ,fail);
   }
 
   #define TM2x·AllocStaticFormat_Write(tape ,item ,cont_nominal ,cont_fail)\
     TM2x·AllocStatic(tape);\
-    continue_into TM2x·format_write(tape ,&item ,byte_n_of(typeof(item)) ,cont_nominal ,cont_fail);
+    continue_into TM2x·construct_write(tape ,&item ,byte_n_of(typeof(item)) ,cont_nominal ,cont_fail);
 
 
 //--------------------------------------------------------------------------------

@@ -5,7 +5,7 @@
 //--------------------------------------------------------------------------------
 // iniitialize the character array from a cstring
 //
-  TM2x·F_PREFIX continuation TM2x·format_write_cstring
+  TM2x·F_PREFIX continuation TM2x·construct_write_cstring
   ( TM2x *tape 
     ,char *pt
     ,continuation nominal
@@ -21,7 +21,7 @@
       continue_via_trampoline nominal;
 
     init:;
-      continue_into TM2x·format_write(tape ,pt ,byte_n_of(char) ,&&init·nominal ,&&alloc_fail_local);
+      continue_into TM2x·construct_write(tape ,pt ,byte_n_of(char) ,&&init·nominal ,&&alloc_fail_local);
         init·nominal:;
           do_write = &&extend;
           continue_from next;

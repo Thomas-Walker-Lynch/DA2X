@@ -30,7 +30,7 @@ TM2x·Result test_0(){
   TM2x·Result r ,*rp; rp = &r;
   TM2x·Result_init(rp);
   TM2x *a0;
-  continue_into TM2x·alloc_heap_format(&a0 ,0 ,byte_n_of(uint32_t) ,&&nominal_0 ,&&fail_0 ,&&fail_0);
+  continue_into TM2x·alloc_heap_construct(&a0 ,0 ,byte_n_of(uint32_t) ,&&nominal_0 ,&&fail_0 ,&&fail_0);
     nominal_0:;
       f[i] = true;
       continue_from end_0;
@@ -144,7 +144,7 @@ TM2x·Result test_1(){
   TM2x·Result r ,*rp; rp = &r;
   TM2x·Result_init(rp);
   TM2x *a0;
-  continue_into TM2x·alloc_heap_format(&a0 ,0 ,byte_n_of(uint32_t) ,&&nominal_0 ,&&fail_0 ,&&fail_0);
+  continue_into TM2x·alloc_heap_construct(&a0 ,0 ,byte_n_of(uint32_t) ,&&nominal_0 ,&&fail_0 ,&&fail_0);
     nominal_0:;
       f[i] = true;
       continue_from end_0;
@@ -243,7 +243,7 @@ TM2x·Result test_2(){
   uint32_t i = 0;
 
   TM2x *a0;
-  continue_into TM2x·alloc_heap_format(&a0 ,0 ,byte_n_of(uint32_t) ,&&nominal_0 ,&&fail_0 ,&&fail_0);
+  continue_into TM2x·alloc_heap_construct(&a0 ,0 ,byte_n_of(uint32_t) ,&&nominal_0 ,&&fail_0 ,&&fail_0);
     nominal_0:;
       f[i] = true;
       continue_from end_0;
@@ -290,7 +290,7 @@ TM2x·Result test_3(){
   TM2x·AllocStatic(a0);
   {
     __label__ nominal ,fail ,end;
-    TM2x·format_write(a0 ,&j ,byte_n_of(j) ,&&nominal ,&&fail);
+    TM2x·construct_write(a0 ,&j ,byte_n_of(j) ,&&nominal ,&&fail);
       nominal:;
         f[i] = true;
         continue_from end;
@@ -421,7 +421,7 @@ TM2x·Result test_3(){
         ,&&fail
         );
 
-      nominal:; // a3 is only formated and initialized if we travel down this path
+      nominal:; // a3 is only constructed and initialized if we travel down this path
         f[i++] = true;
         fprintf(stderr, "a3 = intersection a1 a0: ");
         TM2xHd·rewind(a3 ,hd);

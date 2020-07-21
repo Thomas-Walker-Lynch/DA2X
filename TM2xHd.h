@@ -101,7 +101,7 @@
 // quantifiers
 //
 
-  // nah .. better to implement this with memcpyn, see TM2x·format_write
+  // nah .. better to implement this with memcpyn, see TM2x·construct_write
   // shallow copy tape_src elements to the end of tape_acc
   TM2xHd·F_PREFIX continuation TM2x·cat
   ( TM2x *tape_acc
@@ -295,7 +295,7 @@
           );
 
     init:;  
-      continue_into TM2x·format_write
+      continue_into TM2x·construct_write
         ( set_intersection 
           ,TM2xHd·pt(hd_a) 
           ,element_byte_n 
