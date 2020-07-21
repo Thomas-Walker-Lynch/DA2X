@@ -292,7 +292,7 @@ TM2x·Result test_2(){
         f[i] = false;
         continue_from read_pop·end;
       }
-      read_pop·end:;{
+      read_pop·end:{
         i++;
       }
     }
