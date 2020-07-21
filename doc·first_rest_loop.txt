@@ -491,7 +491,7 @@ Step can be pulled back in:
   a labeled sequence of instruction that exits through a continue_from call.
   For example, the 'init' continuation:
 
-    init:;{
+    init:{
       write_init(output ,hd);
       when_found = &&extend;
       continue_from_local step;
@@ -519,7 +519,7 @@ Step can be pulled back in:
       struct is_one_data{
       }is_one_data;
 
-      is_one_entry:;{
+      is_one_entry:{
         if( TM2xHd_Read_Exp(is_one_operands.hd) > 10 ){
           continue_from *(is_one_operands.found);
         }else{
