@@ -65,8 +65,8 @@
   // tape becomes a pointer to a static allocation of a TM2x struct
   #define TM2x·AllocStatic(tape) TM2x TM2x· ## tape ,*tape; tape = &TM2x· ## tape;
 
-  // after deconstruction, the TM2x may be re-constructed and used again
-  TM2x·F_PREFIX void TM2x·deconstruct(TM2x *tape){
+  // after destruction, the TM2x may be re-constructed and used again
+  TM2x·F_PREFIX void TM2x·destruct(TM2x *tape){
     free(tape->base_pt);
     TM2x·constructed_cnt--;
   }
@@ -82,7 +82,7 @@
     continue_via_trampoline mallocn((void **)tape ,byte_n_of(TM2x) ,nominal ,fail);
   }
   TM2x·F_PREFIX void TM2x·dealloc_heap(TM2x *tape){
-    TM2x·deconstruct(tape);
+    TM2x·destruct(tape);
     free(tape);
   }
 

@@ -454,7 +454,7 @@ TM2x·Result test_3(){
         TM2xHd·rewind(a3 ,hd);
         TM2xHd·apply_to_each(a3 ,hd ,byte_n_of(uint) ," " ,TM2xHd·f_print_int);
         fputc('\n' ,stderr);
-        TM2x·deconstruct(a3);
+        TM2x·destruct(a3);
         continue_from end;
 
       empty:;
@@ -468,9 +468,9 @@ TM2x·Result test_3(){
       end:;
   }
 
-  TM2x·deconstruct(a0);
-  TM2x·deconstruct(a1);
-  TM2x·deconstruct(a2);
+  TM2x·destruct(a0);
+  TM2x·destruct(a1);
+  TM2x·destruct(a2);
   f[i++] = malloc_cnt == TM2x·malloc_cnt;
   f[i++] = constructed_cnt == TM2x·constructed_cnt;
   TM2x·Result_tally("test_3" ,rp ,f ,i);

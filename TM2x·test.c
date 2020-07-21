@@ -38,7 +38,7 @@ TM2x·Result test_0(){
   TM2x·Read(a0p ,0 ,k);
   f[i++] = k == -5;
 
-  TM2x·deconstruct(a0p);
+  TM2x·destruct(a0p);
   f[i++] = malloc_cnt == TM2x·malloc_cnt;
   f[i++] = constructed_cnt == TM2x·constructed_cnt;
   TM2x·Result_tally("test_0" ,rp ,f ,i);
@@ -128,7 +128,7 @@ TM2x·Result test_1(){
     }
     f[i++] = a0p->byte_n == 3;
 
-  TM2x·deconstruct(a0p);
+  TM2x·destruct(a0p);
   f[i++] =  malloc_cnt == TM2x·malloc_cnt;
   f[i++] = constructed_cnt == TM2x·constructed_cnt;
   TM2x·Result_tally("test_1" ,rp ,f ,i);
@@ -293,7 +293,7 @@ TM2x·Result test_2(){
   f[i++] = y == 1;  
   f[i++] = TM2x·test_after_allocation_n == 3;
 
-  TM2x·deconstruct(a0);
+  TM2x·destruct(a0);
   f[i++] = malloc_cnt == TM2x·malloc_cnt;
   f[i++] = constructed_cnt == TM2x·constructed_cnt;
   // printf("test_2 'i': %u" ,i);
