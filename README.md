@@ -57,7 +57,7 @@ This array is kind of expanding tape as described in the tm library.
 
   In mathematics, a sequence consists of a series of indexable elements.
 
-     e_0, e_1, ... e_i, ... e_n
+     e_0, e_1, ... e_i, ... e_ntt
 
   Where each index is a natural number. The natural number n+1 is said to be the 'length'
   of the sequence. 
