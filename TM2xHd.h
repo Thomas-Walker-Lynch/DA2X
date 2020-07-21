@@ -282,7 +282,7 @@
       // when_found is either &&init or &&extend
     continuation do_write = &&init;
 
-    exists:;
+    exists:;{
       continue_into TM2xHd·exists
         ( set_b 
           ,hd_b 
@@ -292,50 +292,60 @@
           ,do_write
           ,&&next
           );
+    }
 
-    init:;  
+    init:;{
+      continuations nominal ,alloc_fail;
       continue_into TM2x·construct_write
         ( set_intersection 
           ,TM2xHd·pt(hd_a) 
           ,element_byte_n 
-          ,&&init·nominal
-          ,&&init·alloc_fail
+          ,&&nominal
+          ,&&alloc_fail
           );
-        init·nominal:;
-          do_write = &&extend;
-          continue_from next;
-        init·alloc_fail:;
-          continue_via_trampoline init_intersection·allocation_failed;
+      nominal:;{
+        do_write = &&extend;
+        continue_from next;
+      }
+      alloc_fail:;{
+        continue_via_trampoline init_intersection·allocation_failed;
+      }
+    }
         
-    extend:;
+    extend:;{
+      continuations nominal ,alloc_fail;
       continue_into TM2x·push
         ( set_intersection 
           ,TM2xHd·pt(hd_a) 
           ,element_byte_n 
-          ,&&extend·nominal 
-          ,&&extend·alloc_fail
+          ,&&nominal 
+          ,&&alloc_fail
           );        
-        extend·nominal:;
-          continue_from next;
-        extend·alloc_fail:;
-          continue_via_trampoline init_intersection·allocation_failed;
+      nominal:;{
+        continue_from next;
+      }
+      alloc_fail:;{
+        continue_via_trampoline init_intersection·allocation_failed;
+      }
+    }
 
-    next:;
+    next:;{
+      continuations end_of_tape;
       TM2xHd·rewind(set_b ,hd_b);
       continue_into TM2xHd·step
         ( set_a
           ,hd_a
           ,element_byte_n
-          ,&&loop
-          ,&&next·end_of_tape
+          ,&&exists
+          ,&&end_of_tape
           );
-        loop:; // this little detour assists with debugging
-          continue_from exists;
-        next·end_of_tape:;
+      end_of_tape:;{
           if( do_write == &&init )
             continue_via_trampoline init_intersection·empty;
           else
             continue_via_trampoline init_intersection·nominal;
+      }
+    }
   }
 
 

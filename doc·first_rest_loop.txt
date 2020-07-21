@@ -491,10 +491,11 @@ Step can be pulled back in:
   a labeled sequence of instruction that exits through a continue_from call.
   For example, the 'init' continuation:
 
-    init:;
+    init:;{
       write_init(output ,hd);
       when_found = &&extend;
       continue_from_local step;
+      }
 
   Note that a continuation does not return to its caller.  Rather it continues with a
   further continuation. There may be one or more possible further continuations. The
@@ -518,12 +519,13 @@ Step can be pulled back in:
       struct is_one_data{
       }is_one_data;
 
-      is_one_entry:;
+      is_one_entry:;{
         if( TM2xHd_Read_Exp(is_one_operands.hd) > 10 ){
           continue_from *(is_one_operands.found);
-        else
+        }else{
           step_entry_operands.hd = hd;
           continue_from step_entry;
+        }}
 
     Currently our is_one just takes the found operand from the context, but
     it would more conceptually elegant if it were passed in as an opreand
@@ -568,6 +570,4 @@ characters for C identifiers .. something for keeping namespaces separate
 getting addresses for gotos inside of functions, use switch statements?  Would the
 opimizer clean it up? .. maybe not because it would go across function call boundaries, but
 in cases everything is in one file?
-
-2020-07-20T11:01:22Z
 

@@ -11,16 +11,15 @@ should be indented
     x = 5;
 
 
-2. label indention to support the format shown in the .h and .c files in this directory.
-  A little bit like switch statements. Right now labels outdent, and it is a constant fight
+2. found a label indentation style that works, see TM2x.h intersection. Also:
 
-  continue_into TM2x_alloc_heap_format(&a0 ,0 ,byte_n_of(uint32_t) ,&&nominal_0 ,&&fail_0);
-    nominal_0:
-      f[i] = true;
-      continue_from_local end_0;
-    fail_0:
-      f[i] = false;
-      continue_from_local end_0;
-    end_0:
-      i++;
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(c-offsets-alist (quote ((label . 2))))
+)
+
+
 
