@@ -137,7 +137,8 @@
     ,void f(void *context ,void *el ,address_t element_byte_n)
     ){
     TM2xHd·apply_to_each:{
-      f(context ,TM2xHd·pt(hd) ,element_byte_n);
+      void *element_pt = TM2xHd·pt(hd);
+      f(context ,element_pt ,element_byte_n);
       continue_into TM2xHd·at_element_n(tape ,hd ,element_byte_n ,&&hd_at_n ,&&hd_not_at_n);
       hd_at_n:{
         return;
