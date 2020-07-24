@@ -1,10 +1,11 @@
 # TM2x
 
 This is a dynamic array for C, along with an iterator.  The 2x refers to
-the feature that the allocation is doubled each time the array expands.
-Hence the name, Tape Machine 2x.
+the fact that the allocation is doubled each time the array expands beyond
+its bound. 
 
-This array is kind of expanding tape as described in the tm library.
+This array is kind of expanding tape as described in the tm library.  Hence the name, Tape
+Machine 2x.
 
 ## Faux Namespaces with a unicode character
   
