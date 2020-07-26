@@ -1,0 +1,153 @@
+
+
+Much of the emptiness discussion here is a review of the same discussion in the TTCA,
+though in the book I use Common Lisp for the examples.  Seeing these same thing done in C
+is helpful for understanding the hardware implications, and it provides an opportunity
+to discuss explicit memory deallocation.
+
+The first-extend pattern does a descent job at managing the problem that a constructor
+call is required only for the addition of the first element to our array.  The first
+element is typicall added with a construct_write() call, while extending the array is done
+with a call to push().  However, C is not garbage collected, so our C array ipmlementation
+will requires a call to a destructor function and a explicit deallocation.
+
+The C array has a header which may be allocated statically, on the stack, or on the heap.
+After construction the header then points to a 'data block' on the heap which is actually
+the array.  An explicit destructor call is required to release the data block.  However
+the destructor call can only be made if the array has been constructed.
+
+In our implementation, a destructed array is in the same state as one that has been
+allocated and not yet constructed.  This might not be the case for other implementations
+of this array interface or that of other containers, but we will assume this is the case
+in this discussion.
+
+1. the method of continuation contracts
+
+Consider that we have a hypothetical routine that is given an allocated but not yet
+constructed array.  This is a common technique for sharing an array with a continuation
+through an outer scope variable. The allocated but not yet constructed array is passed in,
+then the routine adds elements to it.
+
+On this hypothetical routine, when the 'nominal' continuation is taken the array will have
+been constructed.  Such a constructed array will have at least one cell for holding an
+element.  It is not necessary that these cells be initialized, but if the
+write_construct() function on the interface is used, then the cells will be initialized
+with the provided write data.  Such a routine will typically also have a 'not_found'
+continuation that is taken when the array has not been constructed, and thus has no
+elements. There may be additional continuations for other special cases upon exit, such as
+errors.  Because our array methods call malloc, there will surely be an 'alloc_fail'
+continuation for the case that malloc fails to expand or contract the array.  (In the case
+of contraction, the array currently allocates a new smaller memory block and copies the
+elements over.  The idea being to give large memory blocks back to the heap.  The
+allocation of the new smaller block could fail. The library realloc was not used due to
+questions about its implementation and possible stale pointer scenarios.)
+
+In general it will be necessary for the continued execution paths to know if the
+array was constructed or not, because if the array was constructed then it needs to be
+destructed.  However, it if was not constructed, the behavior of destruction is undefined,
+with a seg fault being a common result, so it not be destructed.
+
+Each continuation from a routine has attached to it a contract. This contract tells us
+something about the state of the operands and context variables. One method for knowing if
+destruction is needed is to attach to the continuation contract a guarantee that the
+array has been, or has not been, constructed.  Then, as each contniuation is on a separate
+execution path, we need only be sure that on the given execution path where an array was
+constructed, that the array be destructed, and vice versa.
+
+A typical example of a path where construction is guaranteed is that stemming from the
+'nominal' continuation.  An example of a path where it is guaranteed that the array
+has not been constructed is that stemming from the 'not_found' path.
+
+The 'alloc_fail' continuation has a subtlety.  If the allocation failure occured when
+allocating the first element, the array was not constructed.  On the other hand, if the
+allocation failure occured when extending the array, the array has been constructed.
+If the routine were to exit on one alloc_fail continuation immediately after malloc
+signaled a failure, it would not be possible to know on the downstream execution path if
+the array had been constructed or not, and thus it would not be possible to destruct it.
+
+We have a couple of options.  We could have two 'alloc_fail' continuations on our
+hypothetical routine, say 'alloc_fail_first' and 'alloc_fail_extend'.  On the
+'alloc_first' execution path have the guarantee that the array has not been constructed,
+while the 'alloc_fail_extend' path would have the guarantee that it was constructed.
+
+Often times the only difference between the 'alloc_fail_first' and the 'alloc_fail_extend'
+paths would be the destruction of the array. Hence, we could instead keep one 'alloc_fail'
+continuation, and for the case where allocation failed when extending, the routine would
+destruct the array before taking the continuation.  In this manner the one 'alloc_fail'
+continuation can carry the guarantee that that the array has not been constructed.
+However, there is a design pattern where upon an allocation failure we might want to do
+some sort of fix up, say expanding the memory allocated to the heap, and then to retry
+the operation.  For such a pattern to work we would need to keep the array in tact even
+when extension fails, and thus would need the two separate continuations.
+
+With the C stdlib malloc the expansion of the heap occurs automatically within the
+library, typically wtih a call to 'more_core()', so when we get an allocation failure it
+means that further expansion is not an option and the condition is fatal. Thus the single
+continuation is sufficient, and in fact, in such a situation even the single continutaion
+might be useless, as the down stream execution will probably not be able to do much.
+
+A draw back of the continuation contract approach is that there can be a combinatorial
+explosion in the number of continuations should we encode too much information in them.
+On the other hand, if the program needs to process each combination separately, we will
+only be pushing the separate paths to other parts of the code if we do not implement the
+needed continuations.
+
+2. the method of using a level 2 array
+
+Suppose we have a higher level array (reference TTCA book). Our level 1 array has a header
+struct with a base pointer and max index fields.  Our level 2 array would also have an array
+state field.  The first-extend code would then be behind the level 2 array interface. As
+discussed prior, this might lead to redundant compuation.  With a level 2 array
+continuations would not occur in pairs. As the state of a level 2 array is known by the
+array, it is not an error to destruct an array that was constructed, the operation is
+simply a no-op.  
+
+For a level 2 array, there is no constructor function on the interface.  Construction
+occurs automatically when the first array cell is added while the array is an allocated
+but not yet constructed state.  However, in C, the level 2 array will have a destructor on
+the interface. However, calling the destructor on a not yet constructed array need not be
+an error.  The destructor code need only check the array state, and if the array is not
+constructed, to immediately return.  For a similar reason, destructing twice will not be
+an error.  If that error behavior is desired, then an extra bit of information would have
+to be added to the array to express how the array arrived in the allocated but not
+constructed state.
+
+When an array header is statically allocated the allocation never goes out of scope.  When
+an array header is stack allocated, the allocation goes out of scope, and the presumably
+the stack is popped, at the next matching closing brace.  In C we have no native way of
+hooking a function to be called when the closing braces is reached, unlike in C++.  When
+an array header is heap allocated, it must be explicitly deallocated.
+
+In the static and stack allocation cases, deallocation is out of control of the level 2
+array, so no deallocation function can be implemented on the interface.  In the heap
+allocation of the header case, the interface could have a deallocation function, but that
+would result in an interface that is different depending on how the header was allocated.
+
+In C++, in the stack allocation and heap allocation of the header cases, the destructor
+function will be called automatically before the header is deallocated.  We could implement
+something like this by creating a redefined closing brace, and then keeping a list of
+hooked destructors that are called. We would have the level 1 array code to make use of
+when creating the hooked function list. Then we would add a deallocate function to the
+interface to for the heap allocation case.  We would keep the destructor on the interface
+as we can have multiple construct-destruct-construct cycles before deallocation.
+
+3. the method of condition codes
+
+With this method we set a bool flag each time an array is constructed.  We may have flags
+for other conditions as well.  These are shared with continuations so they know to
+destruct the array or not.  This approach makes sense when the condition flags do not
+result in branching later.  Otherwise they are just pushing the branch to later in the
+execution stream.
+
+
+
+
+
+
+
+
+
+
+
+
+

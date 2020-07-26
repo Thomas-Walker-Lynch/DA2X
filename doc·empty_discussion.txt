@@ -20,7 +20,7 @@ Due to these operations an array may be found to be in one of the following stat
 
      A variable name exists, but it has not been allocated.
 
-  2. Partial
+  2. Allocated-But-Not-Constructed
 
      Allocated but not constructed. Waiting to be constructed so that it may be used.
 
@@ -34,14 +34,15 @@ Here is state diagram:
 
        |<---deallocate------------
        |                          |
-   [Conceptual] --allocate--> [Partial] --construct--> [Constructed]
-                                 |                           |
-                                 |<-----------------destruct--
+   [Conceptual] --allocate--> [Allocated-But-Not-Constructed] --construct--> [Constructed]
+                                 |                                              |
+                                 |<-----------------destruct--------------------
 
 
-An array in the Partial or Constructed state is also said to be Allocated. Conceptual and
-Partial arrays have not been constructed yet. Only arrays in the [Constructed] state
-may be used.  After destruction our arrays can be constructed again and reused.
+An array in the Allocated-But-Not-Constructed or Constructed state is also said to be
+Allocated. Conceptual and Allocated-But-Not-Constructed arrays have not been constructed
+yet. Only arrays in the [Constructed] state may be used.  After destruction our arrays can
+be constructed again and reused.
 
 So given this situation, what does it mean for an array to be 'empty'?  Perhaps you would
 like it to mean that the array has been constructed and is ready to use, but has zero
@@ -58,10 +59,11 @@ least one element.  And furthermore, and this is the kicker, the normal construc
 still be required when a first element is added. I.e. we can see in practice how we are
 forced to make emptiness a second level construct. (**)
 
-There are three states for our array: Conceptual, Partial, Constructed. A Constructed array
-has at least length of 1.  Both a Conceptual array and a Partial array have no elements,
-and in this sense, then, arrays in those states may be said to be Empty. Before an empty
-array may be used, it must be constructed.
+There are three states for our array: Conceptual, Allocated-But-Not-Constructed,
+Constructed. A Constructed array has at least length of 1.  Both a Conceptual array and a
+Allocated-But-Not-Constructed array have no elements, and in this sense, then, arrays in
+those states may be said to be Empty. Before an empty array may be used, it must be
+constructed.
 
 We already ran into this issue in the theoretical discussion on emptiness.  We noted the
 implications and the fundamental nature then of the first/extend loop structure.  We
