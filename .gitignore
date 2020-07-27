@@ -11,6 +11,9 @@ test/TM2xHd·test
 try/trampoline
 try/nested_functions 
 try/utf8
+try/nested_labeling
 try/nested_labeling_1 
 try/nested_labeling_2 
 try/nested_labeling_3
+try/nested_labeling_works
+
