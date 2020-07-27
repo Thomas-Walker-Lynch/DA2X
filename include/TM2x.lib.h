@@ -6,6 +6,7 @@
 #include <assert.h>
 #include "inclusive.h"
 #include "Continuation.h"
+#include "TM2x·misc.h"
 
 /*--------------------------------------------------------------------------------
    global stuff
@@ -20,24 +21,7 @@
   inlined. For 'extern inline', the non-inline versions of the functions have to be
   compiled separately and made available for linking.  To make the C file for the extern
   definitions simply define the prefix with a null value then include this header.
-
 */  
-
-  #ifndef TM2x·F_PREFIX 
-    //#define TM2x·F_PREFIX static
-    //#define TM2x·F_PREFIX extern inline
-    #define TM2x·F_PREFIX static inline
-  #endif
-
-  #define CAT2(x ,y) x ## y
-  #define CAT(x ,y) CAT2(x ,y)
-  #define VAR(x) CAT(x, __LINE__)
-
-  TM2x·F_PREFIX address_t binary_interval_inclusive_upper_bound(address_t byte_n){
-    if( byte_n == 0 ) return 1;
-    // if( byte_n <= 15) return 15;
-    return (1 << (address_bit_length - __builtin_clz(byte_n))) - 1;
-  }
 
   TM2x·F_PREFIX continuation mallocn(void **pt ,address_t n ,continuation nominal ,continuation fail){
     if( n == address_t_n ) continue_via_trampoline fail;
@@ -106,20 +90,32 @@
     }
 
     char *after_base_pt;
-    continue_into mallocn((void **)&after_base_pt ,after_alloc_n ,&&malloc_nominal ,&&malloc_fail);
-      malloc_nominal:
-        {}
-        #ifdef TM2x·TEST
-          TM2x·test_after_allocation_n = after_alloc_n;
-        #endif
-        address_t copy_n = after_byte_n <  tape->byte_n ? after_byte_n : tape->byte_n;
-        memcpyn( after_base_pt ,tape->base_pt ,copy_n);
-        free(tape->base_pt);
-        tape->base_pt = after_base_pt;
-        tape->byte_n = after_byte_n;
-        continue_via_trampoline nominal;
-      malloc_fail:
-       continue_via_trampoline alloc_fail;
+    // #include "CLib·mallocn·args.h"
+    #define CLib·mallocn·args·pt      (void **)&after_base_pt
+    #define CLib·mallocn·args·n       after_alloc_n
+    #define CLib·mallocn·args·nominal malloc_nominal
+    #define CLib·mallocn·args·fail    malloc_fail
+    #include "CLib·mallocn.h"
+
+    continue_from CLib·mallocn;
+
+    malloc_nominal:{
+      #ifdef TM2x·TEST
+        TM2x·test_after_allocation_n = after_alloc_n;
+      #endif
+      address_t copy_n = after_byte_n < tape->byte_n ? after_byte_n : tape->byte_n;
+      memcpyn( after_base_pt ,tape->base_pt ,copy_n);
+      free(tape->base_pt);
+      tape->base_pt = after_base_pt;
+      tape->byte_n = after_byte_n;
+      continue_via_trampoline nominal;
+      cend
+    }
+    malloc_fail:{
+     continue_via_trampoline alloc_fail;
+     cend
+    }
+
   }
 
   TM2x·F_PREFIX continuation TM2x·resize_elements

@@ -36,12 +36,18 @@
   // Typically used to find the size in bytes of an array from the size of elements and the index of the last element.
   // c_n = (a_n + 1) * (b_n + 1) - 1
   // c_n = a_n * b_n + a_n + b_n;
-  inline static continuation mul_ib(address_t an ,address_t bn ,address_t *cn ,continuation nominal ,continuation overflow){
+  static inline continuation mul_ib(address_t an ,address_t bn ,address_t *cn ,continuation nominal ,continuation overflow){
     uint128_t d_an = an, d_bn = bn, d_cn;
     d_cn = d_an * d_bn + d_an + d_bn;
     if( d_cn > address_t_n ) continue_via_trampoline overflow;
     *cn = d_cn;
     continue_via_trampoline nominal;
   }
+
+  static inline address_t binary_interval_inclusive_upper_bound(address_t byte_n){
+    if( byte_n == 0 ) return 1;
+    return (1 << (address_bit_length - __builtin_clz(byte_n))) - 1;
+  }
+
 
 #endif
