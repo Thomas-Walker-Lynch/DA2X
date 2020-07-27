@@ -1,0 +1,41 @@
+
+
+The caller defines pt after taking the address of a pointer:
+
+    #define pt      (void **)&after_base_pt
+
+The continuation then redundantly dereferences pt.  We can only hope that the optimizer
+catches that and removes the redundant code.
+
+  CLib·mallocn:{
+    if( n == address_t_n ) continue_from fail;
+    *pt = malloc(n+1);
+    if(!*pt) continue_from fail;
+    continue_from nominal;
+    cend
+  }
+
+So why is it done this way?  The reason is that the same code can be used with operands
+passed in.
+
+  #define S0(x) CLib·mallocn· ## x
+
+  struct{
+    void **pt;
+    address_t n;
+    continuation nominal;
+    continuation fail;
+  }S0(args);
+
+  #undef S0
+
+Presumably the value of pt in this struct can be changed depending on the origin of the
+continuation.  As the same code may be #included into multiple places we must prepare
+pt as a void **.
+
+But why have more than once copy of a continuation?  It is not necessary.  The reason
+to have more than one copy of a continuation for inlining the code for efficiency.
+The inlined version can be optimized against the use of variables in the local scope, and
+some branches might become redundant.  Enabling such optimization is why the #defines
+are supported for the operands.
+

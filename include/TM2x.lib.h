@@ -6,6 +6,7 @@
 #include <assert.h>
 #include "inclusive.h"
 #include "Continuation.h"
+#include "misc.h"
 #include "TM2x·misc.h"
 
 /*--------------------------------------------------------------------------------
@@ -90,13 +91,12 @@
     }
 
     char *after_base_pt;
-    // #include "CLib·mallocn·args.h"
-    #define CLib·mallocn·args·pt      (void **)&after_base_pt
-    #define CLib·mallocn·args·n       after_alloc_n
-    #define CLib·mallocn·args·nominal malloc_nominal
-    #define CLib·mallocn·args·fail    malloc_fail
+    //  #include "CLib·mallocn·args.h"
+    #define pt      (void **)&after_base_pt
+    #define n       after_alloc_n
+    #define nominal malloc_nominal
+    #define fail    malloc_fail
     #include "CLib·mallocn.h"
-
     continue_from CLib·mallocn;
 
     malloc_nominal:{
