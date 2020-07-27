@@ -1,5 +1,5 @@
-#ifndef continuation_H
-#define continuation_H
+#ifndef CONTINUATION_H
+#define CONTINUATION_H
 #include <stdlib.h>
 
   // continuations by trampoline

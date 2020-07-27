@@ -4,10 +4,9 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "TM2x·malloc_counter.h"
+#include "MallocCounter.h"
 #include "TM2x.h"
-#include "TM2xHd.h"
-#include "TM2x·Result.h"
+#include "Result.h"
 
 typedef struct {
   uint ref; // reference value
@@ -21,14 +20,14 @@ void TM2xHd·f0(void *context ,void *item_pt ,address_t element_byte_n){
   cpt->result = cpt->result && (item == cpt->ref++);
 }
 
-TM2x·Result test_0(){
-  address_t malloc_cnt = TM2x·malloc_cnt;
-  address_t constructed_cnt = TM2x·constructed_cnt;
+Result·Tallies test_0(){
+  address_t malloc_cnt = MallocCounter·count;
+  address_t constructed_cnt = TM2x·constructed_count;
   bool f[256];
   uint32_t i = 0;
 
-  TM2x·Result r ,*rp; rp = &r;
-  TM2x·Result_init(rp);
+  Result·Tallies r ,*rp; rp = &r;
+  Result·Tallies·init(rp);
   TM2x *a0;
   continue_into TM2x·alloc_heap_construct(&a0 ,0 ,byte_n_of(uint32_t) ,&&nominal_0 ,&&fail_0 ,&&fail_0);
   nominal_0:{
@@ -68,9 +67,9 @@ TM2x·Result test_0(){
   f[i++] = c->ref == 100;
 
   TM2x·dealloc_heap(a0);
-  f[i++] = malloc_cnt == TM2x·malloc_cnt;
-  f[i++] = constructed_cnt == TM2x·constructed_cnt;
-  TM2x·Result_tally("test_0" ,rp ,f ,i);
+  f[i++] = malloc_cnt == MallocCounter·count;
+  f[i++] = constructed_cnt == TM2x·constructed_count;
+  Result·Tallies·tally("test_0" ,rp ,f ,i);
   return r;
 }
 
@@ -140,14 +139,14 @@ continuation TM2xHd·p4
     continue_via_trampoline pred_false;
 }
 
-TM2x·Result test_1(){
-  address_t malloc_cnt = TM2x·malloc_cnt;
-  address_t constructed_cnt = TM2x·constructed_cnt;
+Result·Tallies test_1(){
+  address_t malloc_cnt = MallocCounter·count;
+  address_t constructed_cnt = TM2x·constructed_count;
   bool f[256];
   uint32_t i = 0;
 
-  TM2x·Result r ,*rp; rp = &r;
-  TM2x·Result_init(rp);
+  Result·Tallies r ,*rp; rp = &r;
+  Result·Tallies·init(rp);
   TM2x *a0;
   continue_into TM2x·alloc_heap_construct(&a0 ,0 ,byte_n_of(uint32_t) ,&&nominal_0 ,&&fail_0 ,&&fail_0);
   nominal_0:{
@@ -258,17 +257,17 @@ TM2x·Result test_1(){
   }
   
   TM2x·dealloc_heap(a0);
-  f[i++] = malloc_cnt == TM2x·malloc_cnt;
-  f[i++] = constructed_cnt == TM2x·constructed_cnt;
-  TM2x·Result_tally("test_1" ,rp ,f ,i);
+  f[i++] = malloc_cnt == MallocCounter·count;
+  f[i++] = constructed_cnt == TM2x·constructed_count;
+  Result·Tallies·tally("test_1" ,rp ,f ,i);
   return r;
 }
 
-TM2x·Result test_2(){
-  address_t malloc_cnt = TM2x·malloc_cnt;
-  address_t constructed_cnt = TM2x·constructed_cnt;
-  TM2x·Result r ,*rp; rp = &r;
-  TM2x·Result_init(rp);
+Result·Tallies test_2(){
+  address_t malloc_cnt = MallocCounter·count;
+  address_t constructed_cnt = TM2x·constructed_count;
+  Result·Tallies r ,*rp; rp = &r;
+  Result·Tallies·init(rp);
   bool f[256];
   uint32_t i = 0;
 
@@ -307,17 +306,17 @@ TM2x·Result test_2(){
   fputc('\n' ,stderr);
 
   TM2x·dealloc_heap(a0);
-  f[i++] = malloc_cnt == TM2x·malloc_cnt;
-  f[i++] = constructed_cnt == TM2x·constructed_cnt;
-  TM2x·Result_tally("test_2" ,rp ,f ,i);
+  f[i++] = malloc_cnt == MallocCounter·count;
+  f[i++] = constructed_cnt == TM2x·constructed_count;
+  Result·Tallies·tally("test_2" ,rp ,f ,i);
   return r;
 }
 
-TM2x·Result test_3(){
-  address_t malloc_cnt = TM2x·malloc_cnt;
-  address_t constructed_cnt = TM2x·constructed_cnt;
-  TM2x·Result r ,*rp; rp = &r;
-  TM2x·Result_init(rp);
+Result·Tallies test_3(){
+  address_t malloc_cnt = MallocCounter·count;
+  address_t constructed_cnt = TM2x·constructed_count;
+  Result·Tallies r ,*rp; rp = &r;
+  Result·Tallies·init(rp);
   bool f[256];
   uint32_t i = 0;
   uint32_t j;
@@ -541,21 +540,21 @@ TM2x·Result test_3(){
   TM2x·destruct(a0);
   TM2x·destruct(a1);
   TM2x·destruct(a2);
-  f[i++] = malloc_cnt == TM2x·malloc_cnt;
-  f[i++] = constructed_cnt == TM2x·constructed_cnt;
-  TM2x·Result_tally("test_3" ,rp ,f ,i);
+  f[i++] = malloc_cnt == MallocCounter·count;
+  f[i++] = constructed_cnt == TM2x·constructed_count;
+  Result·Tallies·tally("test_3" ,rp ,f ,i);
   return r;
 }
 
 int main(){
-  TM2x·Result r ,acc ,*accp; accp=&acc;
-  TM2x·Result_init(accp);
+  Result·Tallies r ,acc ,*accp; accp=&acc;
+  Result·Tallies·init(accp);
 
-  r = test_0(); TM2x·Result_accumulate(accp ,&r);
-  r = test_1(); TM2x·Result_accumulate(accp ,&r);
-  r = test_2(); TM2x·Result_accumulate(accp ,&r);
-  r = test_3(); TM2x·Result_accumulate(accp ,&r);
+  r = test_0(); Result·Tallies·accumulate(accp ,&r);
+  r = test_1(); Result·Tallies·accumulate(accp ,&r);
+  r = test_2(); Result·Tallies·accumulate(accp ,&r);
+  r = test_3(); Result·Tallies·accumulate(accp ,&r);
 
-  TM2x·Result_print("TM2xHd·test results" ,accp);
+  Result·Tallies·print("TM2xHd·test results" ,accp);
   return acc.failed;
 }

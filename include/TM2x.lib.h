@@ -5,7 +5,7 @@
 #include <stdbool.h>
 #include <assert.h>
 #include "inclusive.h"
-#include "continuation.h"
+#include "Continuation.h"
 
 /*--------------------------------------------------------------------------------
    global stuff
@@ -49,7 +49,7 @@
   // This is a debug feature. To keep the heap clean all constructed arrays must be
   // TM2x·data_dalloc'ed.  This counter is incremented upon construction of an array,
   // and it is decremented upon destruction.
-  extern address_t TM2x·constructed_cnt;
+  extern address_t TM2x·constructed_count;
 
 //--------------------------------------------------------------------------------
 // dynamic array instance type
@@ -68,7 +68,7 @@
   // after destruction, the TM2x may be re-constructed and used again
   TM2x·F_PREFIX void TM2x·destruct(TM2x *tape){
     free(tape->base_pt);
-    TM2x·constructed_cnt--;
+    TM2x·constructed_count--;
   }
 
   // for dynammic allocation of TM2xs:
@@ -141,7 +141,7 @@
   }
 
   TM2x·F_PREFIX address_t TM2x·constructed(TM2x *tape){
-    return TM2x·constructed_cnt;
+    return TM2x·constructed_count;
   }
 
 //--------------------------------------------------------------------------------
@@ -157,7 +157,7 @@
    ,continuation construct_nominal
    ,continuation construct_alloc_fail
    ){
-    TM2x·constructed_cnt++; // to assist with debugging
+    TM2x·constructed_count++; // to assist with debugging
     tape->byte_n = byte_n;
     address_t alloc_byte_n = binary_interval_inclusive_upper_bound(byte_n);
     continue_into mallocn( (void **)&(tape->base_pt) ,alloc_byte_n ,&&mallocn_nominal ,&&mallocn_fail);

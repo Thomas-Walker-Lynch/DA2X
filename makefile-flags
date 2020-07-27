@@ -1,0 +1,19 @@
+
+MAKE=/usr/bin/make --no-print-directory -f $(PHOME)/project/makefile-cc
+#MAKE=/usr/bin/make -f $(PHOME)/project/makefile-cc
+
+# override makefile defaults here
+MODULE=TM2x
+ENVDIR=$(PHOME)/env
+DEPFILE=$(TMPDIR)/makefile-cc.deps
+LIBFILE=$(LIBDIR)/lib$(MODULE).a
+INCFILE=$(INCDIR)/$(MODULE).h
+
+# some versions of Linux need a -e option others complain if there is a -e .. and it isn't the binary for echo ..
+ECHO= echo
+#ECHO= echo -e
+
+C=gcc
+CFLAGS=-std=gnu18 -Werror -O0 -ggdb -DDEBUG -DDEBUGDB -I$(SRCDIR) -I$(INCDIR) -I$(ENVDIR)/include 
+LINKFLAGS=-L$(LIBDIR) -L$(ENVDIR)/lib/ -l$(MODULE) -lTM2x
+

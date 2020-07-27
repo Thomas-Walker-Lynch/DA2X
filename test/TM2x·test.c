@@ -5,20 +5,20 @@
 #include <stdbool.h>
 
 #define TM2x·TEST
-#include "TM2x·malloc_counter.h"
+#include "MallocCounter.h"
 #include "TM2x.h"
-#include "TM2x·Result.h"
+#include "Result.h"
 
 address_t TM2x·test_after_allocation_n = 0;
 
-TM2x·Result test_0(){
-  address_t malloc_cnt = TM2x·malloc_cnt;
-  address_t constructed_cnt = TM2x·constructed_cnt;
+Result·Tallies test_0(){
+  address_t malloc_cnt = MallocCounter·count;
+  address_t constructed_cnt = TM2x·constructed_count;
   bool f[5];
   uint i = 0;
 
-  TM2x·Result r ,*rp; rp = &r;
-  TM2x·Result_init(rp);
+  Result·Tallies r ,*rp; rp = &r;
+  Result·Tallies·init(rp);
 
   TM2x·AllocStaticConstruct(a0p ,0 ,int32_t ,&&nominal ,&&fail);
   nominal:{
@@ -42,17 +42,17 @@ TM2x·Result test_0(){
   f[i++] = k == -5;
 
   TM2x·destruct(a0p);
-  f[i++] = malloc_cnt == TM2x·malloc_cnt;
-  f[i++] = constructed_cnt == TM2x·constructed_cnt;
-  TM2x·Result_tally("test_0" ,rp ,f ,i);
+  f[i++] = malloc_cnt == MallocCounter·count;
+  f[i++] = constructed_cnt == TM2x·constructed_count;
+  Result·Tallies·tally("test_0" ,rp ,f ,i);
   return r;
 }
 
-TM2x·Result test_1(){
-  address_t malloc_cnt = TM2x·malloc_cnt;
-  address_t constructed_cnt = TM2x·constructed_cnt;
-  TM2x·Result r ,*rp; rp = &r;
-  TM2x·Result_init(rp);
+Result·Tallies test_1(){
+  address_t malloc_cnt = MallocCounter·count;
+  address_t constructed_cnt = TM2x·constructed_count;
+  Result·Tallies r ,*rp; rp = &r;
+  Result·Tallies·init(rp);
 
   bool f[256];
   uint i = 0;
@@ -144,20 +144,20 @@ TM2x·Result test_1(){
     f[i++] = a0p->byte_n == 3;
 
   TM2x·destruct(a0p);
-  f[i++] =  malloc_cnt == TM2x·malloc_cnt;
-  f[i++] = constructed_cnt == TM2x·constructed_cnt;
-  TM2x·Result_tally("test_1" ,rp ,f ,i);
+  f[i++] =  malloc_cnt == MallocCounter·count;
+  f[i++] = constructed_cnt == TM2x·constructed_count;
+  Result·Tallies·tally("test_1" ,rp ,f ,i);
   return r;
 }
 
-TM2x·Result test_2(){
-  address_t malloc_cnt = TM2x·malloc_cnt;
-  address_t constructed_cnt = TM2x·constructed_cnt;
+Result·Tallies test_2(){
+  address_t malloc_cnt = MallocCounter·count;
+  address_t constructed_cnt = TM2x·constructed_count;
   bool f[256];
   uint i = 0;
 
-  TM2x·Result r ,*rp; rp = &r;
-  TM2x·Result_init(rp);
+  Result·Tallies r ,*rp; rp = &r;
+  Result·Tallies·init(rp);
 
   TM2x·AllocStaticConstruct(a0 ,0 ,int32_t ,&&nominal ,&&fail);
   nominal:{
@@ -344,21 +344,21 @@ TM2x·Result test_2(){
   f[i++] = TM2x·test_after_allocation_n == 3;
 
   TM2x·destruct(a0);
-  f[i++] = malloc_cnt == TM2x·malloc_cnt;
-  f[i++] = constructed_cnt == TM2x·constructed_cnt;
+  f[i++] = malloc_cnt == MallocCounter·count;
+  f[i++] = constructed_cnt == TM2x·constructed_count;
   // printf("test_2 'i': %u" ,i);
-  TM2x·Result_tally("test_2" ,rp ,f ,i);
+  Result·Tallies·tally("test_2" ,rp ,f ,i);
   return r;
 }
 
 int main(){
-  TM2x·Result r ,acc ,*accp; accp=&acc;
-  TM2x·Result_init(accp);
+  Result·Tallies r ,acc ,*accp; accp=&acc;
+  Result·Tallies·init(accp);
 
-  r = test_0(); TM2x·Result_accumulate(accp ,&r);
-  r = test_1(); TM2x·Result_accumulate(accp ,&r);
-  r = test_2(); TM2x·Result_accumulate(accp ,&r);
+  r = test_0(); Result·Tallies·accumulate(accp ,&r);
+  r = test_1(); Result·Tallies·accumulate(accp ,&r);
+  r = test_2(); Result·Tallies·accumulate(accp ,&r);
 
-  TM2x·Result_print("TM2x·test results" ,accp);
+  Result·Tallies·print("TM2x·test results" ,accp);
   return acc.failed;
 }

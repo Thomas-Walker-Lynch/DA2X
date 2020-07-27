@@ -1,10 +1,10 @@
-#ifndef DA2XHD_LIB_H
-#define DA2XHD_LIB_H
+#ifndef TM2XHD_LIB_H
+#define TM2XHD_LIB_H
 #include <stdlib.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
-#include "TM2x.h"
+#include "TM2x.lib.h"
 
 /*
   element_pt is always element aligned and pointing to the base of an element.

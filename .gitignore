@@ -1,15 +1,16 @@
 
+tmp/
+lib/
+exec/
 .*
 !.gitignore
 *~
 *.o
-tmp·*
-libTM2x.a
-TM2x·test
-TM2xHd·test
-example·trampoline
-example·nested_functions 
-example·utf8
-example·nested_labeling_1 
-example·nested_labeling_2 
-example·nested_labeling_3
+test/TM2x·test
+test/TM2xHd·test
+try/trampoline
+try/nested_functions 
+try/utf8
+try/nested_labeling_1 
+try/nested_labeling_2 
+try/nested_labeling_3

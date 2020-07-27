@@ -1,5 +1,5 @@
-#ifndef inclusive_H
-#define inclusive_H
+#ifndef INCLUSIVE_H
+#define INCLUSIVE_H
 /*
   Address interval inclusive bound versions of some C library functions.
 
@@ -11,7 +11,7 @@
 */
 #include <stdint.h>
 #include <limits.h>
-#include "continuation.h"
+#include "Continuation.h"
 
   #define address_t uint64_t
   #define address_bit_length 64
