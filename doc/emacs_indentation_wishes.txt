@@ -10,6 +10,15 @@ should be indented
   //
     x = 5;
 
+  /* blah blah */
+    x = 7   
+
+
+  /* blah blah
+     blah
+  */
+    x = 7   
+
 
 2. found a label indentation style that works, see TM2x.h intersection. Also:
 
@@ -21,5 +30,18 @@ should be indented
  '(c-offsets-alist (quote ((label . 2))))
 )
 
+3. #defines for the operand continuations are not indenting ... look for a custom variable ..
+ only setting I could find for pounds says: Only currently supported behavior is ‘alignleft’.
+ wish they did not jump over but stayed consistent.
+
+ e.g.
+
+  TM2x·alloc_heap:{
+    //  #include "CLib·mallocn·args.h"
+    #define pt      tape
+    #define n       byte_n_of(TM2x)
+    #define nominal malloc_nominal
+    #define fail    malloc_fail
+    #include "CLib·mallocn.h"
 
 
