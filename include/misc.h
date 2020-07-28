@@ -1,8 +1,9 @@
 #ifndef MISC_H
 #define MISC_H
 
-  #define CAT2(x ,y) x ## y
-  #define CAT(x ,y) CAT2(x ,y)
-  #define VAR(x) CAT(x, __LINE__)
+// see try/var.c
+  #define CAT(x ,y) x ## y
+  #define CAT2(x ,y) CAT(x ,y)
+  #define VAR(x) CAT2(x, __LINE__)
 
 #endif

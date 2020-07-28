@@ -3,12 +3,13 @@
   This does not allocate data for the array itself.
 */
 
-#define S0(x) TM2x·alloc_heap· ## x
+#define S0(x) TM2x·resize_bytes· ## x
 
 struct{
   TM2x *tape;
+  address_t after_byte_n;
   continuation nominal;
-  continuation fail;
+  continuation alloc_fail;
 }S0(args);
 
 #undef S0

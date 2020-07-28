@@ -9,24 +9,24 @@
   // macro names.  We avoid collisions because macro names are always all caps, and
   // and these will be undef'ed right after the inline code is included.
   #ifdef DEFAULT_ARGS
-  #define pt      S0(args.pt)
-  #define n       S0(args.n)      
-  #define nominal S0(args.nominal) 
-  #define fail    S0(args.fail)
+  #define CLib·mallocn·pt      S0(args.pt)
+  #define CLib·mallocn·n       S0(args.n)      
+  #define CLib·mallocn·nominal S0(args.nominal) 
+  #define CLib·mallocn·fail    S0(args.fail)
   #endif
   #undef DEFAULT_ARGS
 
   CLib·mallocn:{
-    if( n == address_t_n ) continue_from fail;
-    *pt = malloc(n+1);
-    if(!*pt) continue_from fail;
-    continue_from nominal;
+    if( CLib·mallocn·n == address_t_n ) continue_from fail;
+    *CLib·mallocn·pt = malloc(CLib·mallocn·n+1);
+    if(!*CLib·mallocn·pt) continue_from CLib·mallocn·fail;
+    continue_from CLib·mallocn·nominal;
     cend
   }
 
-  #undef pt
-  #undef n 
-  #undef nominal
-  #undef fail
+  #undef CLib·mallocn·pt
+  #undef CLib·mallocn·n 
+  #undef CLib·mallocn·nominal
+  #undef CLib·mallocn·fail
 
 #undef S0

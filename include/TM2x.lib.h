@@ -50,23 +50,6 @@
   // tape becomes a pointer to a static allocation of a TM2x struct
   #define TM2x·AllocStatic(tape) TM2x TM2x· ## tape ,*tape; tape = &TM2x· ## tape;
 
-  // for dynammic allocation of TM2xs:
-  TM2x·F_PREFIX continuation TM2x·alloc_heap
-  ( TM2x **tape 
-   ,continuation nominal
-   ,continuation fail
-   ){
-    continue_via_trampoline mallocn((void **)tape ,byte_n_of(TM2x) ,nominal ,fail);
-  }
-
-#define TM2x·ALLOC_HEAP(tape ,nominal ,fail) 
-
-
-  TM2x·F_PREFIX void TM2x·dealloc_heap(TM2x *tape){
-    TM2x·destruct(tape);
-    free(tape);
-  }
-
   // similar to stdlib realloc
   #ifdef TM2x·TEST
     extern address_t TM2x·test_after_allocation_n;

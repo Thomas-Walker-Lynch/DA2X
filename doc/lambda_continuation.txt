@@ -1,4 +1,4 @@
-
+--------------------------------------------------------------------------------
 
 The caller defines pt after taking the address of a pointer:
 
@@ -39,3 +39,53 @@ The inlined version can be optimized against the use of variables in the local s
 some branches might become redundant.  Enabling such optimization is why the #defines
 are supported for the operands.
 
+--------------------------------------------------------------------------------
+Where to put continuations
+
+lambda continuation is a redundant term, it came about due to the transition from functions,
+to functions that take lambdas, to lamdas that do not return (but continue).  Also the
+conventional use of the term continuation seems to be that of running a lambda?   I will now
+just use the term 'continuation'.
+
+Continuations placed at global scope are not thread safe.  This is due to the sharing of
+the args struct and local variables struct between the threads.  If instead we place all
+the continuations in the main() function, then they are thread safe, as each thread has
+its own stack, so each thread will be given cloned copies of its own args and local variable
+structs when it is made.
+
+Continuations may also be placed at lower scopes as a kind of inlining technique.  The
+related continuations will have to be declared (makes use of a gcc extension) so that the
+labels with the outerscope will not be conflated.  We facilitate the embedding of
+continuations in this manner with the #define preface that defines shared variables.
+Also, the compiler optimization may remove unusued fields from the args and local variable
+structs.  A smarter optimizer might recognize that the write through on the args struct
+and eliminate the redundant assignments.  I do not know if this is done.  In any case with
+the #define of args to local variables we get closer to how lambdas should be implemented
+when they become available.
+
+--------------------------------------------------------------------------------
+continuation embedding in library routines
+
+For the TM library I have lower scope embedded calls to other continuations.  This
+is for performance reasons.  For exmaple, the alloc_heap call embeds mallocn rather
+than continuing from a higher level instance of it.  Both calls pretty much reduce
+to malloc, so the higher level call would not save much code space if any.  Other
+continuations in the library could be given alternative impelementations that call
+rather than embed, this would result in a more compact library.
+
+
+--------------------------------
+
+The example-pound-define-lambdas branch implements redefinition of argument variables
+names in continuations performed by #include for the first few functions in the former
+TM2x.lib.h.  With this method a parent continuation can share variables with child
+continuations. We achieve true usage of variables in scope through the continuation
+call.
+
+The code is pretty, but the the lack of functionality in the cpp macro language combined
+with the lack of namespace structures conspired to cause a lot of typing and very long
+names for arguments and local variables in the continuations.
+
+Hence, I am going to move to a model where continuations always read their arguments from
+a partner struct. I will rely upon the compiler's optimizer to recognize the redundant use
+of the struct and to clean things up.
