@@ -50,71 +50,6 @@
   // tape becomes a pointer to a static allocation of a TM2x struct
   #define TM2x·AllocStatic(tape) TM2x TM2x· ## tape ,*tape; tape = &TM2x· ## tape;
 
-  // similar to stdlib realloc
-  #ifdef TM2x·TEST
-    extern address_t TM2x·test_after_allocation_n;
-  #endif
-  TM2x·F_PREFIX continuation TM2x·resize_bytes
-  ( TM2x *tape 
-   ,address_t after_byte_n
-   ,continuation nominal
-   ,continuation alloc_fail
-   ){
-
-    address_t before_alloc_n = binary_interval_inclusive_upper_bound(tape->byte_n);
-    address_t after_alloc_n = binary_interval_inclusive_upper_bound(after_byte_n);
-
-    if( after_alloc_n == before_alloc_n ){
-      tape->byte_n = after_byte_n;
-      continue_via_trampoline nominal;
-    }
-
-    char *after_base_pt;
-    //  #include "CLib·mallocn·args.h"
-    #define pt      (void **)&after_base_pt
-    #define n       after_alloc_n
-    #define nominal malloc_nominal
-    #define fail    malloc_fail
-    #include "CLib·mallocn.h"
-    continue_from CLib·mallocn;
-
-    malloc_nominal:{
-      #ifdef TM2x·TEST
-        TM2x·test_after_allocation_n = after_alloc_n;
-      #endif
-      address_t copy_n = after_byte_n < tape->byte_n ? after_byte_n : tape->byte_n;
-      memcpyn( after_base_pt ,tape->base_pt ,copy_n);
-      free(tape->base_pt);
-      tape->base_pt = after_base_pt;
-      tape->byte_n = after_byte_n;
-      continue_via_trampoline nominal;
-      cend
-    }
-    malloc_fail:{
-     continue_via_trampoline alloc_fail;
-     cend
-    }
-
-  }
-
-  TM2x·F_PREFIX continuation TM2x·resize_elements
-  ( TM2x *tape 
-    ,address_t after_element_n
-    ,address_t element_byte_n
-    ,continuation nominal
-    ,continuation alloc_fail
-    ,continuation bad_index
-    ){
-    address_t after_byte_n;
-    continue_into mul_ib(after_element_n ,element_byte_n ,&after_byte_n ,&&mul_ib·nominal ,&&mul_ib·overflow);
-    mul_ib·nominal:{
-      continue_via_trampoline TM2x·resize_bytes(tape ,after_byte_n ,nominal ,alloc_fail);
-    }
-    mul_ib·overflow:{
-      continue_via_trampoline bad_index;
-    }
-  }
-
   TM2x·F_PREFIX address_t TM2x·constructed(TM2x *tape){
     return TM2x·constructed_count;
   }
@@ -123,22 +58,6 @@
 // constructing / constructing and initializing
 //
 
-  // Need to add limit check against our upper address bound
-  // element_n is the maximum index for the initial data array
-  // returns true when constructing succeeds
-  TM2x·F_PREFIX continuation TM2x·construct_bytes
-  ( TM2x *tape 
-   ,address_t byte_n 
-   ,continuation construct_nominal
-   ,continuation construct_alloc_fail
-   ){
-    TM2x·constructed_count++; // to assist with debugging
-    tape->byte_n = byte_n;
-    address_t alloc_byte_n = binary_interval_inclusive_upper_bound(byte_n);
-    continue_into mallocn( (void **)&(tape->base_pt) ,alloc_byte_n ,&&mallocn_nominal ,&&mallocn_fail);
-      mallocn_nominal: continue_via_trampoline construct_nominal;
-      mallocn_fail: continue_via_trampoline construct_alloc_fail;
-  }
   TM2x·F_PREFIX continuation TM2x·construct_elements
   ( TM2x *tape
     ,address_t element_n

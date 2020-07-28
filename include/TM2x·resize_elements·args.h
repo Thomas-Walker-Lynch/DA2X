@@ -5,10 +5,11 @@
 
 struct{
   TM2x *tape;
-  address_t after_byte_n;
+  address_t after_element_n;
+  address_t element_byte_n;
   continuation nominal;
   continuation alloc_fail;
-}TM2x·resize_bytes·args;
-
+  continuation bad_index;
+}TM2x·resize_elements·args;
 
 

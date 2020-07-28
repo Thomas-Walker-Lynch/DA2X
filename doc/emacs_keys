@@ -1,5 +1,12 @@
 
 
+add so that cdot is not a word character:
+   (add-hook 'c-mode-hook (lambda () (modify-syntax-entry ?· "_")))
+
+add so that labels indent, currently in my custom variables setting:
+   (c-offsets-alist (quote ((label . 2))))
+
+
   (global-set-key (kbd "C-x g cdot SPC") [?·]) ; scoping sepearator for gcc C
 
 

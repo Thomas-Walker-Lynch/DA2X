@@ -3,14 +3,10 @@
   This does not allocate data for the array itself.
 */
 
-#define S0(x) TM2x·dealloc_heap· ## x
-
 struct{
   TM2x **tape;
   continuation nominal;
-}S0(args);
-
-#undef S0
+}TM2x·dealloc_heap·args;
 
 
 

@@ -84,8 +84,22 @@ call.
 
 The code is pretty, but the the lack of functionality in the cpp macro language combined
 with the lack of namespace structures conspired to cause a lot of typing and very long
-names for arguments and local variables in the continuations.
+names for arguments and local variables in the continuations. Also, because #define names
+must be constant identifiers, and #defines have file scope, but our continuations (thanks
+to the gcc extension for scoped labels) are scoped.  Thus there can be collisions between
+#define names. 
+
+** .. wouldn't it be so nice to have a locally scoped pound define? One that
+tracked braces, could shadow a value at a higher scope, and goes out of scope at the
+closing brace?  Scopied pound define would solve the name space problem. Static Lexical
+scoping through braces is scannable by the cpp. Also need that the #def name expands
+embeded macros so that it may be name scoped.  #def eval(CAT(NS2,begin)) 5 or some such.
+Note that #define macros may have unbalanced braces in them, so they tracking of
+scope braces would have to be after macro expansion.
 
 Hence, I am going to move to a model where continuations always read their arguments from
 a partner struct. I will rely upon the compiler's optimizer to recognize the redundant use
 of the struct and to clean things up.
+
+------------------------
+should mention re-entrance is not an issue because continuations do not return.

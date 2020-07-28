@@ -1,22 +1,3 @@
-
---------------------------------
-
-The example-pound-define-lambdas branch implements redefinition of argument variables
-names in continuations performed by #include for the first few functions in the former
-TM2x.lib.h.  With this method a parent continuation can share variables with child
-continuations. We achieve true usage of variables in scope through the continuation
-call.
-
-The code is pretty, but the the lack of functionality in the cpp macro language combined
-with the lack of namespace structures conspired to cause a lot of typing and very long
-names for arguments and local variables in the continuations.
-
-Hence, I am going to move to a model where continuations always read their arguments from
-a partner struct. I will rely upon the compiler's optimizer to recognize the redundant use
-of the struct and to clean things up.
-
-
-
 # TM2x
 
 This is a dynamic array for C, along with an iterator.  The 2x refers to
