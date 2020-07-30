@@ -15,7 +15,7 @@ TM2x·F_PREFIX continuation TM2x·resize_elements:{
   address_t element_byte_n  = TM2x·resize_elements·args.element_byte_n;
   continuation nominal      = TM2x·resize_elements·args.nominal;
   continuation alloc_fail   = TM2x·resize_elements·args.alloc_fail;
-  continuation bad_index    = TM2x·resize_elements·args.bad_index;
+  continuation index_gt_n    = TM2x·resize_elements·args.index_gt_n;
 
   address_t after_byte_n;
   #include "inclusive·mul_ib·args.h"
@@ -23,7 +23,7 @@ TM2x·F_PREFIX continuation TM2x·resize_elements:{
   inclusive·mul_ib·args.bn = element_byte_n;
   inclusive·mul_ib·args.cn = &after_byte_n;
   inclusive·mul_ib·args.nominal = &&mul_ib·nominal;
-  inclusive·mul_ib·args.overflow = bad_index;
+  inclusive·mul_ib·args.overflow = index_gt_n;
   continue_from inclusive·mul_ib;
 
   mul_ib·nominal:{

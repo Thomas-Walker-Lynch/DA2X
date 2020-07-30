@@ -1,10 +1,11 @@
 
+  
 struct{
   TM2x *tape;
-  void *source_pt;
+  address_t index;
   address_t element_n;
   address_t element_byte_n;
+  void *dst_element_pt;
   continuation nominal;
-  continuation fail;
   continuation index_gt_n;
-} TM2x·construct_write_elements·args;
+} TM2x·index·read·args;

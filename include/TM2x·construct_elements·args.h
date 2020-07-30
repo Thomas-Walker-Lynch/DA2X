@@ -5,5 +5,5 @@ struct{
   address_t element_byte_n; // index of last byte in element
   continuation nominal;
   continuation alloc_fail;
-  continuation bad_index;
+  continuation index_gt_n;
 } TM2x·construct_bytes·args;

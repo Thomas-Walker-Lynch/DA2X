@@ -19,4 +19,5 @@ TM2x·construct_bytes:{
   CLib·mallocn·args.fail    = alloc_fail;
   #include "CLib·mallocn.h"
   continue_from CLib·mallocn;
+  cend;
 }

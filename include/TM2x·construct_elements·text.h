@@ -1,12 +1,12 @@
 
 
 TM2x·construct_elements:{
-  TM2x *tape               = TM2x·construct_bytes·args.tape;      
-  address_t element_n      = TM2x·construct_bytes·args.element_n;    
-  address_t element_byte_n = TM2x·construct_bytes·args.element_byte_n;    
-  continuation nominal     = TM2x·construct_bytes·args.nominal;
-  continuation alloc_fail  = TM2x·construct_bytes·args.alloc_fail;
-  continuation bad_index   = TM2x·construct_bytes·args.bad_index;
+  TM2x *tape               = TM2x·construct_elements·args.tape;      
+  address_t element_n      = TM2x·construct_elements·args.element_n;    
+  address_t element_byte_n = TM2x·construct_elements·args.element_byte_n;    
+  continuation nominal     = TM2x·construct_elements·args.nominal;
+  continuation alloc_fail  = TM2x·construct_elements·args.alloc_fail;
+  continuation index_gt_n  = TM2x·construct_elements·args.index_gt_n;
 
   address_t byte_n;
   #include "inclusive·mul_ib·args.h"
@@ -14,7 +14,8 @@ TM2x·construct_elements:{
   inclusive·mul_ib·args.bn = element_byte_n;
   inclusive·mul_ib·args.cn = &byte_n;
   inclusive·mul_ib·args.nominal = &&mul_ib·nominal;
-  inclusive·mul_ib·args.overflow = bad_index;
+  inclusive·mul_ib·args.overflow = index_gt_n;
+  #include "inclusive·mul_ib.h"
   continue_from inclusive·mul_ib;
 
   mul_ib·nominal:{
@@ -27,5 +28,6 @@ TM2x·construct_elements:{
     continue_from TM2x·construct_bytes;
     cend;
   }
-  cend
+
+  cend;
 }

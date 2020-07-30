@@ -45,82 +45,6 @@
   } TM2x;
 
 //--------------------------------------------------------------------------------
-// allocation
-//
-  // tape becomes a pointer to a static allocation of a TM2x struct
-  #define TM2x·AllocStatic(tape) TM2x TM2x· ## tape ,*tape; tape = &TM2x· ## tape;
-
-  TM2x·F_PREFIX address_t TM2x·constructed(TM2x *tape){
-    return TM2x·constructed_count;
-  }
-
-//--------------------------------------------------------------------------------
-// constructing / constructing and initializing
-//
-
-  TM2x·F_PREFIX continuation TM2x·construct_write_bytes
-  ( TM2x *tape 
-    ,void *source_pt 
-    ,address_t source_byte_n 
-    ,continuation nominal
-    ,continuation fail
-    ){
-    continue_into TM2x·construct_bytes(tape ,source_byte_n ,&&construct_nominal ,&&construct_fail);
-      construct_nominal:
-        memcpyn(tape->base_pt, source_pt, source_byte_n);
-        continue_via_trampoline nominal;
-      construct_fail: continue_via_trampoline fail;
-  }
-
-  // use this to block copy an array of bytes to a newly allocated TM2x
-  TM2x·F_PREFIX continuation TM2x·construct_write
-  ( TM2x *tape 
-    ,void *element_base_pt
-    ,address_t element_byte_n 
-    ,continuation nominal
-    ,continuation fail
-    ){
-    continue_via_trampoline TM2x·construct_write_bytes(tape ,element_base_pt ,element_byte_n ,nominal  ,fail);
-  }
-
-  // use this to block copy an array to a newly allocated TM2x
-  TM2x·F_PREFIX continuation TM2x·construct_write_elements
-  ( TM2x *tape 
-    ,void *base_pt
-    ,address_t element_n 
-    ,address_t element_byte_n 
-    ,continuation nominal
-    ,continuation fail
-    ,continuation bad_index
-    ){
-    address_t byte_n;
-    continue_into mul_ib(element_n ,element_byte_n ,&byte_n ,&&mul_ib·nominal ,&&mul_ib·overflow);
-    mul_ib·nominal:{
-      continue_via_trampoline TM2x·construct_write(tape ,base_pt ,byte_n ,nominal  ,fail);
-    }
-    mul_ib·overflow:{
-      continue_via_trampoline bad_index;
-    }
-  }
-
-
-
-  // use this to block copy another TM2x to a newly allocated TM2x
-  TM2x·F_PREFIX continuation TM2x·construct_write_TM2x
-  ( TM2x *tape 
-    ,TM2x *tape_source
-    ,continuation nominal
-    ,continuation fail
-    ){
-    continue_via_trampoline TM2x·construct_write(tape ,tape_source->base_pt ,tape_source->byte_n ,nominal  ,fail);
-  }
-
-  #define TM2x·AllocStaticConstruct_Write(tape ,item ,cont_nominal ,cont_fail)\
-    TM2x·AllocStatic(tape);\
-    continue_into TM2x·construct_write(tape ,&item ,byte_n_of(typeof(item)) ,cont_nominal ,cont_fail);
-
-
-//--------------------------------------------------------------------------------
 // adjectives
 //
 // Use these adjectives rather than accessing the TM2x struct directly.
@@ -153,33 +77,37 @@
   }
   #define TM2x·Element_N_Pt(tape ,type) TM2x·element_n_pt(tape ,byte_n_of(type))
 
+
+//--------------------------------------------------------------------------------
+// allocation
+//
+  // tape becomes a pointer to a static allocation of a TM2x struct
+  #define TM2x·AllocStatic(tape) TM2x TM2x· ## tape ,*tape; tape = &TM2x· ## tape;
+
+  TM2x·F_PREFIX address_t TM2x·constructed(TM2x *tape){
+    return TM2x·constructed_count;
+  }
+
+//--------------------------------------------------------------------------------
+// constructing / constructing and initializing
+//
+
 //--------------------------------------------------------------------------------
 // indexing
 //   consider using the iterator TM2xHd.h instead of indexes
 //
 
-  // returns pointer to element at given index
-  TM2x·F_PREFIX void *TM2x·element_i_pt(TM2x *tape ,address_t index ,address_t element_byte_n){
-    return TM2x·byte_0_pt(tape) + element_byte_n * index + index;
-  }
-
-  TM2x·F_PREFIX void TM2x·read(TM2x *tape ,address_t index ,void *dst_element_pt ,address_t element_byte_n){
-    void *src_element_pt = TM2x·element_i_pt(tape ,index ,element_byte_n);
-    memcpyn(dst_element_pt, src_element_pt, element_byte_n);
-  }
-  #define TM2x·Read(tape ,index ,x) TM2x·read(tape ,index ,&x ,byte_n_of(typeof(x)))
-
 TM2x·write_bytes·args
 
   TM2x·F_PREFIX continuation TM2x·write_bytes
-  ( void *src_pt
     ,TM2x *dst
     ,address_t dst_byte_i
+    ,void *src_pt
     ,address_t byte_n
     ,continuation nominal
     ,continuation alloc_fail
-    ,continuation bad_src_index
-    ,continuation bad_dst_index
+    ,continuation src_index_gt_n
+    ,continuation dst_index_gt_n
     ){
     if( (address_t)(src_pt + byte_n) < (address_t)src_pt  ) continue_via_trampoline bad_src_index;
     if( dst_byte_i + byte_n > TM2x·byte_n(dst) ) continue_via_trampoline bad_dst_index;
@@ -187,7 +115,7 @@ TM2x·write_bytes·args
   }
 
   TM2x·F_PREFIX void TM2x·write(TM2x *tape ,address_t index ,void *src_element_pt ,address_t element_byte_n){
-    void *dst_element_pt = TM2x·element_i_pt(tape ,index ,element_byte_n);
+    void *dst_element_pt = TM2x·index·to_pt(tape ,index ,element_byte_n);
     memcpyn(dst_element_pt, src_element_pt, element_byte_n);
   }
   #define TM2x·Write(tape ,index ,x) TM2x·write(tape ,index ,&(x) ,byte_n_of(typeof(x)))
@@ -306,7 +234,7 @@ TM2x·push_elements·args
     ,address_t element_byte_n 
     ,continuation nominal
     ,continuation alloc_fail
-    ,continuation bad_index
+    ,continuation index_gt_n
     ){
     address_t byte_n;
     continue_into mul_ib(element_n ,element_byte_n ,&byte_n ,&&mul_ib·nominal ,&&mul_ib·overflow);
@@ -314,7 +242,7 @@ TM2x·push_elements·args
       continue_via_trampoline TM2x·push(tape ,base_pt ,byte_n ,nominal  ,alloc_fail);
     }
     mul_ib·overflow:{
-      continue_via_trampoline bad_index;
+      continue_via_trampoline index_gt_n;
     }
   }
 

@@ -6,5 +6,5 @@ TM2x·push_elements·args:{
   address_t element_byte_n  = TM2x·push_elements·args.element_byte_n;
   continuation nominal      = TM2x·push_elements·args.nominal;
   continuation alloc_fail   = TM2x·push_elements·args.alloc_fail;
-  continuation bad_index    = TM2x·push_elements·args.bad_index;
+  continuation index_gt_n    = TM2x·push_elements·args.index_gt_n;
  }
