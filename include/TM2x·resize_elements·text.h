@@ -23,7 +23,7 @@ TM2x·F_PREFIX continuation TM2x·resize_elements:{
   inclusive·mul_ib·args.bn = element_byte_n;
   inclusive·mul_ib·args.cn = &after_byte_n;
   inclusive·mul_ib·args.nominal = &&mul_ib·nominal;
-  inclusive·mul_ib·args.overflow = index_gt_n;
+  inclusive·mul_ib·args.gt_address_n = index_gt_n;
   continue_from inclusive·mul_ib;
 
   mul_ib·nominal:{

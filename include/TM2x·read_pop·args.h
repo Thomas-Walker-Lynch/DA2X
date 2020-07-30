@@ -6,4 +6,4 @@ struct{
    continuation nominal;
    continuation pop_last;
    continuation alloc_fail;
-} TM2x·read_pop·args;
+} TM2x·read_pop;

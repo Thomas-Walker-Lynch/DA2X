@@ -12,12 +12,10 @@ TM2x·construct_bytes:{
   tape->byte_n = byte_n;
   address_t alloc_byte_n = binary_interval_inclusive_upper_bound(byte_n);
 
-  #include "CLib·mallocn.args.h"
   CLib·mallocn·args.pt      = (void **)&(tape->base_pt);
   CLib·mallocn·args.n       = alloc_byte_n;
   CLib·mallocn·args.nominal = nominal;
   CLib·mallocn·args.fail    = alloc_fail;
-  #include "CLib·mallocn.h"
   continue_from CLib·mallocn;
   cend;
 }

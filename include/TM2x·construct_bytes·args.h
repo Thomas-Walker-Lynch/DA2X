@@ -4,4 +4,4 @@ struct{
   address_t byte_n;
   continuation nominal;
   continuation alloc_fail;
-} TM2x·construct_bytes·args;
+} TM2x·construct_bytes;

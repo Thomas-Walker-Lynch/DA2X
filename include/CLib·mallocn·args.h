@@ -4,7 +4,7 @@ struct{
   address_t n;
   continuation nominal;
   continuation fail;
-} CLib·mallocn·args;
+} CLib·mallocn;
 
 
 

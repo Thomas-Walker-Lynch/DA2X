@@ -1,7 +1,9 @@
 #ifndef TM2X_ARGS_H
-#ifndef TM2X_ARGS_H
+#define TM2X_ARGS_H
 
 #include "TM2x.lib.h"
+
+union{
 
 // ls *args.h | sed -e 's/^/#include "/g' | sed -e 's/ *$/"/g'
 #include "inclusive·mul_ib·args.h"
@@ -28,4 +30,7 @@
 #include "TM2x·resize_elements·args.h"
 #include "TM2x·write_bytes·args.h"
 
+}args;
+
 #endif
+

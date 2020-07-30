@@ -24,7 +24,7 @@
 
   #define byte_n_of(type) sizeof(type)-1
 
-  // the n+1 could overflow:
+  // the n+1 could gt_address_n:
   #define memcpyn(dst ,src ,n) memcpy(dst ,src ,n+1) 
   #define memcmpn(e0 ,e1 ,n) memcmp(e0 ,e1 ,n+1) 
   #define strncmpn(e0 ,e1 ,n) strncmp(e0 ,e1 ,n+1)
@@ -36,10 +36,10 @@
   // Typically used to find the size in bytes of an array from the size of elements and the index of the last element.
   // c_n = (a_n + 1) * (b_n + 1) - 1
   // c_n = a_n * b_n + a_n + b_n;
-  static inline continuation mul_ib(address_t an ,address_t bn ,address_t *cn ,continuation nominal ,continuation overflow){
+  static inline continuation mul_ib(address_t an ,address_t bn ,address_t *cn ,continuation nominal ,continuation gt_address_n){
     uint128_t d_an = an, d_bn = bn, d_cn;
     d_cn = d_an * d_bn + d_an + d_bn;
-    if( d_cn > address_t_n ) continue_via_trampoline overflow;
+    if( d_cn > address_t_n ) continue_via_trampoline gt_address_n;
     *cn = d_cn;
     continue_via_trampoline nominal;
   }

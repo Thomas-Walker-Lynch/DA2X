@@ -4,4 +4,4 @@ struct{
   TM2x *tape_source;
   continuation nominal;
   continuation fail;
-} TM2x·construct_write·args;
+} TM2x·construct_write;

@@ -154,18 +154,18 @@ TM2x·copy_elements·args
     ,continuation bad_dst_index
     ){
 
-    continuations nominal ,overflow;
+    continuations nominal ,gt_address_n;
     address_t src_byte_i;
-    continue_into mul_ib(src_element_i ,element_byte_n ,&src_byte_i ,&&nominal ,&&overflow);
+    continue_into mul_ib(src_element_i ,element_byte_n ,&src_byte_i ,&&nominal ,&&gt_address_n);
 
     nominal:{ 
       continuations nominal;
       address_t dst_byte_i;
-      continue_into mul_ib(dst_element_i ,element_byte_n ,&dst_byte_i ,&&nominal ,&&overflow);
+      continue_into mul_ib(dst_element_i ,element_byte_n ,&dst_byte_i ,&&nominal ,&&gt_address_n);
       nominal:{
         continuations nominal;
         address_t byte_n;
-        continue_into mul_ib(element_n ,element_byte_n ,&byte_n ,&&nominal ,&&overflow);
+        continue_into mul_ib(element_n ,element_byte_n ,&byte_n ,&&nominal ,&&gt_address_n);
         nominal:{
           continue_via_trampoline TM2x·copy_bytes
             ( src
@@ -182,7 +182,7 @@ TM2x·copy_elements·args
       }
     }
 
-    overflow:{
+    gt_address_n:{
       continue_via_trampoline bad_src_index;
     }
 
@@ -234,15 +234,15 @@ TM2x·push_elements·args
     ,address_t element_byte_n 
     ,continuation nominal
     ,continuation alloc_fail
-    ,continuation index_gt_n
+    ,continuation bad_index
     ){
     address_t byte_n;
-    continue_into mul_ib(element_n ,element_byte_n ,&byte_n ,&&mul_ib·nominal ,&&mul_ib·overflow);
+    continue_into mul_ib(element_n ,element_byte_n ,&byte_n ,&&mul_ib·nominal ,&&mul_ib·gt_address_n);
     mul_ib·nominal:{
       continue_via_trampoline TM2x·push(tape ,base_pt ,byte_n ,nominal  ,alloc_fail);
     }
-    mul_ib·overflow:{
-      continue_via_trampoline index_gt_n;
+    mul_ib·gt_address_n:{
+      continue_via_trampoline bad_index;
     }
   }
 

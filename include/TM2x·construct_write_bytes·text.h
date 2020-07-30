@@ -6,13 +6,11 @@ construct_write_bytes:{
   continuation nominal   = TM2x·construct_write_bytes·args.nominal;
   continuation fail      = TM2x·construct_write_bytes·args.fail;
 
-  #include "TM2x·construct_bytes·args.h"
   TM2x·construct_bytes·args.tape = tape;      
   TM2x·construct_bytes·args.tape_source = tape_source->base_pt;  
   TM2x·construct_bytes·args.byte_n = tape_source->byte_n;
   TM2x·construct_bytes·args.continuation nominal = &&construct_nominal;
   TM2x·construct_bytes·args.continuation fail = fail;
-  #include "TM2x·construct_bytes.h"
   continue_from TM2x·construct_bytes;
 
   construct_nominal:{

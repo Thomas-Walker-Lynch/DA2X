@@ -6,4 +6,4 @@ struct{
    void **pt;
    continuation nominal;
    continuation index_gt_n;
-} TM2x·index·to_pt·args;
+} TM2x·index·to_pt;

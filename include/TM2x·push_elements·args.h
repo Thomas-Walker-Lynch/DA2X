@@ -7,4 +7,4 @@ struct{
   continuation nominal;
   continuation alloc_fail;
   continuation index_gt_n;
- } TM2x·push_elements·args;
+ } TM2x·push_elements;

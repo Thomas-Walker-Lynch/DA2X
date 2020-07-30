@@ -8,12 +8,11 @@ TM2x·index·to_pt{
   continuation index_gt_n = TM2x·index·to_pt·args.index_gt_n;
 
   address_t byte_i;
-  #include "inclusive·mul_ib·args.h"
   inclusive·mul_ib·args.an = index;
   inclusive·mul_ib·args.bn = element_byte_n;
   inclusive·mul_ib·args.cn = &byte_i;
   inclusive·mul_ib·args.nominal = &&mul_ib·nominal;
-  inclusive·mul_ib·args.overflow = index_gt_n;
+  inclusive·mul_ib·args.gt_address_n = index_gt_n;
   continue_from inclusive·mul_ib;
 
   mul_ib·nominal:{

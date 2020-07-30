@@ -9,22 +9,18 @@ TM2x·construct_elements:{
   continuation index_gt_n  = TM2x·construct_elements·args.index_gt_n;
 
   address_t byte_n;
-  #include "inclusive·mul_ib·args.h"
   inclusive·mul_ib·args.an = element_n;
   inclusive·mul_ib·args.bn = element_byte_n;
   inclusive·mul_ib·args.cn = &byte_n;
   inclusive·mul_ib·args.nominal = &&mul_ib·nominal;
-  inclusive·mul_ib·args.overflow = index_gt_n;
-  #include "inclusive·mul_ib.h"
+  inclusive·mul_ib·args.gt_address_n = index_gt_n;
   continue_from inclusive·mul_ib;
 
   mul_ib·nominal:{
-    #include "TM2x·construct_bytes·args.h"
     TM2x·construct_bytes·args.tape       = tape;
     TM2x·construct_bytes·args.byte_n     = byte_n;
     TM2x·construct_bytes·args.nominal    = nominal;
     TM2x·construct_bytes·args.alloc_fail = alloc_fail;
-    #include "TM2x·construct_bytes.h"
     continue_from TM2x·construct_bytes;
     cend;
   }

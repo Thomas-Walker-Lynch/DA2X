@@ -7,4 +7,4 @@ struct{
   continuation nominal;
   continuation fail;
   continuation index_gt_n;
-} TM2x·construct_write_elements·args;
+} TM2x·construct_write_elements;

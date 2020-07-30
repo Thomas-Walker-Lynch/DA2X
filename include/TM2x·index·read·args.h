@@ -8,4 +8,4 @@ struct{
   void *dst_element_pt;
   continuation nominal;
   continuation index_gt_n;
-} TM2x·index·read·args;
+} TM2x·index·read;

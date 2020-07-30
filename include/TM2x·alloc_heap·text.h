@@ -4,7 +4,6 @@
 */
 
 TM2x·alloc_heap:{
-  continuations CLib·mallocn;
   CLib·mallocn·args.pt      = TM2x·alloc_heap·args.tape;
   CLib·mallocn·args.n       = byte_n_of(TM2x);
   CLib·mallocn·args.nominal = TM2x·alloc_heap·args.malloc_nominal;

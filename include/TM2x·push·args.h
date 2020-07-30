@@ -5,4 +5,4 @@ struct{
   address_t element_byte_n;
   continuation nominal;
   continuation alloc_fail;
-} TM2x·push·args;
+} TM2x·push;

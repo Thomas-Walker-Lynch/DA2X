@@ -6,4 +6,4 @@ struct{
   continuation nominal;
   continuation alloc_fail;
   continuation index_gt_n;
-} TM2x·construct_bytes·args;
+} TM2x·construct_bytes;
