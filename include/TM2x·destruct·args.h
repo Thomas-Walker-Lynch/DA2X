@@ -3,7 +3,7 @@
 struct{
   TM2x *tape;
   continuation nominal;
-}TM2x·destruct·args;
+} TM2x·destruct·args;
 
 
 

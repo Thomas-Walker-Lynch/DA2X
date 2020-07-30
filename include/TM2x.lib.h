@@ -58,45 +58,6 @@
 // constructing / constructing and initializing
 //
 
-  TM2x·F_PREFIX continuation TM2x·construct_elements
-  ( TM2x *tape
-    ,address_t element_n
-    ,address_t element_byte_n 
-    ,continuation nominal
-    ,continuation alloc_fail
-    ,continuation bad_index
-    ){
-    address_t byte_n;
-    continue_into mul_ib(element_n ,element_byte_n ,&byte_n ,&&mul_ib·nominal ,&&mul_ib·overflow);
-    mul_ib·nominal:{
-      continue_via_trampoline TM2x·construct_bytes(tape ,byte_n ,nominal ,alloc_fail);
-    }
-    mul_ib·overflow:{
-      continue_via_trampoline bad_index;
-    }
-  }
-  // makes a pointer to an unitialized tape
-  #define TM2x·AllocStaticConstruct(tape ,element_n ,type ,cont_nominal ,cont_fail) \
-    TM2x·AllocStatic(tape);\
-    continue_into TM2x·construct_elements(tape ,element_n ,byte_n_of(type), cont_nominal ,cont_fail ,cont_fail);
-
-  TM2x·F_PREFIX continuation TM2x·alloc_heap_construct
-  ( TM2x **tape 
-    ,address_t element_n 
-    ,address_t element_byte_n
-    ,continuation nominal
-    ,continuation fail
-    ,continuation bad_index
-    ){
-    continue_into mallocn((void **)tape ,byte_n_of(TM2x) ,&&mallocn_nominal ,&&mallocn_fail);
-      mallocn_nominal:
-        continue_into TM2x·construct_elements(*tape ,element_n ,element_byte_n ,&&construct_nominal ,&&construct_fail ,&&construct_bad_index);
-          construct_fail: continue_via_trampoline fail;
-          construct_nominal: continue_via_trampoline nominal;
-          construct_bad_index: continue_via_trampoline bad_index;
-      mallocn_fail: continue_via_trampoline fail;
-    }
-
   TM2x·F_PREFIX continuation TM2x·construct_write_bytes
   ( TM2x *tape 
     ,void *source_pt 
@@ -141,6 +102,8 @@
       continue_via_trampoline bad_index;
     }
   }
+
+
 
   // use this to block copy another TM2x to a newly allocated TM2x
   TM2x·F_PREFIX continuation TM2x·construct_write_TM2x
@@ -206,6 +169,8 @@
   }
   #define TM2x·Read(tape ,index ,x) TM2x·read(tape ,index ,&x ,byte_n_of(typeof(x)))
 
+TM2x·write_bytes·args
+
   TM2x·F_PREFIX continuation TM2x·write_bytes
   ( void *src_pt
     ,TM2x *dst
@@ -228,6 +193,7 @@
   #define TM2x·Write(tape ,index ,x) TM2x·write(tape ,index ,&(x) ,byte_n_of(typeof(x)))
 
 
+TM2x·copy_bytes·args
   TM2x·F_PREFIX continuation TM2x·copy_bytes
   ( TM2x *src
     ,address_t src_byte_i
@@ -246,8 +212,9 @@
 
   // A bad index is either one that overlflows the address space for either source or
   // destination, or one that is off the end of the source array.
+TM2x·copy_elements·args
   TM2x·F_PREFIX continuation TM2x·copy_elements
-  ( TM2x *src
+   ( TM2x *src
     ,address_t src_element_i
     ,TM2x *dst
     ,address_t dst_element_i
@@ -296,8 +263,9 @@
 //--------------------------------------------------------------------------------
 // stack behavior
 //
+TM2x·push_bytes.args
   TM2x·F_PREFIX continuation TM2x·push_bytes
-  ( TM2x *tape 
+   ( TM2x *tape 
     ,void *source_pt 
     ,address_t source_byte_n
     ,continuation nominal
@@ -318,8 +286,9 @@
   }
 
   // use this to block push an entire array of bytes 
+continuation TM2x·push·args
   TM2x·F_PREFIX continuation TM2x·push
-  ( TM2x *tape 
+   ( TM2x *tape 
     ,void *element_base_pt
     ,address_t element_byte_n
     ,continuation nominal
@@ -329,8 +298,9 @@
   }
 
   // use this to block push an entire array of elements
+TM2x·push_elements·args
   TM2x·F_PREFIX continuation TM2x·push_elements
-  ( TM2x *tape 
+   ( TM2x *tape 
     ,void *base_pt
     ,address_t element_n 
     ,address_t element_byte_n 
@@ -349,8 +319,9 @@
   }
 
   // use this to block push the contents of another TM2x
+TM2x·push_TM2x·args
   TM2x·F_PREFIX continuation TM2x·push_TM2x
-  ( TM2x *tape 
+   ( TM2x *tape 
     ,TM2x *tape_source
     ,continuation nominal
     ,continuation alloc_fail
@@ -362,7 +333,7 @@
     TM2x·push(tape ,&src_element ,byte_n_of(typeof(src_element)) ,nominal ,alloc_fail)
 
 
-  TM2x·F_PREFIX continuation TM2x·pop
+  TM2x·F_PREFIX continuation TM2x·pop·args
   ( TM2x *tape
     ,address_t element_byte_n
     ,continuation nominal
@@ -384,7 +355,8 @@
   #define TM2x·Pop(tape ,type ,cont_nominal ,cont_pop_last)\
     TM2x·pop(tape ,byte_n_of(type) ,cont_nominal ,cont_pop_last )
 
-  TM2x·F_PREFIX continuation TM2x·read_pop
+  TM2x·F_PREFIX continuation 
+TM2x·read_pop·args
   ( TM2x *tape 
     ,void *dst_element_pt 
     ,address_t element_byte_n

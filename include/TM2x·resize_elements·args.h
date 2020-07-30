@@ -10,6 +10,6 @@ struct{
   continuation nominal;
   continuation alloc_fail;
   continuation bad_index;
-}TM2x·resize_elements·args;
+} TM2x·resize_elements·args;
 
 
