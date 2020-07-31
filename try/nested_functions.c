@@ -5,7 +5,7 @@
   Yes they do, but redefinition at the same scope level is not allowed.
 
   2020-07-10T11:51:00Z
-  > gcc -g -o example·nested_functions example·nested_functions.c
+  > gcc -g example·nested_functions.c
   > ./example·nested_functions
   1 outer a:;
   2 outer a:;

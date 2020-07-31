@@ -9,8 +9,8 @@
 
   2020-07-11T16:24:35Z
   morpheus@localhost§~/projects/tranche_dev/TM2x§
-  > gcc -g -o example·nested_labeling_2 example·nested_labeling_2.c
-  > ./example·nested_labeling_2
+  > gcc -g  example·nested_labeling_2.c
+  > ./a.out
   outer a:;
   first a:;
   second a:;

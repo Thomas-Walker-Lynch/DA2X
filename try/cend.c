@@ -1,7 +1,7 @@
 /*
   This does work, but it will mess up the C code formatting in emacs.
 
-  gcc -o cend cend.c
+  gcc cend.c
 
 */
 #include <stdlib.h>

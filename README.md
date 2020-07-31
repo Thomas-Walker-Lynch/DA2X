@@ -33,6 +33,7 @@ Machine 2x.
   3. empty structures
   4. declared labels ('local labels')
   5. 128 bit unsigned int
+  6. #pragma `push_macro`/`pop_macro`
 
   In the near future, will probably make use of 
   3. nested functions

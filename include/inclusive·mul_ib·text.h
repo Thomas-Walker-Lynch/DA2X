@@ -2,6 +2,8 @@
 /*
   mul_ib = mul inclusive bounds.
 
+  gives the product of two extent values.
+
   When an is the max element index for a region, and bn is the max byte
   index within an element, then cn is the max byte index for the region.
 
@@ -29,6 +31,8 @@ inclusive·mul_ib:{
 
 /*
   mul_ei_bi  convert element index to a byte index
+
+  Given an element index and the extent of the element, computes the byte index.
 
     an (bn + 1)
     = an bn + an 

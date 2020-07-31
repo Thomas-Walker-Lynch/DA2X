@@ -8,7 +8,7 @@
   follow scope rules.
 
   2020-07-11T16:31:15Z
-  > gcc -g -o example·nested_labeling_3 example·nested_labeling_3.c
+  > gcc -g  example·nested_labeling_3.c
   example·nested_labeling_3.c: In function ‘main’:
   example·nested_labeling_3.c:42:5: error: label ‘c’ used but not defined
      42 |     goto c;
@@ -17,7 +17,7 @@
   commenting out the declaration of label c:
 
   2020-07-11T16:33:47Z
-  > ./example·nested_labeling_3
+  > ./a.out
   outer a:;
   first a:;
   second a:;

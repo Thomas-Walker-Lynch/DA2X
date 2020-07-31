@@ -5,7 +5,7 @@
    on top of speghetti .. all covered with cheese ...
 
    2020-07-10T11:38:28Z
-   > gcc -g -o example·nested_labeling example·nested_labeling.c
+   > gcc -g example·nested_labeling.c
    example·nested_labeling.c: In function ‘main’:
    example·nested_labeling.c:29:3: error: duplicate label ‘a’
       29 |   a:;

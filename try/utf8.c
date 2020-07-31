@@ -8,8 +8,8 @@ from UTF-8 in idenifiers did not work, so it is far from being anything.
 https://en.cppreference.com/w/cpp/language/identifiers#Unicode_characters_in_identifiers
 
   2020-07-11T12:42:11Z
-  > gcc -std=gnu18 -o example·utf8 example·utf8.c 
-  > ./example·utf8
+  > gcc -std=gnu18 example·utf8.c 
+  > ./a.out
   àños:
 
 

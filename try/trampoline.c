@@ -1,8 +1,8 @@
 /*
    makes use of the trampoline technique, and a gcc extension to hold labels in variables
 
-   > gcc -g -o example·trampoline example·trampoline.c
-   > ./example·trampoline 
+   > gcc -g  example·trampoline.c
+   > ./a.out
       mallocn succeded 
 
 */
