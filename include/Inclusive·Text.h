@@ -1,4 +1,11 @@
 
+
+struct{
+  Conveyance mul_ib = &&mul_ib;
+  Conveyance mul_ei_bi = &&mul_ei_bi;
+}Inclusive;
+
+
 /*
   mul_ib = mul inclusive bounds.
 

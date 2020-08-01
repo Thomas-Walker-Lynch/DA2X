@@ -23,8 +23,7 @@ int main(){
     #include "Inclusive·Locals.h"
   }Locals;
 
-  //-------------------------------------------------------------------------------------
-  //-------------------------------------------------------------------------------------
+  #include "Inclusive·Text.h"
 
   uint64_t r;
 
@@ -36,7 +35,7 @@ int main(){
   S1.rpt = &r;
   S1.nominal = &&nominal;
   S1.gt_address_t_n = &&gt_address_t_n;
-  continue_from Inclusive·mul_ib;
+  continue_from *Inclusive.mul_ib;
   #pragma pop_macro("S1") 
 
   nominal:{
@@ -53,14 +52,5 @@ int main(){
     exit(1);
     cend;
   }
-
-  exraneous:{
-    printf("here!");
-  }
-
-  //-------------------------------------------------------------------------------------
-  //-------------------------------------------------------------------------------------
-
-  #include "Inclusive·text.h"
 
 }

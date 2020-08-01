@@ -14,7 +14,7 @@
   #define cend abort();
 
   // These are no longer used in the library, but a program might use them.
-  // continuations by trampoline
+  // Conveyances by trampoline
   #define continue_into goto *
   #define continue_via_trampoline return
 

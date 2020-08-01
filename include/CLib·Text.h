@@ -4,6 +4,10 @@
 #include "Inclusive.h"
 #include "Conveyance.h"
 
+struct{
+  Conveyance mallocn = &&mallocn;
+}CLib;
+
 /* 
   Implementations use non-inclusive bounding artihmetic to accomodate the C library, 
   but this is not carried through to the interface.
@@ -12,13 +16,13 @@
 #undef S1
 #define S1 Args.CLib·mallocn
 CLib·mallocn:{
-  if( S1.n == address_t_n ) continue_from fail; 
+  if( S1.n == address_t_n ) continue_from *S1.fail; 
   *S1.pt = malloc(S1.n + 1);
   if(!*S1.pt) continue_from *S1.fail;
   continue_from *S1.nominal;
   cend;
 }
-#pragma pop("S1")
+#pragma pop_macro("S1")
 
 
 #endif

@@ -4,8 +4,8 @@
 struct{
   void **pt;
   address_t n;
-  continuation nominal;
-  continuation fail;
+  Conveyance nominal;
+  Conveyance fail;
 } CLib·mallocn;
 
 #endif
