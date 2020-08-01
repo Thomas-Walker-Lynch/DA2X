@@ -27,14 +27,30 @@ int main(){
 
   //--------------------------------------------------------------------------------
   //--------------------------------------------------------------------------------
+  continue_from test_0;
 
   test_0:{
+    TM2x *tape;
+    
     #pragma push_macro("S1")
     #undef S1
-    #define S1 TM2x.alloc_heap
-  
-  
+    #define S1 Args.TM2x·alloc_heap
+    S1.tape = &tape;
+    S1.nominal = &&nominal;
+    S1.fail = &&fail;
+    continue_from TM2x·alloc_heap;
+    #pragma pop_macro("S1")
 
+    nominal:{
+      printf("passed");
+      exit(0);
+      cend;
+    }
+    fail:{
+      printf("fail");
+      exit(0);
+      cend;
+    }
     cend;
   }
 
