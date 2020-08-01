@@ -32,8 +32,9 @@ int main(){
     #pragma push_macro("S1")
     #undef S1
     #define S1 TM2x.alloc_heap
-  
-  
+    S1.tape ;
+    S1.nominal ;
+    S1.fail ;
 
     cend;
   }
