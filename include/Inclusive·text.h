@@ -1,6 +1,3 @@
-#ifndef INCLUSIVE_H
-#define INCLUSIVE_H
-
 /*
   mul_ib = mul inclusive bounds.
 
@@ -42,15 +39,15 @@ overflow?
 #pragma push_macro("S1")
 #undef S0
 #undef S1
-#define S1 Locals.Inclusive·mul_ib
-#define S1 Args.Inclusive·mul_ib
+#define S0 Locals.Inclusive·3opLL
+#define S1 Args.Inclusive·3op
 Inclusive·mul_ib:{
-  S0.an = S1.an;
-  S0.bn = S1.bn;
-  S0.cn = S0.an * S0.bn + S0.an + S0.bn;
-  if( S0.cn > address_t_n ) continue_from *S1.gt_address_n;
-  *S1.cn = S0.cn;
-  continue_from *nominal;
+  S0.a0 = S1.a0;
+  S0.a1 = S1.a1;
+  S0.r = S0.a0 * S0.a1 + S0.a0 + S0.a1;
+  if( S0.r > address_t_n ) continue_from *S1.gt_address_t_n;
+  *S1.rpt = S0.r;
+  continue_from *S1.nominal;
 }
 #pragma pop_macro("S0")
 #pragma pop_macro("S1")
@@ -58,16 +55,16 @@ Inclusive·mul_ib:{
 /*
   mul_ei_bi  convert element index to a byte index
 
-  Given an element index and the extent of elements in bytes, computes the byte index.
+  Given a0 element index a0d the extent of elements in bytes, computes the byte index.
 
-    an (bn + 1)
-    = an bn + an 
+    a0 (a1 + 1)
+    = a0 a1 + a0 
 
-   eg.  an = 0,  bn = 3   --> 0
-        an = 1,  bn = 3   --> 4
-        an = 2,  bn = 3   --> 8
+   eg.  a0 = 0,  a1 = 3   --> 0
+        a0 = 1,  a1 = 3   --> 4
+        a0 = 2,  a1 = 3   --> 8
 
-   smaller than mul_ib so no ov possible, also
+   smaller tha0 mul_ib so no ov possible, also
    (2^n - 1) * (2^n) = 2^2n - 2^n ; 2^n >= 1, so no ov possible
 
 */
@@ -75,17 +72,16 @@ Inclusive·mul_ib:{
 #pragma push_macro("S1")
 #undef S0
 #undef S1
-#define S1 Locals.Inclusive·mul_ei_bi
-#define S1 Args.Inclusive·mul_ei_bi
+#define S0 Locals.Inclusive·3opLL
+#define S1 Args.Inclusive·3op
 inclusive·mul_ei_bi:{
-  S0.an = S1.an;
-  S0.bn = S1.bn;
-  S0.cn = S0.an * S0.bn + S0.an;
-  if( S0.cn > address_t_n ) continue_from *S1.gt_address_n;
-  *S1.cn = S0.cn;
-  continue_from *nominal;
+  S0.a0 = S1.a0;
+  S0.a1 = S1.a1;
+  S0.r = S0.a0 * S0.a1 + S0.a0;
+  if( S0.r > address_t_n ) continue_from *S1.gt_address_t_n;
+  *S1.rpt = S0.r;
+  continue_from *S1.nominal;
 }
 #pragma pop_macro("S0")
 #pragma pop_macro("S1")
 
-#endif

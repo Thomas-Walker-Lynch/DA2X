@@ -1,7 +1,13 @@
-#ifndef INCLUSIVE_H
-#define INCLUSIVE_H
 
-#include "inculusive.h"
-#include "inclusive·mul_ib·args.h"
+/*
+  All 3 operand address computations may use this.
+*/
+struct{
+  address_t a0;
+  address_t a1;
+  address_t *rpt;
+  Conveyance nominal;
+  Conveyance gt_address_t_n;
+} Inclusive·3op;
 
-#endif
+
