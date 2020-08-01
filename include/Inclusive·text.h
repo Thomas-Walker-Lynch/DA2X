@@ -1,3 +1,4 @@
+
 /*
   mul_ib = mul inclusive bounds.
 
@@ -35,6 +36,7 @@ overflow?
     yikes, but we just make it ( 2^n * 2^n - 1 leads to the result more directly)
 
 */
+
 #pragma push_macro("S0")
 #pragma push_macro("S1")
 #undef S0
@@ -84,4 +86,3 @@ inclusive·mul_ei_bi:{
 }
 #pragma pop_macro("S0")
 #pragma pop_macro("S1")
-

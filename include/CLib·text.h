@@ -1,5 +1,8 @@
 #ifndef CLIB_TEXT_H
 #define CLIB_TEXT_H
+#include <stdlib.h>
+#include "Inclusive.h"
+#include "Conveyance.h"
 
 /* 
   Implementations use non-inclusive bounding artihmetic to accomodate the C library, 

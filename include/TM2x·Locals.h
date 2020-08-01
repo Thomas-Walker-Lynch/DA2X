@@ -17,8 +17,8 @@
       TM2x *tape;
       continuation nominal;
       continuation fail;
-    } alloc_heap;
-
+    } TM2x·alloc_heap;
+#if 0
     struct{
       TM2x *tape;
       address_t byte_n;   // extent of the array, in bytes
@@ -27,7 +27,7 @@
 
       address_t alloc_byte_n;
 
-    } construct_bytes;
+    } TM2x·construct_bytes;
 
     struct{
       TM2x *tape;
@@ -38,14 +38,14 @@
       continuation alloc_fail;
 
       address_t byte_n;
-    } construct_elements;
+    } TM2x·construct_elements;
 
     struct{
       TM2x *tape;
       TM2x *tape_source;
       continuation nominal;
       continuation fail;
-    } construct_write;
+    } TM2x·construct_write;
 
     struct{
       TM2x *tape;
@@ -53,7 +53,7 @@
       address_t byte_n;
       continuation nominal;
       continuation fail;
-    } construct_write_bytes;
+    } TM2x·construct_write_bytes;
 
     struct{
       TM2x *tape;
@@ -65,14 +65,14 @@
       continuation fail;
 
       address_t byte_n;
-    } construct_write_elements;
+    } TM2x·construct_write_elements;
 
     struct{
       TM2x *tape;
       TM2x *tape_source;
       continuation nominal;
       continuation fail;
-    } construct_write_TM2x;
+    } TM2x·construct_write_TM2x;
 
     /* copy_bytes does not make use of other continuations, and does not have local vars.
     struct{
@@ -84,7 +84,7 @@
       continuation nominal;
       continuation src_index_gt_n;
       continuation dst_index_gt_n;
-    } copy_bytes;
+    } TM2x·copy_bytes;
     */
 
     struct{
@@ -98,17 +98,17 @@
       continuation alloc_fail;
       continuation src_index_gt_n;
       continuation dst_index_gt_n;
-    } copy_elements;
+    } TM2x·copy_elements;
 
     struct{
       TM2x **tape;
       continuation nominal;
-    } dealloc_heap;
+    } TM2x·dealloc_heap;
 
     struct{
       TM2x *tape;
       continuation nominal;
-    } destruct;
+    } TM2x·destruct;
 
     struct{
       TM2x *tape;
@@ -118,7 +118,7 @@
       void *dst_element_pt;
       continuation nominal;
       continuation index_gt_n;
-    } index·read;
+    } TM2x·index·read;
 
     struct{
        TM2x *tape ;
@@ -127,7 +127,7 @@
        void **pt;
        continuation nominal;
        continuation index_gt_n;
-    } index·to_pt;
+    } TM2x·index·to_pt;
 
     struct{
        TM2x *tape;
@@ -135,7 +135,7 @@
        continuation nominal;
        continuation pop_last;
        continuation alloc_fail;
-    } pop;
+    } TM2x·pop;
 
     struct{
       TM2x *tape;
@@ -143,7 +143,7 @@
       address_t element_byte_n;
       continuation nominal;
       continuation alloc_fail;
-    } push;
+    } TM2x·push;
 
     struct{
       TM2x *tape;
@@ -151,7 +151,7 @@
       address_t source_byte_n;
       continuation nominal;
       continuation alloc_fail;
-    } push_bytes;
+    } TM2x·push_bytes;
 
     struct{
       TM2x *tape ;
@@ -161,14 +161,14 @@
       continuation nominal;
       continuation alloc_fail;
       continuation index_gt_n;
-     } push_elements;
+     } TM2x·push_elements;
 
     struct{
       TM2x *tape ;
       TM2x *tape_source;
       continuation nominal;
       continuation alloc_fail;
-    } push_TM2x;
+    } TM2x·push_TM2x;
 
     struct{
        TM2x *tape ;
@@ -177,14 +177,14 @@
        continuation nominal;
        continuation pop_last;
        continuation alloc_fail;
-    } read_pop;
+    } TM2x·read_pop;
 
     struct{
       TM2x *tape;
       address_t after_byte_n;
       continuation nominal;
       continuation alloc_fail;
-    } resize_bytes;
+    } TM2x·resize_bytes;
 
     struct{
       TM2x *tape;
@@ -193,7 +193,7 @@
       continuation nominal;
       continuation alloc_fail;
       continuation index_gt_n;
-    } resize_elements;
+    } TM2x·resize_elements;
 
     struct{
       void *src_pt;
@@ -204,4 +204,6 @@
       continuation alloc_fail;
       continuation src_index_gt_n;
       continuation dst_index_gt_n;
-    } write_bytes;
+    } TM2x·write_bytes;
+
+#endif
