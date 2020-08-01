@@ -40,7 +40,7 @@ int main(){
     S1.tape = &tape;
     S1.nominal = &&nominal;
     S1.fail = &&fail;
-    continue_from TM2x·alloc_heap;
+    continue_from *Text·TM2x.alloc_heap;
     #pragma pop_macro("S1")
 
     nominal:{
