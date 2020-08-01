@@ -7,6 +7,6 @@ struct{
   address_t bn;
   address_t *cn;
   continuation nominal;
-  continuation gt_uint64;
+  continuation gt_address_n;
 } inclusive·3op_gt;
 
