@@ -6,11 +6,16 @@
 */
 #include "TM2x.h"
 
-struct{
-  Conveyance alloc_heap = &&TM2x·alloc_heap;
+/*
+struct Text·TM2x{
+  Conveyance alloc_heap;
+} Text·TM2x
+={
+  &&TM2x·alloc_heap
+};
+*/
 
-}TM2x;
-
+goto TM2x·end;
 
 //----------------------------------------
 //  Dynamic allocation of the TM2x header.  For static allocation use the AllocStatic()
@@ -41,8 +46,6 @@ TM2x·alloc_heap:{
 #pragma pop_macro("S1")
 #pragma pop_macro("S2")
 
-#if 0
-
 //----------------------------------------
 //  Construct an allocated array. 
 //  Given the exent in bytes, sets aside heap memory for the data.
@@ -52,25 +55,33 @@ TM2x·alloc_heap:{
 #undef S0
 #undef S1
 #undef S2
-#define S0 TM2x·local.construct_bytes
+#define S0 Locals.TM2x·construct_bytes
 #define S1 Args.TM2x·construct_bytes
 #define S2 Args.CLib·mallocn
 TM2x·construct_bytes:{
 
-  TM2x·constructed_count++; // to assist with debugging
-  S1.tape->byte_n = S1.byte_n;
-  S0.alloc_byte_n = binary_interval_inclusive_upper_bound(S1.byte_n);
+  S0.tape = S1.tape;
+  S0.byte_n = S1.byte_n;
+  S0.nominal = S1.nominal;
+  S0.alloc_fail = S1.alloc_fail;
 
-  S2.pt      = (void **)&(S1.tape->base_pt);
+  TM2x·constructed_count++; // to assist with debugging
+  S0.tape->byte_n = S0.byte_n;
+  S0.alloc_byte_n = binary_interval_inclusive_upper_bound(S0.byte_n);
+
+  S2.pt      = (void **)&(S0.tape->base_pt);
   S2.n       = S0.alloc_byte_n;
-  S2.nominal = S1.nominal;
-  S2.fail    = S1.alloc_fail;
+  S2.nominal = S0.nominal;
+  S2.fail    = S0.alloc_fail;
   continue_from CLib·mallocn;
   cend;
 }
 #pragma pop_macro("S0")
 #pragma pop_macro("S1")
 #pragma pop_macro("S2")
+
+#if 0
+
 
 TM2x·construct_elements:{
   TM2x *tape               = Args.TM2x·construct_elements.tape;      
@@ -507,3 +518,5 @@ TM2x·write_bytes:{
 }
 
 #endif
+
+TM2x·end:;

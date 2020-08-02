@@ -40,12 +40,22 @@ int main(){
     S1.tape = &tape;
     S1.nominal = &&nominal;
     S1.fail = &&fail;
-    continue_from *Text·TM2x.alloc_heap;
+    continue_from TM2x·alloc_heap;
     #pragma pop_macro("S1")
 
     nominal:{
-      printf("passed");
-      exit(0);
+      Conveyances ;
+
+      #pragma push_macro("S1")
+      #undef S1
+      #define S1 Args.TM2x·alloc_heap
+      S1.tape = tape;
+      S1.byten = 48;
+      S1.nominal = &&nominal;
+      S1.fail = &&fail;
+      continue_from TM2x·construct_bytes;
+      #pragma pop_macro("S1")
+
       cend;
     }
     fail:{

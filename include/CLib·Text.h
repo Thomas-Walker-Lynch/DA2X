@@ -1,12 +1,17 @@
-#ifndef CLIB_TEXT_H
-#define CLIB_TEXT_H
 #include <stdlib.h>
 #include "Inclusive.h"
 #include "Conveyance.h"
 
-struct{
-  Conveyance mallocn = &&mallocn;
-}CLib;
+/* Tested, works, but I will add an interface to L2
+struct Text·CLib{
+  Conveyance mallocn;
+} Text·CLib
+={
+  &&CLib·mallocn
+};
+*/
+
+goto CLib·end;
 
 /* 
   Implementations use non-inclusive bounding artihmetic to accomodate the C library, 
@@ -24,5 +29,5 @@ CLib·mallocn:{
 }
 #pragma pop_macro("S1")
 
+CLib·end:;
 
-#endif

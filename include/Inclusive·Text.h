@@ -1,10 +1,16 @@
 
+/*
+struct Text·Inclusive{
+  Conveyance mul_ib;
+  Conveyance mul_ei_bi;
+} Text·Inclusive
+={
+  &&Inclusive·mul_ib
+  ,&&Inclusive·mul_ei_bi
+};
+*/
 
-struct{
-  Conveyance mul_ib = &&mul_ib;
-  Conveyance mul_ei_bi = &&mul_ei_bi;
-}Inclusive;
-
+goto Inclusive·end;
 
 /*
   mul_ib = mul inclusive bounds.
@@ -83,7 +89,7 @@ Inclusive·mul_ib:{
 #undef S1
 #define S0 Locals.Inclusive·3opLL
 #define S1 Args.Inclusive·3op
-inclusive·mul_ei_bi:{
+Inclusive·mul_ei_bi:{
   S0.a0 = S1.a0;
   S0.a1 = S1.a1;
   S0.r = S0.a0 * S0.a1 + S0.a0;
@@ -93,3 +99,6 @@ inclusive·mul_ei_bi:{
 }
 #pragma pop_macro("S0")
 #pragma pop_macro("S1")
+
+
+Inclusive·end:;

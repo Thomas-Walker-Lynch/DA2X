@@ -35,7 +35,7 @@ int main(){
   S1.rpt = &r;
   S1.nominal = &&nominal;
   S1.gt_address_t_n = &&gt_address_t_n;
-  continue_from *Text·Inclusive.mul_ib;
+  continue_from Inclusive·mul_ib;
   #pragma pop_macro("S1") 
 
   nominal:{

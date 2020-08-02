@@ -6,7 +6,7 @@
 
   // unlike for the rest of C, the Conveyance type can not be used to declare
   // Conveyances, instead there is a separate DECL form.
-  #define ConveyanceDECL __label__
+  #define Conveyances __label__
   typedef void **Conveyance; // The Conveyance type
 
   // It is good form for a conveyance definition to end with this.

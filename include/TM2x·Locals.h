@@ -15,7 +15,7 @@
       Conveyance nominal;
       Conveyance fail;
     } TM2x·alloc_heap;
-#if 0
+
     struct{
       TM2x *tape;
       address_t byte_n;   // extent of the array, in bytes
@@ -203,4 +203,3 @@
       Conveyance dst_index_gt_n;
     } TM2x·write_bytes;
 
-#endif
