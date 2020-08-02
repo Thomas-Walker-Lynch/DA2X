@@ -15,21 +15,30 @@ gcc -s -std=gnu2x -Wall -O3 -I../include -L../lib  -o Inclusive·test.s Inclusiv
 
 int main(){
 
-  union{
-    #include "Inclusive·Args.h"
-  }Args;
-
-  union{
+  union Conveyance·Args{
     #include "Inclusive·Locals.h"
-  }Locals;
+  }Conveyance·Args;
 
+  union Conveyance·Locals{
+    #include "Inclusive·Locals.h"
+  }Conveyance·Locals;
+
+  #include "Conveyance·Text.h"
   #include "Inclusive·Text.h"
 
   uint64_t r;
+  struct Inclusive·3opLL  *s = &Conveyance·Args_pt->Inclusive·3opLL;
+  s->a0 = 541;
+  s->a1 = 727;
+  s->rpt = &r;
+  s->nominal = &&nominal;
+  s->gt_address_t_n = &&get_address_t_n;
+  continue_from Inclusive·mul_ib;
 
+  /*
   #pragma push_macro("S1")
   #undef S1
-  #define S1 Args.Inclusive·3op
+  #define S1 Conveyance·Args_pt->Inclusive·3opLL
   S1.a0 = 541;
   S1.a1 = 727;
   S1.rpt = &r;
@@ -37,6 +46,7 @@ int main(){
   S1.gt_address_t_n = &&gt_address_t_n;
   continue_from Inclusive·mul_ib;
   #pragma pop_macro("S1") 
+  */
 
   nominal:{
     if( r == 394575 ){

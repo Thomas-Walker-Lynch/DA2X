@@ -13,17 +13,17 @@ address_t TM2x·test_after_allocation_n = 0;
 
 int main(){
 
-  union{
+  union Conveyance·Args{
     #include "CLib·Args.h"
     #include "Inclusive·Args.h"
     #include "TM2x·Args.h"
-  }Args;
+  } Conveyance·Args;
 
-  union{
+  union Conveyance·Locals{
     #include "CLib·Locals.h"
     #include "Inclusive·Locals.h"
     #include "TM2x·Locals.h"
-  }Locals;
+  } Conveyance·Locals;
 
   #include "CLib·Text.h"
   #include "Inclusive·Text.h"
