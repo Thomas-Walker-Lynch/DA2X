@@ -15,13 +15,11 @@ gcc -s -std=gnu2x -Wall -O3 -I../include -L../lib  -o Inclusive·test.s Inclusiv
 
 int main(){
 
-  union Conveyance·Args{
-    #include "Inclusive·Locals.h"
-  }Conveyance·Args;
+  union Conveyance·Data{
+    #include "Inclusive·Data.h"
+  };
 
-  union Conveyance·Locals{
-    #include "Inclusive·Locals.h"
-  }Conveyance·Locals;
+  union Conveyance·Data Conveyance·Data0 ,Conveyance·Data1;
 
   #include "Conveyance·Text.h"
   #include "Inclusive·Text.h"
@@ -32,7 +30,7 @@ int main(){
   s->a1 = 727;
   s->rpt = &r;
   s->nominal = &&nominal;
-  s->gt_address_t_n = &&get_address_t_n;
+  s->gt_address_t_n = &&gt_address_t_n;
   continue_from Inclusive·mul_ib;
 
   /*

@@ -15,6 +15,7 @@ the 2x in the name.
   5. `#pragma push_macro/pop_macro`
   6. statement expressions
   7. `__builtin_clz`
+  8. nested functions
 
 ## Namespaces
 

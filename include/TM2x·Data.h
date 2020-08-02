@@ -1,12 +1,12 @@
 /*
   This is not a traditional header, and can not be used as such.
 
-  #include this file inside of a Locals union with other conveyance's locals .h files. 
+  #include this file inside of a Data union with other conveyance's locals .h files. 
 
   union{
    ...
-   #include "TM2x·Locals"
-  }Locals;
+   #include "TM2x·Data"
+  }Data;
 
 */
 

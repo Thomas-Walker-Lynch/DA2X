@@ -20,9 +20,9 @@ int main(){
   } Conveyance·Args;
 
   union Conveyance·Locals{
-    #include "CLib·Locals.h"
-    #include "Inclusive·Locals.h"
-    #include "TM2x·Locals.h"
+    #include "CLib·Data.h"
+    #include "Inclusive·Data.h"
+    #include "TM2x·Data.h"
   } Conveyance·Locals;
 
   #include "CLib·Text.h"

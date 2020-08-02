@@ -11,7 +11,6 @@
 //--------------------------------------------------------------------------------
 // misc
 //    
-
   extern address_t TM2x·constructed_count;
 
   #define MINIMUM_ALLOC_EXTENT 15
@@ -20,6 +19,9 @@
     if( byte_n < MINIMUM_ALLOC_EXTENT) return MINIMUM_ALLOC_EXTENT;
     return power_2_extent(byte_n);
   }
+
+
+
 
 //--------------------------------------------------------------------------------
 // The TM2x dynamic array header struct

@@ -1,10 +1,12 @@
 /*
   This is not a traditional header, and can not be used as such.
 
-  #include "TM2x·text.h" after the Args and Locals unions.
+  #include "TM2x·text.h" after the Args and Data unions.
 
   Provided that this is included into main or another function, the outer scope instances
   here, e.g. TM2·constructed_count, will be on the stack, and thus thread safe.
+
+  Would be nice if we could give an inline option to conveyances.
 
 */
 #include "TM2x.h"
@@ -18,13 +20,18 @@ struct Text·TM2x{
 };
 */
 
-goto TM2x·end;
-
 address_t TM2x·constructed_count = 0;
-
 #ifdef TM2x·TEST
   address_t TM2x·Test·allocation_n = 0;
 #endif
+
+#define MINIMUM_ALLOC_EXTENT 15
+INLINE_PREFIX address_t power_2_extent_w_lower_bound(address_t byte_n){
+    if( byte_n < MINIMUM_ALLOC_EXTENT) return MINIMUM_ALLOC_EXTENT;
+    return power_2_extent(byte_n);
+  }
+
+goto TM2x·end;
 
 //----------------------------------------
 //  Dynamic allocation of the TM2x header.  For static allocation use the AllocStatic()
@@ -35,7 +42,7 @@ address_t TM2x·constructed_count = 0;
 #undef S0
 #undef S1
 #undef S2
-#define S0 Locals.TM2x·alloc_heap
+#define S0 Data.TM2x·alloc_heap
 #define S1 Args.TM2x·alloc_heap
 #define S2 Args.CLib·mallocn
 TM2x·alloc_heap:{
@@ -64,7 +71,7 @@ TM2x·alloc_heap:{
 #undef S0
 #undef S1
 #undef S2
-#define S0 Locals.TM2x·construct_bytes
+#define S0 Data.TM2x·construct_bytes
 #define S1 Args.TM2x·construct_bytes
 #define S2 Args.CLib·mallocn
 TM2x·construct_bytes:{
