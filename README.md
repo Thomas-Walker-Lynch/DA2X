@@ -10,11 +10,11 @@ the 2x in the name.
 
   1. 128 bit unsigned int
   2. typeof
-  3. nested functions
-  4. variable holds a &&label value
-  5. declared labels ('local labels')
-  6. #pragma `push_macro`/`pop_macro`
-  7. statement expressions
+  3. variable holds a &&label value
+  4. declared labels ('local labels')
+  5. `#pragma push_macro/pop_macro`
+  6. statement expressions
+  7. `__builtin_clz`
 
 ## Namespaces
 
@@ -33,9 +33,9 @@ the 2x in the name.
 
 ```
    #pragma push_macro("S")
-   #undef S0 
+   #undef S0
    #define S TM2x
-   
+
       ...
       S·x = 5
 
@@ -67,17 +67,17 @@ the 2x in the name.
   In the main of the program that is intended to use conveyance libraries, #include all the `...args.h`
   header files in a union called 'Args'.  Immediately after that declare another union called `Text`
   and #include the `...text.h` files there.  In the test directory you can find some examples.
-  
+
 ## Conveyances
 
-  The library is a collection of segments of code that are called as 'conveyances'. 
+  The library is a collection of segments of code that are called as 'conveyances'.
 
   Each convenyance has one entry point and potentially multiple exit points.  The entry point
   is the name of the conveyance, and the exit points are called continuations.  A conveyance
   does not have a return statement, which is why it is not called a function.  A conveyance is
   guaranteed to follow a continuation before reaching the closing brace.
-  
-  One enters a convenyance by banching to it. We call such a branch a 'continuation'. 
+
+  One enters a convenyance by banching to it. We call such a branch a 'continuation'.
 
   The header file `Conveyance.h` provides some syntax hacks to give the programmer a feeling that
   C has direct support for conveyances.
@@ -142,10 +142,10 @@ the 2x in the name.
           array_byte_0_pt
     ```
 
-   We might expect that the value of a variable called `array_byte_0` would be zero.  
+   We might expect that the value of a variable called `array_byte_0` would be zero.
    A variable called `array_byte_0_pt` would be the address of the first byte of the array
    relative to the start of memory.  This is also called: 'the array's location in memory',
-   'a pointer to the first byte in the array', 'a pointer to the first element in the array', 
+   'a pointer to the first byte in the array', 'a pointer to the first element in the array',
    and 'the array base'.
 
    Since the object here is obviously 'array' we will drop that part.
@@ -187,7 +187,7 @@ the 2x in the name.
    static  - allocation on directly in memory
    stack   - allocation on a stack frame
    heap    - allocation on the heap
- 
+
   The C language used to have storage class keywords of 'register', 'static', and 'auto',
   where auto class referred to stack allocation. Allocation classes have since been
   dropped from the language.  If a variable is declared at global scope it will be static
@@ -216,4 +216,3 @@ the 2x in the name.
   type object involved in the copy, whereas the other end of the copy is just a plain old
   poitner to memory.  When a copy moves data between two TM2x's we call the operation a
   'copy'.
-

@@ -6,6 +6,7 @@
 */
 #include <stdint.h>
 #include <limits.h>
+#include "misc.h"
 #include "Conveyance.h"
 
   #define address_t uint64_t
@@ -25,6 +26,12 @@
   #define str_octet_n(cstring) (strlen(cstring) - 1)
 
   typedef unsigned __int128 uint128_t;
+
+  INLINE_PREFIX address_t power_2_extent(address_t byte_n){
+    if( byte_n == 0 ) return 1;
+    return (1 << (address_bit_length - __builtin_clz(byte_n))) - 1;
+  }
+
 
 
 #endif

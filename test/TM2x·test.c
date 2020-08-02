@@ -52,7 +52,7 @@ int main(){
       S1.tape = tape;
       S1.byten = 48;
       S1.nominal = &&nominal;
-      S1.fail = &&fail;
+      S1.alloc_fail = &&alloc_fail;
       continue_from TM2x·construct_bytes;
       #pragma pop_macro("S1")
 

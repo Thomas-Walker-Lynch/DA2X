@@ -21,8 +21,6 @@
       address_t byte_n;   // extent of the array, in bytes
       Conveyance nominal;
       Conveyance alloc_fail;
-
-      address_t alloc_byte_n;
     } TM2x·construct_bytes;
 
     struct TM2x·Args·ConstructElements{

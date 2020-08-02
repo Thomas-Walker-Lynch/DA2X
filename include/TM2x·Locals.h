@@ -23,7 +23,6 @@
       Conveyance alloc_fail;
 
       address_t alloc_byte_n;
-
     } TM2x·construct_bytes;
 
     struct{

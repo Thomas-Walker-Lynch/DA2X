@@ -4,20 +4,22 @@
 #include <string.h> // memcpy
 #include <stdbool.h>
 #include <assert.h>
+#include "misc.h"
 #include "Inclusive.h"
 #include "Conveyance.h"
-#include "misc.h"
 
 //--------------------------------------------------------------------------------
 // misc
 //    
-  #ifndef TM2x·F_PREFIX 
-    //#define TM2x·F_PREFIX static
-    //#define TM2x·F_PREFIX extern inline
-    #define TM2x·F_PREFIX static inline
-  #endif
 
   extern address_t TM2x·constructed_count;
+
+  #define MINIMUM_ALLOC_EXTENT 15
+
+  INLINE_PREFIX address_t power_2_extent_w_lower_bound(address_t byte_n){
+    if( byte_n < MINIMUM_ALLOC_EXTENT) return MINIMUM_ALLOC_EXTENT;
+    return power_2_extent(byte_n);
+  }
 
 //--------------------------------------------------------------------------------
 // The TM2x dynamic array header struct
@@ -34,28 +36,28 @@
 //
 
   // base pointers
-  TM2x·F_PREFIX char *TM2x·byte_0_pt(TM2x *tape){
+  INLINE_PREFIX char *TM2x·byte_0_pt(TM2x *tape){
     return tape->base_pt;
   }
-  TM2x·F_PREFIX void *TM2x·element_0_pt(TM2x *tape){
+  INLINE_PREFIX void *TM2x·element_0_pt(TM2x *tape){
     return tape->base_pt;
   }
 
   // max offsets
-  TM2x·F_PREFIX address_t TM2x·byte_n(TM2x *tape){
+  INLINE_PREFIX address_t TM2x·byte_n(TM2x *tape){
     return tape->byte_n;
   }
   // The index of the last element in the array.  Note that the
   // (element_byte_n + 1) in the denominator must be representable:
-  TM2x·F_PREFIX address_t TM2x·element_n(TM2x *tape ,address_t element_byte_n){
+  INLINE_PREFIX address_t TM2x·element_n(TM2x *tape ,address_t element_byte_n){
     return tape->byte_n/(element_byte_n + 1);
   }
 
   // nth pointers
-  TM2x·F_PREFIX char *TM2x·byte_n_pt(TM2x *tape){
+  INLINE_PREFIX char *TM2x·byte_n_pt(TM2x *tape){
     return tape->base_pt + tape->byte_n;
   }
-  TM2x·F_PREFIX void *TM2x·element_n_pt(TM2x *tape ,address_t element_byte_n){
+  INLINE_PREFIX void *TM2x·element_n_pt(TM2x *tape ,address_t element_byte_n){
     return TM2x·byte_n_pt(tape) - element_byte_n;
   }
   #define TM2x·Element_N_Pt(tape ,type) TM2x·element_n_pt(tape ,byte_n_of(type))
@@ -67,7 +69,7 @@
   // tape becomes a pointer to a static allocation of a TM2x struct
   #define TM2x·AllocStatic(tape) TM2x TM2x· ## tape ,*tape; tape = &TM2x· ## tape;
 
-  TM2x·F_PREFIX address_t TM2x·constructed(TM2x *tape){
+  INLINE_PREFIX address_t TM2x·constructed(TM2x *tape){
     return TM2x·constructed_count;
   }
 

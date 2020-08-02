@@ -67,7 +67,7 @@ TM2x·construct_bytes:{
 
   TM2x·constructed_count++; // to assist with debugging
   S0.tape->byte_n = S0.byte_n;
-  S0.alloc_byte_n = binary_interval_inclusive_upper_bound(S0.byte_n);
+  S0.alloc_byte_n = power_2_extent_w_lower_bound(S0.byte_n);
 
   S2.pt      = (void **)&(S0.tape->base_pt);
   S2.n       = S0.alloc_byte_n;
@@ -407,7 +407,7 @@ TM2x·read_pop:{
 */
 
 #ifdef TM2x·TEST
-  extern address_t TM2x·test_after_allocation_n;
+  extern address_t TM2x·Test·after_allocation_n;
 #endif
 
 extern address_t TM2x·constructed_count;
@@ -419,8 +419,8 @@ TM2x·resize_bytes:{
   Conveyance nominal = Args.TM2x·resize_bytes.nominal;
   Conveyance alloc_fail = Args.TM2x·resize_bytes.alloc_fail;
 
-  address_t before_alloc_n = binary_interval_inclusive_upper_bound(tape->byte_n);
-  address_t after_alloc_n = binary_interval_inclusive_upper_bound(after_byte_n);
+  address_t before_alloc_n = power_2_extent_w_lower_bound(tape->byte_n);
+  address_t after_alloc_n = power_2_extent_w_lower_bound(after_byte_n);
 
   if( after_alloc_n == before_alloc_n ){
     tape->byte_n = after_byte_n;
@@ -439,7 +439,7 @@ TM2x·resize_bytes:{
 
   malloc_nominal:{
     #ifdef TM2x·TEST
-      TM2x·test_after_allocation_n = after_alloc_n;
+      TM2x·Test·after_allocation_n = after_alloc_n;
     #endif
     address_t copy_n = after_byte_n < tape->byte_n ? after_byte_n : tape->byte_n;
     memcpyn( after_base_pt ,tape->base_pt ,copy_n);
@@ -463,7 +463,7 @@ TM2x·resize_bytes:{
 */
 
 #ifdef TM2x·TEST
-  extern address_t TM2x·test_after_allocation_n;
+  extern address_t TM2x·Test·after_allocation_n;
 #endif
 
 extern address_t TM2x·constructed_count;
