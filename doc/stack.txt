@@ -50,14 +50,31 @@
 
   For the case of multiple threads, the library uses an 'ownership' model for maintaining
   the count. Though an array may be shared among multiple threads, its owner is
-  responsible for destructing it. Upon creation of a new thread, on the spawning thread we subract from the
-  constructed_count the number of arrays who's ownership has been transferred to the new
-  thread, and on the new thread we set the initial constructed_count to the number arrays
-  transferred. If no ownership is transferred, then nothing need be done on the spawning
-  thread, and the new thread count will initially be set to zero.  At any time the count
-  may be checked to see how many arrays the thread owns.
+  responsible for destructing it. Upon creation of a new thread, on the spawning thread we
+  subract from the constructed_count the number of arrays who's ownership has been
+  transferred to the new thread, and on the new thread we set the initial
+  constructed_count to the number arrays transferred. If no ownership is transferred, then
+  nothing need be done on the spawning thread, and the new thread count will initially be
+  set to zero.  At any time the count may be checked to see how many arrays the thread
+  owns.
 
   As each thread has it's own constructed_count, the constructed_count is kept at
   the bottom of the stack along with the Args and Locals.
 
+## the Args to Local copy
 
+  It is pretty common that the first thing done at the top of a Conveyance is
+  to copy the Args struct to the Locals struct.  This frees the Conveyance to
+  then build up an Args struct for a continuation Conveyance. This event is
+  analogyous to the processor itself updating its flip-flops on a clock tick.
+
+  The compiler optimizer has a good view of what is going on in the current
+  flow.  It can see and eliminate redundant transfers, particularly when a
+  conveyance is not shared.
+
+  In hardware we could simply use two swapping buffers. The buffers would be
+  of fixed size, and a conveyance that needs a larger buffer would handle
+  that through a continuation.
+
+  We can emulate the buffer swap by keeping pointers to each of the Args and
+  Locals unions, and then flipping the pointers.
