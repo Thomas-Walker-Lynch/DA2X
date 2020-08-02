@@ -14,6 +14,8 @@ ECHO= echo
 #ECHO= echo -e
 
 C=gcc
-CFLAGS=-std=gnu18 -Werror -Wno-unused-label -O0 -ggdb -DDEBUG -DDEBUGDB -I$(SRCDIR) -I$(INCDIR) -I$(ENVDIR)/include 
+CFLAGS=-std=gnu18 -Werror -Wno-unused-label -O0 -ggdb -DDEBUG -DDEBUGDB -DTM2x·TEST -I$(SRCDIR) -I$(INCDIR) -I$(ENVDIR)/include 
+#CFLAGS=-std=gnu18 -Werror -Wno-unused-label -O3 -I$(SRCDIR) -I$(INCDIR) -I$(ENVDIR)/include 
 LINKFLAGS=-L$(LIBDIR) -L$(ENVDIR)/lib/ -l$(MODULE) -lTM2x
+
 

@@ -3,6 +3,9 @@
 
   #include "TM2x·text.h" after the Args and Locals unions.
 
+  Provided that this is included into main or another function, the outer scope instances
+  here, e.g. TM2·constructed_count, will be on the stack, and thus thread safe.
+
 */
 #include "TM2x.h"
 
@@ -17,9 +20,10 @@ struct Text·TM2x{
 
 goto TM2x·end;
 
-extern address_t TM2x·constructed_count;
+address_t TM2x·constructed_count = 0;
+
 #ifdef TM2x·TEST
-  extern address_t TM2x·Test·after_allocation_n;
+  address_t TM2x·Test·allocation_n = 0;
 #endif
 
 //----------------------------------------
@@ -412,7 +416,7 @@ TM2x·read_pop:{
 */
 
 #ifdef TM2x·TEST
-  extern address_t TM2x·Test·after_allocation_n;
+  extern address_t TM2x·Test·allocation_n;
 #endif
 
 extern address_t TM2x·constructed_count;
@@ -444,7 +448,7 @@ TM2x·resize_bytes:{
 
   malloc_nominal:{
     #ifdef TM2x·TEST
-      TM2x·Test·after_allocation_n = after_alloc_n;
+      TM2x·Test·allocation_n = after_alloc_n;
     #endif
     address_t copy_n = after_byte_n < tape->byte_n ? after_byte_n : tape->byte_n;
     memcpyn( after_base_pt ,tape->base_pt ,copy_n);

@@ -1,0 +1,64 @@
+
+## Stack Usage
+
+### On a single thread
+
+  Conveyeances make no direct use of the stack.
+
+  Conveyances do not return.  Hence, when continuing from a conveyance we do not push on to
+  the stack a return address. Conveyances do not push nor pop arguments to or from the stack,
+  nor do they  push a temporary variable frame on to the stack. 
+
+  Arguments are passed to a conveyance through a static structure.  On any given thread, the
+  program counter is pointing at exactly one instruction.  Hence, only once conveyance may
+  be used at a time, so the argument structures for all conveyances are placed into
+  union. This union is called Args.
+
+  Each conveyance may have local variables.  These are held in a structure. Again, because
+  the program counter may be on only one instruction at a time, all conveyances have their
+  local variable structures in union.  This union is called Locals.
+
+  Despite there being no stack, it is possible to pass continuation parameters so a
+  conveyance could continue back into itself.  If a continuation continues directly back
+  into itself, the Args and Locals may be shared with the prior invocation.  This would be
+  the case of A -> A, for a conveyance called A.  However if we ahve A -> B -> A, messages
+  may not be passed in this manner, as the continuation into B will write into the Args and
+  Locals and my clobber anything left there.  It is generally considered bad form for a
+  programmer to study B so as to see what would and would not be clobbered.  In any case
+  this is not necessary as compiler optimizer is pretty good at eliminationg redudant
+  copies.  Hence for A to message a second continuation into A, the message would be
+  sent as an argument explicitly copied by B.
+
+  Any state variables should be explicit data, and not implied through the stack.
+
+### Multiple Threads
+
+  For arrays that are shared between threads, their header structs are static allocation
+  class or heap allocation class objects.  I.e. they are not on the stack.  This is because
+  each thread has it's own stack.
+
+  The Args and Locals unions are included into main.  This puts them at the bottom
+  of the stack were they can not be popped off until the program exist.  All
+  conveyances share these.  Due to being on the stack each thread will naturally operate
+  on separate Args and Locals frames.
+
+## TM2x·constructed_count
+
+  The constructed count is maintained by the library, but not used by it. It is there
+  to assist programmers in balancing construction and destruction calls on dynamic
+  arrays and thus for catching memory leaks.
+
+  For the case of multiple threads, the library uses an 'ownership' model for maintaining
+  the count. Though an array may be shared among multiple threads, its owner is
+  responsible for destructing it. Upon creation of a new thread, on the spawning thread we
+  subract from the constructed_count the number of arrays who's ownership has been
+  transferred to the new thread, and on the new thread we set the initial
+  constructed_count to the number arrays transferred. If no ownership is transferred, then
+  nothing need be done on the spawning thread, and the new thread count will initially be
+  set to zero.  At any time the count may be checked to see how many arrays the thread
+  owns.
+
+  As each thread has it's own constructed_count, the constructed_count is kept at
+  the bottom of the stack along with the Args and Locals.
+
+

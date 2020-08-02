@@ -44,17 +44,26 @@ int main(){
     #pragma pop_macro("S1")
 
     nominal:{
-      Conveyances ;
+      Conveyances nominal;
 
       #pragma push_macro("S1")
       #undef S1
-      #define S1 Args.TM2x·alloc_heap
+      #define S1 Args.TM2x·construct_bytes
       S1.tape = tape;
-      S1.byten = 48;
+      S1.byte_n = 48;
       S1.nominal = &&nominal;
-      S1.alloc_fail = &&alloc_fail;
+      S1.alloc_fail = &&fail;
       continue_from TM2x·construct_bytes;
       #pragma pop_macro("S1")
+
+      nominal:{
+        if( TM2x·Test·allocation_n == 63 )
+          printf("pass");
+        else
+          printf("fail");
+        exit(0);
+        cend;
+      }
 
       cend;
     }
