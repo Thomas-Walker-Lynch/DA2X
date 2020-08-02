@@ -45,11 +45,14 @@ the 2x in the name.
 
 ## Identifier case convention
 
-   Symbols that identify type or namespaces are camel case with a leading capital letter.  Unless
-   they come from the language itself or a library.  All other identifiers are lower case with
-   separate words separated by underscores.
+   ALL_CAPS - macros.
+   
+   CamelCase - types and namespaces, except for built in types and types in other
+   libraries.
 
-## Building
+   lower_case - everything else.
+
+## Building the Library
 
   `make test` should buid and run the tests.  The output should be identical to the contents of the file
   `test_results_expected.txt`. (In the future the tests should probably be modified so only the passed

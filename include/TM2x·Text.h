@@ -17,6 +17,11 @@ struct Text·TM2x{
 
 goto TM2x·end;
 
+extern address_t TM2x·constructed_count;
+#ifdef TM2x·TEST
+  extern address_t TM2x·Test·after_allocation_n;
+#endif
+
 //----------------------------------------
 //  Dynamic allocation of the TM2x header.  For static allocation use the AllocStatic()
 //  macro.  This does not allocate data for the array itself.
@@ -462,11 +467,6 @@ TM2x·resize_bytes:{
   This does not allocate data for the array itself.
 */
 
-#ifdef TM2x·TEST
-  extern address_t TM2x·Test·after_allocation_n;
-#endif
-
-extern address_t TM2x·constructed_count;
 
 TM2x·F_PREFIX Conveyance TM2x·resize_elements:{
   TM2x *tape                = Args.TM2x·resize_elements.tape;
