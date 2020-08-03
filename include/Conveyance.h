@@ -4,10 +4,7 @@
 #include "misc.h"
 
 #define continue_from goto
-typedef void **ConveyancePtr; // The ConveyancePtr type
-
-// unlike for the rest of C, the ConveyancePtr type can not be used to declare
-// Conveyance, instead we start with 'Conveyance' 
+typedef void **ConveyancePtr; 
 #define Conveyance __label__
 
 // It is good form for a conveyance definition to end with this.

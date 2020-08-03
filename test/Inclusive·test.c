@@ -12,6 +12,7 @@ gcc -s -std=gnu2x -Wall -O3 -I../include -L../lib  -o Inclusive·test.s Inclusiv
 #include "Result.h"
 #include "Conveyance.h"
 #include "Inclusive.h"
+#include "MallocCounter.h"
 
 int main(){
 
@@ -19,18 +20,26 @@ int main(){
     #include "Inclusive·Data.h"
   };
   union Conveyance·Data Conveyance·Data0 ,Conveyance·Data1;
-  #include "Conveyance.h"
+  #include "Conveyance·Text.h"
   #include "Inclusive·Text.h"
 
-  Result·Tallies res ,*resp; resp = &res;
-  Result·Tallies·init(resp);
-  bool f[256];
-  uint i = 0;
+  Result·Tallies accumulated_results ,*accumulated_results_pt;
+  accumulated_results_pt=&accumulated_results;
+  Result·Tallies·init(accumulated_results_pt);
 
   continue_from test0;
 
   test0:{
-    Conveyance nominal ,gt_address_t_n;
+    Conveyance nominal ,gt_address_t_n ,report;
+
+    address_t malloc_cnt = MallocCounter·count;
+    // address_t constructed_cnt = TM2x·constructed_count;
+
+    Result·Tallies results ,*results_pt;
+    results_pt = &results;
+    Result·Tallies·init(results_pt);
+    bool f[256]; // flags
+    uint i = 0;  // count
 
     uint64_t r;
     struct Inclusive·3opLL  *ar = &Conveyance·Args_pt->Inclusive·3opLL;
@@ -52,14 +61,21 @@ int main(){
       cend;
     }
 
+    report:{
+      f[i++] = malloc_cnt == MallocCounter·count;
+      // f[i++] = constructed_cnt == TM2x·constructed_count;
+      Result·Tallies·tally("test_0" ,results_pt ,f ,i);
+      Result·Tallies·accumulate(accumulated_results_pt ,results_pt);
+      continue_from tests_finished;
+      cend;
+    }
+
     cend;
   }
 
-  report:{
-    Result·Tallies·tally("test_0" ,resp ,f ,i);
-    Result·Tallies·print("Inclusive·test results" ,resp);
-    exit(resp->failed);
-    cend;
+  tests_finished:{
+    Result·Tallies·print("Inclusive·test results" ,accumulated_results_pt);
+    return accumulated_results.failed;
   }
 
 
