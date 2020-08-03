@@ -21,80 +21,52 @@ struct Text·TM2x{
 */
 
 address_t TM2x·constructed_count = 0;
-#ifdef TM2x·TEST
-  address_t TM2x·Test·allocation_n = 0;
-#endif
 
 #define MINIMUM_ALLOC_EXTENT 15
-INLINE_PREFIX address_t power_2_extent_w_lower_bound(address_t byte_n){
-    if( byte_n < MINIMUM_ALLOC_EXTENT) return MINIMUM_ALLOC_EXTENT;
-    return power_2_extent(byte_n);
-  }
+address_t power_2_extent_w_lower_bound(address_t byte_n){
+  if( byte_n < MINIMUM_ALLOC_EXTENT) return MINIMUM_ALLOC_EXTENT;
+  return power_2_extent(byte_n);
+}
 
 goto TM2x·end;
 
 //----------------------------------------
 //  Dynamic allocation of the TM2x header.  For static allocation use the AllocStatic()
 //  macro.  This does not allocate data for the array itself.
-#pragma push_macro("S0")
-#pragma push_macro("S1")
-#pragma push_macro("S2")
-#undef S0
-#undef S1
-#undef S2
-#define S0 Data.TM2x·alloc_heap
-#define S1 Args.TM2x·alloc_heap
-#define S2 Args.CLib·mallocn
 TM2x·alloc_heap:{
+  Conveyance·update();
+  struct TM2x·alloc_heap *lc = &Conveyance·Locals_pt->TM2x·alloc_heap;
 
-  S0.tape    = S1.tape;
-  S0.nominal = S1.nominal;
-  S0.fail    = S1.fail;
-
-  S2.pt      = (void **)S0.tape;
-  S2.n       = byte_n_of(TM2x);
-  S2.nominal = S0.nominal;
-  S2.fail    = S0.fail;
+  struct CLib·mallocn    *ar = &Conveyance·Args_pt->CLib·mallocn;
+  ar->pt      = (void **)lc->tape;
+  ar->n       = byte_n_of(TM2x);
+  ar->nominal = lc->nominal;
+  ar->fail    = lc->fail;
   continue_from CLib·mallocn;
+
   cend;
 }
-#pragma pop_macro("S0")
-#pragma pop_macro("S1")
-#pragma pop_macro("S2")
 
 //----------------------------------------
 //  Construct an allocated array. 
 //  Given the exent in bytes, sets aside heap memory for the data.
-#pragma push_macro("S0")
-#pragma push_macro("S1")
-#pragma push_macro("S2")
-#undef S0
-#undef S1
-#undef S2
-#define S0 Data.TM2x·construct_bytes
-#define S1 Args.TM2x·construct_bytes
-#define S2 Args.CLib·mallocn
 TM2x·construct_bytes:{
-
-  S0.tape = S1.tape;
-  S0.byte_n = S1.byte_n;
-  S0.nominal = S1.nominal;
-  S0.alloc_fail = S1.alloc_fail;
+  Conveyance·update();
+  struct TM2x·construct_bytes *lc = &Conveyance·Locals_pt->TM2x·construct_bytes;
 
   TM2x·constructed_count++; // to assist with debugging
-  S0.tape->byte_n = S0.byte_n;
-  S0.alloc_byte_n = power_2_extent_w_lower_bound(S0.byte_n);
+  lc->tape->byte_n = lc->byte_n;
+  lc->alloc_byte_n = power_2_extent_w_lower_bound(lc->byte_n);
 
-  S2.pt      = (void **)&(S0.tape->base_pt);
-  S2.n       = S0.alloc_byte_n;
-  S2.nominal = S0.nominal;
-  S2.fail    = S0.alloc_fail;
+  struct CLib·mallocn *ar = &Conveyance·Args_pt->CLib·mallocn;
+  ar->pt      = (void **)&(lc->tape->base_pt);
+  ar->n       = lc->alloc_byte_n;
+  ar->nominal = lc->nominal;
+  ar->fail    = lc->alloc_fail;
   continue_from CLib·mallocn;
+
   cend;
 }
-#pragma pop_macro("S0")
-#pragma pop_macro("S1")
-#pragma pop_macro("S2")
 
 #if 0
 

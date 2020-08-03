@@ -18,33 +18,18 @@ int main(){
   union Conveyance·Data{
     #include "Inclusive·Data.h"
   };
-
   union Conveyance·Data Conveyance·Data0 ,Conveyance·Data1;
-
   #include "Conveyance·Text.h"
   #include "Inclusive·Text.h"
 
   uint64_t r;
-  struct Inclusive·3opLL  *s = &Conveyance·Args_pt->Inclusive·3opLL;
-  s->a0 = 541;
-  s->a1 = 727;
-  s->rpt = &r;
-  s->nominal = &&nominal;
-  s->gt_address_t_n = &&gt_address_t_n;
+  struct Inclusive·3opLL  *ar = &Conveyance·Args_pt->Inclusive·3opLL;
+  ar->a0 = 541;
+  ar->a1 = 727;
+  ar->rpt = &r;
+  ar->nominal = &&nominal;
+  ar->gt_address_t_n = &&gt_address_t_n;
   continue_from Inclusive·mul_ib;
-
-  /*
-  #pragma push_macro("S1")
-  #undef S1
-  #define S1 Conveyance·Args_pt->Inclusive·3opLL
-  S1.a0 = 541;
-  S1.a1 = 727;
-  S1.rpt = &r;
-  S1.nominal = &&nominal;
-  S1.gt_address_t_n = &&gt_address_t_n;
-  continue_from Inclusive·mul_ib;
-  #pragma pop_macro("S1") 
-  */
 
   nominal:{
     if( r == 394575 ){

@@ -11,23 +11,31 @@ struct Text·CLib{
 };
 */
 
+#if TEST
+  address_t Test·CLib·allocation_n = 0;
+#endif
+
+
 goto CLib·end;
 
 /* 
   Implementations use non-inclusive bounding artihmetic to accomodate the C library, 
   but this is not carried through to the interface.
 */
-#pragma push_macro("S1")
-#undef S1
-#define S1 Args.CLib·mallocn
 CLib·mallocn:{
-  if( S1.n == address_t_n ) continue_from *S1.fail; 
-  *S1.pt = malloc(S1.n + 1);
-  if(!*S1.pt) continue_from *S1.fail;
-  continue_from *S1.nominal;
+  Conveyance·update();
+  struct CLib·mallocn *lc = &Conveyance·Locals_pt->CLib·mallocn;
+
+#if TEST
+  Test·CLib·allocation_n = lc->n;
+#endif
+
+  if( lc->n == address_t_n ) continue_from *lc->fail; 
+  *lc->pt = malloc(lc->n + 1);
+  if(!*lc->pt) continue_from *lc->fail;
+  continue_from *lc->nominal;
   cend;
 }
-#pragma pop_macro("S1")
 
 CLib·end:;
 

@@ -8,23 +8,20 @@
 #include "TM2x.h"
 #include "MallocCounter.h"
 #include "Result.h"
+#include "Conveyance.h"
+#include "Inclusive.h"
 
 address_t TM2x·test_after_allocation_n = 0;
 
 int main(){
 
-  union Conveyance·Args{
-    #include "CLib·Args.h"
-    #include "Inclusive·Args.h"
-    #include "TM2x·Args.h"
-  } Conveyance·Args;
-
-  union Conveyance·Locals{
+  union Conveyance·Data{
     #include "CLib·Data.h"
     #include "Inclusive·Data.h"
     #include "TM2x·Data.h"
-  } Conveyance·Locals;
-
+  };
+  union Conveyance·Data Conveyance·Data0 ,Conveyance·Data1;
+  #include "Conveyance·Text.h"
   #include "CLib·Text.h"
   #include "Inclusive·Text.h"
   #include "TM2x·Text.h"
@@ -34,30 +31,24 @@ int main(){
   test_0:{
     TM2x *tape;
     
-    #pragma push_macro("S1")
-    #undef S1
-    #define S1 Args.TM2x·alloc_heap
-    S1.tape = &tape;
-    S1.nominal = &&nominal;
-    S1.fail = &&fail;
+    struct TM2x·alloc_heap  *ar = &Conveyance·Args_pt->TM2x·alloc_heap;
+    ar->tape = &tape;
+    ar->nominal = &&nominal;
+    ar->fail = &&fail;
     continue_from TM2x·alloc_heap;
-    #pragma pop_macro("S1")
 
     nominal:{
       Conveyances nominal;
 
-      #pragma push_macro("S1")
-      #undef S1
-      #define S1 Args.TM2x·construct_bytes
-      S1.tape = tape;
-      S1.byte_n = 48;
-      S1.nominal = &&nominal;
-      S1.alloc_fail = &&fail;
+      struct TM2x·construct_bytes  *ar = &Conveyance·Args_pt->TM2x·construct_bytes;
+      ar->tape = tape;
+      ar->byte_n = 48;
+      ar->nominal = &&nominal;
+      ar->alloc_fail = &&fail;
       continue_from TM2x·construct_bytes;
-      #pragma pop_macro("S1")
 
       nominal:{
-        if( TM2x·Test·allocation_n == 63 )
+        if( Test·CLib·allocation_n == 63 )
           printf("pass");
         else
           printf("fail");

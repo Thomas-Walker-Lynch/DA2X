@@ -50,17 +50,16 @@ overflow?
 
 */
 
-#pragma push_macro("S0")
-#undef S0
-#define S0 Conveyance·Locals_pt->Inclusive·3opLL
 Inclusive·mul_ib:{
   Conveyance·update();
-  S0.r = S0.a0 * S0.a1 + S0.a0 + S0.a1;
-  if( S0.r > address_t_n ) continue_from *S0.gt_address_t_n;
-  *S0.rpt = S0.r;
-  continue_from *S0.nominal;
+  struct Inclusive·3opLL *lc = &Conveyance·Locals_pt->Inclusive·3opLL;
+
+  lc->r = lc->a0 * lc->a1 + lc->a0 + lc->a1;
+  if( lc->r > address_t_n ) continue_from *lc->gt_address_t_n;
+  *lc->rpt = lc->r;
+  continue_from *lc->nominal;
+
 }
-#pragma pop_macro("S0")
 
 
 /*
@@ -79,15 +78,13 @@ Inclusive·mul_ib:{
    (2^n - 1) * (2^n) = 2^2n - 2^n ; 2^n >= 1, so no ov possible
 
 */
-#pragma push_macro("S0")
-#undef S0
-#define S0 Conveyance·Locals_pt->Inclusive·3opLL
 Inclusive·mul_ei_bi:{
   Conveyance·update();
-  S0.r = S0.a0 * S0.a1 + S0.a0;
-  if( S0.r > address_t_n ) continue_from *S0.gt_address_t_n;
-  *S0.rpt = S0.r;
-  continue_from *S0.nominal;
+  struct Inclusive·3opLL *lc = &Conveyance·Locals_pt->Inclusive·3opLL;
+  lc->r = lc->a0 * lc->a1 + lc->a0;
+  if( lc->r > address_t_n ) continue_from *lc->gt_address_t_n;
+  *lc->rpt = lc->r;
+  continue_from *lc->nominal;
 }
 #pragma pop_macro("S0")
 
