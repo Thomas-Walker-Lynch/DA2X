@@ -24,7 +24,7 @@
   definitions simply define the prefix with a null value then include this header.
 */  
 
-  TM2x·F_PREFIX Conveyance mallocn(void **pt ,address_t n ,Conveyance nominal ,Conveyance fail){
+  TM2x·F_PREFIX ConveyancePtr mallocn(void **pt ,address_t n ,ConveyancePtr nominal ,ConveyancePtr fail){
     if( n == address_t_n ) continue_via_trampoline fail;
     *pt = malloc(n+1);
     if(!*pt) continue_via_trampoline fail;
@@ -99,15 +99,15 @@
 
 TM2x·write_bytes·args
 
-  TM2x·F_PREFIX Conveyance TM2x·write_bytes
+  TM2x·F_PREFIX ConveyancePtr TM2x·write_bytes
     ,TM2x *dst
     ,address_t dst_byte_i
     ,void *src_pt
     ,address_t byte_n
-    ,Conveyance nominal
-    ,Conveyance alloc_fail
-    ,Conveyance src_index_gt_n
-    ,Conveyance dst_index_gt_n
+    ,ConveyancePtr nominal
+    ,ConveyancePtr alloc_fail
+    ,ConveyancePtr src_index_gt_n
+    ,ConveyancePtr dst_index_gt_n
     ){
     if( (address_t)(src_pt + byte_n) < (address_t)src_pt  ) continue_via_trampoline bad_src_index;
     if( dst_byte_i + byte_n > TM2x·byte_n(dst) ) continue_via_trampoline bad_dst_index;
@@ -122,16 +122,16 @@ TM2x·write_bytes·args
 
 
 TM2x·copy_bytes·args
-  TM2x·F_PREFIX Conveyance TM2x·copy_bytes
+  TM2x·F_PREFIX ConveyancePtr TM2x·copy_bytes
   ( TM2x *src
     ,address_t src_byte_i
     ,TM2x *dst
     ,address_t dst_byte_i
     ,address_t byte_n
-    ,Conveyance nominal
-    ,Conveyance alloc_fail
-    ,Conveyance bad_src_index
-    ,Conveyance bad_dst_index
+    ,ConveyancePtr nominal
+    ,ConveyancePtr alloc_fail
+    ,ConveyancePtr bad_src_index
+    ,ConveyancePtr bad_dst_index
     ){
     if( src_byte_i + byte_n > TM2x·byte_n(src) ) continue_via_trampoline bad_src_index;
     if( dst_byte_i + byte_n > TM2x·byte_n(dst) ) continue_via_trampoline bad_dst_index;
@@ -141,29 +141,29 @@ TM2x·copy_bytes·args
   // A bad index is either one that overlflows the address space for either source or
   // destination, or one that is off the end of the source array.
 TM2x·copy_elements·args
-  TM2x·F_PREFIX Conveyance TM2x·copy_elements
+  TM2x·F_PREFIX ConveyancePtr TM2x·copy_elements
    ( TM2x *src
     ,address_t src_element_i
     ,TM2x *dst
     ,address_t dst_element_i
     ,address_t element_n  // index of nth element of the copy region
     ,address_t element_byte_n
-    ,Conveyance nominal
-    ,Conveyance alloc_fail
-    ,Conveyance bad_src_index
-    ,Conveyance bad_dst_index
+    ,ConveyancePtr nominal
+    ,ConveyancePtr alloc_fail
+    ,ConveyancePtr bad_src_index
+    ,ConveyancePtr bad_dst_index
     ){
 
-    Conveyances nominal ,gt_address_n;
+    Conveyance nominal ,gt_address_n;
     address_t src_byte_i;
     continue_into mul_ib(src_element_i ,element_byte_n ,&src_byte_i ,&&nominal ,&&gt_address_n);
 
     nominal:{ 
-      Conveyances nominal;
+      Conveyance nominal;
       address_t dst_byte_i;
       continue_into mul_ib(dst_element_i ,element_byte_n ,&dst_byte_i ,&&nominal ,&&gt_address_n);
       nominal:{
-        Conveyances nominal;
+        Conveyance nominal;
         address_t byte_n;
         continue_into mul_ib(element_n ,element_byte_n ,&byte_n ,&&nominal ,&&gt_address_n);
         nominal:{
@@ -192,12 +192,12 @@ TM2x·copy_elements·args
 // stack behavior
 //
 TM2x·push_bytes.args
-  TM2x·F_PREFIX Conveyance TM2x·push_bytes
+  TM2x·F_PREFIX ConveyancePtr TM2x·push_bytes
    ( TM2x *tape 
     ,void *source_pt 
     ,address_t source_byte_n
-    ,Conveyance nominal
-    ,Conveyance alloc_fail
+    ,ConveyancePtr nominal
+    ,ConveyancePtr alloc_fail
     ){
     address_t push_pt = TM2x·byte_n(tape) + 1;
     address_t after_byte_n = push_pt + source_byte_n;
@@ -214,27 +214,27 @@ TM2x·push_bytes.args
   }
 
   // use this to block push an entire array of bytes 
-Conveyance TM2x·push·args
-  TM2x·F_PREFIX Conveyance TM2x·push
+ConveyancePtr TM2x·push·args
+  TM2x·F_PREFIX ConveyancePtr TM2x·push
    ( TM2x *tape 
     ,void *element_base_pt
     ,address_t element_byte_n
-    ,Conveyance nominal
-    ,Conveyance alloc_fail
+    ,ConveyancePtr nominal
+    ,ConveyancePtr alloc_fail
     ){
     continue_via_trampoline TM2x·push_bytes(tape ,element_base_pt ,element_byte_n ,nominal  ,alloc_fail);
   }
 
   // use this to block push an entire array of elements
 TM2x·push_elements·args
-  TM2x·F_PREFIX Conveyance TM2x·push_elements
+  TM2x·F_PREFIX ConveyancePtr TM2x·push_elements
    ( TM2x *tape 
     ,void *base_pt
     ,address_t element_n 
     ,address_t element_byte_n 
-    ,Conveyance nominal
-    ,Conveyance alloc_fail
-    ,Conveyance bad_index
+    ,ConveyancePtr nominal
+    ,ConveyancePtr alloc_fail
+    ,ConveyancePtr bad_index
     ){
     address_t byte_n;
     continue_into mul_ib(element_n ,element_byte_n ,&byte_n ,&&mul_ib·nominal ,&&mul_ib·gt_address_n);
@@ -248,11 +248,11 @@ TM2x·push_elements·args
 
   // use this to block push the contents of another TM2x
 TM2x·push_TM2x·args
-  TM2x·F_PREFIX Conveyance TM2x·push_TM2x
+  TM2x·F_PREFIX ConveyancePtr TM2x·push_TM2x
    ( TM2x *tape 
     ,TM2x *tape_source
-    ,Conveyance nominal
-    ,Conveyance alloc_fail
+    ,ConveyancePtr nominal
+    ,ConveyancePtr alloc_fail
     ){
     continue_via_trampoline TM2x·push(tape ,tape_source->base_pt ,tape_source->byte_n ,nominal  ,alloc_fail);
   }
@@ -261,12 +261,12 @@ TM2x·push_TM2x·args
     TM2x·push(tape ,&src_element ,byte_n_of(typeof(src_element)) ,nominal ,alloc_fail)
 
 
-  TM2x·F_PREFIX Conveyance TM2x·pop·args
+  TM2x·F_PREFIX ConveyancePtr TM2x·pop·args
   ( TM2x *tape
     ,address_t element_byte_n
-    ,Conveyance nominal
-    ,Conveyance pop_last
-    ,Conveyance alloc_fail
+    ,ConveyancePtr nominal
+    ,ConveyancePtr pop_last
+    ,ConveyancePtr alloc_fail
     ){
 
     address_t before_byte_n = TM2x·byte_n(tape);
@@ -283,14 +283,14 @@ TM2x·push_TM2x·args
   #define TM2x·Pop(tape ,type ,cont_nominal ,cont_pop_last)\
     TM2x·pop(tape ,byte_n_of(type) ,cont_nominal ,cont_pop_last )
 
-  TM2x·F_PREFIX Conveyance 
+  TM2x·F_PREFIX ConveyancePtr 
 TM2x·read_pop·args
   ( TM2x *tape 
     ,void *dst_element_pt 
     ,address_t element_byte_n
-    ,Conveyance nominal
-    ,Conveyance pop_last
-    ,Conveyance alloc_fail
+    ,ConveyancePtr nominal
+    ,ConveyancePtr pop_last
+    ,ConveyancePtr alloc_fail
     ){
     memcpyn(dst_element_pt, TM2x·element_n_pt(tape ,element_byte_n) ,element_byte_n);
     continue_into TM2x·pop(tape ,element_byte_n ,&&pop_nominal ,&&pop_pop_last ,&&pop_alloc_fail);

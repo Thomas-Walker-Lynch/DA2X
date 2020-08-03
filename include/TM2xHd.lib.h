@@ -33,21 +33,21 @@
 //--------------------------------------------------------------------------------
 // adjectives
 //
-  TM2xHd·F_PREFIX Conveyance TM2xHd·is_on_tape
+  TM2xHd·F_PREFIX ConveyancePtr TM2xHd·is_on_tape
   ( TM2x *tape 
     ,TM2xHd *hd 
-    ,Conveyance is_true  
-    ,Conveyance is_false
+    ,ConveyancePtr is_true  
+    ,ConveyancePtr is_false
     ){
     if( hd->element_pt <= TM2x·byte_n_pt(tape) && hd->element_pt >= TM2x·byte_0_pt(tape) ) continue_via_trampoline is_true;
     continue_via_trampoline is_false;
   }
-  TM2xHd·F_PREFIX Conveyance TM2xHd·at_element_n
+  TM2xHd·F_PREFIX ConveyancePtr TM2xHd·at_element_n
   ( TM2x *tape 
     ,TM2xHd *hd 
     ,address_t element_byte_n
-    ,Conveyance is_true  
-    ,Conveyance is_false
+    ,ConveyancePtr is_true  
+    ,ConveyancePtr is_false
     ){
     if( hd->element_pt == TM2x·element_n_pt(tape ,element_byte_n) ) continue_via_trampoline is_true;
     continue_via_trampoline is_false;
@@ -65,12 +65,12 @@
     hd->element_pt += element_byte_n + 1;
   }
 
-  TM2xHd·F_PREFIX Conveyance TM2xHd·step
+  TM2xHd·F_PREFIX ConveyancePtr TM2xHd·step
   ( TM2x *tape 
     ,TM2xHd *hd 
     ,address_t element_byte_n
-    ,Conveyance nominal
-    ,Conveyance end_of_tape
+    ,ConveyancePtr nominal
+    ,ConveyancePtr end_of_tape
     ){
     continue_into TM2xHd·at_element_n(tape ,hd ,element_byte_n ,&&at_n ,&&not_at_n);
     at_n:{
@@ -105,12 +105,12 @@
 
   // nah .. better to implement this with memcpyn, see TM2x·construct_write
   // shallow copy tape_src elements to the end of tape_acc
-  TM2xHd·F_PREFIX Conveyance TM2x·cat
+  TM2xHd·F_PREFIX ConveyancePtr TM2x·cat
   ( TM2x *tape_acc
     ,TM2x *tape_src
     ,address_t element_byte_n
-    ,Conveyance nominal
-    ,Conveyance allocation_failed
+    ,ConveyancePtr nominal
+    ,ConveyancePtr allocation_failed
     ){
     TM2xHd·AllocStaticRewind(tape_src, hd_src);
     loop:{
@@ -128,7 +128,7 @@
   }
 
   // applies f to each element, in order starting at the current hd position, until reaching the end of the tape
-  // should f accept/return Conveyances?  Should it take an hd instead of an element?
+  // should f accept/return Conveyance?  Should it take an hd instead of an element?
   TM2xHd·F_PREFIX void TM2xHd·apply_to_each
   ( TM2x *tape
     ,TM2xHd *hd
@@ -151,14 +151,14 @@
   }
 
   // applies pred to each element until either pred is not true, or reaching the end of the tape
-  TM2xHd·F_PREFIX Conveyance TM2xHd·all
+  TM2xHd·F_PREFIX ConveyancePtr TM2xHd·all
   ( TM2x *tape
     ,TM2xHd *hd
     ,address_t element_byte_n
     ,void *context
-    ,Conveyance pred(void *context ,void *el ,address_t element_byte_n ,Conveyance pred_true ,Conveyance pred_false)
-    ,Conveyance true_for_all
-    ,Conveyance an_exception
+    ,ConveyancePtr pred(void *context ,void *el ,address_t element_byte_n ,ConveyancePtr pred_true ,ConveyancePtr pred_false)
+    ,ConveyancePtr true_for_all
+    ,ConveyancePtr an_exception
     ){
     TM2xHd·all:{
       continue_into pred(context ,TM2xHd·pt(hd) ,element_byte_n ,&&pred_true ,&&pred_false);
@@ -178,14 +178,14 @@
     }
   }
 
-  TM2xHd·F_PREFIX Conveyance TM2xHd·exists
+  TM2xHd·F_PREFIX ConveyancePtr TM2xHd·exists
   ( TM2x *tape
     ,TM2xHd *hd
     ,address_t element_byte_n
     ,void *context
-    ,Conveyance pred(void *context ,void *el ,address_t element_byte_n ,Conveyance pred_true ,Conveyance pred_false)
-    ,Conveyance found_one
-    ,Conveyance not_on_tape
+    ,ConveyancePtr pred(void *context ,void *el ,address_t element_byte_n ,ConveyancePtr pred_true ,ConveyancePtr pred_false)
+    ,ConveyancePtr found_one
+    ,ConveyancePtr not_on_tape
     ){
     TM2xHd·exists:{
       continue_into pred(context ,TM2xHd·pt(hd) ,element_byte_n ,&&pred_true ,&&pred_false );
@@ -214,14 +214,14 @@
   // otherwise does a push
   // when pred is a comparison can be used to force order
   // when pred is equality treats tape like a set
-  TM2xHd·F_PREFIX Conveyance TM2xHd·push_not_exists
+  TM2xHd·F_PREFIX ConveyancePtr TM2xHd·push_not_exists
   ( TM2x *tape_dst
     ,void *src_element_pt 
     ,address_t element_byte_n
-    ,Conveyance pred(void *context ,void *el ,address_t element_byte_n ,Conveyance pred_true ,Conveyance pred_false)
-    ,Conveyance wrote_it
-    ,Conveyance already_on_tape_dst
-    ,Conveyance allocate_failed
+    ,ConveyancePtr pred(void *context ,void *el ,address_t element_byte_n ,ConveyancePtr pred_true ,ConveyancePtr pred_false)
+    ,ConveyancePtr wrote_it
+    ,ConveyancePtr already_on_tape_dst
+    ,ConveyancePtr allocate_failed
     ){
     TM2xHd·AllocStaticRewind(tape_dst ,hd);
     continue_into TM2xHd·exists
@@ -250,17 +250,17 @@
     continue_into TM2xHd·push_not_exists(tape_dst ,&item ,byte_n_of(type_of(item)) ,pred ,wrote_it ,already_on_tape ,allocate_failed)
 
   // -accumulates elements from set_src which are not already in set_acc into set_acc.
-  // -returns whether set_src was a subset of set_acc even before the union (make this a separate Conveyance?)
+  // -returns whether set_src was a subset of set_acc even before the union (make this a separate ConveyancePtr?)
   // -context given to the pred is a pointer to the src element
-  TM2xHd·F_PREFIX Conveyance TM2xHd·accumulate_union
+  TM2xHd·F_PREFIX ConveyancePtr TM2xHd·accumulate_union
   ( TM2x *set_acc
     ,TM2x *set_src
     ,TM2xHd *hd_src
     ,address_t element_byte_n
-    ,Conveyance pred(void *context ,void *el ,address_t element_byte_n ,Conveyance pred_true ,Conveyance pred_false)
+    ,ConveyancePtr pred(void *context ,void *el ,address_t element_byte_n ,ConveyancePtr pred_true ,ConveyancePtr pred_false)
     ,bool *subset
-    ,Conveyance nominal
-    ,Conveyance allocation_failed
+    ,ConveyancePtr nominal
+    ,ConveyancePtr allocation_failed
     ){
     if(subset) *subset = true;
     TM2xHd·accumulate_union:{
@@ -280,7 +280,7 @@
       }
 
       pw_already_on_tape:{
-        Conveyances at_n ,not_at_n;
+        Conveyance at_n ,not_at_n;
         continue_into TM2xHd·at_element_n(set_src ,hd_src ,element_byte_n ,&&at_n , &&not_at_n);
         at_n:{
           continue_via_trampoline nominal;
@@ -299,21 +299,21 @@
   // - context given to the pred is a_element, the pred src element is the b_element
   // - on allocation failure the intersection set might be partially created
   // - if the intersection is empty, we never construct set_intersection
-  TM2xHd·F_PREFIX Conveyance TM2xHd·init_intersection
+  TM2xHd·F_PREFIX ConveyancePtr TM2xHd·init_intersection
   ( TM2x *set_intersection
     ,TM2x *set_a
     ,TM2x *set_b
     ,address_t element_byte_n
-    ,Conveyance pred(void *context ,void *el ,address_t element_byte_n ,Conveyance pred_true ,Conveyance pred_false)
-    ,Conveyance init_intersection·nominal
-    ,Conveyance init_intersection·empty
-    ,Conveyance init_intersection·allocation_failed
+    ,ConveyancePtr pred(void *context ,void *el ,address_t element_byte_n ,ConveyancePtr pred_true ,ConveyancePtr pred_false)
+    ,ConveyancePtr init_intersection·nominal
+    ,ConveyancePtr init_intersection·empty
+    ,ConveyancePtr init_intersection·allocation_failed
     ){
     TM2xHd·AllocStaticRewind(set_a ,hd_a);
     TM2xHd·AllocStaticRewind(set_b ,hd_b);
 
       // when_found is either &&init or &&extend
-    Conveyance do_write = &&init;
+    ConveyancePtr do_write = &&init;
 
     exists:{
       continue_into TM2xHd·exists
@@ -328,7 +328,7 @@
     }
 
     init:{
-      Conveyances nominal ,alloc_fail;
+      Conveyance nominal ,alloc_fail;
       continue_into TM2x·construct_write
         ( set_intersection 
           ,TM2xHd·pt(hd_a) 
@@ -346,7 +346,7 @@
     }
         
     extend:{
-      Conveyances nominal ,alloc_fail;
+      Conveyance nominal ,alloc_fail;
       continue_into TM2x·push
         ( set_intersection 
           ,TM2xHd·pt(hd_a) 
@@ -363,7 +363,7 @@
     }
 
     next:{
-      Conveyances end_of_tape;
+      Conveyance end_of_tape;
       TM2xHd·rewind(set_b ,hd_b);
       continue_into TM2xHd·step
         ( set_a
@@ -386,33 +386,33 @@
 // some useful predicates
 //
 
-  TM2xHd·F_PREFIX Conveyance TM2xHd·true
+  TM2xHd·F_PREFIX ConveyancePtr TM2xHd·true
   ( void *context 
     ,TM2x *tape 
     ,TM2xHd *hd
     ,address_t element_byte_n
-    ,Conveyance pred_true
-    ,Conveyance pred_false
+    ,ConveyancePtr pred_true
+    ,ConveyancePtr pred_false
     ){
     continue_via_trampoline pred_true;
   }
 
-  TM2xHd·F_PREFIX Conveyance TM2xHd·false
+  TM2xHd·F_PREFIX ConveyancePtr TM2xHd·false
   ( void *context 
     ,void *a_e0 
     ,address_t element_byte_n
-    ,Conveyance pred_true
-    ,Conveyance pred_false
+    ,ConveyancePtr pred_true
+    ,ConveyancePtr pred_false
     ){
     continue_via_trampoline pred_false;
   }
 
-  TM2xHd·F_PREFIX Conveyance TM2xHd·pred_bytes_eq
+  TM2xHd·F_PREFIX ConveyancePtr TM2xHd·pred_bytes_eq
   ( void *context 
     ,void *a_e0 
     ,address_t element_byte_n
-    ,Conveyance pred_true
-    ,Conveyance pred_false
+    ,ConveyancePtr pred_true
+    ,ConveyancePtr pred_false
     ){
     char *e0 = a_e0;
     char *e1 = context;
@@ -422,12 +422,12 @@
       continue_via_trampoline pred_false;
   }
 
-  TM2xHd·F_PREFIX Conveyance TM2xHd·pred_cstring_eq
+  TM2xHd·F_PREFIX ConveyancePtr TM2xHd·pred_cstring_eq
   ( void *context 
     ,void *a_e0 
     ,address_t element_byte_n
-    ,Conveyance pred_true
-    ,Conveyance pred_false
+    ,ConveyancePtr pred_true
+    ,ConveyancePtr pred_false
     ){
     char *e0 = a_e0;
     char *e1 = context;

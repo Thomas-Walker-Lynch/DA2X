@@ -7,8 +7,8 @@ struct Inclusive·3opLL {
   address_t a0;
   address_t a1;
   address_t *rpt;
-  Conveyance nominal;
-  Conveyance gt_address_t_n;
+  ConveyancePtr nominal;
+  ConveyancePtr gt_address_t_n;
 
   uint128_t r;
 } Inclusive·3opLL;

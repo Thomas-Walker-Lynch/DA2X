@@ -19,7 +19,7 @@ int main(){
     #include "Inclusive·Data.h"
   };
   union Conveyance·Data Conveyance·Data0 ,Conveyance·Data1;
-  #include "Conveyance·Text.h"
+  #include "Conveyance.h"
   #include "Inclusive·Text.h"
 
   Result·Tallies res ,*resp; resp = &res;
@@ -30,7 +30,7 @@ int main(){
   continue_from test0;
 
   test0:{
-    Conveyances nominal ,gt_address_t_n;
+    Conveyance nominal ,gt_address_t_n;
 
     uint64_t r;
     struct Inclusive·3opLL  *ar = &Conveyance·Args_pt->Inclusive·3opLL;

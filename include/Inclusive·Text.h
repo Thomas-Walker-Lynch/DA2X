@@ -1,8 +1,8 @@
 
 /*
 struct Text·Inclusive{
-  Conveyance mul_ib;
-  Conveyance mul_ei_bi;
+  ConveyancePtr mul_ib;
+  ConveyancePtr mul_ei_bi;
 } Text·Inclusive
 ={
   &&Inclusive·mul_ib

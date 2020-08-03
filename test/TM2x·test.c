@@ -38,7 +38,7 @@ int main(){
     continue_from TM2x·alloc_heap;
 
     nominal:{
-      Conveyances nominal;
+      Conveyance nominal;
 
       struct TM2x·construct_bytes  *ar = &Conveyance·Args_pt->TM2x·construct_bytes;
       ar->tape = tape;

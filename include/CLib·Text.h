@@ -4,7 +4,7 @@
 
 /* Tested, works, but I will add an interface to L2
 struct Text·CLib{
-  Conveyance mallocn;
+  ConveyancePtr mallocn;
 } Text·CLib
 ={
   &&CLib·mallocn

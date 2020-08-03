@@ -13,7 +13,7 @@
 
 /*
 struct Text·TM2x{
-  Conveyance alloc_heap;
+  ConveyancePtr alloc_heap;
 } Text·TM2x
 ={
   &&TM2x·alloc_heap
@@ -75,9 +75,9 @@ TM2x·construct_elements:{
   TM2x *tape               = Args.TM2x·construct_elements.tape;      
   address_t element_n      = Args.TM2x·construct_elements.element_n;    
   address_t element_byte_n = Args.TM2x·construct_elements.element_byte_n;    
-  Conveyance nominal     = Args.TM2x·construct_elements.nominal;
-  Conveyance alloc_fail  = Args.TM2x·construct_elements.alloc_fail;
-  Conveyance index_gt_n  = Args.TM2x·construct_elements.index_gt_n;
+  ConveyancePtr nominal     = Args.TM2x·construct_elements.nominal;
+  ConveyancePtr alloc_fail  = Args.TM2x·construct_elements.alloc_fail;
+  ConveyancePtr index_gt_n  = Args.TM2x·construct_elements.index_gt_n;
 
   address_t byte_n;
   inclusive·mul_ib·args.an = element_n;
@@ -103,8 +103,8 @@ construct_write_bytes:{
          TM2x *tape      = Args.TM2x·construct_write_bytes.tape;
          void *source_pt = Args.TM2x·construct_write_bytes.source_pt;
      address_t byte_n    = Args.TM2x·construct_write_bytes.byte_n;
-  Conveyance nominal   = Args.TM2x·construct_write_bytes.nominal;
-  Conveyance fail      = Args.TM2x·construct_write_bytes.fail;
+  ConveyancePtr nominal   = Args.TM2x·construct_write_bytes.nominal;
+  ConveyancePtr fail      = Args.TM2x·construct_write_bytes.fail;
 
   Args.TM2x·construct_bytes.tape = tape;      
   Args.TM2x·construct_bytes.tape_source = tape_source->base_pt;  
@@ -127,9 +127,9 @@ TM2x·construct_write_elements:{
          void *source_pt       = Args.TM2x·construct_write_elements.source_pt;        
      address_t element_n       = Args.TM2x·construct_write_elements.element_n;      
      address_t element_byte_n  = Args.TM2x·construct_write_elements.element_byte_n; 
-  Conveyance nominal         = Args.TM2x·construct_write_elements.nominal;        
-  Conveyance fail            = Args.TM2x·construct_write_elements.fail;           
-  Conveyance index_gt_n       = Args.TM2x·construct_write_elements.index_gt_n;      
+  ConveyancePtr nominal         = Args.TM2x·construct_write_elements.nominal;        
+  ConveyancePtr fail            = Args.TM2x·construct_write_elements.fail;           
+  ConveyancePtr index_gt_n       = Args.TM2x·construct_write_elements.index_gt_n;      
 
   address_t byte_n;
   inclusive·mul_ib·args.an = element_n;
@@ -157,8 +157,8 @@ Args.TM2x·construct_write.{
           TM2x *tape            = Args.TM2x·construct_write.tape;
           void *element_pt      = Args.TM2x·construct_write.element_pt;
      address_t  element_byte_n  = Args.TM2x·construct_write.element_byte_n;
-  Conveyance  nominal         = Args.TM2x·construct_write.nominal;
-  Conveyance  fail            = Args.TM2x·construct_write.fail;
+  ConveyancePtr  nominal         = Args.TM2x·construct_write.nominal;
+  ConveyancePtr  fail            = Args.TM2x·construct_write.fail;
 
   Args.TM2x·construct_write_bytes.tape      = tape;
   Args.TM2x·construct_write_bytes.source_pt = element_pt;
@@ -172,8 +172,8 @@ Args.TM2x·construct_write.{
 TM2x·construct_write_TM2x{
   TM2x *tape            = Args.TM2x·construct_write_TM2x.tape;           
   TM2x *tape_source     = Args.TM2x·construct_write_TM2x.tape_source;    
-  Conveyance nominal  = Args.TM2x·construct_write_TM2x.Conveyance nominal; 
-  Conveyance fail     = Args.TM2x·construct_write_TM2x.Conveyance fail;    
+  ConveyancePtr nominal  = Args.TM2x·construct_write_TM2x.ConveyancePtr nominal; 
+  ConveyancePtr fail     = Args.TM2x·construct_write_TM2x.ConveyancePtr fail;    
 
   Args.TM2x·construct_write_bytes.tape = tape;      
   Args.TM2x·construct_write_bytes.tape_source = tape_source->base_pt;  
@@ -190,10 +190,10 @@ TM2x·copy_bytes:{
          TM2x *dst             = Args.TM2x·copy_bytes.dst;          
      address_t dst_byte_i      = Args.TM2x·copy_bytes.dst_byte_i;   
      address_t byte_n          = Args.TM2x·copy_bytes.byte_n;       
-  Conveyance nominal         = Args.TM2x·copy_bytes.nominal;      
-  Conveyance alloc_fail      = Args.TM2x·copy_bytes.alloc_fail;   
-  Conveyance src_index_gt_n   = Args.TM2x·copy_bytes.src_index_gt_n;
-  Conveyance dst_index_gt_n   = Args.TM2x·copy_bytes.dst_index_gt_n;
+  ConveyancePtr nominal         = Args.TM2x·copy_bytes.nominal;      
+  ConveyancePtr alloc_fail      = Args.TM2x·copy_bytes.alloc_fail;   
+  ConveyancePtr src_index_gt_n   = Args.TM2x·copy_bytes.src_index_gt_n;
+  ConveyancePtr dst_index_gt_n   = Args.TM2x·copy_bytes.dst_index_gt_n;
 } 
 
 TM2x·copy_elements:{
@@ -203,10 +203,10 @@ TM2x·copy_elements:{
      address_t dst_element_i   = Args.TM2x·copy_elements.dst_element_i;
      address_t element_n       = Args.TM2x·copy_elements.element_n;
      address_t element_byte_n  = Args.TM2x·copy_elements.element_byte_n;
-  Conveyance nominal         = Args.TM2x·copy_elements.nominal;
-  Conveyance alloc_fail      = Args.TM2x·copy_elements.alloc_fail;
-  Conveyance src_index_gt_n   = Args.TM2x·copy_elements.src_index_gt_n;
-  Conveyance dst_index_gt_n   = Args.TM2x·copy_elements.dst_index_gt_n;
+  ConveyancePtr nominal         = Args.TM2x·copy_elements.nominal;
+  ConveyancePtr alloc_fail      = Args.TM2x·copy_elements.alloc_fail;
+  ConveyancePtr src_index_gt_n   = Args.TM2x·copy_elements.src_index_gt_n;
+  ConveyancePtr dst_index_gt_n   = Args.TM2x·copy_elements.dst_index_gt_n;
 };
 
 //  deallocation for dynamically allocated headers.
@@ -221,7 +221,7 @@ extern address_t TM2x·constructed_count;
 
 TM2x·destruct:{
   TM2x *tape           = 
-  Conveyance nominal = ;
+  ConveyancePtr nominal = ;
 
 free(Args.TM2x·destruct.tape->base_pt);
   TM2x·constructed_count--;
@@ -244,8 +244,8 @@ TM2x·index·read:{
   address_t element_n       = Args.TM2x·index·read.element_byte_n;
   address_t element_byte_n  = Args.TM2x·index·read.element_byte_n;
   void *dst_element_pt      = Args.TM2x·index·read.dst_element_pt;    
-  Conveyance nominal      = Args.TM2x·index·read.nominal;
-  Conveyance index_gt_n   = Args.TM2x·index·read.index_gt_n;
+  ConveyancePtr nominal      = Args.TM2x·index·read.nominal;
+  ConveyancePtr index_gt_n   = Args.TM2x·index·read.index_gt_n;
 
   // byte_n relative to element_0_pt.
   address_t region_byte_n;
@@ -297,8 +297,8 @@ TM2x·index·to_pt{
   address_t index          = Args.TM2x·index·to_pt.index;
   address_t element_byte_n = Args.TM2x·index·to_pt.element_byte_n;
   void **pt                = Args.TM2x·index·to_pt.pt;
-  Conveyance nominal     = Args.TM2x·index·to_pt.nominal;
-  Conveyance index_gt_n = Args.TM2x·index·to_pt.index_gt_n;
+  ConveyancePtr nominal     = Args.TM2x·index·to_pt.nominal;
+  ConveyancePtr index_gt_n = Args.TM2x·index·to_pt.index_gt_n;
 
   address_t byte_i;
   inclusive·mul_ib·args.an = index;
@@ -325,9 +325,9 @@ TM2x·index·to_pt{
 TM2x·pop:{
    TM2x *tape                = Args.TM2x·pop.tape;           
    address_t element_byte_n  = Args.TM2x·pop.element_byte_n; 
-   Conveyance nominal      = Args.TM2x·pop.nominal;        
-   Conveyance pop_last     = Args.TM2x·pop.pop_last;       
-   Conveyance alloc_fail   = Args.TM2x·pop.alloc_fail;     
+   ConveyancePtr nominal      = Args.TM2x·pop.nominal;        
+   ConveyancePtr pop_last     = Args.TM2x·pop.pop_last;       
+   ConveyancePtr alloc_fail   = Args.TM2x·pop.alloc_fail;     
 } Args.TM2x·pop.
 
 
@@ -340,8 +340,8 @@ TM2x·push_bytes:{
   TM2x *tape              = TM2x·push_bytes.args.tape;           
   void *source_pt         = TM2x·push_bytes.args.source_pt;      
   address_t source_byte_n = TM2x·push_bytes.args.source_byte_n;  
-  Conveyance nominal    = TM2x·push_bytes.args.nominal;        
-  Conveyance alloc_fail = TM2x·push_bytes.args.alloc_fail;     
+  ConveyancePtr nominal    = TM2x·push_bytes.args.nominal;        
+  ConveyancePtr alloc_fail = TM2x·push_bytes.args.alloc_fail;     
 }
 
 
@@ -356,34 +356,34 @@ Args.TM2x·push_elements.{
   void *base_pt             = Args.TM2x·push_elements.base_pt;
   address_t element_n       = Args.TM2x·push_elements.element_n;
   address_t element_byte_n  = Args.TM2x·push_elements.element_byte_n;
-  Conveyance nominal      = Args.TM2x·push_elements.nominal;
-  Conveyance alloc_fail   = Args.TM2x·push_elements.alloc_fail;
-  Conveyance index_gt_n    = Args.TM2x·push_elements.index_gt_n;
+  ConveyancePtr nominal      = Args.TM2x·push_elements.nominal;
+  ConveyancePtr alloc_fail   = Args.TM2x·push_elements.alloc_fail;
+  ConveyancePtr index_gt_n    = Args.TM2x·push_elements.index_gt_n;
  }
 
   TM2x·push:{
     TM2x *tape                 = Args.TM2x·push.tape;
     void *element_base_pt      = Args.TM2x·push.element_base_pt;
     address_t element_byte_n   = Args.TM2x·push.element_byte_n;
-    Conveyance nominal       = Args.TM2x·push.nominal;
-    Conveyance alloc_fail    = Args.TM2x·push.alloc_fail;
+    ConveyancePtr nominal       = Args.TM2x·push.nominal;
+    ConveyancePtr alloc_fail    = Args.TM2x·push.alloc_fail;
     cend;
   }
 
 Args.TM2x·push_TM2x.{
   TM2x *tape                = Args.TM2x·push_TM2x.tape;
   TM2x *tape_source         = Args.TM2x·push_TM2x.tape_source;
-  Conveyance nominal      = Args.TM2x·push_TM2x.nominal;
-  Conveyance alloc_fail   = Args.TM2x·push_TM2x.alloc_fail;
+  ConveyancePtr nominal      = Args.TM2x·push_TM2x.nominal;
+  ConveyancePtr alloc_fail   = Args.TM2x·push_TM2x.alloc_fail;
 }
 
 TM2x·read_pop:{
   TM2x *tape                 = Args.TM2x·read_pop.TM2x *tape;            
   void *dst_element_pt       = Args.TM2x·read_pop.void *dst_element_pt;  
   address_t element_byte_n   = Args.TM2x·read_pop.address_t element_byte_n;
-  Conveyance nominal       = Args.TM2x·read_pop.Conveyance nominal;   
-  Conveyance pop_last      = Args.TM2x·read_pop.Conveyance pop_last;  
-  Conveyance alloc_fail    = Args.TM2x·read_pop.Conveyance alloc_fail;
+  ConveyancePtr nominal       = Args.TM2x·read_pop.ConveyancePtr nominal;   
+  ConveyancePtr pop_last      = Args.TM2x·read_pop.ConveyancePtr pop_last;  
+  ConveyancePtr alloc_fail    = Args.TM2x·read_pop.ConveyancePtr alloc_fail;
   cend;
 }
 
@@ -404,8 +404,8 @@ TM2x·resize_bytes:{
   // shorten the arg names, give the optimizer something more to do
   TM2x *tape = Args.TM2x·resize_bytes.tape;
   address_t after_byte_n = Args.TM2x·resize_bytes.after_byte_n;
-  Conveyance nominal = Args.TM2x·resize_bytes.nominal;
-  Conveyance alloc_fail = Args.TM2x·resize_bytes.alloc_fail;
+  ConveyancePtr nominal = Args.TM2x·resize_bytes.nominal;
+  ConveyancePtr alloc_fail = Args.TM2x·resize_bytes.alloc_fail;
 
   address_t before_alloc_n = power_2_extent_w_lower_bound(tape->byte_n);
   address_t after_alloc_n = power_2_extent_w_lower_bound(after_byte_n);
@@ -451,13 +451,13 @@ TM2x·resize_bytes:{
 */
 
 
-TM2x·F_PREFIX Conveyance TM2x·resize_elements:{
+TM2x·F_PREFIX ConveyancePtr TM2x·resize_elements:{
   TM2x *tape                = Args.TM2x·resize_elements.tape;
   address_t after_element_n = Args.TM2x·resize_elements.after_element_n;
   address_t element_byte_n  = Args.TM2x·resize_elements.element_byte_n;
-  Conveyance nominal      = Args.TM2x·resize_elements.nominal;
-  Conveyance alloc_fail   = Args.TM2x·resize_elements.alloc_fail;
-  Conveyance index_gt_n    = Args.TM2x·resize_elements.index_gt_n;
+  ConveyancePtr nominal      = Args.TM2x·resize_elements.nominal;
+  ConveyancePtr alloc_fail   = Args.TM2x·resize_elements.alloc_fail;
+  ConveyancePtr index_gt_n    = Args.TM2x·resize_elements.index_gt_n;
 
   address_t after_byte_n;
   #include "inclusive·mul_ib·args.h"
@@ -494,10 +494,10 @@ TM2x·write_bytes:{
      address_t  dst_byte_i      = Args.TM2x·write_bytes.dst_byte_i   
           void *src_pt          = Args.TM2x·write_bytes.src_pt       
      address_t  byte_n          = Args.TM2x·write_bytes.byte_n       
-  Conveyance  nominal         = Args.TM2x·write_bytes.nominal      
-  Conveyance  alloc_fail      = Args.TM2x·write_bytes.alloc_fail   
-  Conveyance  src_index_gt_n   = Args.TM2x·write_bytes.src_index_gt_n
-  Conveyance  dst_index_gt_n   = Args.TM2x·write_bytes.dst_index_gt_n
+  ConveyancePtr  nominal         = Args.TM2x·write_bytes.nominal      
+  ConveyancePtr  alloc_fail      = Args.TM2x·write_bytes.alloc_fail   
+  ConveyancePtr  src_index_gt_n   = Args.TM2x·write_bytes.src_index_gt_n
+  ConveyancePtr  dst_index_gt_n   = Args.TM2x·write_bytes.dst_index_gt_n
 }
 
 #endif

@@ -4,18 +4,18 @@
 #include "misc.h"
 
 #define continue_from goto
-typedef void **ConveyancePtr; // The Conveyance type
+typedef void **ConveyancePtr; // The ConveyancePtr type
 
-// unlike for the rest of C, the Conveyance type can not be used to declare
-// Conveyances, instead we start with 'Conveyances' 
-#define Conveyances __label__
+// unlike for the rest of C, the ConveyancePtr type can not be used to declare
+// Conveyance, instead we start with 'Conveyance' 
+#define Conveyance __label__
 
 // It is good form for a conveyance definition to end with this.
 // Later it might be related with destructors.
 #define cend abort();
 
 // These are no longer used in the library, but a program might use them.
-// Conveyances by trampoline.
+// Conveyance by trampoline.
 //
   // this is placed just before the function name in the call, the function
   #define continue_into goto *
