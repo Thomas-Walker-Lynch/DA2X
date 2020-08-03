@@ -9,7 +9,7 @@ gcc -s -std=gnu2x -Wall -O3 -I../include -L../lib  -o Inclusive·test.s Inclusiv
 #include <stdint.h>
 #include <stdbool.h>
 
-//#include "Result.h"
+#include "Result.h"
 #include "Conveyance.h"
 #include "Inclusive.h"
 
@@ -22,28 +22,45 @@ int main(){
   #include "Conveyance·Text.h"
   #include "Inclusive·Text.h"
 
-  uint64_t r;
-  struct Inclusive·3opLL  *ar = &Conveyance·Args_pt->Inclusive·3opLL;
-  ar->a0 = 541;
-  ar->a1 = 727;
-  ar->rpt = &r;
-  ar->nominal = &&nominal;
-  ar->gt_address_t_n = &&gt_address_t_n;
-  continue_from Inclusive·mul_ib;
+  Result·Tallies res ,*resp; resp = &res;
+  Result·Tallies·init(resp);
+  bool f[256];
+  uint i = 0;
 
-  nominal:{
-    if( r == 394575 ){
-      printf("passed");
-      exit(0);
+  continue_from test0;
+
+  test0:{
+    Conveyances nominal ,gt_address_t_n;
+
+    uint64_t r;
+    struct Inclusive·3opLL  *ar = &Conveyance·Args_pt->Inclusive·3opLL;
+    ar->a0 = 541;
+    ar->a1 = 727;
+    ar->rpt = &r;
+    ar->nominal = &&nominal;
+    ar->gt_address_t_n = &&gt_address_t_n;
+    continue_from Inclusive·mul_ib;
+
+    nominal:{
+      f[i++] = r == 394575;
+      continue_from report;
+      cend;
     }
-    printf("failed bad result");
-    exit(1);
+    gt_address_t_n:{
+      f[i++] = false;
+      continue_from report;
+      cend;
+    }
+
     cend;
   }
-  gt_address_t_n:{
-    printf("failed overflow");
-    exit(1);
+
+  report:{
+    Result·Tallies·tally("test_0" ,resp ,f ,i);
+    Result·Tallies·print("Inclusive·test results" ,resp);
+    exit(resp->failed);
     cend;
   }
+
 
 }

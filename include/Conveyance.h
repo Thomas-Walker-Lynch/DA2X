@@ -4,7 +4,7 @@
 #include "misc.h"
 
 #define continue_from goto
-typedef void **Conveyance; // The Conveyance type
+typedef void **ConveyancePtr; // The Conveyance type
 
 // unlike for the rest of C, the Conveyance type can not be used to declare
 // Conveyances, instead we start with 'Conveyances' 
