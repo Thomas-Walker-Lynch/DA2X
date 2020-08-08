@@ -25,6 +25,16 @@
 #define continue_via_trampoline return
 typedef void **continuation;
 
+/*
+ nested scope not allowed inside of global scope:
+
+nested_functions.c:28:1: error: expected identifier or ‘(’ before ‘{’ token
+   28 | {
+      | ^
+{
+}
+*/
+
 int main(){
 
   void a(uint i){
