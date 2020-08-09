@@ -13,24 +13,35 @@
 
 int main(){
 
+  // ----------------------------------------
+  // Includes Conveyance library, and local conveyances
+
   #include "CLib·DataTypes.h"
   #include "Inclusive·DataTypes.h"
   #include "TM2x·DataTypes.h"
+  struct test_00{
+    ConveyancePtr continuation;
+  };
+  struct CX·test_0{
+    address_t malloc_cnt;
+    address_t constructed_cnt;
+    Result·Tallies results;
+    bool f[256];
+    uint i;
+    TM2x *tape;
+    ConveyancePtr continuation;
+  };
+
   union Conveyance·Data{
     #include "CLib·Data.h"
     #include "Inclusive·Data.h"
     #include "TM2x·Data.h"
+    struct test_00 test_0;
   };
   union Conveyance·Data Conveyance·Data0 ,Conveyance·Data1;
+
   union {
-    struct test_00{
-      address_t malloc_cnt;
-      address_t constructed_cnt;
-      Result·Tallies results;
-      bool f[256];
-      uint i;
-      TM2x *tape;
-    } test_0;
+    struct CX·test_0 test_0;
   } Conveyance·Context0;
 
   #include "Conveyance·Text.h"
@@ -38,18 +49,27 @@ int main(){
   #include "Inclusive·Text.h"
   #include "TM2x·Text.h"
 
+  // ----------------------------------------
+  //  test code
+
   Result·Tallies accumulated_results ,*accumulated_results_pt;
   accumulated_results_pt=&accumulated_results;
   Result·Tallies·init(accumulated_results_pt);
 
+  AR(test_0 ,0);
+  ar->continuation = &&tests_finished;
   continue_from test_0;
 
   test_0:{
     Conveyance nominal ,fail ,cleanup ,report;
-    CX(test_0 ,0 ,0);
+
+    Conveyance·swap();
+    LC(test_0, 0);
+    CX(test_0 ,0);
     cx->malloc_cnt = MallocCounter·count;
     cx->constructed_cnt = TM2x·constructed_count;
     cx->i = 0;
+    cx->continuation = lc->continuation;
 
     //allocate
     AR(TM2x·alloc_heap ,0);
@@ -98,17 +118,19 @@ int main(){
       cx->f[cx->i++] = cx->constructed_cnt == TM2x·constructed_count;
       Result·Tallies·tally("test_0" ,&cx->results ,cx->f ,cx->i);
       Result·Tallies·accumulate(accumulated_results_pt ,&cx->results);
-      continue_from tests_finished;
+      continue_from *cx->continuation;
       cend;
-    }
-
-    tests_finished:{
-      Result·Tallies·print("Inclusive·test results" ,accumulated_results_pt);
-      return accumulated_results.failed;
     }
 
     cend;
   }
+
+  tests_finished:{
+    Result·Tallies·print("TM2x·test results" ,accumulated_results_pt);
+    return accumulated_results.failed;
+  }
+
+
 
   exit(0);
 
