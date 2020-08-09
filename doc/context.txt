@@ -6,6 +6,13 @@ language.  C is chosen because it is more portable than assembly. Later we will 
 enhancements to C, or possibly a new language, which will have direct support for these
 techniques.
 
+Note we are using data 'pads' for passing arguments.  Data pads are placed in union and
+included into a function, typically into main. When included in main they are never popped
+until the program returns, but this sort of allocation differs from that of static
+allocation because we get independent copies in different threads. Perhaps this should be
+called 'stack static' allocation or some such. Nothing prevents a programmer for
+statically allocating a pad, but that is not the design intention.  
+
 In C there is an outermost file wide lexical scope.  Variables and functions may be defined
 at file scope scope. Such variables are statically allocated.
 
@@ -109,77 +116,139 @@ TM2x·dealloc_heap, the outer conveyance.  That continuation is set to 'success'
 may think of the values lc0->tape and lc->nominal as messages that are sent from c1 to
 c3.
 
+3. Messaage relaying
+
 If the programmer has control over c1, c2, and c3, then he or she may design the code so
 that c2 relays the message for c1 by making it an argument of c2.  However, if the
 programmer desires, or is comppelled, to keep the definitions of c1 and c3 as separate
 code maintinance tasks, a different solution will be needed.  A solution that does not
 depend up on how c2 uses its data pad.
 
-3. Difficulites in passing such messages through the stack
+In general message relaying is a pain for a human programmer because he or she has
+to keep track of all the call dependencies.
 
-When we do a function call, the function is given a stack frame.  Upon return from
+3. Context on the stack.
+
+Upon being called each function is given a stack frame.  Upon return from
 the function the stack frame is popped.  Thus local variables are allocated and
-cleaned up. Our conveyances do not make use of the stack, but they do make use
-of nested lexical scope.
+cleaned up.
 
-By lexical scoping rules in C a variable may only be used after it is declared, and may
-not be referenced after the next closing brace at that scope level.  Hence, a programmer
-might conclude that this structure is parallleled in the generated code.  I.e. conclude
-that when the compiler would insert code to push variables declared within a lexcial
-scope at the pointer where the opening brace occurs, or even where the local variable
-is declared, and then would generate code to pop such local variables off the stack
-at the place where the matching closing brace occurs in the source.  Such a compilation
-strategy would also have to add pop instructions before branches that left the code
-generated from said lexcial scope.
+Our conveyances do not make use of the stack, but they do make use of nested lexical
+scope. According to lexical scoping rules in C a variable may only be used after it is
+declared, and may not be referenced after the next closing brace at that scope level.
+Hence, a programmer might conclude that this structure is parallleled in the generated
+code.  I.e. conclude that when the compiler would insert code to push variables declared
+within a lexcial scope at the pointer where the opening brace occurs, or even where the
+local variable is declared, and then would generate code to pop such local variables off
+the stack at the place where the matching closing brace occurs in the source.  Such a
+compilation strategy would also have to add pop instructions before branches that left the
+code generated from said lexcial scope.
 
 If C compilers generated code in this manner, i.e. code that dynamically parralleled the
-static lexical scope structures, then it would be possible for c1 to declare variables to
-be sent to c3 in the normal fashion, and it would work just like it works for functions,
-such variables would get allocated on the stack upon entering the conveyance, and then
-popped off when leaving it, because our conveyances always start with an opening brace and
-end with a closing one.
+static lexical scope structures, then it would be straightforward for c1 to declare
+variables to be sent to c3 in the normal fashion, and it would work just like it works for
+functions, such variables would get allocated with a push onto the stack upon entering the
+conveyance, and then be deallocated when by being popped off when leaving it, because our
+conveyances always start with an opening brace and end with a closing one.
 
-However, all that is just wishful thinking.  C compilers are not obligated to create
-parallel structures to the lexical scopes in the generated code. They are perfectly free
-to declare the variables to be used at any scoping level when the program starts, and then
-to ditch them when the program exits - or anything else inbetween.  The only constraint is
-that the compiler must respect the C specification and maintain the appearence of
-variables only being available within their correpsonding lexical scopes.
+However, C compilers are not obligated by the C standard to create parallel structures
+between lexical scopes and generated code. The constraint is that the compiler must
+respect the programmers view of the C standard, thus maintain the appearence of variables
+only being available within their correpsonding lexical scopes.
 
-And indeed this is what an example I coded up in the the try directory is doing.
-Everything gets reserved upon the entrance to main, and all get popped off at the end of
-the program.  This happens independent of the optimization level. With this approach the
-compiler need not generate pops upon leaving a lexical scope.  However this simplification
-comes at a cost, in that if, due to the vagaries of the computation, we never use a
-particular lexical scope, the variables declared in that scope still take up memory.  I
-used this effect to cause the program shown in the try directory to crash due to not
-having enough stack space, though it actually only needs a few bytes of space.
+In an example I coded up in the the try directory everything gets reserved upon the
+entrance to main, and all get popped off when main returns.  This happens independent of
+the optimization level. With this approach the compiler need not generate pops upon
+leaving a lexical scope.  However this simplification comes at a cost, in that if, due to
+the vagaries of the computation, we never use a particular lexical scope, the variables
+declared in that scope still take up memory.  I used this effect to cause the program
+shown in the try directory to crash due to not having enough stack space, though it
+actually only needs a few bytes of space.
+
+The approach that Gcc is using will cause all of the shared context variable in all
+of the conveyances that are encapsulated by a function to be allocated together on
+that functions frame, independent of the path of continuation through the conveyances.
+We end up with an 'all contexts separate and always allocated' scenario.
 
 As a side note, C++ compilers do guarantee that object destructors will be called when
 leaving a lexical scope, even if that departure is due to a 'goto'.  But this does not
-help us here, because even if destructors are called, all of our messages still might end
-up allocated on the stack without ever being deallocated.  We need a deallocation
-guarantee, not a destructor call guarantee.  Note the stack will not grow at run time
-due to this.  There will be one message allocation per conveyance, but all the messages
-from all the convyances will take up space independent of the path taken at run time.
+help us here, because even if destructors are called, all of our contexts still might end
+up allocated on the stack without ever being deallocated until the encapsulating function
+returns.  We need a deallocation guarantee, not a destructor call guarantee.
 
-We could fource the push pop parallel structures to be placed into the generated code by
-using some inline asm functions and explicit calls to them.  However, right now we do not
-use the stack at all, so we really should have a stack free method of passing messages.
-If I have to write some new code for this and add explicit calls, I will first attempt to
-implement a stackless approach.
+We could fource the the behavior we want by using some inline asm functions and explicit
+calls to them. It is interesting that we are talking about push and pop control for
+contexts used in messenging, not arguments or local variables.
 
-4. Shared pads.
+An interesting aspect of using the stack for sharing context is that the stack grows and
+shrinks with context usage. Even in a structure where conveyance recursively continues
+into itself, the stack will not accumulate in size. A reasonable bound may be placed on the
+stack size through static analysis of the code.  I.e. it is the code structure rather
+than the run time behavior which determines stack size. Of course a program can still have
+memory complexity at run time, but that will be expressed through heap usage rather than
+stack usage.
 
-When we have control over c1, c2, and c3 code, we may simply have c2 relay the message.
-In situations where we do not have such control, then we will use a method of shared
-message pads. 
+Rather than using the system stack we might implement our own on the heap.  An expanding
+array would be perfect for that .. but that is what we are implementing right now, so
+that would be circular problem.  Another complication is that when creating a second thread
+we would have to give the new thread a copy of the stack.  We would not have the advantage
+of the virtual memory system to add performance to this.
+
+4. Context Pads
 
 We add a data pad in analogy to our arguments pad.  Both c1 and c3 know about this pad and
-may use it to relay a message.  All such pads throughout our code, which can not be in in
-simultaneous use are placed in union, just as we do with the argument pads.  Hence we
-will end up with N such pads, where N is the static nesting levels of message passing we
+may use it to relay a message. 
+
+
+In analogy to the arguments data pad, all such contexts used throughout our code that can not be
+in simultaneous used may be placed in union, just as we do with the argument pads.  Ideally we
+would end up with N such context pads, where N is the static nesting levels of message passing we
 find in our source code.
+
+We would expect that code modules would have their own context pads.  That way static analysis
+can be limited to a module.
+
+Static analysis will not always be sufficient.  Say for example a conveyance takes a continuation
+argument where the value of that argument is not known at run time.  In which case would have
+have to make a worse case assumption that such an argument might be any one of a set of values.
+This might mean that a given function would have to have an independent context from every
+one of those other conveyances.
+
+5. Comparison
+
+We have discussed three context sharing techniques:
+
+    1. relays
+    2. stack
+    3. context  pads
+
+Among them the stack approach is the only one that does not require the programmer to be
+aware of the behavior of the code to get the logic of the program correct.  In some ways
+tt resembles the context pad approach where the pads are allocated at run time on the
+heap instead of being allocated 'stack static'.
+
+The relay where all the conveyances are sitting together in the same file gives the
+compiler the most chance for optimization.
+
+Context pads have the advantage that we do not use the stack, and can not get stack
+overflow errors at run time for single threaded execution.  In a multiple threading
+environment the stack space that is used is duplicated for each thread, so in this sense,
+if the number of threads depends upon the computation, the stack can still grow by an
+amount that depends on the computation. Also, if the program makes use of the heap,
+there can still be memory resource shortages.  Still there is something to be said for
+having only one expanding memory problem to analyze instead of two.
+
+Because the expanding array is fundamental, the code is pretty simple and easily
+analyzable, and as it is a library the library developer has full control of the code
+base, so I am going to use relaying and context pads that are dedicated to the library.
+
+
+
+
+
+
+
+
 
 
 

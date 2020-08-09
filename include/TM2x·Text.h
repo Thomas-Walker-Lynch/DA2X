@@ -111,40 +111,39 @@ TM2x·construct_bytes:{
   cend;
 }
 
-#if 0
-
-
 TM2x·construct_elements:{
   Conveyance·swap();
   LC(lc ,TM2x·construct_elements ,0);
 
+  CX(cx ,TM2x0 ,construct_elements);
+  cx->tape       = lc->tape;
+  cx->byte_n     = lc->byte_n;
+  cx->nominal    = lc->nominal;
+  cx->alloc_fail = lc->alloc_fail;
 
-
-         TM2x       *tape  = lc->tape;
-     address_t     byte_n  = lc->byte_n;
-  ConveyancePtr    nominal = lc->nominal;
-  ConveyancePtr alloc_fail = lc->fail;
-
-  AR(ar ,CLib·mallocn ,0)
-  ar->an = lc->element_n;
-  ar->bn = lc->element_byte_n;
-  ar->cn = &lc->byte_n;
-  ar->nominal = &&lc->mul_ib·nominal;
-  ar->gt_address_n = lc->index_gt_n;
-  continue_from inclusive·mul_ib;
+  AR(ar ,Inclusive·3opLL ,0);
+  ar->a0 = lc->element_n;
+  ar->a1 = lc->element_byte_n;
+  ar->rpt = &lc->byte_n;
+  ar->nominal = &&mul_ib·nominal;
+  ar->gt_address_t_n = lc->index_gt_n;
+  continue_from Inclusive·mul_ib;
 
   mul_ib·nominal:{
-    struct TM2x·construct_bytes *ar = &Conveyance·Args_pt->TM2x·construct_bytes;
-    ar->tape       = tape;
-    ar->byte_n     = byte_n;
-    ar->nominal    = nominal;
-    ar->alloc_fail = alloc_fail;
+    AR(ar ,TM2x·construct_bytes ,0);
+    ar->tape       = cx->tape;
+    ar->byte_n     = cx->byte_n;
+    ar->nominal    = cx->nominal;
+    ar->alloc_fail = cx->alloc_fail;
     continue_from TM2x·construct_bytes;
     cend;
   }
 
   cend;
 }
+
+
+#if 0
 
 
 
