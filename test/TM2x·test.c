@@ -31,7 +31,7 @@ int main(){
       uint i;
       TM2x *tape;
     } test_0;
-  } Conveyance·Context;
+  } Conveyance·Context0;
 
   #include "Conveyance·Text.h"
   #include "CLib·Text.h"
@@ -46,11 +46,12 @@ int main(){
 
   test_0:{
     Conveyance nominal ,fail ,cleanup ,report;
-    CX(test_0 ,0);
+    CX(test_0 ,0 ,0);
     cx->malloc_cnt = MallocCounter·count;
     cx->constructed_cnt = TM2x·constructed_count;
     cx->i = 0;
 
+    //allocate
     AR(TM2x·alloc_heap ,0);
     ar->tape = &cx->tape;
     ar->nominal = &&nominal;
@@ -61,6 +62,7 @@ int main(){
       Conveyance nominal;
       cx->f[cx->i++] = true;
 
+      //construct
       AR(TM2x·construct_bytes ,0);
       ar->tape = cx->tape;
       ar->byte_n = 48;
@@ -83,10 +85,11 @@ int main(){
     }
 
     cleanup:{
-      AR(TM2x·dealloc_heap ,0);
+      // destruct and deallocate
+      AR(TM2x·destruct_dealloc_heap ,0);
       ar->tape = cx->tape;
       ar->nominal = &&report;
-      continue_from TM2x·dealloc_heap;
+      continue_from TM2x·destruct_dealloc_heap;
       cend;
     }
 
