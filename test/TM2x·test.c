@@ -66,6 +66,8 @@ int main(){
     continue_from **(test_pt - 1);
   }
 
+  // Sort of smoke tests, allocates and constructs and array of bytes, checks the allocation size.
+  // Uses many features of conveyances, including a relay.
   test_0:{
     Conveyance nominal ,fail ,cleanup ,report;
 
@@ -132,6 +134,8 @@ int main(){
     cend;
   }
 
+  // Sort of smoke tests, allocates and constructs and array of elements, checks the allocation size.
+  // This the first that makes use of a context pad.
   test_1:{
     Conveyance nominal ,fail ,cleanup ,report;
 
