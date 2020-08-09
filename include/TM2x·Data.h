@@ -12,6 +12,7 @@ struct TM2x·construct_write_TM2x0 TM2x·construct_write_TM2x;
 struct TM2x·copy_elements0 TM2x·copy_elements;
 struct TM2x·dealloc_heap0 TM2x·dealloc_heap;
 struct TM2x·destruct1 TM2x·destruct;
+struct TM2x·destruct_dealloc_heap0 TM2x·destruct_dealloc_heap;
 struct TM2x·index·read0 TM2x·index·read;
 struct TM2x·index·to_pt0 TM2x·index·to_pt;
 struct TM2x·pop0 TM2x·pop;

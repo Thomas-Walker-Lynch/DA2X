@@ -20,8 +20,11 @@ typedef void **ConveyancePtr;
   #define continue_via_trampoline return
 
 // Declare local pad pointers
-#define AR(x ,i) register struct x##i *ar = (struct x##i *)&Conveyance·Args_pt->x;
-#define LC(x ,i) register struct x##i *lc = (struct x##i *)&Conveyance·Locals_pt->x;
-#define CX(x ,i) register struct x##i *cx = (struct x##i *)&Conveyance·Context.x;
+// x - conveyance name
+// i - interpreteation, mainly used with local pads
+// n - static nesting depth for context
+#define AR(v ,x ,i) register struct x##i *v = (struct x##i *)&Conveyance·Args_pt->x;
+#define LC(v ,x ,i) register struct x##i *v = (struct x##i *)&Conveyance·Locals_pt->x;
+#define CX(v ,x ,n) register struct CX·##x *v = (struct CX·##x *)&Conveyance·Context##n.x;
 
 #endif

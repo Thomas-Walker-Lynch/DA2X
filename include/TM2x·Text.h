@@ -39,26 +39,33 @@ goto TM2x·end;
 //       2.2. dealloc_heap_nominal is unwritten
 //
 TM2x·destruct:{
-  AR(TM2x·destruct ,0);
+  AR(ar ,TM2x·destruct ,0);
   free(ar->tape->base_pt);
   TM2x·constructed_count--;
   continue_from *ar->nominal;
   cend
 }
 
-// Deallocation for dynamically allocated headers.
 TM2x·dealloc_heap:{
-  Conveyance·swap();
-  LC(TM2x·dealloc_heap ,0);
+  AR(ar ,TM2x·destruct ,0);
+  free(ar->tape);
+  continue_from *ar->nominal;
+  cend;
+}
 
-  AR(TM2x·destruct ,1);
+// Deallocation for dynamically allocated headers.
+TM2x·destruct_dealloc_heap:{
+  Conveyance·swap();
+  LC(lc ,TM2x·dealloc_heap ,0);
+
+  AR(ar ,TM2x·destruct ,1);
   ar->tape = lc->tape;
   ar->nominal = &&nominal;
   ar->message_dealloc_heap_nominal = lc->nominal;
   continue_from TM2x·destruct;
 
   nominal:{
-    register struct TM2x·destruct1 *ar = &Conveyance·Args_pt->TM2x·destruct;
+    AR(ar ,TM2x·destruct ,1);
     free(ar->tape);
     continue_from *ar->message_dealloc_heap_nominal;
     cend;
@@ -72,9 +79,9 @@ TM2x·dealloc_heap:{
 //  macro.  This does not allocate data for the array itself.
 TM2x·alloc_heap:{
   Conveyance·swap();
-  LC(TM2x·alloc_heap ,0);
+  LC(lc ,TM2x·alloc_heap ,0);
 
-  AR(CLib·mallocn ,0);
+  AR(ar ,CLib·mallocn ,0);
   ar->pt      = (void **)lc->tape;
   ar->n       = byte_n_of(TM2x);
   ar->nominal = lc->nominal;
@@ -89,12 +96,12 @@ TM2x·alloc_heap:{
 //  Given the exent in bytes, sets aside heap memory for the data.
 TM2x·construct_bytes:{
   Conveyance·swap();
-  LC(TM2x·construct_bytes ,0);
+  LC(lc ,TM2x·construct_bytes ,0);
   TM2x·constructed_count++; // to assist with debugging
   lc->tape->byte_n = lc->byte_n;
   lc->alloc_byte_n = power_2_extent_w_lower_bound(lc->byte_n);
 
-  AR(CLib·mallocn ,0);
+  AR(ar ,CLib·mallocn ,0);
   ar->pt      = (void **)&(lc->tape->base_pt);
   ar->n       = lc->alloc_byte_n;
   ar->nominal = lc->nominal;
@@ -117,7 +124,7 @@ TM2x·construct_elements:{
   ConveyancePtr    nominal = lc->nominal;
   ConveyancePtr alloc_fail = lc->fail;
 
-  struct CLib·mallocn *ar = &Conveyance·Args_pt->CLib·mallocn;
+  AR(ar ,CLib·mallocn ,0)
   ar->an = lc->element_n;
   ar->bn = lc->element_byte_n;
   ar->cn = &lc->byte_n;

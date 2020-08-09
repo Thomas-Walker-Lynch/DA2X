@@ -56,7 +56,7 @@ int main(){
   accumulated_results_pt=&accumulated_results;
   Result·Tallies·init(accumulated_results_pt);
 
-  AR(test_0 ,0);
+  AR(ar ,test_0 ,0);
   ar->continuation = &&tests_finished;
   continue_from test_0;
 
@@ -64,15 +64,15 @@ int main(){
     Conveyance nominal ,fail ,cleanup ,report;
 
     Conveyance·swap();
-    LC(test_0, 0);
-    CX(test_0 ,0);
+    LC(lc ,test_0, 0);
+    CX(cx ,test_0 ,0);
     cx->malloc_cnt = MallocCounter·count;
     cx->constructed_cnt = TM2x·constructed_count;
     cx->i = 0;
     cx->continuation = lc->continuation;
 
     //allocate
-    AR(TM2x·alloc_heap ,0);
+    AR(ar ,TM2x·alloc_heap ,0);
     ar->tape = &cx->tape;
     ar->nominal = &&nominal;
     ar->fail = &&fail;
@@ -83,7 +83,7 @@ int main(){
       cx->f[cx->i++] = true;
 
       //construct
-      AR(TM2x·construct_bytes ,0);
+      AR(ar ,TM2x·construct_bytes ,0);
       ar->tape = cx->tape;
       ar->byte_n = 48;
       ar->nominal = &&nominal;
@@ -106,7 +106,7 @@ int main(){
 
     cleanup:{
       // destruct and deallocate
-      AR(TM2x·destruct_dealloc_heap ,0);
+      AR(ar ,TM2x·destruct_dealloc_heap ,0);
       ar->tape = cx->tape;
       ar->nominal = &&report;
       continue_from TM2x·destruct_dealloc_heap;
