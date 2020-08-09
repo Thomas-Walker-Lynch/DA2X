@@ -116,9 +116,10 @@ TM2x·construct_bytes:{
 
 TM2x·construct_elements:{
   Conveyance·swap();
-  struct construct_elements *lc = &Conveyance·Locals_pt->TM2x·construct_elements;
+  LC(lc ,TM2x·construct_elements ,0);
 
-  // lambda passing context -- who pops it? .... on heap, who frees it?
+
+
          TM2x       *tape  = lc->tape;
      address_t     byte_n  = lc->byte_n;
   ConveyancePtr    nominal = lc->nominal;
@@ -144,6 +145,11 @@ TM2x·construct_elements:{
 
   cend;
 }
+
+
+
+
+
 
 construct_write_bytes:{
          TM2x *tape      = Args.TM2x·construct_write_bytes.tape;

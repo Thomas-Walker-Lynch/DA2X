@@ -22,15 +22,6 @@ int main(){
   struct test_00{
     ConveyancePtr continuation;
   };
-  struct CX·test_0{
-    address_t malloc_cnt;
-    address_t constructed_cnt;
-    Result·Tallies results;
-    bool f[256];
-    uint i;
-    TM2x *tape;
-    ConveyancePtr continuation;
-  };
 
   union Conveyance·Data{
     #include "CLib·Data.h"
@@ -41,8 +32,16 @@ int main(){
   union Conveyance·Data Conveyance·Data0 ,Conveyance·Data1;
 
   union {
-    struct CX·test_0 test_0;
-  } Conveyance·Context0;
+    struct  CX·TM2x·Test·test_0 {
+      address_t malloc_cnt;
+      address_t constructed_cnt;
+      Result·Tallies results;
+      bool f[256];
+      uint i;
+      TM2x *tape;
+      ConveyancePtr continuation;
+    } test_0;
+  } CX·TM2x·Test;
 
   #include "Conveyance·Text.h"
   #include "CLib·Text.h"
@@ -65,7 +64,7 @@ int main(){
 
     Conveyance·swap();
     LC(lc ,test_0, 0);
-    CX(cx ,test_0 ,0);
+    CX(cx ,TM2x·Test ,test_0);
     cx->malloc_cnt = MallocCounter·count;
     cx->constructed_cnt = TM2x·constructed_count;
     cx->i = 0;
