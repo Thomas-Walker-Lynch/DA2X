@@ -21,8 +21,6 @@
   }
 
 
-
-
 //--------------------------------------------------------------------------------
 // The TM2x dynamic array header struct
 //   .. does the mutex lock variable belongs here, or at L2? Perhaps here,
@@ -32,6 +30,7 @@
     char *base_pt;
     address_t byte_n;
   } TM2x;
+
 
 //--------------------------------------------------------------------------------
 // adjectives

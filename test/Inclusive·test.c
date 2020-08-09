@@ -16,6 +16,7 @@ gcc -s -std=gnu2x -Wall -O3 -I../include -L../lib  -o Inclusive·test.s Inclusiv
 
 int main(){
 
+  #include "Inclusive·DataTypes.h"
   union Conveyance·Data{
     #include "Inclusive·Data.h"
   };
@@ -42,7 +43,7 @@ int main(){
     uint i = 0;  // count
 
     uint64_t r;
-    struct Inclusive·3opLL  *ar = &Conveyance·Args_pt->Inclusive·3opLL;
+    register struct Inclusive·3opLL0 *ar = &Conveyance·Args_pt->Inclusive·3opLL;
     ar->a0 = 541;
     ar->a1 = 727;
     ar->rpt = &r;

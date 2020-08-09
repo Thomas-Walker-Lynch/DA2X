@@ -11,6 +11,7 @@
 */
 #include "TM2x.h"
 
+// interfaces will be used for L2
 /*
 struct Text·TM2x{
   ConveyancePtr alloc_heap;
@@ -20,6 +21,7 @@ struct Text·TM2x{
 };
 */
 
+// 'thread static' allocation class
 address_t TM2x·constructed_count = 0;
 
 #define MINIMUM_ALLOC_EXTENT 15
@@ -30,14 +32,49 @@ address_t power_2_extent_w_lower_bound(address_t byte_n){
 
 goto TM2x·end;
 
+// contract with dealloc heap:
+//    1.No swap.
+//    2.TM2x·destruct1 interpretation struct:
+//       2.1. tape is unwritten
+//       2.2. dealloc_heap_nominal is unwritten
+//
+TM2x·destruct:{
+  AR(TM2x·destruct ,0);
+  free(ar->tape->base_pt);
+  TM2x·constructed_count--;
+  continue_from *ar->nominal;
+  cend
+}
+
+// Deallocation for dynamically allocated headers.
+TM2x·dealloc_heap:{
+  Conveyance·swap();
+  LC(TM2x·dealloc_heap ,0);
+
+  AR(TM2x·destruct ,1);
+  ar->tape = lc->tape;
+  ar->nominal = &&nominal;
+  ar->message_dealloc_heap_nominal = lc->nominal;
+  continue_from TM2x·destruct;
+
+  nominal:{
+    register struct TM2x·destruct1 *ar = &Conveyance·Args_pt->TM2x·destruct;
+    free(ar->tape);
+    continue_from *ar->message_dealloc_heap_nominal;
+    cend;
+  }
+
+  cend;
+}
+
 //----------------------------------------
 //  Dynamic allocation of the TM2x header.  For static allocation use the AllocStatic()
 //  macro.  This does not allocate data for the array itself.
 TM2x·alloc_heap:{
-  Conveyance·update();
-  struct TM2x·alloc_heap *lc = &Conveyance·Locals_pt->TM2x·alloc_heap;
+  Conveyance·swap();
+  LC(TM2x·alloc_heap ,0);
 
-  struct CLib·mallocn    *ar = &Conveyance·Args_pt->CLib·mallocn;
+  AR(CLib·mallocn ,0);
   ar->pt      = (void **)lc->tape;
   ar->n       = byte_n_of(TM2x);
   ar->nominal = lc->nominal;
@@ -51,14 +88,13 @@ TM2x·alloc_heap:{
 //  Construct an allocated array. 
 //  Given the exent in bytes, sets aside heap memory for the data.
 TM2x·construct_bytes:{
-  Conveyance·update();
-  struct TM2x·construct_bytes *lc = &Conveyance·Locals_pt->TM2x·construct_bytes;
-
+  Conveyance·swap();
+  LC(TM2x·construct_bytes ,0);
   TM2x·constructed_count++; // to assist with debugging
   lc->tape->byte_n = lc->byte_n;
   lc->alloc_byte_n = power_2_extent_w_lower_bound(lc->byte_n);
 
-  struct CLib·mallocn *ar = &Conveyance·Args_pt->CLib·mallocn;
+  AR(CLib·mallocn ,0);
   ar->pt      = (void **)&(lc->tape->base_pt);
   ar->n       = lc->alloc_byte_n;
   ar->nominal = lc->nominal;
@@ -72,26 +108,29 @@ TM2x·construct_bytes:{
 
 
 TM2x·construct_elements:{
-  TM2x *tape               = Args.TM2x·construct_elements.tape;      
-  address_t element_n      = Args.TM2x·construct_elements.element_n;    
-  address_t element_byte_n = Args.TM2x·construct_elements.element_byte_n;    
-  ConveyancePtr nominal     = Args.TM2x·construct_elements.nominal;
-  ConveyancePtr alloc_fail  = Args.TM2x·construct_elements.alloc_fail;
-  ConveyancePtr index_gt_n  = Args.TM2x·construct_elements.index_gt_n;
+  Conveyance·swap();
+  struct construct_elements *lc = &Conveyance·Locals_pt->TM2x·construct_elements;
 
-  address_t byte_n;
-  inclusive·mul_ib·args.an = element_n;
-  inclusive·mul_ib·args.bn = element_byte_n;
-  inclusive·mul_ib·args.cn = &byte_n;
-  inclusive·mul_ib·args.nominal = &&mul_ib·nominal;
-  inclusive·mul_ib·args.gt_address_n = index_gt_n;
+  // lambda passing context -- who pops it? .... on heap, who frees it?
+         TM2x       *tape  = lc->tape;
+     address_t     byte_n  = lc->byte_n;
+  ConveyancePtr    nominal = lc->nominal;
+  ConveyancePtr alloc_fail = lc->fail;
+
+  struct CLib·mallocn *ar = &Conveyance·Args_pt->CLib·mallocn;
+  ar->an = lc->element_n;
+  ar->bn = lc->element_byte_n;
+  ar->cn = &lc->byte_n;
+  ar->nominal = &&lc->mul_ib·nominal;
+  ar->gt_address_n = lc->index_gt_n;
   continue_from inclusive·mul_ib;
 
   mul_ib·nominal:{
-    Args.TM2x·construct_bytes.tape       = tape;
-    Args.TM2x·construct_bytes.byte_n     = byte_n;
-    Args.TM2x·construct_bytes.nominal    = nominal;
-    Args.TM2x·construct_bytes.alloc_fail = alloc_fail;
+    struct TM2x·construct_bytes *ar = &Conveyance·Args_pt->TM2x·construct_bytes;
+    ar->tape       = tape;
+    ar->byte_n     = byte_n;
+    ar->nominal    = nominal;
+    ar->alloc_fail = alloc_fail;
     continue_from TM2x·construct_bytes;
     cend;
   }
@@ -209,25 +248,7 @@ TM2x·copy_elements:{
   ConveyancePtr dst_index_gt_n   = Args.TM2x·copy_elements.dst_index_gt_n;
 };
 
-//  deallocation for dynamically allocated headers.
-TM2x·dealloc_heap:{
-  Args.TM2x·destruct(TM2x·dealloc_heap.tape);
-  free(Args.TM2x·dealloc_heap.tape);
-  continue_from *Args.TM2x·dealloc_heap.nominal;
-  cend;
-}
 
-extern address_t TM2x·constructed_count;
-
-TM2x·destruct:{
-  TM2x *tape           = 
-  ConveyancePtr nominal = ;
-
-free(Args.TM2x·destruct.tape->base_pt);
-  TM2x·constructed_count--;
-  continue_from *Args.TM2x·destruct.nominal;
-  cend
-}
 
 /*
 Copy elements at index of the given tape, to the location specified by dst_element_pt.

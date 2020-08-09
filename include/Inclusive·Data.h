@@ -3,14 +3,9 @@
   All 3 operand address computations may use this.
 */
 
-struct Inclusive·3opLL {
-  address_t a0;
-  address_t a1;
-  address_t *rpt;
-  ConveyancePtr nominal;
-  ConveyancePtr gt_address_t_n;
+//Two interpretations for Inclusive·3opLL
+//struct Inclusive·3opLL  *ar = &Conveyance·Args_pt->Inclusive·3opLL ;
 
-  uint128_t r;
-} Inclusive·3opLL;
+struct Inclusive·3opLL0 Inclusive·3opLL;
 
 

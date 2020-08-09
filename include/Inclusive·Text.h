@@ -51,14 +51,15 @@ overflow?
 */
 
 Inclusive·mul_ib:{
-  Conveyance·update();
-  struct Inclusive·3opLL *lc = &Conveyance·Locals_pt->Inclusive·3opLL;
+  Conveyance·swap();
 
-  lc->r = lc->a0 * lc->a1 + lc->a0 + lc->a1;
-  if( lc->r > address_t_n ) continue_from *lc->gt_address_t_n;
-  *lc->rpt = lc->r;
-  continue_from *lc->nominal;
+  register struct Inclusive·3opLL0 *lc0 = &Conveyance·Locals_pt->Inclusive·3opLL;
+  register struct Inclusive·3opLL1 *lc1 = (struct Inclusive·3opLL1 *)&Conveyance·Locals_pt->Inclusive·3opLL;
 
+  lc1->r = lc0->a0 * lc0->a1 + lc0->a0 + lc0->a1;
+  if( lc1->r > address_t_n ) continue_from *lc0->gt_address_t_n;
+  *lc0->rpt = lc1->r;
+  continue_from *lc0->nominal;
 }
 
 
@@ -79,12 +80,15 @@ Inclusive·mul_ib:{
 
 */
 Inclusive·mul_ei_bi:{
-  Conveyance·update();
-  struct Inclusive·3opLL *lc = &Conveyance·Locals_pt->Inclusive·3opLL;
-  lc->r = lc->a0 * lc->a1 + lc->a0;
-  if( lc->r > address_t_n ) continue_from *lc->gt_address_t_n;
-  *lc->rpt = lc->r;
-  continue_from *lc->nominal;
+  Conveyance·swap();
+
+  register struct Inclusive·3opLL0 *lc0 = &Conveyance·Locals_pt->Inclusive·3opLL;
+  register struct Inclusive·3opLL1 *lc1 = (struct Inclusive·3opLL1 *)&Conveyance·Locals_pt->Inclusive·3opLL;
+
+  lc1->r = lc0->a0 * lc0->a1 + lc0->a0;
+  if( lc1->r > address_t_n ) continue_from *lc0->gt_address_t_n;
+  *lc0->rpt = lc1->r;
+  continue_from *lc0->nominal;
 }
 #pragma pop_macro("S0")
 

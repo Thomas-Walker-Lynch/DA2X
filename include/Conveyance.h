@@ -19,5 +19,9 @@ typedef void **ConveyancePtr;
   // this is used inside of the function in place of continue_from
   #define continue_via_trampoline return
 
+// Declare local pad pointers
+#define AR(x ,i) register struct x##i *ar = (struct x##i *)&Conveyance·Args_pt->x;
+#define LC(x ,i) register struct x##i *lc = (struct x##i *)&Conveyance·Locals_pt->x;
+#define CX(x ,i) register struct x##i *cx = (struct x##i *)&Conveyance·Context.x;
 
 #endif

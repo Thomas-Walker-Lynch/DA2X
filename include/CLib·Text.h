@@ -23,8 +23,8 @@ goto CLib·end;
   but this is not carried through to the interface.
 */
 CLib·mallocn:{
-  Conveyance·update();
-  struct CLib·mallocn *lc = &Conveyance·Locals_pt->CLib·mallocn;
+  Conveyance·swap();
+  struct CLib·mallocn0 *lc = &Conveyance·Locals_pt->CLib·mallocn;
 
 #if TEST
   Test·CLib·allocation_n = lc->n;
