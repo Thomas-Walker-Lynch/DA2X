@@ -55,6 +55,7 @@ TM2x·dealloc_heap:{
 
 // Deallocation for dynamically allocated headers.
 TM2x·destruct_dealloc_heap:{
+  Conveyance nominal;
   Conveyance·swap();
   LC(lc ,TM2x·dealloc_heap ,0);
 
@@ -96,7 +97,7 @@ TM2x·alloc_heap:{
 //  Given the exent in bytes, sets aside heap memory for the data.
 TM2x·construct_bytes:{
   Conveyance·swap();
-  LC(lc ,TM2x·construct_bytes ,0);
+  LC(lc ,TM2x·construct_bytes ,1);
   TM2x·constructed_count++; // to assist with debugging
   lc->tape->byte_n = lc->byte_n;
   lc->alloc_byte_n = power_2_extent_w_lower_bound(lc->byte_n);
@@ -112,24 +113,24 @@ TM2x·construct_bytes:{
 }
 
 TM2x·construct_elements:{
+  Conveyance nominal;
   Conveyance·swap();
-  LC(lc ,TM2x·construct_elements ,0);
+  LC(lc ,TM2x·construct_elements ,1);
 
   CX(cx ,TM2x0 ,construct_elements);
   cx->tape       = lc->tape;
-  cx->byte_n     = lc->byte_n;
   cx->nominal    = lc->nominal;
   cx->alloc_fail = lc->alloc_fail;
 
   AR(ar ,Inclusive·3opLL ,0);
   ar->a0 = lc->element_n;
   ar->a1 = lc->element_byte_n;
-  ar->rpt = &lc->byte_n;
-  ar->nominal = &&mul_ib·nominal;
+  ar->rpt = &cx->byte_n;
+  ar->nominal = &&nominal;
   ar->gt_address_t_n = lc->index_gt_n;
   continue_from Inclusive·mul_ib;
 
-  mul_ib·nominal:{
+  nominal:{
     AR(ar ,TM2x·construct_bytes ,0);
     ar->tape       = cx->tape;
     ar->byte_n     = cx->byte_n;

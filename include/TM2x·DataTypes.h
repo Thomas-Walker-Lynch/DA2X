@@ -30,11 +30,25 @@ struct TM2x·construct_bytes0{
   address_t byte_n;   // extent of the array, in bytes
   ConveyancePtr nominal;
   ConveyancePtr alloc_fail;
+};
+struct TM2x·construct_bytes1{
+  TM2x *tape;
+  address_t byte_n;   // extent of the array, in bytes
+  ConveyancePtr nominal;
+  ConveyancePtr alloc_fail;
 
   address_t alloc_byte_n;
 };
 
 struct TM2x·construct_elements0{
+  TM2x *tape;
+  address_t element_n;  // extent of the array, in elements
+  address_t element_byte_n; // extent of the element, in bytes
+  ConveyancePtr nominal;
+  ConveyancePtr index_gt_n;
+  ConveyancePtr alloc_fail;
+};
+struct TM2x·construct_elements1{
   TM2x *tape;
   address_t element_n;  // extent of the array, in elements
   address_t element_byte_n; // extent of the element, in bytes

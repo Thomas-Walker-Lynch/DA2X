@@ -19,6 +19,7 @@ typedef void **ConveyancePtr;
   // this is used inside of the function in place of continue_from
   #define continue_via_trampoline return
 
+// May call more than once to get multiple variables with different interpretations of the same args.
 // Declare local pad pointers
 // v - variable name for the namespace
 // s - context name 
@@ -27,5 +28,6 @@ typedef void **ConveyancePtr;
 #define AR(v ,x ,i) register struct x##i *v = (struct x##i *)&Conveyance·Args_pt->x;
 #define LC(v ,x ,i) register struct x##i *v = (struct x##i *)&Conveyance·Locals_pt->x;
 #define CX(v ,s ,x) register struct CX·##s##·##x *v = &CX·##s.x;
+
 
 #endif

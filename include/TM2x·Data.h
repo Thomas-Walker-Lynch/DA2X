@@ -3,8 +3,8 @@
 // there is no larger interpretation.
 
 struct TM2x·alloc_heap0 TM2x·alloc_heap;
-struct TM2x·construct_bytes0 TM2x·construct_bytes;
-struct TM2x·construct_elements0 TM2x·construct_elements;
+struct TM2x·construct_bytes1 TM2x·construct_bytes;
+struct TM2x·construct_elements1 TM2x·construct_elements;
 struct TM2x·construct_write0 TM2x·construct_write;
 struct TM2x·construct_write_bytes0 TM2x·construct_write_bytes;
 struct TM2x·construct_write_elements0 TM2x·construct_write_elements;
