@@ -31,8 +31,9 @@ int main(){
   };
   union Conveyance·Data Conveyance·Data0 ,Conveyance·Data1;
 
+  #include "TM2x·Context.h"
   union {
-    struct  CX·TM2x·Test·test_0 {
+    struct CX·TM2x·Test·test_0 {
       address_t malloc_cnt;
       address_t constructed_cnt;
       Result·Tallies results;
@@ -69,6 +70,7 @@ int main(){
     cx->constructed_cnt = TM2x·constructed_count;
     cx->i = 0;
     cx->continuation = lc->continuation;
+    Result·Tallies·init(&cx->results);
 
     //allocate
     AR(ar ,TM2x·alloc_heap ,0);

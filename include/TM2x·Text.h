@@ -150,7 +150,6 @@ TM2x·construct_elements:{
 
 
 
-
 construct_write_bytes:{
          TM2x *tape      = Args.TM2x·construct_write_bytes.tape;
          void *source_pt = Args.TM2x·construct_write_bytes.source_pt;
