@@ -87,25 +87,26 @@ struct TM2x·construct_write_elements0{
   address_t byte_n;
 };
 
-
 struct TM2x·construct_write_TM2x0{
   TM2x *tape;
   TM2x *tape_source;
   ConveyancePtr nominal;
   ConveyancePtr fail;
 };
-/* copy_bytes does not make use of other Conveyance, and does not have local vars.
-   struct TM2x·copy_bytes0{
-   TM2x *src;
-   address_t src_byte_i;
-   TM2x *dst;
-   address_t dst_byte_i;
-   address_t byte_n;
-   ConveyancePtr nominal;
-   ConveyancePtr src_index_gt_n;
-   ConveyancePtr dst_index_gt_n;
-   };*/
 
+struct TM2x·copy_bytes0{
+  TM2x *src;
+  address_t src_byte_i;
+  TM2x *dst;
+  address_t dst_byte_i;
+  address_t byte_n;
+  ConveyancePtr nominal;
+  ConveyancePtr src_index_gt_n;
+  ConveyancePtr dst_index_gt_n;
+};
+struct TM2x·copy_bytes1{
+  uint128 end_n;
+};
 
 struct TM2x·copy_elements0{
   TM2x *src;
@@ -115,7 +116,6 @@ struct TM2x·copy_elements0{
   address_t element_n;  // index of nth element of the copy region
   address_t element_byte_n;
   ConveyancePtr nominal;
-  ConveyancePtr alloc_fail;
   ConveyancePtr src_index_gt_n;
   ConveyancePtr dst_index_gt_n;
 };

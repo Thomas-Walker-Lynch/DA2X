@@ -32,12 +32,7 @@ address_t power_2_extent_w_lower_bound(address_t byte_n){
 
 goto TM2x·end;
 
-// contract with dealloc heap:
-//    1.No swap.
-//    2.TM2x·destruct1 interpretation struct:
-//       2.1. tape is unwritten
-//       2.2. dealloc_heap_nominal is unwritten
-//
+// no swap, uses only AR
 TM2x·destruct:{
   AR(ar ,TM2x·destruct ,0);
   free(ar->tape->base_pt);
@@ -46,6 +41,7 @@ TM2x·destruct:{
   cend
 }
 
+// no swap, uses only AR
 TM2x·dealloc_heap:{
   AR(ar ,TM2x·destruct ,0);
   free(ar->tape);
@@ -53,19 +49,23 @@ TM2x·dealloc_heap:{
   cend;
 }
 
+// swap, uses ar and lc
 // Deallocation for dynamically allocated headers.
 TM2x·destruct_dealloc_heap:{
-  Conveyance nominal;
+  Conveyance destruct ,dealloc;
   Conveyance·swap();
   LC(lc ,TM2x·dealloc_heap ,0);
 
-  AR(ar ,TM2x·destruct ,1);
-  ar->tape = lc->tape;
-  ar->nominal = &&nominal;
-  ar->message_dealloc_heap_nominal = lc->nominal;
-  continue_from TM2x·destruct;
+  destruct:{
+    AR(ar ,TM2x·destruct ,1);
+    ar->tape = lc->tape;
+    ar->nominal = &&dealloc;
+    ar->message_dealloc_heap_nominal = lc->nominal;
+    continue_from TM2x·destruct;
+    cend;
+  }
 
-  nominal:{
+  dealloc:{
     AR(ar ,TM2x·destruct ,1);
     free(ar->tape);
     continue_from *ar->message_dealloc_heap_nominal;
@@ -112,8 +112,10 @@ TM2x·construct_bytes:{
   cend;
 }
 
+// uses context TM2x0
+// depends on: construct_bytes
 TM2x·construct_elements:{
-  Conveyance nominal;
+  Conveyance scale ,construct_bytes;
   Conveyance·swap();
   LC(lc ,TM2x·construct_elements ,1);
 
@@ -122,15 +124,20 @@ TM2x·construct_elements:{
   cx->nominal    = lc->nominal;
   cx->alloc_fail = lc->alloc_fail;
 
-  AR(ar ,Inclusive·3opLL ,0);
-  ar->a0 = lc->element_n;
-  ar->a1 = lc->element_byte_n;
-  ar->rpt = &cx->byte_n;
-  ar->nominal = &&nominal;
-  ar->gt_address_t_n = lc->index_gt_n;
-  continue_from Inclusive·mul_ib;
+  continue_from scale;
 
-  nominal:{
+  scale:{
+    AR(ar ,Inclusive·3opLL ,0);
+    ar->a0 = lc->element_n;
+    ar->a1 = lc->element_byte_n;
+    ar->rpt = &cx->byte_n;
+    ar->nominal = &&construct_bytes;
+    ar->gt_address_t_n = lc->index_gt_n;
+    continue_from Inclusive·mul_ib;
+    cend;
+  };
+
+  construct_bytes:{
     AR(ar ,TM2x·construct_bytes ,0);
     ar->tape       = cx->tape;
     ar->byte_n     = cx->byte_n;
@@ -138,14 +145,15 @@ TM2x·construct_elements:{
     ar->alloc_fail = cx->alloc_fail;
     continue_from TM2x·construct_bytes;
     cend;
-  }
+  };
 
   cend;
 }
 
-
+// uses context TM2x0
+// depends on: construct_bytes
 construct_write_bytes:{
-  Conveyance nominal;
+  Conveyance construct ,write;
   Conveyance·swap();
   LC(lc ,TM2x·construct_write_bytes ,0);
 
@@ -155,15 +163,20 @@ construct_write_bytes:{
   cx->byte_n    = lc->byte_n;
   cx->nominal   = lc->nominal;
 
-  AR(ar ,TM2x·construct_bytes.tape ,0);
-  ar->tape = lc->tape;
-  ar->byte_n = lc->byte_n;
-  ar->nominal = &&nominal;
-  ar->alloc_fail = lc->fail;
-  continue_from TM2x·construct_bytes;
+  continue_from construct;
 
-  nominal:{
-    memcpyn(cx->tape->base_pt, cx->source_pt, cx->byte_n);
+  construct:{
+    AR(ar ,TM2x·construct_bytes.tape ,0);
+    ar->tape = lc->tape;
+    ar->byte_n = lc->byte_n;
+    ar->nominal = &&write;
+    ar->alloc_fail = lc->fail;
+    continue_from TM2x·construct_bytes;
+    cend;
+  }
+  
+  write:{
+    memcpyn(TM2x·byte_0_pt(cx->tape), cx->source_pt, cx->byte_n);
     continue_from *cx->nominal;
     cend;
   }
@@ -171,26 +184,34 @@ construct_write_bytes:{
   cend;
 }
 
+// uses context TM2x1
+// depends on: mul_ib ,construct_write_bytes
+// dependency with context: construct_write_bytes
 TM2x·construct_write_elements:{
-  Conveyance nominal;
+  Conveyance scale ,construct_write_bytes;
   Conveyance·swap();
   LC(lc ,TM2x·construct_write_elements ,0);
 
-  CX(cx ,TM2x0 ,construct_write_elements);
+  CX(cx ,TM2x1 ,construct_write_elements);
   cx->tape      = lc->tape;
   cx->source_pt = lc->source_pt;
   cx->nominal   = lc->nominal;
   cx->fail      = lc->fail;
 
-  AR(ar ,Inclusive·3opLL ,0);
-  ar->a0             = lc->element_n;
-  ar->a1             = lc->element_byte_n;
-  ar->rpt            = &cx->byte_n;
-  ar->nominal        = &&nominal;
-  ar->gt_address_t_n = lc->index_gt_n;
-  continue_from Inclusive·mul_ib;
+  continue_from scale;
 
-  nominal:{
+  scale:{
+    AR(ar ,Inclusive·3opLL ,0);
+    ar->a0             = lc->element_n;
+    ar->a1             = lc->element_byte_n;
+    ar->rpt            = &cx->byte_n;
+    ar->nominal        = &&construct_write_bytes;
+    ar->gt_address_t_n = lc->index_gt_n;
+    continue_from Inclusive·mul_ib;
+    cend;
+  }
+
+  construct_write_bytes:{
     AR(ar ,TM2x·construct_write_bytes ,0);
     ar->tape      = cx->tape;
     ar->source_pt = cx->source_pt;
@@ -221,51 +242,115 @@ Args.TM2x·construct_write:{
   cend;
 }
 
-#if 0
-
-// initialize tape from another TM
+// construct and initialize tape from another TM
 TM2x·construct_write_TM2x{
-  TM2x *tape            = Args.TM2x·construct_write_TM2x.tape;           
-  TM2x *tape_source     = Args.TM2x·construct_write_TM2x.tape_source;    
-  ConveyancePtr nominal  = Args.TM2x·construct_write_TM2x.ConveyancePtr nominal; 
-  ConveyancePtr fail     = Args.TM2x·construct_write_TM2x.ConveyancePtr fail;    
+  Conveyance·swap();
+  LC(lc  ,TM2x·construct_write_TM2x ,0);
 
-  Args.TM2x·construct_write_bytes.tape = tape;      
-  Args.TM2x·construct_write_bytes.tape_source = tape_source->base_pt;  
-  Args.TM2x·construct_write_bytes.source_byte_n = tape_source->byte_n;
-  Args.TM2x·construct_write_bytes.nominal = nominal;
-  Args.TM2x·construct_write_bytes.fail = fail;
+  AR(ar ,TM2x·construct_write_bytes ,0);
+  ar->tape      = lc->tape;
+  ar->source_pt = TM2x·byte_0_pt(lc->tape_source);
+  ar->byte_n    = TM2x·byte_n(lc->tape_source);
+  ar->nominal   = lc->nominal;
+  ar->fail      = lc->fail;
   continue_from TM2x·construct_write_bytes;
+
   cend;
 };
 
-
-
 TM2x·copy_bytes:{
-         TM2x *src             = Args.TM2x·copy_bytes.src;          
-     address_t src_byte_i      = Args.TM2x·copy_bytes.src_byte_i;   
-         TM2x *dst             = Args.TM2x·copy_bytes.dst;          
-     address_t dst_byte_i      = Args.TM2x·copy_bytes.dst_byte_i;   
-     address_t byte_n          = Args.TM2x·copy_bytes.byte_n;       
-  ConveyancePtr nominal         = Args.TM2x·copy_bytes.nominal;      
-  ConveyancePtr alloc_fail      = Args.TM2x·copy_bytes.alloc_fail;   
-  ConveyancePtr src_index_gt_n   = Args.TM2x·copy_bytes.src_index_gt_n;
-  ConveyancePtr dst_index_gt_n   = Args.TM2x·copy_bytes.dst_index_gt_n;
+  AR(ar  ,TM2x·copy_bytes ,0);
+
+  if( 
+     TM2x·byte_n(ar->src) < ar->byte_n
+     ||
+     TM2x·byte_n(ar->src) - ar->byte_n < ar->src_byte_i
+      )
+    continue_from ar->src_index_gt_n;
+
+  if( 
+     TM2x·byte_n(ar->dst) < ar->byte_n
+     ||
+     TM2x·byte_n(ar->dst) - ar->byte_n < ar->dst_byte_i
+      )
+    continue_from ar->dst_index_gt_n;
+  
+  memcpyn(TM2x·byte_0_pt(ar->dst) + ar->dst_byte_i, TM2x·byte_0_pt(ar->src) + ar->src_byte_i, ar->byte_n);
+
 } 
 
 TM2x·copy_elements:{
-         TM2x *src             = Args.TM2x·copy_elements.src;
-     address_t src_element_i   = Args.TM2x·copy_elements.src_element_i;
-         TM2x *dst             = Args.TM2x·copy_elements.dst;
-     address_t dst_element_i   = Args.TM2x·copy_elements.dst_element_i;
-     address_t element_n       = Args.TM2x·copy_elements.element_n;
-     address_t element_byte_n  = Args.TM2x·copy_elements.element_byte_n;
-  ConveyancePtr nominal         = Args.TM2x·copy_elements.nominal;
-  ConveyancePtr alloc_fail      = Args.TM2x·copy_elements.alloc_fail;
-  ConveyancePtr src_index_gt_n   = Args.TM2x·copy_elements.src_index_gt_n;
-  ConveyancePtr dst_index_gt_n   = Args.TM2x·copy_elements.dst_index_gt_n;
-};
+  Conveyance nominal ,byte_n ,src_byte_i ,dst_byte_i ,copy_bytes;
+  Conveyance·swap();
+  AR(ar ,TM2x·construct_write_elements ,0);
 
+  CX(cx ,TM2x0 ,construct_write_elements);
+  cx->src            = ar->src;
+  cx->src_element_i  = ar->src_element_i;
+  cx->dst            = ar->dst;
+  cx->dst_element_i  = ar->dst_element_i;
+  cx->element_n      = ar->element_n ;
+  cx->element_byte_n = ar->element_byte_n;
+  cx->nominal        = ar->nominal;
+  cx->src_index_gt_n = ar->src_index_gt_n;
+  cx->dst_index_gt_n = ar->dst_index_gt_n;
+
+  //cx->byte_n;
+  //cx->src_byte_i;
+  //cx->dst_byte_i;
+
+  continue_from byte_n;
+
+  byte_n:{
+    AR(ar ,Inclusive·3opLL ,0);
+    ar->a0             = cx->element_n;
+    ar->a1             = cx->element_byte_n;
+    ar->rpt            = &cx->byte_n;
+    ar->nominal        = &&src_byte_i;
+    ar->gt_address_t_n = cx->src_index_gt_n;
+    continue_from Inclusive·mul_ib;
+  }
+
+  src_byte_i:{
+    AR(ar ,Inclusive·3opLL ,0);
+    ar->a0             = cx->src_element_i;
+    ar->a1             = cx->element_byte_n;
+    ar->rpt            = &cx->src_byte_i;
+    ar->nominal        = &&dst_byte_i;
+    ar->gt_address_t_n = cx->src_index_gt_n;
+    continue_from Inclusive·mul_ei_bi;
+    cend;
+  }
+
+  dst_byte_i:{
+    AR(ar ,Inclusive·3opLL ,0);
+    ar->a0             = cx->dst_element_i;
+    ar->a1             = cx->element_byte_n;
+    ar->rpt            = &cx->dst_byte_i;
+    ar->nominal        = &&copy_bytes;
+    ar->gt_address_t_n = cx->dst_index_gt_n;
+    continue_from Inclusive·mul_ei_bi;
+    cend;
+  }
+
+  copy_bytes:{
+    AR(ar ,TM2x·construct_copy_bytes ,0);
+    ar->src             = cx->src;
+    ar->src_byte_i      = cx->src_byte_i;
+    ar->dst             = cx->dst;
+    ar->dst_byte_i      = cx->dst_byte_i;
+    ar->byte_n          = cx->byte_n;
+    ar->nominal         = cx->nominal;
+    ar->src_index_gt_n  = cx->src_index_gt_n;
+    ar->dst_index_gt_n  = cx->dst_index_gt_n;
+    continue_from TM2x·copy_bytes;
+    cend;
+  }
+
+  cend;
+}
+
+#if 0
 
 
 /*
@@ -278,13 +363,13 @@ Our attention is focused on the tape, so we call this a 'read' operation.
 */
 
 TM2x·index·read:{
-  TM2x *tape                = Args.TM2x·index·read.tape;              
-  address_t index           = Args.TM2x·index·read.index;         
-  address_t element_n       = Args.TM2x·index·read.element_byte_n;
-  address_t element_byte_n  = Args.TM2x·index·read.element_byte_n;
-  void *dst_element_pt      = Args.TM2x·index·read.dst_element_pt;    
-  ConveyancePtr nominal      = Args.TM2x·index·read.nominal;
-  ConveyancePtr index_gt_n   = Args.TM2x·index·read.index_gt_n;
+  TM2x *tape               = Args.TM2x·index·read.tape;              
+  address_t index          = Args.TM2x·index·read.index;         
+  address_t element_n      = Args.TM2x·index·read.element_byte_n;
+  address_t element_byte_n = Args.TM2x·index·read.element_byte_n;
+  void *dst_element_pt     = Args.TM2x·index·read.dst_element_pt;    
+  ConveyancePtr nominal    = Args.TM2x·index·read.nominal;
+  ConveyancePtr index_gt_n = Args.TM2x·index·read.index_gt_n;
 
   // byte_n relative to element_0_pt.
   address_t region_byte_n;

@@ -24,7 +24,7 @@ goto CLib·end;
 */
 CLib·mallocn:{
   Conveyance·swap();
-  struct CLib·mallocn0 *lc = &Conveyance·Locals_pt->CLib·mallocn;
+  LC(CLib·mallocn ,0);
 
 #if TEST
   Test·CLib·allocation_n = lc->n;
