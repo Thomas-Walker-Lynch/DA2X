@@ -82,7 +82,7 @@ We have a situation like the following:
    |  |
    |  [c2]
     \ |   \
-      c3 
+      c3
       | \
 
 Here c1 is our outer lexical scope conveyance.  c3 is our nested conveyeance that has been
@@ -98,7 +98,7 @@ continue on to the nested conveyance called 'success, which corresponds to c3.
     TM2x·dealloc_heap:{
 
       // Swaps the args and locals pads.
-      Conveyance·swap(); 
+      Conveyance·swap();
 
       // Makes lc0 an alias for Conveyance·Locals_pt->dealloc_heap.
       register struct TM2x·dealloc_heap0 *lc0 = &Conveyance·Locals_pt->dealloc_heap;
@@ -113,7 +113,7 @@ continue on to the nested conveyance called 'success, which corresponds to c3.
       success:{
         free( <message>->tape);
         continue_from  <message>->nominal;
-        cend; 
+        cend;
       }
 
       cend; // it is an error to reach cend
@@ -212,7 +212,7 @@ when we continue to c2, then we lose the context variable.
 4. Context Pads
 
 We add a data pad in analogy to our arguments pad.  Both c1 and c3 know about this pad and
-may use it to relay a message. 
+may use it to relay a message.
 
 In analogy to the arguments data pad, all such contexts used throughout our code that can not be
 in simultaneous used may be placed in union, just as we do with the argument pads.  Ideally we
@@ -242,7 +242,7 @@ if tools did the maintenance automatically.
    context  |  |
             |  [c2]
              \ |   \
-               c3 
+               c3
                | \
 
 Firstly, we should note that the structure of our program is static. Decisions can be made
@@ -316,6 +316,77 @@ lexical scope definition message passing problem.  Even if we gave up this synta
 convenience we would still have this problem of keeping program state outside the
 argument list of the next conveyance.
 
+8....
+                   c1
+                   |
+                  /  \
+                 /    \
+               [c2]--->c3
+               /       | \
 
+Really what is happening here is that c1 is continuing into both c2 and c3.  We can
+think of c3 as a node in a petri net, or as a reservatoin station. It needs to  have
+tokens from both c1 and c2 before it can run.  So our problem with deallocating
+the message really has to do with the fact that c3 does not know how long to
+wait for a message from c2, and that message might not ever arrive. Currently
+continuations are either taken or not, we do not go to the other continuations and
+tell them that we will not be taking them.
+
+The current assumption is that only one conveyance can be taken at a time. As
+a consequence of that assumption we placed all the arguments structs into a
+union. Now here is a case that c1 continues into two conveyances and we need
+to allocate non-overlapping arguments structs.
+
+We can also have this:
+
+            c0
+           /  \
+          | .--c1
+          | |  |
+          | |  [c2]
+          \  \ |   \
+           \-> c3
+               | \
+
+Here c0 is in a scope yet further out. c3 now has a three input reservation station, with c0
+giving it data first, then c1, and then c2 triggering it to run.  Generally though, I would
+imagine a reservation station as a separate object that emits an event, then c3 would be
+an event handler with one thing causing its to run, that of the event making it to the bottom
+of the event queue.  Still to implement a reservation station we need a function that
+gathers inputs from multiple sources. Anyway, there is probably not a way to do this with
+sufficient efficiency for such at thing as the TM library.
+
+If only c2 did not optionally re-enter the scope, or not, this would be an easy problem, we would
+just push and pop.  I wonder though, is the network a better model than a stack?  Perhaps
+multiple conveyances may leave bits and pieces for another convenence, and some such
+have reservation statons. Each using context having its own reservation station would be the
+same as letting all contexts be non-overlapping.
+
+If we stopped trying to put contexts in unions, we would not need the static analysis.  Indeed
+we could just use the current stack paradigm provided by Gcc.
+
+This problem does not exist with trampolines. With a trampline we can arbitrarily divide up
+the conveyeances in function encapsulated groups, then pope the stack frames up on return. But the
+trampoline was not a good approach to a conveyance library due to all the uncessary calls and
+return overhead.  Of course, the inline function implementation looks like the most efficient
+for this library, but then we do not get to try conveyances.  The original idea was that the
+optimizer would give us similar results with conveyances.
+
+How about the programmer just makes the contexts separate, then someday a tool will
+will be used to do the analysis and create the unions ..
+
+Perhaps c1 passes c2 as an argument to c3 ...
+
+What if we guarantee encapsulation within the c0 lexical scope. Though c2 might continue
+elsewhere, wherever that is, it always comes back to a dedicated conveyance in the c0 scope.
+Then we can define one exit conveyance that does the cleanup.  **
+
+Then we have two approaches that appear to work:
+
+   1. contexts and a tool that places contexts into unions
+
+   2. encapsulation requirement within the outer scope, allocate contexts probably on the
+      stack, encapsulation requirement, and dedicated cleanup conveyance that does
+      deallocation.
 
 
