@@ -405,4 +405,10 @@ proposal:
   instead of the called function's stack frame 2) the return value is a always talken
   as a continuation.
 
+  #continue_into(Inclusive·mul_ib ,ar ,ar0 ,ar1 ...)
+
+
+                                  
+
+
 
