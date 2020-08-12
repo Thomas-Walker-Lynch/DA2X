@@ -382,11 +382,21 @@
 
  --->
 
-proposal:
+* Proposal:
 
-  We use function encapasulation, but pass argument through pads.  Give
-  the function one argument, that of the pad to use.  The function structure
-  manages encapsulation and context.
+  We use function encapasulation, some sort of encapsulation is necessary if we want to
+  allocate context on the stack, so as to know when to pop the context off the stack.
+
+  Accordingly every call to another conveyance will be a call to an function encapsulated
+  conveyance, and its return value will be a continuation to some point in the caller,
+  because the caller is also encapsulated.
+
+  The only way to leave the function encapsulation is through a 'leave_continuation_from'
+  macro, while providing it a ContinuationPtr argument that was passed into the function.
+
+  We do not pass arguments to the function encapsulation, but rather we write those to
+  the arguments pad. We do pass the continuation parameters as those are nearly always
+  needed as context.  Only context ends up on the stack.
 
   A call to a function encapsulation of conveyances then looks like:
 
@@ -395,20 +405,72 @@ proposal:
   ar->a0 = lc->element_n;
   ar->a1 = lc->element_byte_n;
   ar->rpt = &cx->byte_n;
-  ar->nominal = &&construct_bytes;
-  ar->gt_address_t_n = lc->index_gt_n;
-  continue_from *Inclusive·mul_ib(ar);
+  continue_from *Inclusive·mul_ib(nominal ,gt_address_t_n);
 
 ```` 
 
-  Two differences from a regular function call.  1) the arguments are copied onto a pad
-  instead of the called function's stack frame 2) the return value is a always talken
-  as a continuation.
+Example of an encapsulated continutation with other continuations defined in its lexical scope,
+and continuations into general use function encapsulated conveyances that return here.  I.e.
+a function encapsulated conveyance with side tripes.
 
-  #continue_into(Inclusive·mul_ib ,ar ,ar0 ,ar1 ...)
+```` 
 
+TM2x·F_PREFIX ContinuationPtr construct_elements
+  (
+   ContinuationPtr cx_nominal 
+   ,ContinuationPtr cx_index_gt_n
+   ,ContinuationPtr cx_alloc_fail
+   ){
+  Conveyance scale ,construct_bytes;
+  Conveyance·swap();
+  LC(lc ,TM2x·construct_elements ,1);
 
-                                  
+  tape = lc->tape;
+  address_t byte_n;
+
+  continue_from scale;
+
+  scale:{
+    AR(ar ,Inclusive·3opLL ,0);
+    ar->a0 = lc->element_n;
+    ar->a1 = lc->element_byte_n;
+    ar->rpt = &byte_n;
+    continue_from Inclusive·mul_ib(&&construct_bytes ,&&index_gt_n);
+    cend;
+  };
+
+  construct_bytes:{
+    AR(ar ,TM2x·construct_bytes ,0);
+    ar->tape       = tape;
+    ar->byte_n     = byte_n;
+    continue_from TM2x·construct_bytes(&&nominal ,&&alloc_fail);
+    cend;
+  };
+
+  index_gt_n:{
+    leave_continue_from index_gt_n;
+    cend;
+  }
+
+  nominal:{
+    leave_continue_from nominal;
+    cend;
+  }
+
+  alloc_fail:{
+    leave_continue_from alloc_fail;
+    cend;
+  }
+    
+
+  cend;
+}
+````
+
+It is too bad that we have to place the last three conveyances here, `index_gt_n`, etc.  It is
+too bad that the side trips do not just continue directly to the real target of that continuation.  However
+by returning here first, the function may correctly pop its stack.  We could perhaps eliminate
+the return and the trampoline, but the pop of context is necessary.
 
 
 

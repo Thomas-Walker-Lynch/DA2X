@@ -10,8 +10,8 @@ typedef void **ConveyancePtr;
 #define cbefore abort();
 #define cend abort();
 
-// must be followed by an argument that was passed in
-#define continue_from_arg return
+// must be followed by an ContinuationPtr argument that was passed in
+#define leave_continue_from return
 
 // May call more than once to get multiple variables with different interpretations of the same args.
 // Declare local pad pointers
