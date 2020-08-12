@@ -1,392 +1,408 @@
 
-1. Intro
+* Intro
 
-Our goal here is to identify techniques for implementing conveyances while using the C
-language.  I chose C because it is more portable than assembly. This work will establish
-the techniques to be used to support conveyances in other languages.
+  Our goal here is to identify techniques for implementing conveyances while using the C
+  language.  I chose C because it is more portable than assembly.
 
-Note we are using data 'pads' for passing arguments.  Data pads are placed in union and
-included into the encapsluationg function, typically into main. When included in main they
-are never popped until the program returns.  Because the data is there the whole time the
-program runs, this sort of allocation resembles static allocation; however it differs in
-that new theads, which have independent copies of the stack, will have independent copies
-of this data.  Perhaps this should be called 'stack static' allocation or some
-such. Nothing prevents a programmer for statically allocating a pad, but that is not the
-design intention.
+* Conveyance
 
-Within a function definition matching curly braces may be used to created nested levels of
-lexical scope.  Programs and statements within a given nesting level may see variables
-declared at outer nesting levels, but not those at deeper levels.  By default such
-variables will be allocated on the stack.
+  A conveyance is called like a function, herein by using the `continue_from`
+  macro. We never flow into a conveyance.
 
-The C standard only allows for functions to be declared at file scope. Functions are
-statically allocated, i.e. have fixed locations in memory.  There is an extern keyword for
-declaring functions who's definitions were given in other source files. According to the C
-standard, functions may not be declared at nested scope levels.  The compiler will issue
-an error and refuse to compile such funcitons.
+  A conveyance is a labeled section of braced code.  A conveyance must branch to another
+  conveyance, or exit the program before reaching the closing brace.  We call such a
+  branch a ‘continuation’.
 
-In the definition of the TM library we made use of the technique of passing in locally
-defined, often anonymous, continuation functions as arguments.  In C we may pass in
-function pointers as arguments to functions, which is probably how the lambda passing
-is implemented anyway. However, we may not locally define C functions as noted in the
-prior paragraph.
+````
+      label:{
 
-In Lisp the locally defined functions, i.e. lambdas, may take advantage of variables what
-are within lexical scope without passing them in as arguments.  This has proven to be a
-natural thing for a programmer to do when defining a function at a lower nesting level of
-lexical scope.
 
-Thankfully, gcc provides an extension for defining nested functions, and these nested
-functions may make use of variables within lexical scope.  These functions may not be
-anonymous but that is only a detail.  This nicely facilitates the programming style of
-using continuations.
+        cend;
+      }
+````
 
-We are using conveyances rather than functions, so we would like to explore the question
-of nested conveyances in analogy to nested functions. Conveyances, at least as they
-are currently defined do not make use of the stack. The stack is the run time analog
-of lexecial scope in our program, so there is reason to question if this is possible.
+  `cend` is a macro that should always be placed before the closing brace.  It will issue an
+  error if control reaches that far.
 
-We can have encapsulation of conveyances within a function.  This is the case where
-all the conveyances and their continuations are located within a funciton.  All conveyances
-are in fact done this way.  Even when we have a 'pure' conveyance implemenation we still
-encapsulate them within the main call.  As noted above, this facilitates the use of
-conveyances with multiple threads. We make use of labels in this conveyance hack, so
-inline asm some work would have to be done to place conveyances at global scope.
+* function encapsulation
 
-We are using a sort of hack to implement conveyances in C.  Accordingly we use a label
-followed by an open brace that defines a nested lexical scope.  Then within the conveyance
-we follow a continuation by using the 'continue_from' macro.  This hack is not that much
-different than how functions are implemented.  After all, all this stuff has to be turned
-into assembly language, and that typically has labels along with branch, and call instructions.
-Whereas a C function will have a label and be invoked through a call, our conveyance will
-have a label and be 'continued' in to via a branch instruction.
+  If all conveyances and their continuations occur within a function, with the only
+  exit from the function being through a `continue_via_trampoline`, then we say that the
+  conveyances are ‘function encapsulated’.
 
-There is a limitation in the C standard where labels are always taken to be at function
-scope no matter where they occur in the lexical scope hierarchy.  Due to this limitation
-it would not be possible to define labels with lexical scope.  However, Gcc has another
-extension that lets us put labels into the lexcial hierarchy by declaring them after an
-opening brace.
+````
+      ConveyancePtr f(int i ,ConveyancePtr not_five ,ConveyancePtr five){
 
-The second problem we need to solve is that of sharing variables at an outer lexical scope
-with the conveyance that is defined within that scope. This is a challenge because conveyances
-do not make use of the stack.  Whereas nested functions and lambads may just reach back
-furher into the stack to find such variables, the local variables of a conveyance are on a data pad
-that is within an union with other data pads, so by the time we reach a nested conveyance the
-out scope variables, so to speak, may well have been overwritten.
+        int j = 7;
+        ink k = 9;
 
-2. Analysis of the outerscope variable passing problem
+        continue_from a;
 
-We have a situation like the following:
+         a:{
+           continue_from b;
+           cend;
+         }
 
-   .--c1
-   |  |
-   |  [c2]
-    \ |   \
-      c3
-      | \
+         b:{
+          if( i + j + k == 21 )
+            continue_via_trampoline five;
+          else
+            continue_via_trampoline not_five;
+          cend;
+        } 
 
-Here c1 is our outer lexical scope conveyance.  c3 is our nested conveyeance that has been
-defined within that scope.  [c2] is a continuation call into conveyance c2.  Its
-definition lies elswhere.  Here c2 continues into c3 which is again withing the c1 lexical
-scopes.  It is common that a conveyance will have multiple continuations, so c3 might just
-be one among a number of possible continuations from c3.
+      }
+````
 
-Consider this example, here TM2x·dealloc_heap is the outer conveyance, c1.  We will call
-TM2x·destruct, which corresponds to [c2] in our diagram, and then TM2x·destruct will
-continue on to the nested conveyance called 'success, which corresponds to c3.
+  Here conveyances `a` and `b` are defined inside the lexical scope of `f()`, and neither `a`
+  nor `b` continue out of `f()`. `f()` accepts `ConveyancePtr` continuations.  It picks one
+  and uses it with the `continue_via_trampoline` macro.  Because `f()` returns a conveyance
+  is is called as through it were a continuation. Such a function is used like this:
 
-    TM2x·dealloc_heap:{
+````
+    int main(){
 
-      // Swaps the args and locals pads.
-      Conveyance·swap();
+      int i = 5;
 
-      // Makes lc0 an alias for Conveyance·Locals_pt->dealloc_heap.
-      register struct TM2x·dealloc_heap0 *lc0 = &Conveyance·Locals_pt->dealloc_heap;
+      continue_from *f( i ,&&not_five ,&&five);
 
-      // Puts arguments for TM2x·destruct on to the arguments pad
-      struct TM2x·destruct0 *ar = &Conveyance·Args_pt->TM2x·destruct;
-      ar->tape = lc0->tape;
-      ar->nominal = &&success; // this is a reference to our nested conveyance
-      continue_from TM2x·destruct;
-
-      // a nested conveyance definition
-      success:{
-        free( <message>->tape);
-        continue_from  <message>->nominal;
+      not_five:{
+        printf("%d" ,i);
+        return 1;
         cend;
       }
 
-      cend; // it is an error to reach cend
+      five:{
+        printf("%d" ,i+1);
+        return 0;
+        cend;
+      }
+
     }
+````
 
-Our c3 analog, 'TM2x·dealloc_heap', accesses variables at the 'outer scope', namely
-lc0->tape and lc0->nominal.  lc0->nominal is a pointer to the nominal continuation for
-TM2x·dealloc_heap, the outer conveyance.  That continuation is set to 'success'.  We
-may think of the values lc0->tape and lc->nominal as messages that are sent from c1 to
-c3.
+  Here `not_five` and `five` are continuations defined in the `main()` function.  The call
+  to `f()` will cause a continuation to either `not_five` or to `five` depending on the
+  return from `f()`. An examination of `f()` will show that it always returns the five
+  continuation. Hopefully the the optimizer would catch on to that and eliminate the
+  function call and the `not_five` conveyance.
 
-From C coding conventions it is perferctly fine that the continuation to c2 causes us
-to leave the current lexical scope before reaching the closing brace, but it is considered
-bad practice that the continuation to c3 then enters the lexical scope from a higher layer.
-The concern has to do with the stack, as discussed in a later section.
+  Variables declared in a function are by default declared in the function stack frame.  C
+  calls this the ‘auto’ storage class. Thus, context shared between function encapsulated
+  continuations will be allocated upon entry of the function, and deallocated when the
+  function returns.  Though functions normally have only one point of return, the trampoline
+  effectively gives this form multiple points of return.
+  
+  Gcc has a nested function extension which makes it easier to define function
+  encapsulated conveyance sets anywere in a program, even inside of other functions.
 
+* Shared general use conveyances
 
-3. Messaage relaying
-
-If the programmer has control over c1, c2, and c3, then he or she may design the code so
-that c2 relays the message for c1 by making it an argument of c2.  However, if the
-programmer desires, or is comppelled, to keep the definitions of c1 and c3 as separate
-code maintinance tasks, a different solution will be needed.
-
-In general message relaying is a pain for a human programmer because he or she has
-to keep track of all the call dependencies.  However, we might be able to build the
-realy into the conveyance pointer itself, and then the message passing would occur
-automatically in a standard way, without the programmer having to build custom relays.
+  Say we included all the shared conveyances at the top of main as a sort of library.
+  Then any conveyance in the program might continue into one of the library
+  conveyances while providing further continuations as arguments.
 
 
-3. Nested lexcial scope, continuations, and the stack.
+** Pad
 
-Each function is given a stack frame when it is invoked.  Upon return from
-the function the stack frame is popped.  Local variables live in the stack
-frame and thus they are allocated on the stack with the call, and deallocated
-with the return.
+  A data pad is a memory buffer shared by mutliple conveyances. It may be bound to
+  any number of types. In C we will declare these types in advance as structs, so
+  a pad is a union of structs.
 
-According to lexical scoping rules in C a variable may only be used after it is declared,
-and may not be referenced after the next matching closing brace at that scope level. A
-variable may be seen at lower scope levels, unless it is shadowed, but not a higher
-scoping levels.
+  We may use a pad to send arguments into a conveyance. As conveyances do not return
+  there is no reason to push and pop arguments, the pad may simply be recycled.
 
-A programmer might surmise that this lexical structure is parallleled in the generated
-code.  Accordingly the compiler would insert code to push variables declared
-within a lexcial scope at the pointer where the opening brace occurs, or even where the
-local variable is declared, and then would generate code to pop such local variables off
-the stack at the place where the matching closing brace occurs in the source.  Such a
-compilation strategy would also have to add pop instructions before branches that left the
-code generated from said lexcial scope.
+** Argument passing
 
-There is an example in the try directory that shows that Gcc does not do this. Independent
-of lexical scope level that a variable is declared at within a function, in the example,
-Gcc places it in the function stack frame.  Thus lower level lexical scope variable are
-allocated on the stack during the whole time a function executies, it is just that the
-compiler will not let you use lower scoped variables at higher scopes.  The example shows
-this behavior independent of the optimizaiton level chosen.
+  Suppose we wanted to have arguments for a conveyance.  We can use a pad to accomplish this.
+  Because only one conveyance runs at a time for single threaded execution, we may place this
+  pad anywhere.  If we want thread safety then we can declare the pad at the top of the main()
+  call where it will be allocated on the stack.  Then each thread would have its own copy of
+  the pad, as each thread has it's own copy of the stack.
+  
+````
+      address_t result;
+      AR(ar ,Inclusive·3opLL ,0);
+      ar->a0 = 1;
+      ar->a1 = 2;
+      ar->rpt = &result;
+      ar->nominal = &&construct_bytes;
+      ar->gt_address_t_n = lc->index_gt_n;
+      continue_from Inclusive·mul_ib;
+````
 
-In general it is conventional practice to escape a lower nested lexical scope by using
-goto.  Due to Gcc's approach locals it does not need even to insert pops for local
-variables.
-
-If a compiler generated pushes for local variables upon entering a lower lexical block,
-then we would need to add those pushes to any gotos that might enter the block.  Unlike
-for the case of leaving the block, those gotos are not in the block.  They are somewhere
-else. C has initializer syntax.  It is not immediately obvious what should be done with
-that if we goto into a nested block.
-
-Although Gcc does not have the issue of pushing of locals at the source of gotos, because
-all of the local variables are already in the function's stack frame to begin with, it is
-still considered bad practice to do this. Yet this is exactly what happens in our nested
-conveyances pattern when c2 continues into c3.  With Gcc this will work. However, relative
-the discussion of lexical scope in the abstract we would have a problem in trying to share
-context from c1 with c3. The return continuation into c3 wuold have to fix the stack if
-local variables were pushed and popped, however, chances are the values of any context
-variables would have been lost.
-
-An interesting side effect of having all local variables being part of the encapsulating
-function's stack frame is that, if we used locals variables in conveyannces, they would
-all be allocated separately and simultaneously in the functions stack frame.  Even
-conveyances that were never called would have their local variables on the stack frame.
-This might be a problem when including a convyeance library.
-
-As a side note, C++ compilers do guarantee that local object destructors will be called
-when leaving a lexical scope, even if that departure is due to a 'goto'.  But this does
-not help us here, because even if destructors are called, all of our contexts still might
-end up allocated on the stack without ever being deallocated until the encapsulating
-function returns.  We need a deallocation guarantee, not a destructor call guarantee.
-
-If we go with the GCC behavior of all temporaries on the function's frame, we have
-allocation issues.  If we tried to circumvent the allocation problem by manually pushing
-and popping temporaries, then we would have the issue of what to do if c2 never continued
-to c3, but instead went elsewhere.  Then where does the pop happen. If it happens
-when we continue to c2, then we lose the context variable.
+  The first line here declares a variable of address_t type.  The second line invokes a
+  macro that sets the variable `ar` to point to the arguments pad.  `ar` will be given the
+  correct type `Inclusive·3opLL` which is the type for the `Inclusive·mul_ib` continuation
+  arguments. `Inclusive·mul_ib` will then pull its arguments from the pad.
 
 
-4. Context Pads
+** Mixed functions and shared conveyance
 
-We add a data pad in analogy to our arguments pad.  Both c1 and c3 know about this pad and
-may use it to relay a message.
+  Suppose we have defined a general use conveyance somewhere for purposes
+  of sharing it. It might even be part of a conveyance library.
 
-In analogy to the arguments data pad, all such contexts used throughout our code that can not be
-in simultaneous used may be placed in union, just as we do with the argument pads.  Ideally we
-would end up with N such context pads, where N is the static nesting levels of message passing we
-find in our source code.
+  So within a function we might end up with code something like this:
 
-We would expect that code modules would have their own context pads.  That way static analysis
-can be limited to a module.
+````
+    conveyancePTR f(conveyancePTR nominal ,conveyancePTR alloc_fail){
 
-Static analysis will not always be sufficient.  Say for example a conveyance follows a
-continuation given in an argument, where the value of that argument is not known at run
-time.  In which case would have have to make a worse case assumption that such an argument
-might be any one of a set of values.  This might mean that a given function would have to
-have an independent context from every one of those other conveyances.
+      struct cx *cx = &cxdat;
+      struct lc *lc = &lcdat;
 
-I tried hard coding context pad references into the TM C library.  The code base is small,
-and most of the contexts can be placed in union so it looked like and efficient approach,
-but I found that even with a small library the complexity of manullly managing the static
-analysis was tedious and error prone. It might be a nice approach for a real time system
-if tools did the maintenance automatically.
+      AR(ar ,Inclusive·3opLL ,0);
+      ar->a0 = lc->element_n;
+      ar->a1 = lc->element_byte_n;
+      ar->rpt = &cx->byte_n;
+      ar->nominal = &&construct_bytes;
+      ar->gt_address_t_n = lc->index_gt_n;
+      continue_from Inclusive·mul_ib;
 
+      construct_bytes:{
+        continue_via_tampoline nonimal;
+        cend;
+      };
 
-5. Is conyeance embedded context necessary?
+      ...
 
+    }
+````
 
+  Here lc is another data pad, and cx is defined in the containing function, but that is
+  not shown.  `Inclusive·mul_ib` is a general use conveyance. It accepts two values, `a`
+  and `b`, and writes a result to `rtp`.  This general use conveyance has two continuation
+  arguments, `nominal` and `gt_address_t_n`.  If the product overflows the type used for
+  for representing the result, `Inclusive·mul_ib` continues with `gt_address_t_n` and
+  no result is written.  Otherwise, it continues with `norminal`. `Inclusive·mul_ib` is
+  defined in main along with a number of general use conveyances.
+
+  The line `continue_from Inclusive·mul_ib` will take us out of the containing function to
+  execute code found in main. This violates our encapsulation property.  `f()` is not
+  a function encapsulating conveyances. It contains a conveyance definition in its lexical
+  scope, but it makes use of one defined elsewhere.
+
+  The `Inclusive·mul_ib` conveyance will have been compiled against the stack frame of
+  main, but when we take the continuation from `f()` to `Inclusive·mul_ib` our stack
+  pointer will be pointing to the stack frame for `f()`, which is the wrong value for
+  `Inclusive·mul_ib`. If the `Inclusive·mul_ib` conveyance does not use the stack, then
+  thing might work out; however, this is hard to accomplish in C because stack usage is
+  deeply engrained with the creation of locals and temporary variables. Even if we
+  declare a value to hold a pointer to where local data is really stored, that pointer
+  will be in a local variable.  If we declare that pointer to be of 'register' storage
+  allocation class, C will not guarantee that it ends up in a register, and it might
+  make it a local value.
+  
+  After running, if running does not seg fault, `Inclusive·mul_ib` then continues to
+  either `construct_bytes` or to `lc->index_gt_n`. 
+
+  The conveyance `construct_bytes` was defined in the lexical scope for `f()`.  Hence
+  continuting here would restore order in the universe.  `contruct_bytes` then returns
+  from the function `continue_via_trampoline nominal`.
+
+  On the other hand we continue with `lc->index_gt_n`, the stack to code correspondence
+  will remain messed up if `lc->index_gt_n` is not defined within `f()`.  If is defined
+  in `f()`, then the situation will be as for `contruct_bytes` and the stack will be
+  well.
+
+  When all continuations out of `f()` return to `f()`, we say that `f()` ‘encapsulates
+  conveyances with side trips’.
+
+  Even if we require that general use conveyances continue into other conveyances that
+  have been defined in the same lexical scope, i.e. even if we have encapsulation with
+  side trips, we still have the issue of the stack being incorrect during execution of
+  the general use conveyances.
+
+** only function encapsulated conveyances
+
+  With this technique all the conveyances in our library are function encapsulated.
+  Then we use the `continue_from` macro to call them.  This is just like sharing
+  functions so there are no hitches with stack alignment. 
+
+  When a library function is small we can hope that the optimizer will make the call overhead
+  go away by just including the contents of the function.  We can make this more likely
+  by declaring the function inline. If it does not, then our arguments will be redundantly
+  copied to stack frames.
+
+  Now suppose we have a large library of small function encapsulated conveyances, where
+  the functions have  been declared inline. The compiler is free to ignore the inline
+  keyword, but suppose that it doesn't.  
+
+  Consider a function that uses several of the library conveyances. The local variables
+  for all the conveyances used by said function would end up simultaneously and separately
+  allocated in said function's stack frame.  That would probalby be more allocated space
+  than needed, because, like arguments, locals inside conveyances are no longer needed
+  after leaving the conveyance.
+
+  Although there would probably be some inefficiency in storage allocation space alloted,
+  this solution nicely manages local variables allocation.
+
+** only conveyances
+
+  We have noticed there are some problems with mixing function encapsulation with raw
+  conveyances.  Namely, the stack could get messed up if we do not introduce some sort of
+  hack to fix that.  In the prior section we avoided this mix by using only function
+  encapsulated conveyances. In this section we discuss the flip side, where we do not have
+  functions at all, except for `main()` where all the conveyances are included.
+
+  When we get rid of the encapsulting function we no longer have its stack frame to
+  passes messages between conveyances that were defined in the encapsulating function's
+  lexical scope. Any local variable that we declare will end up in `main()`'s stack frame,
+  And as locals are not needed simultaneously, indeed none are needed at all until a
+  conveyance that uses locals has been continued into, this would be inefficient.
+
+  The reason we need local variables is for context where data can be shared.  More
+  specifically it is for message passing.
+
+*** context pad
+
+  This is a common pattern:
+
+````
             .--c1
    context  |  |
             |  [c2]
              \ |   \
                c3
                | \
+````
 
-Firstly, we should note that the structure of our program is static. Decisions can be made
-to traverse different paths through the program, but the choice of paths is determined
-when the program is written. There are no limitations introduced by having a static
-program structure, because the Turing Machine makes use of a state machine as a controller.
-Our program corresponds to such a controller.
+  Here conveyance c1 shares data with c3.  c2 is a general use conveyance that will be
+  called and then continue on to c3, or perhaps it will instead continue elsewhere.
 
-Secondly, the embedding of c3 within the lexical scope is never necessary.  c3 could
-be written at the same scope level as c1.  When we move c3 to the higher scope, the
-context that c1 wants to write, and that c3 reads, is also moved to that higher scope.
-Raising a variable to higher scope does not change the viewability of that variable
-at a lower scope.  As long as we have sufficient imagination we may always name a
-variable such that its name does not collide with others at the higher scope.  As we
-have reserved the center dot for namespacing, we are always guaranteed that we can
-come up with an unambiguous name mangling scheme to facilitate this.
+  Here is an example of this pattern. Here `TM2x·dealloc_heap` corresponds to c1.
+  `TM2x·destruct` corresponds to c2, and `success` corresponds to c3.
 
-We can repeat this process of moving continuations to higher scope at each nesting level
-until we reach a point that there is no nesting.  At this point we will be at the level of
-the encapsulating function so context variables would be allocated as part of the function.
+````
+    TM2x·construct_elements:{
+      Conveyance construct_bytes;
+      Conveyance·swap();
+      LC(lc ,TM2x·construct_elements ,1);
 
-Hence, we know two things: static analysis of the program can determine a bound on
-the number of layers of context needed. Those context variables can be allocated
-in the ecapsulating function.
+      // CX is a macro that points `cx` at a context pad and gives it type
+      CX(cx ,TM2x0 ,construct_elements);
+      cx->tape       = lc->tape;
+      cx->nominal    = lc->nominal;
+      cx->alloc_fail = lc->alloc_fail;
 
-6. back to relays - continuation pointer embedded arguments
+      // AR is a macro that points `ar` to the arguments pad and gives it type.
+      AR(ar ,Inclusive·3opLL ,0);
+      ar->a0 = lc->element_n;
+      ar->a1 = lc->element_byte_n;
+      ar->rpt = &cx->byte_n;
+      ar->nominal = &&construct_bytes;
+      ar->gt_address_t_n = lc->index_gt_n;
+      continue_from Inclusive·mul_ib;
 
-Our c3 code knows that the context exists, and knows to take some of its arguments from
-it. The problem is that our c2 code does not know the context exists, and it stands between
-c1 and c3. The manual realying approach is to explicitly code another argument onto c2
-that gets passed to c3. This is truly a hack, because c2 might be called from a function
-other than c1, and it might take an argument specifying the continuation, and that argument
-might only sometimes be c3.
+      construct_bytes:{
+        AR(ar ,TM2x·construct_bytes ,0);
+        ar->tape       = cx->tape;
+        ar->byte_n     = cx->byte_n;
+        ar->nominal    = cx->nominal;
+        ar->alloc_fail = cx->alloc_fail;
+        continue_from TM2x·construct_bytes;
+        cend;
+      };
 
-If a conveyance pointer could be variable length, then c1 could add its message to c3 by
-attaching the message to the conveyance pointer when it passes it as an argument to c2.
+      cend;
+    }
+````
 
-struct{
-   real_continuation_pointer;
-   message_data;
-} continuation_pointer;
+  It just so happens that we defined c3 within c1´s lexical scope, however c1 will have
+  continued into c2 before reaching c3.  
 
-C2 treats it as the parent type that applies to any continuation, i.e. one with just a
-continuation pointer.  C2 then gives C3 a copy of the continuation pointer it was called
-with. C3 treates it as the child C3 continuation pointer type, and that has a message field.
+  If c1 were a function instead of a conveyance, then it could declare local variables to
+  share with c3.  We already discussed this option and found problems with maintaining the
+  stack for c2, and for c1.  However here c1 is not a function. Any variables declared in
+  c1's lexecial scope (*) will end up on the ecapsulating function's stack frame.  They
+  can still be used for sharing, but as noted above for the inline function expansion, we
+  would end up with all the local variables from all the conveyances separately allocated
+  on the encapsulating functions stack frame.
 
-But this would make a continuation pointer variable size, which means it would have to be
-referenced, and the target of that reference would have to be allocated somewhere and then
-deallocated.  We are back to the allocation problem.  Alternatively we could place all
-such continuation_pointer structs in a union, and make that the size of a
-continuation_pointer parent type. All messages types would then have to be available at
-compile time.  So much for small and efficent.
+  Essentially this is a message passing problem, c1 desires to send a message
+  to c3, but c2 stands in the way.
 
-7. Thoughts ..
+  The idea of the context pad is to do a static analysis of the code, and where we can see
+  which context variables can not be used simultaneously, and then to place them together
+  on a pad.  We then keep multiple context pads for conveyances to make use of.  This is
+  similar to how we are doing argument passing.
 
-c3 only takes messages from c1.  c3 is in a sense dedicated only to c1.  It is not a
-general use convyance like c2 might be. If there is a place known at compile time where
-the message will be located, that place can be compiled in.  Though such an approach would
-mean that all messages are separate and allocated at compile time.  We could put messages
-that can not occur simultaneously in a union, but accounting for that is a complex
-analysis problem.
+  The number of pads needed is determined by nesting depth in the source code.  Consider
+  for example, if we add a loop to our diagram whereby c3 conditionally continues into c1.
 
-
-All options contemplated so far have lead to either: 1) analysis and unions 2) allocation
-on a stack.  However, we have yet to identify a good way to pop messages from a stack.
-
-There is no control flow or program logic benifit for having c3 is found in the lexical
-scope of c1.  That is just a syntactical convenience for the programmer.  The efficient
-couple of what we are calling context here is actually more general than the nested
-lexical scope definition message passing problem.  Even if we gave up this syntactical
-convenience we would still have this problem of keeping program state outside the
-argument list of the next conveyance.
-
-8....
-                   c1
-                   |
-                  /  \
-                 /    \
-               [c2]--->c3
-               /       | \
-
-Really what is happening here is that c1 is continuing into both c2 and c3.  We can
-think of c3 as a node in a petri net, or as a reservatoin station. It needs to  have
-tokens from both c1 and c2 before it can run.  So our problem with deallocating
-the message really has to do with the fact that c3 does not know how long to
-wait for a message from c2, and that message might not ever arrive. Currently
-continuations are either taken or not, we do not go to the other continuations and
-tell them that we will not be taking them.
-
-The current assumption is that only one conveyance can be taken at a time. As
-a consequence of that assumption we placed all the arguments structs into a
-union. Now here is a case that c1 continues into two conveyances and we need
-to allocate non-overlapping arguments structs.
-
-We can also have this:
-
-            c0
-           /  \
-          | .--c1
-          | |  |
-          | |  [c2]
-          \  \ |   \
-           \-> c3
+````
+            .--c1
+   context  |  |
+            |  [c2]
+             \ |   \
+               c3
                | \
+              c1
+````
 
-Here c0 is in a scope yet further out. c3 now has a three input reservation station, with c0
-giving it data first, then c1, and then c2 triggering it to run.  Generally though, I would
-imagine a reservation station as a separate object that emits an event, then c3 would be
-an event handler with one thing causing its to run, that of the event making it to the bottom
-of the event queue.  Still to implement a reservation station we need a function that
-gathers inputs from multiple sources. Anyway, there is probably not a way to do this with
-sufficient efficiency for such at thing as the TM library.
+   We stil only need one context pad, because once we continue from c3 the context pad
+   used to send a message from c1 to c3 is no longer used.  Should this whole structure be
+   embeded in an outer conveyance, and that outer conveyance makes use of context, then
+   the outer conveyance would need to use a separate context pad.  Two levels of nesting,
+   two pads. This is independent of how the code loops, rather it is related to the
+   program structure.
 
-If only c2 did not optionally re-enter the scope, or not, this would be an easy problem, we would
-just push and pop.  I wonder though, is the network a better model than a stack?  Perhaps
-multiple conveyances may leave bits and pieces for another convenence, and some such
-have reservation statons. Each using context having its own reservation station would be the
-same as letting all contexts be non-overlapping.
+   If general use convyeance c2 were in a library and that library were separately
+   maintained, the library would have to be given its own context pads in number that
+   reflect the nesting levels there.
+    
+   This approach will use less memory than giving each conveyance it's own pad,
+   but it migth not be an optimal solution.  For example, at run time, control
+   might not ever pass into deeper nesting layers, yet their context will have
+   been allocated.
 
-If we stopped trying to put contexts in unions, we would not need the static analysis.  Indeed
-we could just use the current stack paradigm provided by Gcc.
+   However, we can not do static analysis when continuation argument values are computed.
+   In which case it is not possible to know which conveyance will call which.  Often we
+   can narrow down the possibilities to a small number of possible continuations. Hence,
+   this solution tends towards the case of having a separate context pad for every
+   context.  Hence, this technique does work, but it might not be an efficient way
+   to allocate context variables.
 
-This problem does not exist with trampolines. With a trampline we can arbitrarily divide up
-the conveyeances in function encapsulated groups, then pope the stack frames up on return. But the
-trampoline was not a good approach to a conveyance library due to all the uncessary calls and
-return overhead.  Of course, the inline function implementation looks like the most efficient
-for this library, but then we do not get to try conveyances.  The original idea was that the
-optimizer would give us similar results with conveyances.
 
-How about the programmer just makes the contexts separate, then someday a tool will
-will be used to do the analysis and create the unions ..
+*** Context stack
 
-Perhaps c1 passes c2 as an argument to c3 ...
+   This proposal is similar to funcitonal encapsulation.  As for functions
+   we push locals on the stack, i.e. push our context to be shared on the
+   stack. Then after it is used we pop it off.  Really the only difference is
+   that we still use a pad for the arguments.
 
-What if we guarantee encapsulation within the c0 lexical scope. Though c2 might continue
-elsewhere, wherever that is, it always comes back to a dedicated conveyance in the c0 scope.
-Then we can define one exit conveyance that does the cleanup.  **
+   Suppose then, that we push context as part of c1, then we pop the context
+   when taking any continuation leaving c1.  However, that would mean that
+   we pop the context when continuing to c2.  The data would be gone when
+   we come back to c3, if indeed we ever come back.
 
-Then we have two approaches that appear to work:
+   If we required that all continuations from c2 return to conyeances that
+   are defined in c1's lexical scope, then we could design into all of
+   these captured conyances a pop stack call.  This looks even more like
+   the solution of using all function encapsulations.
 
-   1. contexts and a tool that places contexts into unions
+ --->
 
-   2. encapsulation requirement within the outer scope, allocate contexts probably on the
-      stack, encapsulation requirement, and dedicated cleanup conveyance that does
-      deallocation.
+proposal:
+
+  We use function encapasulation, but pass argument through pads.  Give
+  the function one argument, that of the pad to use.  The function structure
+  manages encapsulation and context.
+
+  A call to a function encapsulation of conveyances then looks like:
+
+````
+  AR(ar ,Inclusive·3opLL ,0);
+  ar->a0 = lc->element_n;
+  ar->a1 = lc->element_byte_n;
+  ar->rpt = &cx->byte_n;
+  ar->nominal = &&construct_bytes;
+  ar->gt_address_t_n = lc->index_gt_n;
+  continue_from *Inclusive·mul_ib(ar);
+
+```` 
+
+  Two differences from a regular function call.  1) the arguments are copied onto a pad
+  instead of the called function's stack frame 2) the return value is a always talken
+  as a continuation.
 
 

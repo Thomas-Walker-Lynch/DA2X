@@ -49,8 +49,8 @@ TM2x·dealloc_heap:{
   cend;
 }
 
-// swap, uses ar and lc
 // Deallocation for dynamically allocated headers.
+// swap, uses ar and lc
 TM2x·destruct_dealloc_heap:{
   Conveyance destruct ,dealloc;
   Conveyance·swap();
