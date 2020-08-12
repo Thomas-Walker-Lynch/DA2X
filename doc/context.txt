@@ -417,9 +417,9 @@ a function encapsulated conveyance with side tripes.
 
 TM2x·F_PREFIX ContinuationPtr construct_elements
   (
-   ContinuationPtr cx_nominal 
-   ,ContinuationPtr cx_index_gt_n
-   ,ContinuationPtr cx_alloc_fail
+   ContinuationPtr nominal 
+   ,ContinuationPtr index_gt_n
+   ,ContinuationPtr alloc_fail
    ){
   Conveyance scale ,construct_bytes;
   Conveyance·swap();

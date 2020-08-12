@@ -142,9 +142,9 @@ TM2x·F_PREFIX ContinuationPtr construct_bytes(){
 // depends on: construct_bytes
 TM2x·F_PREFIX ContinuationPtr construct_elements
   (
-   ContinuationPtr cx_nominal 
-   ,ContinuationPtr cx_index_gt_n
-   ,ContinuationPtr cx_alloc_fail
+   ContinuationPtr nominal 
+   ,ContinuationPtr index_gt_n
+   ,ContinuationPtr alloc_fail
    ){
   Conveyance scale ,construct_bytes;
   Conveyance·swap();
@@ -173,17 +173,17 @@ TM2x·F_PREFIX ContinuationPtr construct_elements
   };
 
   index_gt_n:{
-    leave_continue_from cx->index_gt_n;
+    leave_continue_from index_gt_n;
     cend;
   }
 
   nominal:{
-    leave_continue_from cx_nominal;
+    leave_continue_from nominal;
     cend;
   }
 
   alloc_fail:{
-    leave_continue_from cx_alloc_fail;
+    leave_continue_from alloc_fail;
     cend;
   }
     
