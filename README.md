@@ -1,8 +1,4 @@
 
-This branch is another look at function encapsulated conveyances as a method for managing
-context.
-
-
 # TM2x
 
 A dynamic array for C, along with an iterator.  It is written in C.
