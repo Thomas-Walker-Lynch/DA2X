@@ -623,5 +623,5 @@
 
    c2 can reliably send messages to the correct c4.  c1 can reliable send messages
    to the correct c3.  However, it does not appear that c1 can send messages
-   to c4, without c2 being a cognizant relay.
+   to c4, without c2 being a relay specifically designed for the message.
 
