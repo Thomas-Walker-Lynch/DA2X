@@ -453,11 +453,11 @@
    stack call. At that point the only difference from the functional encapsulation
    approach would be that we use a pad for the arguments.
 
-*** Sending messages with continue_from calls.
+*** Explicit message passing
 
    In the control flow pattern under discussion, c1 is sending a message to c3.  Now
    suppose that c3 is not defined in c1's lexical scope, and that c3 is a general use
-   conveyance. Let us limit analysis here to a single thread of execution.
+   conveyance. Also, let us limit analysis here to a single thread of execution.
 
    c3 still needs two messages, one provided directly as part of being continued into from
    c2.  The other sent by c1 during an earlier point in the execution stream. c3 is
@@ -465,11 +465,13 @@
    know which messages correspond to which when putting them in pairs.
 
    In data flow systems we accomplish such alignment of messages by giving each a token,
-   and then having a reservations stations in front of execution units, here are
-   conveyances. Only when all the tokens are received, i.e. all the synchronized messages
-   have arrived, do we continue with processing. This approach would require even more
-   memory than dedicating a context pad to each conveyance.  It would also be unusual to do
-   such a thing when we are not synchronizing data between separate theads of execution.
+   and then having a reservations stations in front of execution units.  Here our
+   executation units are the conveyances. Only when a set of matching tokens are received,
+   i.e. when all the messages in a synchronized set have arrived, do we continue with
+   execution. This approach would require even more memory than dedicating a context pad
+   to each conveyance.  It would also be unusual to do such a thing when we are not
+   synchronizing data between separate theads of execution. It is a too heavy of a
+   solution for something like our TM2x library.
 
    c3 essentially has two paths for receiving messages.  On one path it receives messages
    from c1, and on the other path it receives messages from c2.  When c3 was defined in
@@ -489,18 +491,18 @@
    it both the arguments and the message. The two both came from the same continuation
    pointer, so like entangled particles, they are already synchronized.
 
-   Suppose our message for c3 were allocated on the heap. When c2 continues into c3, it
-   would go through the unused continuation pointers and deallocate their messages. In
-   general, when a conveyance continues forward to another conveyance it would deallocate
-   all the messages in the unusued continuation ponters.  This is one solution to the
-   deallocation problem.
+   Suppose our message for c3 were allocated on the heap. Just before c2 continues into
+   c3, c2 code would go through the unused continuation pointers and deallocate their
+   messages. In general, when a conveyance continues forward to another conveyance it
+   would deallocate all the messages in the unusued continuation ponters.  This is a
+   solution to the deallocation problem.
 
    Now consider this pattern:
 
             .--c1
          m0 |  |
             |  c2--.
-            | /|   | m1
+            |  |   | m1
             |  |   |
             |  c3  |
              \ |  /
@@ -518,8 +520,6 @@
    graph, thus we are guaranteed that one message will suffice independent of the graph
    topology.  We send along one message, and it collects data as it goes, then
    it gets used when it reaches it's destination.
-
-   
 
 * Proposal:
 
