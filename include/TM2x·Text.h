@@ -1,37 +1,16 @@
-/*
-  This is not a traditional header, and can not be used as such.
-
-  #include "TM2x·text.h" after the Args and Data unions.
-
-  Provided that this is included into main or another function, the outer scope instances
-  here, e.g. TM2·constructed_count, will be on the stack, and thus thread safe.
-
-  Would be nice if we could give an inline option to conveyances.
-
-*/
 #include "TM2x.h"
-
-// interfaces will be used for L2
-/*
-struct Text·TM2x{
-  ConveyancePtr alloc_heap;
-} Text·TM2x
-={
-  &&TM2x·alloc_heap
-};
-*/
 
 // 'thread static' allocation class
 address_t TM2x·constructed_count = 0;
 
 #define MINIMUM_ALLOC_EXTENT 15
-address_t power_2_extent_w_lower_bound(address_t byte_n){
+INLINE_PREFIX address_t power_2_extent_w_lower_bound(address_t byte_n){
   if( byte_n < MINIMUM_ALLOC_EXTENT) return MINIMUM_ALLOC_EXTENT;
   return power_2_extent(byte_n);
 }
 
 // no swap, uses only AR
-TM2x·F_PREFIX ContinuationPtr TM2x·destruct(){
+INLINE_PREFIX ContinuationPtr TM2x·destruct(){
   AR(ar ,TM2x·destruct ,0);
   free(ar->tape->base_pt);
   TM2x·constructed_count--;
@@ -40,7 +19,7 @@ TM2x·F_PREFIX ContinuationPtr TM2x·destruct(){
 }
 
 // no swap, uses only AR
-TM2x·F_PREFIX ContinuationPtr TM2x·dealloc_heap(){
+INLINE_PREFIX ContinuationPtr TM2x·dealloc_heap(){
   AR(ar ,TM2x·destruct ,0);
   free(ar->tape);
   leave_continue_from *ar->nominal;
@@ -49,7 +28,7 @@ TM2x·F_PREFIX ContinuationPtr TM2x·dealloc_heap(){
 
 // Deallocation for dynamically allocated headers.
 // swap, uses ar and lc
-TM2x·F_PREFIX ContinuationPtr destruct_dealloc_heap(){
+INLINE_PREFIX ContinuationPtr destruct_dealloc_heap(){
   Conveyance destruct ,dealloc;
   Conveyance·swap();
   LC(lc ,TM2x·dealloc_heap ,0);
@@ -59,7 +38,7 @@ TM2x·F_PREFIX ContinuationPtr destruct_dealloc_heap(){
 
   continue_from destruct;
 
-  destruct:{
+  cdef(destruct){
     AR(ar ,TM2x·destruct ,1);
     ar->tape = lc->tape;
     ar->nominal = &&dealloc;
@@ -67,7 +46,7 @@ TM2x·F_PREFIX ContinuationPtr destruct_dealloc_heap(){
     cend;
   }
 
-  dealloc:{
+  cdef(dealloc){
     free(cx_tape);
     leave_continue_from cx_nominal;
     cend;
@@ -80,7 +59,7 @@ TM2x·F_PREFIX ContinuationPtr destruct_dealloc_heap(){
 //  Dynamic allocation of the TM2x header.  For static allocation use the AllocStatic()
 //  macro.  This does not allocate data for the array itself.
 //  Ah too bad, the only reason context is here is to pop the context.
-TM2x·F_PREFIX ContinuationPtr alloc_heap(){
+INLINE_PREFIX ContinuationPtr alloc_heap(){
   Conveyance·swap();
   LC(lc ,TM2x·alloc_heap ,0);
 
@@ -94,11 +73,11 @@ TM2x·F_PREFIX ContinuationPtr alloc_heap(){
   ar->fail    = &&fail;
   continue_from *CLib·mallocn();
 
-  nominal:{
+  cdef(nominal){
     leave_continue_from cx_nominal;
     cend;
   }
-  fail:{
+  cdef(fail){
     leave_continue_from cx_fail;
     cend;
   }
@@ -109,7 +88,7 @@ TM2x·F_PREFIX ContinuationPtr alloc_heap(){
 //----------------------------------------
 //  Construct an allocated array. 
 //  Given the exent in bytes, sets aside heap memory for the data.
-TM2x·F_PREFIX ContinuationPtr construct_bytes(){
+INLINE_PREFIX ContinuationPtr construct_bytes(){
   Conveyance·swap();
   LC(lc ,TM2x·construct_bytes ,1);
   TM2x·constructed_count++; // to assist with debugging
@@ -126,11 +105,11 @@ TM2x·F_PREFIX ContinuationPtr construct_bytes(){
   ar->fail    = &&alloc_fail;
   continue_from CLib·mallocn;
 
-  nominal:{
+  cdef(nominal){
     leave_continue_from cx_nominal;
     cend;
   }
-  alloc_fail:{
+  cdef(alloc_fail){
     leave_continue_from cx_alloc_fail;
     cend;
   }
@@ -140,7 +119,7 @@ TM2x·F_PREFIX ContinuationPtr construct_bytes(){
 
 // uses context TM2x0
 // depends on: construct_bytes
-TM2x·F_PREFIX ContinuationPtr construct_elements
+INLINE_PREFIX ContinuationPtr construct_elements
   (
    ContinuationPtr nominal 
    ,ContinuationPtr index_gt_n
@@ -155,7 +134,7 @@ TM2x·F_PREFIX ContinuationPtr construct_elements
 
   continue_from scale;
 
-  scale:{
+  cdef(scale){
     AR(ar ,Inclusive·3opLL ,0);
     ar->a0 = lc->element_n;
     ar->a1 = lc->element_byte_n;
@@ -164,7 +143,7 @@ TM2x·F_PREFIX ContinuationPtr construct_elements
     cend;
   };
 
-  construct_bytes:{
+  cdef(construct_bytes){
     AR(ar ,TM2x·construct_bytes ,0);
     ar->tape       = tape;
     ar->byte_n     = byte_n;
@@ -172,17 +151,17 @@ TM2x·F_PREFIX ContinuationPtr construct_elements
     cend;
   };
 
-  index_gt_n:{
+  cdef(index_gt_n){
     leave_continue_from index_gt_n;
     cend;
   }
 
-  nominal:{
+  cdef(nominal){
     leave_continue_from nominal;
     cend;
   }
 
-  alloc_fail:{
+  cdef(alloc_fail){
     leave_continue_from alloc_fail;
     cend;
   }
@@ -206,7 +185,7 @@ construct_write_bytes(){
 
   continue_from construct;
 
-  construct:{
+  cdef(construct){
     AR(ar ,TM2x·construct_bytes.tape ,0);
     ar->tape = lc->tape;
     ar->byte_n = lc->byte_n;
@@ -216,7 +195,7 @@ construct_write_bytes(){
     cend;
   }
   
-  write:{
+  cdef(write){
     memcpyn(TM2x·byte_0_pt(cx->tape), cx->source_pt, cx->byte_n);
     continue_from *cx->nominal;
     cend;
@@ -228,7 +207,7 @@ construct_write_bytes(){
 // uses context TM2x1
 // depends on: mul_ib ,construct_write_bytes
 // dependency with context: construct_write_bytes
-TM2x·F_PREFIX ContinuationPtr construct_write_elements(){
+INLINE_PREFIX ContinuationPtr construct_write_elements(){
   Conveyance scale ,construct_write_bytes;
   Conveyance·swap();
   LC(lc ,TM2x·construct_write_elements ,0);
@@ -241,7 +220,7 @@ TM2x·F_PREFIX ContinuationPtr construct_write_elements(){
 
   continue_from scale;
 
-  scale:{
+  cdef(scale){
     AR(ar ,Inclusive·3opLL ,0);
     ar->a0             = lc->element_n;
     ar->a1             = lc->element_byte_n;
@@ -252,7 +231,7 @@ TM2x·F_PREFIX ContinuationPtr construct_write_elements(){
     cend;
   }
 
-  construct_write_bytes:{
+  cdef(construct_write_bytes){
     AR(ar ,TM2x·construct_write_bytes ,0);
     ar->tape      = cx->tape;
     ar->source_pt = cx->source_pt;
@@ -284,7 +263,7 @@ Args.TM2x·construct_write(){
 }
 
 // construct and initialize tape from another TM
-TM2x·F_PREFIX ContinuationPtr construct_write_TM2x{
+INLINE_PREFIX ContinuationPtr construct_write_TM2x{
   Conveyance·swap();
   LC(lc  ,TM2x·construct_write_TM2x ,0);
 
@@ -299,7 +278,7 @@ TM2x·F_PREFIX ContinuationPtr construct_write_TM2x{
   cend;
 };
 
-TM2x·F_PREFIX ContinuationPtr copy_bytes(){
+INLINE_PREFIX ContinuationPtr copy_bytes(){
   AR(ar  ,TM2x·copy_bytes ,0);
 
   if( 
@@ -320,7 +299,7 @@ TM2x·F_PREFIX ContinuationPtr copy_bytes(){
 
 } 
 
-TM2x·F_PREFIX ContinuationPtr copy_elements(){
+INLINE_PREFIX ContinuationPtr copy_elements(){
   Conveyance nominal ,byte_n ,src_byte_i ,dst_byte_i ,copy_bytes;
   Conveyance·swap();
   AR(ar ,TM2x·construct_write_elements ,0);
@@ -342,7 +321,7 @@ TM2x·F_PREFIX ContinuationPtr copy_elements(){
 
   continue_from byte_n;
 
-  byte_n:{
+  cdef(byte_n){
     AR(ar ,Inclusive·3opLL ,0);
     ar->a0             = cx->element_n;
     ar->a1             = cx->element_byte_n;
@@ -352,7 +331,7 @@ TM2x·F_PREFIX ContinuationPtr copy_elements(){
     continue_from Inclusive·mul_ib;
   }
 
-  src_byte_i:{
+  cdef(src_byte_i){
     AR(ar ,Inclusive·3opLL ,0);
     ar->a0             = cx->src_element_i;
     ar->a1             = cx->element_byte_n;
@@ -363,7 +342,7 @@ TM2x·F_PREFIX ContinuationPtr copy_elements(){
     cend;
   }
 
-  dst_byte_i:{
+  cdef(dst_byte_i){
     AR(ar ,Inclusive·3opLL ,0);
     ar->a0             = cx->dst_element_i;
     ar->a1             = cx->element_byte_n;
@@ -374,7 +353,7 @@ TM2x·F_PREFIX ContinuationPtr copy_elements(){
     cend;
   }
 
-  copy_bytes:{
+  cdef(copy_bytes){
     AR(ar ,TM2x·construct_copy_bytes ,0);
     ar->src             = cx->src;
     ar->src_byte_i      = cx->src_byte_i;
@@ -403,7 +382,7 @@ Our attention is focused on the tape, so we call this a 'read' operation.
 
 */
 
-TM2x·F_PREFIX ContinuationPtr index·read(){
+INLINE_PREFIX ContinuationPtr index·read(){
   TM2x *tape               = Args.TM2x·index·read.tape;              
   address_t index          = Args.TM2x·index·read.index;         
   address_t element_n      = Args.TM2x·index·read.element_byte_n;
@@ -421,7 +400,7 @@ TM2x·F_PREFIX ContinuationPtr index·read(){
   inclusive·mul_ib·args.gt_address_n = index_gt_n;
   continue_from inclusive·mul_ib;
 
-  mul_ib·nominal:{
+  cdef(mul_ib·nominal){
     address_t byte_i;
     inclusive·mul_ib·args.an = index;
     inclusive·mul_ib·args.bn = element_byte_n;
@@ -441,10 +420,10 @@ TM2x·F_PREFIX ContinuationPtr index·read(){
     continue_from TM2x·index·to_pt;
   }
 
-  index_nominal:{
+  cdef(index_nominal){
 
 
-    mul_ib·nominal:{
+    cdef(mul_ib·nominal){
       if( 
 
     }
@@ -457,7 +436,7 @@ TM2x·F_PREFIX ContinuationPtr index·read(){
   cend;
 }
 
-TM2x·F_PREFIX ContinuationPtr index·to_pt{
+INLINE_PREFIX ContinuationPtr index·to_pt{
   TM2x *tape               = Args.TM2x·index·to_pt.tape;
   address_t index          = Args.TM2x·index·to_pt.index;
   address_t element_byte_n = Args.TM2x·index·to_pt.element_byte_n;
@@ -473,7 +452,7 @@ TM2x·F_PREFIX ContinuationPtr index·to_pt{
   inclusive·mul_ib·args.gt_address_n = index_gt_n;
   continue_from inclusive·mul_ib;
 
-  mul_ib·nominal:{
+  cdef(mul_ib·nominal){
     if( byte_i > TM2x·byte_n(tape) ) continue_from index_gt_n;
     *pt = (void *)(TM2x·byte_0_pt(tape) + byte_i);
     cend;
@@ -487,7 +466,7 @@ TM2x·F_PREFIX ContinuationPtr index·to_pt{
 
 
 
-TM2x·F_PREFIX ContinuationPtr pop(){
+INLINE_PREFIX ContinuationPtr pop(){
    TM2x *tape                = Args.TM2x·pop.tape;           
    address_t element_byte_n  = Args.TM2x·pop.element_byte_n; 
    ConveyancePtr nominal      = Args.TM2x·pop.nominal;        
@@ -501,7 +480,7 @@ TM2x·F_PREFIX ContinuationPtr pop(){
 
 
 
-TM2x·F_PREFIX ContinuationPtr push_bytes(){
+INLINE_PREFIX ContinuationPtr push_bytes(){
   TM2x *tape              = TM2x·push_bytes.args.tape;           
   void *source_pt         = TM2x·push_bytes.args.source_pt;      
   address_t source_byte_n = TM2x·push_bytes.args.source_byte_n;  
@@ -526,7 +505,7 @@ Args.TM2x·push_elements.{
   ConveyancePtr index_gt_n    = Args.TM2x·push_elements.index_gt_n;
  }
 
-  TM2x·push:{
+  cdef(TM2x·push){
     TM2x *tape                 = Args.TM2x·push.tape;
     void *element_base_pt      = Args.TM2x·push.element_base_pt;
     address_t element_byte_n   = Args.TM2x·push.element_byte_n;
@@ -542,7 +521,7 @@ Args.TM2x·push_TM2x.{
   ConveyancePtr alloc_fail   = Args.TM2x·push_TM2x.alloc_fail;
 }
 
-TM2x·F_PREFIX ContinuationPtr read_pop(){
+INLINE_PREFIX ContinuationPtr read_pop(){
   TM2x *tape                 = Args.TM2x·read_pop.TM2x *tape;            
   void *dst_element_pt       = Args.TM2x·read_pop.void *dst_element_pt;  
   address_t element_byte_n   = Args.TM2x·read_pop.address_t element_byte_n;
@@ -565,7 +544,7 @@ TM2x·F_PREFIX ContinuationPtr read_pop(){
 
 extern address_t TM2x·constructed_count;
 
-TM2x·F_PREFIX ContinuationPtr resize_bytes(){
+INLINE_PREFIX ContinuationPtr resize_bytes(){
   // shorten the arg names, give the optimizer something more to do
   TM2x *tape = Args.TM2x·resize_bytes.tape;
   address_t after_byte_n = Args.TM2x·resize_bytes.after_byte_n;
@@ -590,7 +569,7 @@ TM2x·F_PREFIX ContinuationPtr resize_bytes(){
   #include "CLib·mallocn.h"
   continue_from CLib·mallocn;
 
-  malloc_nominal:{
+  cdef(malloc_nominal){
     #ifdef TM2x·TEST
       TM2x·Test·allocation_n = after_alloc_n;
     #endif
@@ -603,7 +582,7 @@ TM2x·F_PREFIX ContinuationPtr resize_bytes(){
     cend
   }
 
-  malloc_fail:{
+  cdef(malloc_fail){
    continue_from *alloc_fail;
    cend
   }
@@ -616,7 +595,7 @@ TM2x·F_PREFIX ContinuationPtr resize_bytes(){
 */
 
 
-TM2x·F_PREFIX ContinuationPtr F_PREFIX ConveyancePtr TM2x·resize_elements(){
+INLINE_PREFIX ContinuationPtr F_PREFIX ConveyancePtr TM2x·resize_elements(){
   TM2x *tape                = Args.TM2x·resize_elements.tape;
   address_t after_element_n = Args.TM2x·resize_elements.after_element_n;
   address_t element_byte_n  = Args.TM2x·resize_elements.element_byte_n;
@@ -633,13 +612,13 @@ TM2x·F_PREFIX ContinuationPtr F_PREFIX ConveyancePtr TM2x·resize_elements(){
   inclusive·mul_ib·args.gt_address_n = index_gt_n;
   continue_from inclusive·mul_ib;
 
-  mul_ib·nominal:{
-   resize_bytes·args.tape = tape;
-   resize_bytes·args.after_byte_n = after_byte_n;
-   resize_bytes·args.nominal = nominal;
-   resize_bytes·args.alloc_fail = alloc_fail;
-   contine_from TM2x·resize_bytes;
-   cend;
+  cdef(mul_ib·nominal){
+    resize_bytes·args.tape = tape;
+    resize_bytes·args.after_byte_n = after_byte_n;
+    resize_bytes·args.nominal = nominal;
+    resize_bytes·args.alloc_fail = alloc_fail;
+    contine_from TM2x·resize_bytes;
+    cend;
   }
 
   cend;
@@ -654,7 +633,7 @@ The only tape explicitly identified is the dst tape, so we say that
 we are writing the dst tape.
 
 */
-TM2x·F_PREFIX ContinuationPtr write_bytes(){
+INLINE_PREFIX ContinuationPtr write_bytes(){
           TM2x *dst             = Args.TM2x·write_bytes.dst          
      address_t  dst_byte_i      = Args.TM2x·write_bytes.dst_byte_i   
           void *src_pt          = Args.TM2x·write_bytes.src_pt       
