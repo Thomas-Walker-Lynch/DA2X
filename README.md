@@ -1,9 +1,5 @@
 
-This attempt at writing a purve conveyance version of the TM2x library highlighted the 
-need to manage context data, i.e. data that is sent as a message to a continuation that
-will be run in the future, but not one being directly called.  This is analogous to context
-shared with lambda functions.
-
+Revisting function encapsulated conveyances for managing context.
 
 # TM2x
 
