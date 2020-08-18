@@ -321,6 +321,7 @@ INLINE_PREFIX ContinuationPtr copy_elements(){
 
   continue_from byte_n;
 
+  // c1
   cdef(byte_n){
     AR(ar ,Inclusive·3opLL ,0);
     ar->a0             = cx->element_n;
@@ -331,6 +332,7 @@ INLINE_PREFIX ContinuationPtr copy_elements(){
     continue_from Inclusive·mul_ib;
   }
 
+  // c2
   cdef(src_byte_i){
     AR(ar ,Inclusive·3opLL ,0);
     ar->a0             = cx->src_element_i;
@@ -342,6 +344,7 @@ INLINE_PREFIX ContinuationPtr copy_elements(){
     cend;
   }
 
+  // c3
   cdef(dst_byte_i){
     AR(ar ,Inclusive·3opLL ,0);
     ar->a0             = cx->dst_element_i;
@@ -353,6 +356,7 @@ INLINE_PREFIX ContinuationPtr copy_elements(){
     cend;
   }
 
+  // c4
   cdef(copy_bytes){
     AR(ar ,TM2x·construct_copy_bytes ,0);
     ar->src             = cx->src;
@@ -367,7 +371,7 @@ INLINE_PREFIX ContinuationPtr copy_elements(){
     cend;
   }
 
-  cend;
+  eend;
 }
 
 #if 0
