@@ -3,7 +3,7 @@
 
   Our goal here is to identify techniques for implementing conveyances while using the C
   language.  I want to be close to the hardware so I chose C which is one step away from
-  assembly, though an assembler would surely have had a better macro front end.
+  assembly, though an assembler would surely have had a better macro processor.
 
 * Conveyances and Continuation
 
@@ -14,7 +14,6 @@
 
   Due to limitations of C labels which are used in the cdef macro, currently a conveyance
   may not be declared at global scope. Rather a conveyance must be declared within a function.
-  Inside of main() is not a bad place to put them.
 
 
 ````
@@ -30,17 +29,17 @@
   An encapsulation is a function like object used to hold conveyances. The definition of
   an encapsulation starts with the `encapsulation(name)` macro, and ends with an `eend` macro.
 
-  By contract with the programmer, we required that from the point of entry into the
-  encapsulation that all paths of execution lead to a `leave_to` macro call. If we hit
-  the eend macro, bad things will happen.
+  By contract with the programmer:
 
-  The `leave_to` macro is how we return from an encapsulation.  By contract with the user
-  the return value must be one of the ConveyancePtrs that was passed into the
+  1. We required that all paths of execution stemming from the point of entry will lead to
+  a `leave_to` macro call. If we hit the `eend` macro, bad things will happen.
+
+  2. The return value must be one of the ConveyancePtrs that was passed into the
   encapsulation.
 
-  By contract with the programmer, conveyances must be declared on the first line of a
-  lexical scope they appear in. (If they are not declared, then they will all appear
-  at the top level function scope independent of where they occur in lexical scope.)
+  3. Conveyances must be declared on the first line of a lexical scope they appear in. (If
+  they are not declared, then they will all appear at the top level function scope
+  independent of where they occur in lexical scope.)
 
 
 ````
@@ -69,7 +68,7 @@
       }
 ````
 
-  Here `f` accepts as arguments and integer and two `ConveyancePtrs`. The conveyances `a` and `b`
+  Here `f` accepts as arguments an integer and two `ConveyancePtrs`. The conveyances `a` and `b`
   are defined inside the lexical scope of `f`, and neither `a` nor `b` convey to a point
   outside of `f`.
 
@@ -78,7 +77,7 @@
   with the programmer, an encapsulating function may only `leave_to` a `ConveyancePtr`
   argument value that was passed in.
 
-  Because `leave_to` returns a conveyance pointer to use an encapsulation we convey it, as
+  Because `leave_to` returns a conveyance pointer we may convey to a an encapsulation, as
   shown here:
 
 ````
