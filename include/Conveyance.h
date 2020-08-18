@@ -5,14 +5,13 @@
 
 typedef void **ConveyancePtr; 
 #define Conveyance __label__
-
-#define continue_from goto
+#define convey goto
 #define cdef(c) abort();c:
 #define cend abort();
-#define encapsulation(name) ConveyancePtr name
 
-// must be followed by an ContinuationPtr argument that was passed in
-#define leave_continue_from return
+#define encapsulation(name) ConveyancePtr name
+#define eend abort();
+#define leave_to return
 
 // May call more than once to get multiple variables with different interpretations of the same args.
 // Declare local pad pointers

@@ -3,14 +3,18 @@
 
   Our goal here is to identify techniques for implementing conveyances while using the C
   language.  I want to be close to the hardware so I chose C which is one step away from
-  an assembler, though an assembler would probably have had a better macro front end.
+  an assembly, though an assembler would surely have had a better macro front end.
 
-* Conveyance
+* Conveyances and Continuation
 
-  A conveyance is a labeled section of braced code.  A conveyance is called like a
-  function by using the `continue_from` macro. We never flow into a conveyance. A
-  conveyance must branch to another conveyance, or exit the program, before reaching the
-  closing brace.  We call such a branch a ‘continuation’.
+  A conveyance is analogous to a function.  Where as a function is ‘called’, a conveyance
+  is ‘conveyed’.
+
+  A conveyance is defined by starting with a `cdef` macro and ending with a `cend` macro.
+
+  Due to limitations of C labels which are used in the cdef macro, currently a conveyance
+  may not be declared at global scope. Rather a conveyance must be declared within a function.
+  Inside of main() is not a bad place to put them.
 
 
 ````
@@ -21,59 +25,69 @@
       }
 ````
 
-  A conveyance starts with the `cdef` macro and ends with the `cend` macro. Control
-  should never reach `cend`.
+* encapsulation
 
-* function encapsulation
+  An encapsulation is a function like object used to hold conveyances. The definition of
+  an encapsulation starts with the `encapsulation(name)` macro, and ends with an `eend` macro.
 
-  If all conveyances and their continuations occur within a function, with the only exit
-  from the function being through a `leave_continue_from` macro call, then we say that
-  the conveyances are ‘function encapsulated’.
+  By contract with the programmer, we required that from the point of entry into the
+  encapsulation that all paths of execution lead to a `leave_to` macro call. If we hit
+  the eend macro, bad things will happen.
 
-  The function that the conveyances are encapsulated in may be called the ‘encapsulating
-  function’, or the ‘encapsulation’.  Encapsulating functions either exit the program or
-  return a `ConveyancePtr`.  This returned `ConveyancePtr` must be one among those passed
-  in.
+  The `leave_to` macro is how we return from an encapsulation.  By contract with the user
+  the return value must be one of the ConveyancePtrs that was passed into the
+  encapsulation.
+
+  By contract with the programmer, conveyances must be declared on the first line of a
+  lexical scope they appear in. (If they are not declared, then they will all appear
+  at the top level function scope independent of where they occur in lexical scope.)
+
 
 ````
       encapsulation(f)(int i ,ConveyancePtr not_five ,ConveyancePtr five){
+        Conveyance a ,b;
 
         int j = 7;
         ink k = 9;
 
-        continue_from a;
+        convey a;
 
         cdef(a){
-          continue_from b;
+          convey b;
           cend;
         }
 
         cdef(b){
           if( i + j + k == 21 )
-            leave_continue_from five;
+            leave_to five;
           else
-            leave_continue_from not_five;
+            leave_to not_five;
           cend;
         }
 
+        eend;
       }
 ````
-  Here conveyances `a` and `b` are defined inside the lexical scope of `f`, and neither
-  `a` nor `b` `continue_from` another conveyance that is outside of `f`. `f` accepts
-  as arguments `ConveyancePtr` continuations.  This function picks one of the passed in
-  conveyances to `leave_continue_from`. Here the term ‘leave’ refers to leaving the
-  context defined by the function.  An encapsulating function may only `leave_continue_from`
-  a `ConveyancePtr` argument value that was passed in.
 
-  Because `f` returns a conveyance it is called as through it were a continuation. Such
-  a function is used like this:
+  Here `f` accepts as arguments and integer and two `ConveyancePtrs`. The conveyances `a` and `b`
+  are defined inside the lexical scope of `f`, and neither `a` nor `b` convey to a point
+  outside of `f`.
+
+  This function picks one of the passed in conveyance pointers to `leave_to`. Here the
+  term ‘leave’ refers to leaving the context defined by the encapsulation.  By contract
+  with the programmer, an encapsulating function may only `leave_to` a `ConveyancePtr`
+  argument value that was passed in.
+
+  Because `leave_to` returns a conveyance pointer to use an encapsulation we convey it, as
+  shown here:
 
 ````
     int main(){
+      Conveyance not_five ,five;
 
       int i = 5;
 
-      continue_from *f( i ,&&not_five ,&&five);
+      convey *f( i ,&&not_five ,&&five);
 
       cdef(not_five){
         printf("%d" ,i);
@@ -90,81 +104,92 @@
     }
 ````
 
-  Here `not_five` and `five` are continuations defined in the `main()` function.  The call
+  Here `not_five` and `five` are conveyances defined in the `main()` function.  The call
   to `f` will continue through to be either `not_five` or to `five`. An examination of `f`
   will show that it always returns the five continuation. Hopefully the optimizer would
   catch on to that and eliminate the function call and the `not_five` conveyance.
 
   Variables declared in an encapsulating function, as for all functions, are by default
   declared in the function's stack frame.  C calls this the ‘auto’ storage class. Thus,
-  function encapsulated continuations may share the variables declared in the encapsulation.
+  function encapsulated conveyances may share the variables declared in the encapsulation.
   Together we call these variables the ‘context’ of the conveyances.
 
   Though functions normally have only one point of return, we use a trampoline to
   effectively give encapsulating functions multiple points of return. If we had more
   control over compilation we could eliminate the return and trampoline, and instead pop
-  the context off the stack and directly continue at the continuation points. Perhaps
-  someday the compiler optimizer will recognize such paterns and do this replacement
-  for us.
+  the context off the stack and convey directly to the other scope. Perhaps someday the
+  compiler optimizer will recognize such patterns and do this replacement for us. Also
+  likely is that we will end up with a new computer language with native support for
+  conveyances.
 
   Gcc has a nested function extension which makes it possible to define encapsulating
   functions inside of other functions. Nested functions may make use of variables found
   in the outer lexical scope context.
 
-  ** more on encapsulate()
+* Pads
 
-    Some sort of encapsulation is necessary if we want to allocate context on the stack, so
-    as to know when to pop the context off the stack.
+  A data pad is a memory buffer shared by multiple conveyances. It may be bound to
+  any number of types. In C we will declare these types in advance as structs, so
+  a pad is a union of structs.
 
-    Accordingly every call to another conveyance will be a call to an function encapsulated
-    conveyance, and its return value will be a continuation to some point in the caller,
-    because the caller is also encapsulated.
+  Because conveyances do not return, there is no reason to place their arguments
+  nor a return address on to the stack.  Instead, to pass arguments to a conveyance
+  we write those arguments to a pad, we will recycle the pad to pass arguments to
+  the next conveyance.  
 
-    The only way to leave the function encapsulation is through a 'leave_continuation_from'
-    macro, while providing it a ContinuationPtr argument that was passed into the function.
+  We may do a similar thing with a call to an encapsulation. Because arguments
+  end up in the stack frame of the encapsulation, we need only to pass arguments
+  that will become part of the encapsulation context.  Arguments that are
+  not used as messages between the encapsulated conveyances, i.e. that are not
+  part of the encapsulation's context, may be passed through a pad.
 
-    We do not pass arguments to the function encapsulation, but rather we write those to
-    the arguments pad. We do pass the continuation parameters as those are nearly always
-    needed as context.  Only context ends up on the stack.
-
-    A call to a function encapsulation of conveyances then looks like:
+  While using a pad, a call to a function encapsulation of conveyances might look like
+  this:
 
   ````
     AR(ar ,Inclusive·3opLL ,0);
     ar->a0 = lc->element_n;
     ar->a1 = lc->element_byte_n;
     ar->rpt = &cx->byte_n;
-    continue_from *Inclusive·mul_ib(nominal ,gt_address_t_n);
+    convey *Inclusive·mul_ib(nominal ,gt_address_t_n);
 
   ````
 
-  Example of an encapsulated continutation with other continuations defined in its lexical scope,
-  and continuations into general use function encapsulated conveyances that return here.  I.e.
-  a function encapsulated conveyance with side tripes.
+  In this example, the AR macro sets up a pointer to point to the arguments pad. Then
+  the arguments are copied to the pad, and then we convey the `Inclusive·mul_ib`
+  encapsulation.
+
+  The following example is what the `construct_elements` encapsulation might
+  look like in the TM2x library.  We make use of two pads.  One for arguments
+  and one for local variables.  We often swap these upon entering an
+  encapsulation so that we might more easily build the arguments pad for
+  the next conveyance.  The LC macro sets up a pointer to point to the
+  local pad.  
+
 
   ````
 
-  TM2x·F_PREFIX ContinuationPtr construct_elements
+  encapsulation(construct_elements)
     (
      ContinuationPtr nominal
      ,ContinuationPtr index_gt_n
      ,ContinuationPtr alloc_fail
      ){
-    Conveyance scale ,construct_bytes;
+    Conveyance scale ,construct_bytes ,local_index_gt_n ,local_nominal ,local_alloc_fail;
     Conveyance·swap();
     LC(lc ,TM2x·construct_elements ,1);
 
     tape = lc->tape;
     address_t byte_n;
 
-    continue_from scale;
+    convey scale;
 
     cdef(scale){
       AR(ar ,Inclusive·3opLL ,0);
       ar->a0 = lc->element_n;
       ar->a1 = lc->element_byte_n;
       ar->rpt = &byte_n;
-      continue_from Inclusive·mul_ib(&&construct_bytes ,&&index_gt_n);
+      convey Inclusive·mul_ib(&&construct_bytes ,&&local_index_gt_n);
       cend;
     };
 
@@ -172,22 +197,22 @@
       AR(ar ,TM2x·construct_bytes ,0);
       ar->tape       = tape;
       ar->byte_n     = byte_n;
-      continue_from TM2x·construct_bytes(&&nominal ,&&alloc_fail);
+      convey TM2x·construct_bytes(&&local_nominal ,&&local_alloc_fail);
       cend;
     };
 
-    cdef(index_gt_n){
-      leave_continue_from index_gt_n;
+    cdef(local_index_gt_n){
+      leave_to index_gt_n;
       cend;
     }
 
-    cdef(nominal){
-      leave_continue_from nominal;
+    cdef(local_nominal){
+      leave_to nominal;
       cend;
     }
 
-    cdef(alloc_fail){
-      leave_continue_from alloc_fail;
+    cdef(local_alloc_fail){
+      leave_to alloc_fail;
       cend;
     }
 
@@ -196,60 +221,15 @@
   }
   ````
 
-  It is too bad that we have to place the last three conveyances here, `index_gt_n`, etc.  It is
-  too bad that the side trips do not just continue directly to the real target of that continuation.  However
-  by returning here first, the function may correctly pop its stack.  We could perhaps eliminate
-  the return and the trampoline, but the pop of context is necessary.
+  It is too bad we need the local conveyances, `local_index_gt_n`, `local_nominal`, and
+  `local_alloc_fail`.  Their sole purpose is to maintain the integrity of the encapsulation
+  of context.  By having `TM2x·contruct_bytes` and `Inclusive·mul_ib` first convey locally
+  we maintain the encapsulation by assuring that the stack frame gets popped.  If we
+  did not need to pop the stack frame, `TM2x·contruct_bytes` and `Inclusive·mul_ib` could
+  convey directly to `index_gt_n`, `nominal`, and `alloc_fail`.
 
-* Shared general use conveyances
-
-  Say we included all the shared conveyances at the top of main as a sort of library.
-  Then any conveyance in the program might continue into one of the library
-  conveyances while providing further continuations as arguments. But then how
-  would we handle argument passing and context?
-
-** Pad
-
-  A data pad is a memory buffer shared by mutliple conveyances. It may be bound to
-  any number of types. In C we will declare these types in advance as structs, so
-  a pad is a union of structs.
-
-  We may use a pad to send arguments into a conveyance. As conveyances do not return
-  there is no reason to push and pop arguments, the pad may simply be recycled.
-
-** Argument passing
-
-  Suppose we wanted to have arguments for a conveyance.  We can use a pad to accomplish
-  this.  Because only one conveyance runs at a time in a given thread, we may place this
-  pad anywhere.  We need to place it on the stack if we want thread safety.  We will
-  typically declare it in main.
-
-````
-      // set up the pad to pass the arguments
-      address_t result;
-      AR(ar ,Inclusive·3opLL ,0);
-      ar->a0 = 1;
-      ar->a1 = 2;
-      ar->rpt = &result;
-      ar->nominal = &&construct_bytes;
-      ar->gt_address_t_n = lc->index_gt_n;
-
-      // continue into the conveyance
-      continue_from Inclusive·mul_ib;
-````
-
-  AR is a macro that sets the variable `ar` to point to the shared arguments pad.  `ar`
-  will be given the correct type `Inclusive·3opLL` which is the type for the
-  `Inclusive·mul_ib` continuation arguments. We will typically declare the argument pad in
-  the main stack frame. By being in main it will not be popped from the stack until the
-  program returns. In this sense of having the same longevity as the program it is similar
-  to a variable allocated statically in memory.  However, unlike a static allocation, with
-  stack allocation each thread will have its own copy of the pad.
-
-  The conveyance `Inclusive·mul_ib` will then pull its arguments from the shared pad.
-  There is no reason to put the arguments in the called functions stack frame because the
-  conveyance does not return.  Some algorithms will of course need growing state data.  Such
-  growing data will come from the heap and be pointed to by arguments.
+  The remainder of this document explores possibilities for using conveyances without
+  encapsulation.
 
 
 ** Mixed functions and shared conveyance
@@ -261,6 +241,8 @@
 ````
     conveyancePTR f(conveyancePTR nominal ,conveyancePTR alloc_fail){
 
+      ...
+
       struct cx *cx = &cxdat;
       struct lc *lc = &lcdat;
 
@@ -270,10 +252,10 @@
       ar->rpt = &cx->byte_n;
       ar->nominal = &&construct_bytes;
       ar->gt_address_t_n = lc->index_gt_n;
-      continue_from Inclusive·mul_ib;
+      convey Inclusive·mul_ib;
 
       cdef(construct_bytes){
-        continue_via_tampoline nonimal;
+        continue_via_trampoline nominal;
         cend;
       };
 
@@ -288,14 +270,14 @@
   `Inclusive·mul_ib` is a general use conveyance from a library. It accepts two values,
   `a` and `b`, and writes a result to `rtp`.  This general use conveyance has two
   continuation arguments, `nominal` and `gt_address_t_n`.  If the product overflows the
-  type used for for representing the result, `Inclusive·mul_ib` continues with
+  type used for representing the result, `Inclusive·mul_ib` continues with
   `gt_address_t_n` and no result is written.  Otherwise, it continues with
-  `norminal`. `Inclusive·mul_ib` is defined in main along with a number of general use
+  `nominal`. `Inclusive·mul_ib` is defined in main along with a number of general use
   conveyances.
 
-  The line `continue_from Inclusive·mul_ib` will take us out of the containing function to
+  The line `convey Inclusive·mul_ib` will take us out of the containing function to
   execute code found in main. This violates our encapsulation property, which is why used
-  the term ‘continaing function’ instead of ‘encapsulating function’.  `f` contains a
+  the term ‘containing function’ instead of ‘encapsulating function’.  `f` contains a
   conveyance definition in its lexical scope, but it makes use of one defined elsewhere.
 
   The `Inclusive·mul_ib` conveyance will have been compiled against the stack frame of
@@ -303,7 +285,7 @@
   pointer will be pointing to the stack frame for `f`, which is the wrong value for
   `Inclusive·mul_ib`. If the `Inclusive·mul_ib` conveyance does not use the stack, then
   things might work out; however, this is hard to accomplish in C because stack usage is
-  deeply engrained with the creation of locals and temporary variables. Even if we
+  deeply ingrained with the creation of locals and temporary variables. Even if we
   declare a value to hold a pointer to where local data is really stored, that pointer
   will be in a local variable.  If we declare that pointer to be of 'register' storage
   allocation class, C will not guarantee that it ends up in a register, and it might
@@ -313,14 +295,14 @@
   either `construct_bytes` or to `lc->index_gt_n`.
 
   The conveyance `construct_bytes` was defined in the lexical scope for `f`.  Hence
-  continuting here would restore order in the universe.  `contruct_bytes` then returns
+  conveying to here would restore order in the universe.  `contruct_bytes` then returns
   from the function `continue_via_trampoline nominal`.
 
   Had we instead continued with `lc->index_gt_n`, the stack to code correspondence would
   remain messed up if `lc->index_gt_n` is not defined within `f`, but would harmony
   would be restored if  it is in ‘f’.
 
-  When all continuations out of `f` return to `f`, we say that `f` ‘encapsulates
+  When all conveyances out of `f` return to `f`, we say that `f` ‘encapsulates
   conveyances with side trips’.
 
   With encapsulation with side trips, we still have the issue of the stack being incorrect
@@ -329,13 +311,13 @@
 ** only function encapsulated conveyances
 
   If we were to require that all general use conveyances be function encapsulated, then we
-  could use `continue_from` macro to call them without concerns over the stack pointer.
+  could use `convey` macro to call them without concerns over the stack pointer.
 
   When a library function is small we can hope that the optimizer will make the call overhead
   go away by just including the contents of the function.  We can make this more likely
   by declaring the function inline. If it does not, then for a normal function call
   our arguments will be redundantly copied into function stack frames. We could avoid
-  this redunancy by passing argument to encapsulated conveyances through a pad.
+  this redundancy by passing argument to encapsulated conveyances through a pad.
 
   Now suppose we have a large library of small function encapsulated conveyances, where
   the functions have  been declared inline. The compiler is free to ignore the inline
@@ -343,11 +325,11 @@
 
   The consider a function that uses several of the library conveyances. The local variables
   for all the conveyances used by said function would end up simultaneously and separately
-  allocated in said function's stack frame.  That would probalby be more allocated space
+  allocated in said function's stack frame.  That would probably be more allocated space
   than needed, because, like arguments, the context of a conveyance is no longer needed
   after leaving the conveyance - unless a message is being passed though that context.
 
-  Although there would probably be some inefficiency in storage allocation space alloted,
+  Although there would probably be some inefficiency in storage allocation space allotted,
   this solution does successfully manage the allocation of contexts.
 
 ** only conveyances
@@ -359,7 +341,7 @@
   section we discuss the flip side approach, where we have all conveyances, with the
   sole exception being the `main()` function, where all the conveyances are included.
 
-  When we get rid of the encapsulting function we no longer have its stack frame for
+  When we get rid of the encapsulating function we no longer have its stack frame for
   storing context. Any local variable that we declare will end up in `main()`'s stack
   frame. This would be inefficient because locals are not needed simultaneously, indeed
   none might not be needed at.
@@ -367,7 +349,7 @@
   We need context when variables are shared with conveyances that do not have a direct
   caller callee relationship.  I.e. we need to be able to pass messages.  So we will also
   need a means for addressing the allocation and deallocation of messages. The following
-  subsectsions explore approaches for doing this.
+  subsections explore approaches for doing this.
 
 *** context pad
 
@@ -410,7 +392,7 @@
       ar->rpt = &cx->byte_n;
       ar->nominal = &&construct_bytes;
       ar->gt_address_t_n = lc->index_gt_n;
-      continue_from Inclusive·mul_ib;
+      convey Inclusive·mul_ib;
 
       cdef(construct_bytes){
         AR(ar ,TM2x·construct_bytes ,0);
@@ -418,7 +400,7 @@
         ar->byte_n     = cx->byte_n;
         ar->nominal    = cx->nominal;
         ar->alloc_fail = cx->alloc_fail;
-        continue_from TM2x·construct_bytes;
+        convey TM2x·construct_bytes;
         cend;
       };
 
@@ -431,7 +413,7 @@
 
   If c1 were a function instead of a conveyance, then it could declare local variables to
   share with c3. We would be back to function encapsulation.  However here c1 is not a
-  function. Any variables declared in c1's lexecial scope will end up on the ecapsulating
+  function. Any variables declared in c1's lexical scope will end up on the encapsulating
   function's stack frame.  They can still be used for sharing, but as noted above for the
   inline function expansion, we would end up with all the local variables from all the
   conveyances separately allocated on the encapsulating functions stack frame, and that
@@ -455,7 +437,7 @@
               c1
 ````
 
-   We stil only need one context pad, because once we continue from c3 the context pad
+   We still only need one context pad, because once we continue from c3 the context pad
    used to send a message from c1 to c3 is no longer needed.
 
    Now consider a structure where c2 that ‘somewhere else’ the unspecified other continuation
@@ -483,8 +465,8 @@
    When, during execution, c2 continues to c1, c1 will still be holding context for c3.
    This context was computed the first time we continued into c1. However, no matter how
    many times we go through this subloop, we still only visit c3 one time. Hence upon the
-   second trip through c1 we need to compute the cumlative message for c3.  So here too
-   only one pad is needed. If the cumlative message gets longer on each loop, and we do
+   second trip through c1 we need to compute the cumulative message for c3.  So here too
+   only one pad is needed. If the cumulative message gets longer on each loop, and we do
    not know how many loops will be taken, the pad will surely hold a pointer to the heap.
    There is still only one message, thus we still only need one pad.
 
@@ -507,12 +489,12 @@
    reused.  This is in fact the first case we discussed, it is just that we included
    the lines in the graph showing the loop.
 
-   If a general use convyeance c2 were in a library and that library were separately
+   If a general use conveyance c2 were in a library and that library were separately
    maintained, the library would have to be given its own context pads in number that
    reflect the nesting levels for the library.  I.e. the library would be done separately.
 
    The context pad approach will use less memory than giving each conveyance it's own
-   context, but it migth not be an optimal solution.  For example, at run time, control
+   context, but it might not be an optimal solution.  For example, at run time, control
    might not ever pass into deeper nesting layers, yet their context will have been
    allocated. It would be more efficient, from a memory usage standpoint, to only allocate
    pads for deeper nesting layers when they are entered.  That would be a stack push.
@@ -520,11 +502,11 @@
    approach.
 
    In the current form, any computation to determine a next continuation is a ‘one out of
-   n’ choice. Even if we have multiple simultaneous continuations defined, each on a
+   n’ choice. Even if we have multiple simultaneous conveyances defined, each on a
    separate thread, it is still ‘one out of n, per thread’.  A variable that holds a
    continuation will always only hold a limited number of values, in the worst case, being
-   all the continuations available at the lexical scope the variable appears in a
-   ‘continue_from’.
+   all the conveyances available at the lexical scope the variable appears in a
+   ‘convey’.
 
 
 *** Context stack
@@ -538,8 +520,8 @@
    continuing to c2.  The data would be gone when we came back to c3, if indeed we ever
    came back.
 
-   If we required that all continuations from c2 return to conyeances that are defined in
-   c1's lexical scope, then we could design into all of these captured conyances a pop
+   If we required that all conveyances from c2 return to conveyances that are defined in
+   c1's lexical scope, then we could design into all of these captured conveyances a pop
    stack call. At that point the only difference from the functional encapsulation
    approach would be that we use a pad for the arguments.
 
@@ -556,11 +538,11 @@
 
    In data flow systems we accomplish such alignment of messages by giving each a token,
    and then having a reservations stations in front of execution units.  Here our
-   executation units are the conveyances. Only when a set of matching tokens are received,
+   execution units are the conveyances. Only when a set of matching tokens are received,
    i.e. when all the messages in a synchronized set have arrived, do we continue with
    execution. This approach would require even more memory than dedicating a context pad
    to each conveyance.  It would also be unusual to do such a thing when we are not
-   synchronizing data between separate theads of execution. It is a too heavy of a
+   synchronizing data between separate threads of execution. It is a too heavy of a
    solution for something like our TM2x library.
 
    c3 essentially has two paths for receiving messages.  On one path it receives messages
@@ -586,7 +568,7 @@
    Suppose our message for c3 were allocated on the heap. Just before c2 continues into
    c3, c2 code would go through the unused continuation pointers and deallocate their
    messages. In general, when a conveyance continues forward to another conveyance it
-   would deallocate all the messages in the unusued continuation ponters.  This is a
+   would deallocate all the messages in the unused continuation pointers.  This is a
    solution to the deallocation problem.
 
    Now consider this pattern:
@@ -604,15 +586,15 @@
    Here both c1, c2, and c3 send messages to c4. If we used context pads, then c1 and c2
    would both write to the same pad, and c4 would use that pad. We can do the same
    here. The message has all the fields that c4 will need in the message.  Any number of
-   conveyances may particiapte in filling out message fields.  When c3 continues to c4 it
+   conveyances may participate in filling out message fields.  When c3 continues to c4 it
    gives it both the arguments and the message. We could even dispense with the arguments
    pad, and put the c4 arguments in the message.
 
-   Suppose that the continuation paramaters for c2 are 'c2_nominal' and 'c2_fail'. Suppose
-   that the continuation paramters for c3 are 'c3_nominal' and 'c3_fail'.  
+   Suppose that the continuation parameters for c2 are 'c2_nominal' and 'c2_fail'. Suppose
+   that the continuation parameters for c3 are 'c3_nominal' and 'c3_fail'.  
 
    Now suppose that c1 passes a pointer to c3 as c2_nominal continuation.  For the above
-   scenario to work c2 would have to expect that its nominal paramter always carried a
+   scenario to work c2 would have to expect that its nominal parameter always carried a
    message of a given type.  Suppose c2 takes its nominal continuation, it then continues
    into c3 while setting c3_nominal to c4. c2 would have to know to include the contents
    of said message with the c4 pointer.  In essence c2 must play the role of a relay.
