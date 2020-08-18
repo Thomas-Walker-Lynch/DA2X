@@ -702,7 +702,7 @@
       cend
     }
 ````
-Here push and pop are see gasket conveyances.  They actually receive the arguments
+Here push and pop are gasket conveyances.  They actually receive the arguments
 on lc, and they ignore ar.  The lc args are the size of the push or pop, and
 the conveyance to come after.  After the push or pop, they convey to the conveyance
 argument, and as the  ar pad is unchanged.
