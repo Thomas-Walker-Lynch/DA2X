@@ -3,7 +3,7 @@
 
   Our goal here is to identify techniques for implementing conveyances while using the C
   language.  I want to be close to the hardware so I chose C which is one step away from
-  an assembly, though an assembler would surely have had a better macro front end.
+  assembly, though an assembler would surely have had a better macro front end.
 
 * Conveyances and Continuation
 
