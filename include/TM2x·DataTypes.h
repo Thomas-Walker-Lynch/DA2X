@@ -125,11 +125,7 @@ struct TM2x·dealloc_heap0{
   ConveyancePtr nominal;
 };
 
-struct TM2x·destruct1{
-  TM2x *tape;
-  ConveyancePtr nominal;
-  ConveyancePtr message_dealloc_heap_nominal;
-};struct TM2x·destruct0{
+struct TM2x·destruct0{
   TM2x *tape;
   ConveyancePtr nominal;
 };

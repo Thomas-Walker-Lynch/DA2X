@@ -221,7 +221,7 @@
 
   It is too bad we need the local conveyances, `local_index_gt_n`, `local_nominal`, and
   `local_alloc_fail`.  Their sole purpose is to maintain the integrity of the
-  encapsulation of context.  By having `TM2x·contruct_bytes` and `Inclusive·mul_ib` first
+  encapsulation of context.  By having `TM2x·construct_bytes` and `Inclusive·mul_ib` first
   convey locally we assure that the stack frame gets popped.  If we did not need to pop
   the stack frame, `TM2x·contruct_bytes` and `Inclusive·mul_ib` could convey directly to
   `index_gt_n`, `nominal`, and `alloc_fail`.
@@ -284,7 +284,7 @@
   because stack usage is deeply ingrained with the creation of locals and temporary
   variables. Even if we declare a value to hold a pointer to where local data is really
   stored, that pointer will be in a local variable.  If we try to get around this and
-  declare that pointer to be of 'register' storage allocation class, C will not guarantee
+  declare that pointer to be of ‘register’ storage allocation class, C will not guarantee
   that it ends up in a register. The compiler is free to make it a local `auto`
   class variable instead.
 
@@ -462,7 +462,7 @@
 
    When, during execution, c2 continues to c1, c1 will still be holding context for c3.
    This context was computed the first time we continued into c1. However, no matter how
-   many times we go through this subloop, we still only visit c3 one time. Hence upon the
+   many times we go through this sub-loop, we still only visit c3 one time. Hence upon the
    second trip through c1 we need to compute the cumulative message for c3.  So here too
    only one pad is needed. If the cumulative message gets longer on each loop, and we do
    not know how many loops will be taken, the pad will surely hold a pointer to the heap.
@@ -646,7 +646,7 @@
 ````
     cdef(c0){
 
-      convey push(byte_n ,byte_n_of(struct c0 ,cx); // cx points to the stack frame
+      convey push(byte_n_of(struct c0) ,cx); // cx points to the stack frame
 
       // c1
       cdef(byte_n){
@@ -710,3 +710,92 @@ argument, and as the  ar pad is unchanged.
 This is very close to an encapsulated function. There is no trampoline. It is a
 sort of ‘this is how you wire it up’ for the compiler, and then a direct run
 at run time.
+
+The problem with stack usage is that it has to occur in order. It is difficult
+for a processor to execute ahead, or for an optimizer to move code around the
+stack pops and pushes.  We could instead `allocate_context` and `deallocate_context`
+and then use any algorithm we want to accomplish those steps.  In the simplest case
+we would use a context pad and there would be no allocation or deallocation work.
+
+````
+    cdef(c0){
+
+      convey cx_alloc(byte_n_of(struct c0) ,cx); // cx points to the stack frame
+
+      // c1
+      cdef(byte_n){
+        AR(ar ,Inclusive·3opLL ,0);
+        ar->a0             = cx->element_n;
+        ar->a1             = cx->element_byte_n;
+        ar->rpt            = &cx->byte_n;
+        ar->nominal        = &&src_byte_i;
+        ar->gt_address_t_n = cx_dealloc(byte_n_of(struct c0) ,cx->src_index_gt_n);    // goes elsewhere
+        convey Inclusive·mul_ib;
+      }
+
+      // c2
+      cdef(src_byte_i){
+        AR(ar ,Inclusive·3opLL ,0);
+        ar->a0             = cx->src_element_i;
+        ar->a1             = cx->element_byte_n;
+        ar->rpt            = &cx->src_byte_i;
+        ar->nominal        = &&dst_byte_i;
+        ar->gt_address_t_n = cx_dealloc(byte_n_of(struct c0) ,cx->src_index_gt_n);  // goes elsewhere
+        convey Inclusive·mul_ei_bi;
+        cend;
+      }
+
+      // c3
+      cdef(dst_byte_i){
+        AR(ar ,Inclusive·3opLL ,0);
+        ar->a0             = cx->dst_element_i;
+        ar->a1             = cx->element_byte_n;
+        ar->rpt            = &cx->dst_byte_i;
+        ar->nominal        = &&copy_bytes;
+        ar->gt_address_t_n = cx_dealloc(byte_n_of(struct c0) ,cx->dst_index_gt_n);   // goes elsewhere
+        convey Inclusive·mul_ei_bi;
+        cend;
+      }
+
+      // c4
+      cdef(copy_bytes){
+        AR(ar ,TM2x·construct_copy_bytes ,0);
+        ar->src             = cx->src;
+        ar->src_byte_i      = cx->src_byte_i;
+        ar->dst             = cx->dst;
+        ar->dst_byte_i      = cx->dst_byte_i;
+        ar->byte_n          = cx->byte_n;
+        ar->nominal         = cx_dealloc(byte_n_of(struct c0) ,cx->nominal);         // goes elsewhere
+        ar->src_index_gt_n  = cx_dealloc(byte_n_of(struct c0) ,cx->src_index_gt_n);  // goes elsewhere
+        ar->dst_index_gt_n  = cx_dealloc(byte_n_of(struct c0) ,cx->dst_index_gt_n);  // goes elsewhere
+        convey TM2x·copy_bytes;
+        cend;
+      }
+
+
+      cend
+    }
+````
+
+It might be better to break out the various messages instead of having a context that holds
+all the messages.
+
+** Bound buffers
+
+  Suppose we statically allocated dedicated memory for arguments and context for each
+  conveyance.  We have already analyzed dedicated memory like this in prior sections, and
+  noted that it is inefficient, as not all conveyances are used simultaneously.  Itis more
+  efficient to have allocation and deallocation so as to share memory.
+
+  However, we are talking about one memory buffer per conveyance.  It is not much memory,
+  and there are a number of computational advantages: 1) It gets rid of the stack bottleneck.
+  Some sort of heap allocation would also get rid of the stack bottleneck, but would be slower.
+  A garbage collection approach would be slower yet.  Pads would be fast, but we would
+  need to have a static analysis tool.  We could create pad based on who calls who, or nesting
+  levels.  2) it is easy for the processor to get ahead in computation 3) simpler for the
+  compiler optimizer to reason about  4) simpler for the programmer to reason about.
+
+  This is similar to one line from a reservation station.  We only need the one line because
+  of having a single thread of execution.  We do not need to keep tokens because the order
+  of arrival of the operands is known.
+

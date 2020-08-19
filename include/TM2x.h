@@ -9,19 +9,6 @@
 #include "Conveyance.h"
 
 //--------------------------------------------------------------------------------
-// misc
-//    
-  extern address_t TM2x·constructed_count;
-
-  #define MINIMUM_ALLOC_EXTENT 15
-
-  INLINE_PREFIX address_t power_2_extent_w_lower_bound(address_t byte_n){
-    if( byte_n < MINIMUM_ALLOC_EXTENT) return MINIMUM_ALLOC_EXTENT;
-    return power_2_extent(byte_n);
-  }
-
-
-//--------------------------------------------------------------------------------
 // The TM2x dynamic array header struct
 //   .. does the mutex lock variable belongs here, or at L2? Perhaps here,
 //   because look at all the trouble we have already gone through to make
@@ -69,6 +56,13 @@
 //--------------------------------------------------------------------------------
 // allocation
 //
+  #define MINIMUM_ALLOC_EXTENT 15
+
+  INLINE_PREFIX address_t power_2_extent_w_lower_bound(address_t byte_n){
+    if( byte_n < MINIMUM_ALLOC_EXTENT) return MINIMUM_ALLOC_EXTENT;
+    return power_2_extent(byte_n);
+  }
+
   // tape becomes a pointer to a static allocation of a TM2x struct
   #define TM2x·AllocStatic(tape) TM2x TM2x· ## tape ,*tape; tape = &TM2x· ## tape;
 

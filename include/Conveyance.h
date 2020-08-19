@@ -15,8 +15,8 @@ typedef void **ConveyancePtr;
 
 // May call more than once to get multiple variables with different interpretations of the same args.
 // Declare local pad pointers
-// v - variable naoome for the namespace
-// s - context name 
+// v - variable name
+// s - context name (space)
 // x - conveyance name
 // i - interpreteation, mainly used with local pads
 #define AR(v ,x ,i) struct x##i *v = (struct x##i *)&Conveyance·Args_pt->x;

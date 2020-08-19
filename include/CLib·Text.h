@@ -26,14 +26,14 @@ CLib·mallocn:{
   Conveyance·swap();
   LC(CLib·mallocn ,0);
 
-#if TEST
-  Test·CLib·allocation_n = lc->n;
-#endif
+  #if TEST
+    Test·CLib·allocation_n = lc->n;
+  #endif
 
-  if( lc->n == address_t_n ) continue_from *lc->fail; 
+  if( lc->n == address_t_n ) convey *lc->fail; 
   *lc->pt = malloc(lc->n + 1);
-  if(!*lc->pt) continue_from *lc->fail;
-  continue_from *lc->nominal;
+  if(!*lc->pt) convey *lc->fail;
+  convey *lc->nominal;
   cend;
 }
 
