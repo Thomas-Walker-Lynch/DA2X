@@ -1,7 +1,7 @@
 
 # TM2x
 
-A dynamic array for C, along with an iterator.  It is written in C.
+A dynamic array for C, along with an iterator.
 
 This is an implementation of the 'tape machine' described in the TTCA book. Hence the TM for
 'tape machine'.  Upon reaching an allocation limit, the array allocation doubles, hence

@@ -3,53 +3,62 @@ address_t TM2x·constructed_count = 0;
 
 goto TM2x·end;
 
-// nc
+struct TM2x·destruct{
+  TM2x *tape;
+  ConveyancePtr nominal;
+} TM2x·destruct;
+#pragma push_macro("S")
+#define S TM2x·destruct
 cdef(TM2x·destruct){
-  AR(ar ,TM2x·destruct ,0);
-  free(ar->tape->base_pt);
+  free(S.tape->base_pt);
   TM2x·constructed_count--;
-  convey *ar->nominal;
+  convey *S.nominal;
   cend;
 }
+#pragma pop_macro("S")
 
-// nc
+struct TM2x·dealloc_heap{
+  TM2x *tape;
+  ConveyancePtr nominal;
+} TM2x·dealloc_heap;
+#pragma push_macro("S")
+#define S TM2x·dealloc_heap
 cdef(TM2x·dealloc_heap){
-  AR(ar ,TM2x·destruct ,0);
-  free(ar->tape);
-  convey *ar->nominal;
+  free(S.tape);
+  convey *S.nominal;
   cend;
 }
+#pragma pop_macro("S")
 
 // Deallocation for dynamically allocated headers.
-// TM2x0
+struct TM2x·destruct_dealloc_heap{
+  TM2x *tape;
+  ConveyancePtr nominal;
+};
+#pragma push_macro("S")
+#define S destruct_dealloc_heap
 cdef(destruct_dealloc_heap){
   Conveyance destruct ,dealloc;
-
-  Conveyance·swap();
-  LC(lc ,TM2x·destruct_dealloc_heap ,0);
-
-  CX(cx ,TM2x0 ,destruct_dealloc_heap);
-  cx->tape = lc->tape;
-  cx->nominal = lc->nominal;
 
   convey destruct;
 
   cdef(destruct){
-    AR(ar ,TM2x·destruct ,0);
-    ar->tape = lc->tape;
-    ar->nominal = &&dealloc;
+    TM2x·destruct.tape = S.tape;
+    TM2x·destruct.nominal = &&dealloc;
     convey TM2x·destruct(); // nc
     cend;
   }
 
   cdef(dealloc){
-    free(cx->tape);
-    convey *cx->nominal; 
+    free(S.tape);
+    convey *S.nominal; 
     cend;
   }
 
   cend; 
 }
+#pragma pop_macro("S")
+
 
 //----------------------------------------
 //  Dynamic allocation of the TM2x header.  For static allocation use the AllocoStatic()
