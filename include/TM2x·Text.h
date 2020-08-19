@@ -22,7 +22,7 @@ cdef(TM2x·dealloc_heap){
 
 // Deallocation for dynamically allocated headers.
 // TM2x0
-cdef(destruct_dealloc_heap){
+cdef(TM2x·destruct_dealloc_heap){
   Conveyance destruct ,dealloc;
 
   Conveyance·swap();
@@ -55,7 +55,7 @@ cdef(destruct_dealloc_heap){
 //  Dynamic allocation of the TM2x header.  For static allocation use the AllocoStatic()
 //  macro.  This does not allocate data for the array itself.
 // nc
-cdef(alloc_heap){
+cdef(TM2x·alloc_heap){
   Conveyance·swap();
   LC(lc ,TM2x·alloc_heap ,0);
 

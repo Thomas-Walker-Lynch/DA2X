@@ -1,4 +1,10 @@
 
+been workign in context.txt in the doc directory for a few days, gathering thoughts on context.
+
+The top TM2x·Text.h in this branch, and the related files show an unfinished implemenation
+of context pads.  This would be practical for the TM library.
+
+
 # TM2x
 
 A dynamic array for C, along with an iterator.  It is written in C.
