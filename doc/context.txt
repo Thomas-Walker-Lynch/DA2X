@@ -506,6 +506,15 @@
    all the conveyances available at the lexical scope the variable appears in a
    ‘convey’.
 
+   However, of n sets overlap at different levels then there might have a recurivse nested
+   structure built at run time, so static analysis becomes impossible.  It might be the
+   case that run time generation of new contexts is necessary.  In Turing Machine theory,
+   the controller is always finite, so such a recursive structure is never necesary.  But
+   there will be a hole between what we can determine by static analysis and what is
+   actually the case. If we limit ourselves to structures that static analysis can
+   determine are not dynamically going to build nesting layers, will we eliminate a
+   finite case that is necessary for Turing completeness?
+
 
 *** Context stack
 
@@ -799,3 +808,9 @@ all the messages.
   of having a single thread of execution.  We do not need to keep tokens because the order
   of arrival of the operands is known.
 
+  As we found last time when looking at a reservation station approach, The problem is
+  that the same function can not be called at two different nesting levels without
+  interference between them on the buffer.  If we try to perform static analysis then we
+  have the problems discussed in the pads section.  If we start allocating and deallocating
+  buffers then we are back to an alloc/dealloc situation as in the prior section.
+  
