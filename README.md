@@ -1,4 +1,9 @@
 
+This branch has some code in include/TM2x·Text.h for what a res station version would look like.
+As noted in doc/context.txt, such structures would have dynamic limitations, or some sort of
+allocation/deallocation would be needed for the buffers.
+
+
 # TM2x
 
 A dynamic array for C, along with an iterator.

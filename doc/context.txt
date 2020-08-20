@@ -125,6 +125,32 @@
   functions inside of other functions. Nested functions may make use of variables found
   in the outer lexical scope context.
 
+** Bound buffers
+
+  Suppose we statically allocated dedicated memory for arguments and context for each
+  conveyance.  We have already analyzed dedicated memory like this in prior sections, and
+  noted that it is inefficient, as not all conveyances are used simultaneously.  Itis more
+  efficient to have allocation and deallocation so as to share memory.
+
+  However, we are talking about one memory buffer per conveyance.  It is not much memory,
+  and there are a number of computational advantages: 1) It gets rid of the stack bottleneck.
+  Some sort of heap allocation would also get rid of the stack bottleneck, but would be slower.
+  A garbage collection approach would be slower yet.  Pads would be fast, but we would
+  need to have a static analysis tool.  We could create pad based on who calls who, or nesting
+  levels.  2) it is easy for the processor to get ahead in computation 3) simpler for the
+  compiler optimizer to reason about  4) simpler for the programmer to reason about.
+
+  This is similar to one line from a reservation station.  We only need the one line because
+  of having a single thread of execution.  We do not need to keep tokens because the order
+  of arrival of the operands is known.
+
+  As we found last time when looking at a reservation station approach, The problem is
+  that the same function can not be called at two different nesting levels without
+  interference between them on the buffer.  If we try to perform static analysis then we
+  have the problems discussed in the pads section.  If we start allocating and deallocating
+  buffers then we are back to an alloc/dealloc situation discusesed in the section.
+
+
 * Pads
 
   A data pad is a memory buffer shared by multiple conveyances. It may be bound to any
@@ -515,7 +541,6 @@
    determine are not dynamically going to build nesting layers, will we eliminate a
    finite case that is necessary for Turing completeness?
 
-
 *** Context stack
 
    This approach is similar to functional encapsulation.  As for functions we push locals
@@ -576,16 +601,32 @@
    would deallocate all the messages in the unused continuation pointers.  This is a
    possible solution to the deallocation problem.
 
+   However, there is a third problem.  And that is setting up the call topology, or
+   in the collogquial,  ‘writing up’ the calls.  Generica conveyances need to have
+   values for the ContinuePtr fields, and we need to know when messages are allocated
+   and deallocated.  The encapsulating function approach solved these problems
+   by provind a layer over the top of the generic conveyences that provided local
+   conveyances that wired up the logic.
+
+
+** Conveyance encapsulation with context on the stack
+
+   This approach uses an encapsulating conveyance to wire up the generic conveyences,
+   and to provide context for message passing.
+
    Now consider this sequence of conveyances that is currently encapsulated in `copy_elements`:
 
 ````
+      swap
+      .. copy required lc fields to cx
+
       convey byte_n;
 
       // c1
       cdef(byte_n){
         AR(ar ,Inclusive·3opLL ,0);
-        ar->a0             = cx->element_n;
-        ar->a1             = cx->element_byte_n;
+        ar->a0             = lc->element_n;
+        ar->a1             = lc->element_byte_n;
         ar->rpt            = &cx->byte_n;
         ar->nominal        = &&src_byte_i;
         ar->gt_address_t_n = cx->src_index_gt_n;
@@ -657,11 +698,14 @@
 
       convey push(byte_n_of(struct c0) ,cx); // cx points to the stack frame
 
+      swap
+      .. copy required lc fields to cx
+
       // c1
       cdef(byte_n){
         AR(ar ,Inclusive·3opLL ,0);
-        ar->a0             = cx->element_n;
-        ar->a1             = cx->element_byte_n;
+        ar->a0             = lc->element_n;
+        ar->a1             = lc->element_byte_n;
         ar->rpt            = &cx->byte_n;
         ar->nominal        = &&src_byte_i;
         ar->gt_address_t_n = pop(byte_n_of(struct c0 ,cx->src_index_gt_n);    // goes elsewhere
@@ -716,26 +760,33 @@ on lc, and they ignore ar.  The lc args are the size of the push or pop, and
 the conveyance to come after.  After the push or pop, they convey to the conveyance
 argument, and as the  ar pad is unchanged.
 
-This is very close to an encapsulated function. There is no trampoline. It is a
+This is very close to an encapsulated function; however there is no trampoline. It is a
 sort of ‘this is how you wire it up’ for the compiler, and then a direct run
 at run time.
+
+** Conveyance encapsulation using generic cx_alloc and cx_dalloc
 
 The problem with stack usage is that it has to occur in order. It is difficult
 for a processor to execute ahead, or for an optimizer to move code around the
 stack pops and pushes.  We could instead `allocate_context` and `deallocate_context`
 and then use any algorithm we want to accomplish those steps.  In the simplest case
-we would use a context pad and there would be no allocation or deallocation work.
+we would use a context pad and there would be no allocation or deallocation work. In a more
+challenging case we would use a heap algorithim.  In the most typical case we would use
+stack push and pop.
 
 ````
     cdef(c0){
 
-      convey cx_alloc(byte_n_of(struct c0) ,cx); // cx points to the stack frame
+      convey cx_alloc(byte_n_of(struct c0) ,cx); 
+
+      swap
+      .. copy required lc fields to cx
 
       // c1
       cdef(byte_n){
         AR(ar ,Inclusive·3opLL ,0);
-        ar->a0             = cx->element_n;
-        ar->a1             = cx->element_byte_n;
+        ar->a0             = lc->element_n;
+        ar->a1             = lc->element_byte_n;
         ar->rpt            = &cx->byte_n;
         ar->nominal        = &&src_byte_i;
         ar->gt_address_t_n = cx_dealloc(byte_n_of(struct c0) ,cx->src_index_gt_n);    // goes elsewhere
@@ -783,34 +834,22 @@ we would use a context pad and there would be no allocation or deallocation work
 
 
       cend
-    }
-````
+ } 
 
-It might be better to break out the various messages instead of having a context that holds
-all the messages.
+```` 
 
-** Bound buffers
+With a context pad the dealloc step does nothing.  We just re-allocate the pad later.  We
+already saw the stack paradigm. Generally the allocation can be moved to just above the
+call, however, with a heap like algorithm, the alloction can be moved anywhere before the call,
+even all the way to the point of the program starting.
 
-  Suppose we statically allocated dedicated memory for arguments and context for each
-  conveyance.  We have already analyzed dedicated memory like this in prior sections, and
-  noted that it is inefficient, as not all conveyances are used simultaneously.  Itis more
-  efficient to have allocation and deallocation so as to share memory.
+It might be better to break out the various messages instead of having one context that
+holds all the local messages, although the one context is simpler to memory manage.  Also, note
+we could put the arguments into the conveyances context instead of handling them
+separately.  If so, then the context would have to be created before the `convey`
+call so that the caller can copy the arguments in.
 
-  However, we are talking about one memory buffer per conveyance.  It is not much memory,
-  and there are a number of computational advantages: 1) It gets rid of the stack bottleneck.
-  Some sort of heap allocation would also get rid of the stack bottleneck, but would be slower.
-  A garbage collection approach would be slower yet.  Pads would be fast, but we would
-  need to have a static analysis tool.  We could create pad based on who calls who, or nesting
-  levels.  2) it is easy for the processor to get ahead in computation 3) simpler for the
-  compiler optimizer to reason about  4) simpler for the programmer to reason about.
+This example looks like a nice generic statement of the problem. It looks like we can
+assign cx_alloc and cx_delloc to different functions so as to implement any of the
+proposed context management methods.
 
-  This is similar to one line from a reservation station.  We only need the one line because
-  of having a single thread of execution.  We do not need to keep tokens because the order
-  of arrival of the operands is known.
-
-  As we found last time when looking at a reservation station approach, The problem is
-  that the same function can not be called at two different nesting levels without
-  interference between them on the buffer.  If we try to perform static analysis then we
-  have the problems discussed in the pads section.  If we start allocating and deallocating
-  buffers then we are back to an alloc/dealloc situation as in the prior section.
-  
