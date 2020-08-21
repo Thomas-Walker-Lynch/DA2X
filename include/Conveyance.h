@@ -19,8 +19,8 @@ typedef void **ConveyancePtr;
 // s - context name (space)
 // x - conveyance name
 // i - interpreteation, mainly used with local pads
-#define AR(v ,x ,i) struct x##i *v = (struct x##i *)&Conveyance·Args_pt->x;
-#define LC(v ,x ,i) struct x##i *v = (struct x##i *)&Conveyance·Locals_pt->x;
+#define P0(v ,x ,i) struct x##i *v = (struct x##i *)&Conveyance·Args_pt->x;
+#define P1(v ,x ,i) struct x##i *v = (struct x##i *)&Conveyance·Locals_pt->x;
 #define CX(v ,s ,x) struct CX·##s##·##x *v = &CX·##s.x;
 
 
