@@ -259,25 +259,71 @@ cdef(copy_bytes){
 
 } 
 
+// every call a dedicated buffer
+
+struct Connector{
+  ConveyancePtr entry;
+  struct Connector *connections;
+  void *arguments;
+};
+
+Connector *current;
+
+struct CopyElements·Tableau{
+    
+  struct{
+    struct Inclusive·Args·3opLL0 args;
+    struct Inclusive·Cons·3opLL cons;
+  } mul_ib_0;
+
+  struct{
+    struct Inclusive·Args·3opLL0 args;
+    struct Inclusive·Cons·3opLL cons;
+  } mul_ei_bi_0;
+
+  struct{
+    struct Inclusive·Args·3opLL0 args;
+    struct Inclusive·Cons·3opLL cons;
+  } mul_ei_bi_1;
+
+  struct{
+    struct TM2x·Args·copy_bytes0 args;
+    struct TM2x·Cons·copy_bytes cons;
+  } copy_bytes_0;
+
+} CopyElements·tableau;
+
+#define CopyElements·tableau t
+
+void copy_element_init(){ 
+  // results
+  t.mul_ib_0.args.rpt    = &t.copy_bytes_0.args.byte_n;
+  t.mul_ei_bi_0.args.rpt = &t.copy_bytes_0.args.src_byte_i;
+  t.mul_ei_bi_1.args.rpt = &t.copy_bytes_0.args.copy_bytes_0.dst_byte_i;
+
+  // connectors
+  t.mul_ib_0.cons.nominal= (Connector) 
+    { .entry = &&Inclusive·mul_ei_bi 
+      ,.connections = &t.mul_ei_bi_0.cons
+      ,.args = &t.mul_ei_bi_0.args
+    }
+  t.mul_ib_0.cons.gt_address_t_n = (struct TM2x·Cons·copy_elements)(current->cons)->gt_address_t_n;
+
+  t.mul_ib_1.cons.nominal= (Connector) 
+    { .entry = &&Inclusive·mul_ei_bi 
+      ,.connections = &t.mul_ei_bi_1.cons
+      ,.args = &t.mul_ei_bi_1.args
+    }
+  t.mul_ib_1.cons.gt_address_t_n = (struct TM2x·Cons·copy_elements)(current->cons)->gt_address_t_n;
+
+  t.copy_bytes_0.cons.mominal = current.connections.nominal;
+  t.copy_bytes_0.cons.src_index_gt_n = current.connections->src_index_gt_n;
+  t.copy_bytes_0.cons.src_index_gt_n = current.connections->src_index_gt_n;
+}
+
+
 cdef(copy_elements){
-  Conveyance nominal ,byte_n ,src_byte_i ,dst_byte_i ,copy_bytes;
-  Conveyance·swap();
-  AR(ar ,TM2x·construct_write_elements ,0);
 
-  CX(cx ,TM2x0 ,construct_write_elements);
-  cx->src            = ar->src;
-  cx->src_element_i  = ar->src_element_i;
-  cx->dst            = ar->dst;
-  cx->dst_element_i  = ar->dst_element_i;
-  cx->element_n      = ar->element_n ;
-  cx->element_byte_n = ar->element_byte_n;
-  cx->nominal        = ar->nominal;
-  cx->src_index_gt_n = ar->src_index_gt_n;
-  cx->dst_index_gt_n = ar->dst_index_gt_n;
-
-  //cx->byte_n;
-  //cx->src_byte_i;
-  //cx->dst_byte_i;
 
   convey byte_n;
 

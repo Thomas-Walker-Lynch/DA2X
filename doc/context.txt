@@ -1,86 +1,172 @@
 
 * Intro
 
-  Our goal here is to identify techniques for implementing conveyances while using the C
-  language.  I want to be close to the hardware so I chose C which is one step away from
-  assembly, though an assembler would surely have had a better macro processor.
+  Our goal here is to identify techniques for implementing ‘conveyances’ while using the C
+  language.  The C language is one step away from assembly, and thus only two steps away
+  from the processor hardware.  Hopefully this will make the implications of the method to
+  processor hardware more clear than did the Common Lisp code of the prior chapters.
 
-  The C language was created before object programming techniques were developed.
-  However, there is no reason that we can not apply OO techniques while writing C
-  programs.
+* Allocation, Deallocation, Reading, Writing, and Copying
 
-  C is a systems language. However here we are not systems programmers, rather in this
-  case we are developing a hardware architecture.  We are developing a programming
-  tool with C.  We are being tools developers.
+  An allocation of memory is a place where we may place data.  Allocation is an
+  abstract concept analogous to a physical memory device. Like memory, we may write
+  data to an allocation, and then later read it back.
+
+  Data refers to the values of the bits found in an allocation.  All data used in a
+  computer is either copied from a source allocation to a destination allocation, or it is
+  clobbered.
+
+  In software the terms ‘read’ and ‘write’ describe the two ends of a copy operation. When
+  we say that an allocation is written, we had to get the data for the write by reading it
+  from somewhere.  Similarly when we say data was read, that statement only has meaning if
+  the data was also written somewhere. Thus, there are only two two data movement
+  operations in software, that of copying data and that of clobbering data.
+
+* Persistence
+
+  The adjective ‘static’ is used in computer science to mean that the described thing is
+  resolved by the compiler, linker, or perhaps loader; or by an interpreter without taking
+  into account run time state.
+
+  The adjective ‘dynamic’ means something is resolved by executing the program, or at
+  least will potentially be resolved that way.
+
+  In the C language lexical scope is a static concept. We can see it when we read our
+  program source, but it will be gone by run time.  At run time we will instead have
+  dynamic scope for such things as stack frames, and lifetimes for such things as
+  memory allocations.
+
+  The process of ‘initialization’ is simply the first write to some data after the data
+  has been allocated.  When data is exposed after allocation and before the first write,
+  there is read before write hazard.  Generally code is malformed if it reads data before
+  initializing it. The term ‘static initialization’ means that a variable was given a
+  value by a static process. At run time it will not be a hazard to read a statically
+  initialized variable although the executing program has not first written it.
+
+  After data is ‘initialized’, if it is never written again, then we say that the data is
+  ‘constant’.  Or more generally if we have a ‘mutability’ service, we might be able to
+  set data to be ‘read only’ for a duration of time, and not read only at other times.  It
+  is fairly common for people to refer to read only data as being constant, but that might
+  not be technically correct.
+
+  One place static constants occur in C are the offsets for finding the fields of a
+  `struct` when given a pointer to the `struct`. Because these values are derived from
+  type definitions and are static in the C paradigm, they can be compiled directly into
+  the instructions of the code. Generally values that are constant in C are either not
+  recognized as such, or they are constant because the language does not give us a
+  facility to write them.  C++ gave us a qualifier keyword where we can tell the compiler
+  that a value is constant, so the compiler should not let us write it.
+
+  The state machine controller of a Turing Machine is static and constant. This is
+  noteworthy because our program is the controller definition for our processor. Hence, we
+  would not expect that having a constant program would limit the computational power of
+  our programs.  If the function pointers in our program do not change between uses, the
+  structure of our program will be constant.  One way to assure that the function pointers
+  will not change between uses is to make them be constants.
 
 
-* Common types of allocation
+* Types of allocation
 
-** generic terminology
+  Memory allocation is the art of setting aside memory to be used by a program. The most
+  common types of allocation are: static, program stack base, program stack, and heap.
 
-  We often make use of these types of allocation: static, program stack base, program stack, and heap.
+  All allocators have two main operations on their interface, `allocate` and `deallocate`.
+  These are commonly shortened to `alloc`, and `dealloc`. We say that data is a ‘alive’
+  after it has been allocated and before it has been deallocated. When the stack is used
+  for memory allocation the allocatin operator is called `push` and and the deallocation
+  operator is `pop`, or sometimes `push` and `pull`.  Languages with garbage collection
+  typically have implied allocations when variables are declared, and then periodically
+  they scan for orphaned objects and deallocate them all at once as a part of a big
+  operation.  When a heap is used we typically keep a free list.  We alloc blocks and
+  take them off the free list, then dealloc them to put them back on the free list.
 
-  For ‘static’ allocation the compiler has set aside some memory for our variable at a
-  fixed location.  The variable can not be deallocated. All threads see the same
-  data at the fixed location.
+** Static allocation
 
-  In the more general sense, static means that something is set at compile time. It is in
-  a sense synonymous with ‘constant’, though the term ‘constant’ is used when referring to
-  the value given to variables.  For example as long as we do not use function pointers,
-  the structure of program will be static. In C lexical scope is static.  This term carries
-  over to allocation because with static allocation the symbol table that associates an
-  identifier with a location in memory will only have constants in it.  It is a constant
-  memory map.  In the C language, all of our symbol tables will be reduced to addresses
-  and offsets by run time, with some exceptions for run time linking of shared libraries.
+  The compiler will create a symbol table that associates identifiers with the locations
+  of data in memory.  Each location will be either an absolute address or a relative
+  offset, but in either case it will be a constant. In the C language paradigm the goal of
+  the compiler, linker, and loader, is to embed these constant location values into the
+  instructions of the program. Data that has an absolute address is said to have been
+  statically allocated.
 
-  The program stack is a stack data structure that is automatically managed due to using
-  the programming language.
+  Statically allocated data is only deallocated when the process terminates and releases
+  its virtual memory space. For statically allocated data all threads will see the same
+  data located in the same place, and the same data will be shared by all the threads.
 
-  For ‘program stack base’ allocation our variable is in the stack frame for the `main()`
-  function. It has similar properties as a static variable in that: it remains for as long
-  as the program is running, it has a fixed location, and it can not be deallocated.
-  However, unlike for static allocation, there will be a separate copy per thread. 
+** Program stack base allocation
 
-  ‘program stack base’ allocation is in fact just a type of stack allocation, it just
-  happens to be done inside of `main()`.  I listed it separately because we will make use
-  of this to get variables that act like statics but have separate copies in different
-  threads.
+  The program stack is an instance of a stack data structure, though one that is
+  automatically managed possibly with help from the operating system and hardware.
 
-  With ‘program stack‘ allocation our variable is allocated with a push to the stack, and
-  is deallocated with a pop. This happens for function arguments and local variables,
-  with the stack frame being pushed when we enter the function, and being popped when
-  we return from the function.
+  With ‘program stack base’ allocation, our data is placed in the first stack frame.  This
+  is the one that will be allocated to the `main()` function in C.  The first stack frame
+  is special as it will never be popped off the stack while the program is running.  This
+  gives program stack base allocated data some properties in common with statically
+  allocated data: such data has a fixed location, and such data will not be deallocated
+  for the entire duration the program is running.
 
-  While the allocation is alive, i.e. while the variable is on the stack, the variable's
-  location is relative to the base of a given stack frame. It is possible that further
-  stack frames will be pushed while the variable is alive. Our variable can still be
-  accessed if we have a pointer to it or to its stack frame. This is commonly done when we
-  pass the address of a variable to another function as an argument. When a thread is
-  spawned the stack is forked, typically with the help of the virtual memory system, so
-  each thread will then have its own working copy of the stack.
+  When a process spawns a new thread, that thread will get a new copy of the
+  stack. Conventionally the copy is done in an efficient manner by using the virtual
+  memory system and copy on write pages.  Hence, unlike for static allocation, for
+  ‘program stack base’ allocation each thread will have its own copy of the allocated
+  data.
+
+  The astute reader will note that 'program stack base' and 'program stack' allocation are
+  a first-rest pattern applied to a single program stack.
+
+** Program stack allocation
+
+  Static data and program stack base data live for duration of the program.  In contrast,
+  stack allocated data comes to life at run time when the corresponding stack frame is
+  pushed, and its life ends when the corresponding stack frame is popped.
+
+  In C a lexical scope starts with an opening brace, and ends with a matching closing
+  brace.  Although scope may be nested, all declared variables will be placed in the stack
+  frame of the containing function. The enforcement of the nesting of lexical scope within
+  the function is due to the compiler itself refusing to allow a programmer to make use of
+  out of scope variables. [I am not sure if this behavior is standard, or required by
+  the specification.]
+
+  The compiled code will address arguments and local variables at constant offsets
+  relative to the base of the function's stack frame. Each function call will start wtih
+  the allocation of a stack frame, thus giving each function call its own copy of
+  arguments and variables. Because a function uses stack relative addressing to find its
+  variables on the stack, the same code will be usable without modification against any
+  stack frame isntance. Upon return from a function the stack frame will be deallocated.
+
+  When we use the ampersand operator, ‘&’, on a local variable we will get its absolute
+  address.  No matter how far down in the call nesting we go, this absolute address will
+  still locate the same value. If we keep such an address in a data structure that is
+  generally accessible, there is a hazard that the address will be used after the located
+  variable has been deallocated, i.e. used after the function for which it is a local
+  variable has returned.
 
   Although a systems programmer would never do it, we tools smiths could write inline
-  assembly to locally push variables to the program stack, and then to pop them off.
+  assembly to manually allocate and deallocate data on the program stack. This would work
+  out provided that our matching allocation/deallocation pairs occur within one function,
+  that we deallocate in reverse order than we did the allocations, and that the stack is
+  in its original state before the function returns.
 
-  With ‘heap’ allocation we have a library of functions that allow us to request for
-  blocks of memory to be allocated, then later to be deallocated.  In C it is conventional
-  to use the ‘stdlib’ functions which define one heap.  This heap is shared by all of the
-  program and all of the threads.
+  Most programs are written by composing a large number of small functions.  Functions
+  need to have their arguments in the same place relative to the stack frame each time
+  they are called.  Consequently a great deal of effort will be spent moving data into
+  stack frames before function calls. This problem inspired AMD to provide a ‘fast call’
+  mode where arguments are passed through registers. Also stack allocation is considered a
+  bottleneck for both optimization and hardware acceleration.
 
-  One of the things side effects of not having well developed OO techniques is that
-  singleton patterns were favored.  Hence there is one stack, and one heap. This might not
-  to be not such a bad thing in these cases, because they have become more than just data
-  structures, but they are also services that extend into the operating system and even
-  the hardware. In the case of the stack, when a second instance is needed when spawning a
-  thread the virtual memory system itself might accelerate the process by doing copy on
-  write. That is how ingrained the stack has become.
+** Heap allocation
 
+  With ‘heap’ allocation we have a library of functions that allow us to request blocks of
+  memory to be allocated from a free list, then later to be deallocated and put back on
+  the free list. In C it is conventional to use the ‘stdlib’ functions which define only
+  one heap to be shared by all functions. Heap overhead such as the free list base pointer
+  will be statically allocated. The one stdlib heap will be shared by all threads. Modern
+  versions of the heap have mutex locks already built in so as to assure thread saftey.
 
-** C terminology
-
+* C terminology for storage allocation classes
 
   The C programming language specification speaks of ‘storage allocation classes’ that are
-  built into the language.  These are: `register`, `static`, and `auto`.  
+  built into the language: `register`, `static`, and `auto`.  
 
   Specifying the `register` storage allocation class is a request to the compiler to place
   the given variable in a register. A C compiler is free to ignore the request and to
@@ -96,18 +182,18 @@
   has added an additional meaning to `static`.  A variable that is allocated statically
   because it was declared at global scope is available to other modules (other source
   files) through the `extern` keyword.  This has always been the case.  The part that is
-  new, is that if a variable is explicitly declared as static it will not be available to
+  new is that if a variable is explicitly declared as static it will not be available to
   other modules through the `extern` keyword. It is fairly useful to be able to set the
   lexical scope of a variable to just the module, so we sometimes see the static keyword
   used.
 
-  But there is more. The static keyword also plays a role in the lexical scope of
-  functions.  Functions in C are always declared at global scope (foregoing gcc
-  extensions). A `static` function is only viewable within a module. Hence we may define
-  two static functions with the same name in two different modules.  And wait! There is
-  yet more you get with this Ginsu Knife of keywords, if an inline function is declared
-  `static`, and the compiler decides to ignore the request to inline the function, then
-  the function become a `static` function.
+  Functions in C are always declared at global scope (foregoing gcc
+  extensions). Declaring a function is identical to declaring a function pointer, and a
+  function pointer is data.  Hence the `static` keyword works the same on functions as
+  it does on other data.
+
+  If an inline function is declared `static`, and the compiler decides to ignore the
+  request to inline the function, then the function become a `static` function.
 
   In C `auto` class variables are allocated on the program stack.  This is the default for
   variables declared inside of a function, including inside the main() function.  It is
@@ -117,7 +203,6 @@
   So the C terminology for ‘storage allocation class’ overlaps with the generic
   terminology used for allocation, yet it differs in places.  We will use the generic
   terminology in this text.  That will then have to be reduced to correct code.
-
 
 * Conveyances and Continuation
 
@@ -142,7 +227,7 @@
       }
 ````
 
-  Unlike functions, conveyances do not return. A conveyance must convey further, or exit
+  Unlike functions, conveyances do not return. A conveyance must convey further or exit
   the program before reaching the cend macro.  If execution reaches the cend macro bad
   things will happen.
 
@@ -381,7 +466,7 @@
   `local_alloc_fail`.  Their sole purpose is to maintain the integrity of the
   encapsulation.  By having `TM2x·construct_bytes` and `Inclusive·mul_ib` first
   convey locally we assure that the stack frame gets popped.  If we did not need to pop
-  the stack frame, `TM2x·contruct_bytes` and `Inclusive·mul_ib` could convey directly to
+  the stack frame, `TM2x·construct_bytes` and `Inclusive·mul_ib` could convey directly to
   `index_gt_n`, `nominal`, and `alloc_fail`.
 
 
@@ -447,7 +532,7 @@
   `construct_bytes` or to `p1->index_gt_n`.
 
   The conveyance `construct_bytes` was defined in the lexical scope for `f`.  Hence
-  conveying to it will restore order to the universe.  `contruct_bytes` then returns
+  conveying to it will restore order to the universe.  `construct_bytes` then returns
   from the function via `leave_to nominal`.
 
   Had we instead conveyed `p1->index_gt_n`, the stack to code correspondence would
@@ -981,107 +1066,112 @@ separately.  If so, then the context would have to be created before the `convey
 that the caller can copy the arguments in.
 
 This example looks like a nice generic statement of the problem. It looks like we can
-assign cx_alloc and cx_delloc to different functions so as to implement any of the
+assign cx_alloc and cx_dealloc to different functions so as to implement any of the
 proposed context management methods.
 
-* General Use to General Use Call.
+* Tableaus
 
-Thus far we have discussed encapsulating conveyances where general purpose conveyances
-never directly call other general purpose conveyances.  Instead each general purpose
-conveyance is wired up to always lead back to a local conveyance.  We may leave the
-encapsulation via a gasket, but we still will end up at another locally defined conveyance
-inside of some sort of encapsulation.
+The method of tableaus is related to the method of dedicated buffers. Instead of
+giving each conveyance a dedicated buffer, which give each convey call a dedicated
+buffer.  We will initially use static buffers and require that the program be static
+and constant.  Later we can losen these constraints and accomodate stack allocation
+or pads as well.
 
-Currently a conveyance returns results by writing them to addresses it finds in its
-parameter list.  A general purpose conveyance has no way of directly providing results to
-a next conveyance because it can not know where to put them. 
-
-Suppose that a conveyance pointer consists of two pointers.  One being to the entry
-point of the conveyance, and the other to the arguments. The arguments might contain
-another such conveyance pointer pair. Etc. hence forming a tree.  An encapsulating
-conveyance could then build such a tree, and thus cause multiple generic conveyances
-to fire successively before going through the deallocation gasket.
-
-...
-
-
-
---------------------------
-   Now consider this sequence of conveyances that is currently encapsulated in `copy_elements`:
+We start by defining a `Connector`.
 
 ````
-      swap
-      .. copy required p1 fields to cx
-
-      convey byte_n;
-
-      // c1
-      cdef(byte_n){
-        P0(p0 ,Inclusive·3opLL ,0);
-        p0->a0             = p1->element_n;
-        p0->a1             = p1->element_byte_n;
-        p0->rpt            = &cx->byte_n;
-        p0->nominal        = &&src_byte_i;
-        p0->gt_address_t_n = cx->src_index_gt_n;
-        convey Inclusive·mul_ib;
-      }
-
-      // c2
-      cdef(src_byte_i){
-        P0(p0 ,Inclusive·3opLL ,0);
-        p0->a0             = cx->src_element_i;
-        p0->a1             = cx->element_byte_n;
-        p0->rpt            = &cx->src_byte_i;
-        p0->nominal        = &&dst_byte_i;
-        p0->gt_address_t_n = cx->src_index_gt_n;
-        convey Inclusive·mul_ei_bi;
-        cend;
-      }
-
-      // c3
-      cdef(dst_byte_i){
-        P0(p0 ,Inclusive·3opLL ,0);
-        p0->a0             = cx->dst_element_i;
-        p0->a1             = cx->element_byte_n;
-        p0->rpt            = &cx->dst_byte_i;
-        p0->nominal        = &&copy_bytes;
-        p0->gt_address_t_n = cx->dst_index_gt_n;
-        convey Inclusive·mul_ei_bi;
-        cend;
-      }
-
-      // c4
-      cdef(copy_bytes){
-        P0(p0 ,TM2x·construct_copy_bytes ,0);
-        p0->src             = cx->src;
-        p0->src_byte_i      = cx->src_byte_i;
-        p0->dst             = cx->dst;
-        p0->dst_byte_i      = cx->dst_byte_i;
-        p0->byte_n          = cx->byte_n;
-        p0->nominal         = cx->nominal;
-        p0->src_index_gt_n  = cx->src_index_gt_n;
-        p0->dst_index_gt_n  = cx->dst_index_gt_n;
-        convey TM2x·copy_bytes;
-        cend;
-      }
+  struct Connector{
+    ConveyancePtr entry;
+    struct Connector *connections;
+    void *arguments;
+  };
 ````
 
-  This sequence makes use of a context called `cx`.  Suppose instead of putting these in an encapsulation
-  we put them in another conveyance. That conveyance would have a message attached to it through its
-  conveyance pointer.  
-    
-````
-     push(conveyance, size){
-        <do the push>        
-        convey *conveyance;
-        cend;
-      }
+The three fields in the connect provide everything a conveyance needs to run.  The
+entry field provides the entry point,  the connections is a list of connectors to
+other conveyances.  These will have names like `nominal` and `alloc_fail`, etc.  The
+arguments are being passed in to the conveyance.
 
-     pop(conveyance, size){
-        <do the pop>        
-        convey *conveyance;
-        cend;
-      }
 
+We have something analogous to a program counter.  It points the currently connector
+for the currently running conveyance.  This connector will be found on the caller's
+tableau.
 
 ````
+  Connector *current;
+````
+
+When a general purpose conveyance runs it will use `current` for finding its
+arguments and continuation conveyances.
+
+The tableau then allocates all the buffers dedicated to the encapsulted
+conveyance calls. This will be allocated in the encapsulating functions stack
+frame.  As we plan to initially place all the conveyances in main(), this will
+be stack base allocated.
+
+````
+  struct CopyElements·Tableau{
+
+    struct{
+      struct Inclusive·Args·3opLL0 args;
+      struct Inclusive·Cons·3opLL cons;
+    } mul_ib_0;
+
+    struct{
+      struct Inclusive·Args·3opLL0 args;
+      struct Inclusive·Cons·3opLL cons;
+    } mul_ei_bi_0;
+
+    struct{
+      struct Inclusive·Args·3opLL0 args;
+      struct Inclusive·Cons·3opLL cons;
+    } mul_ei_bi_1;
+
+    struct{
+      struct TM2x·Args·copy_bytes0 args;
+      struct TM2x·Cons·copy_bytes cons;
+    } copy_bytes_0;
+
+  } CopyElements·tableau;
+````
+
+The above is the tableau for the copy_elements conveyance.  Each field is dedicaated to
+each convyance that may be called while performing the copy_elements operation.
+
+The tableau will then be used as a sort of chalkboard during run time. When a conveyance
+derferences a result argument, and writes a result, that result will be written into an
+argument for another conveyance.
+
+Before we may use a tableau, we must wire up the conveyance connections.  Here this is
+done with a nested function (a gcc extension).
+
+````
+#define CopyElements·tableau t
+void copy_element_init(){ 
+  // results
+  t.mul_ib_0.args.rpt    = &t.copy_bytes_0.args.byte_n;
+  t.mul_ei_bi_0.args.rpt = &t.copy_bytes_0.args.src_byte_i;
+  t.mul_ei_bi_1.args.rpt = &t.copy_bytes_0.args.copy_bytes_0.dst_byte_i;
+
+  // connectors
+  t.mul_ib_0.cons.nominal= (Connector) 
+    { .entry = &&Inclusive·mul_ei_bi 
+      ,.connections = &t.mul_ei_bi_0.cons
+      ,.args = &t.mul_ei_bi_0.args
+    }
+  t.mul_ib_0.cons.gt_address_t_n = (struct TM2x·Cons·copy_elements)(current->cons)->gt_address_t_n;
+
+  t.mul_ib_1.cons.nominal= (Connector) 
+    { .entry = &&Inclusive·mul_ei_bi 
+      ,.connections = &t.mul_ei_bi_1.cons
+      ,.args = &t.mul_ei_bi_1.args
+    }
+  t.mul_ib_1.cons.gt_address_t_n = (struct TM2x·Cons·copy_elements)(current->cons)->gt_address_t_n;
+
+  t.copy_bytes_0.cons.mominal = current.connections.nominal;
+  t.copy_bytes_0.cons.src_index_gt_n = current.connections->src_index_gt_n;
+  t.copy_bytes_0.cons.src_index_gt_n = current.connections->src_index_gt_n;
+}
+````
+
+This connection function is called once before the conveyances are run.
