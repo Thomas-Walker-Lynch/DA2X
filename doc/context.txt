@@ -1261,7 +1261,9 @@ copied down to all children that might leave.  It appears the pointer indirectio
 lighter weight.  It is interesting that following the pointer indirection resembles the
 method of dealing with encapsulation we described earlier of conveying back to a
 dedicated conveyance that then leaves. The copy-down approach leads to a cleaner
-network, as the one or more pointer indirections are unnecessary.
+network, as the one or more pointer indirections are unnecessary. As the pointer indrections
+are added at time of ‘wire-up’ we could recognize a ‘pointer to pointer’ cases and reduce
+those to just one pointer to the ultimate target.
 
 
 
