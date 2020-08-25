@@ -1154,7 +1154,7 @@ be done even before the program runs.
 
 
 ````
-#define CopyElements·tableau t
+#define CopyElements·tableau
 void copy_element_init(){ 
   // results
   t.mul_ib_0.args.rpt    = &t.copy_bytes_0.args.byte_n;
@@ -1246,15 +1246,24 @@ in its context.  A child may leave in the same manner a child may leave by using
 of its connections.
 
 The copy-down algorithm could potentially slow down a convey-to.  An alternative algorithm
-is ‘dereference up’.  This algorithm can be applied at wire-up time.  We create a new type
+is ‘dereference-up’.  This algorithm can be applied at wire-up time.  We create a new type
 that fits inside of a `GeneralConveyancePtr`.  This type holds a pointer to the actual
 GeneralConveyancePtr.  Then, instead of copy-down at time of call, the wire-up step adds a
 pointer that points into the parent's connection struct.  Though of course, that might
 also be an indirect pointer. One way we could distinguish between an indirect pointer and
 a direct one, would be to set the lsb of the indirect pointer to 1.  Of course this would
-have to be stripped off before following the pointer. By doing this they most common
-case of leave convey would go through one layer of indirection. This would be traded for
-copy-down. This looks like a good trade off.
+have to be stripped off before following the pointer. 
+
+The most common case of leave convey would be for a child to leave.  With this
+dereference-up algorithm this would require one level of indirection to find the
+conveyance.  With the copy-down algorithm this would require that the leave connection by
+copied down to all children that might leave.  It appears the pointer indirection is
+lighter weight.  It is interesting that following the pointer indirection resembles the
+method of dealing with encapsulation we described earlier of conveying back to a
+dedicated conveyance that then leaves. The copy-down approach leads to a cleaner
+network, as the one or more pointer indirections are unnecessary.
+
+
 
 
 
