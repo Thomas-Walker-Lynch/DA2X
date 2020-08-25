@@ -54,8 +54,9 @@
   type definitions and are static in the C paradigm, they can be compiled directly into
   the instructions of the code. Generally values that are constant in C are either not
   recognized as such, or they are constant because the language does not give us a
-  facility to write them.  C++ gave us a qualifier keyword where we can tell the compiler
-  that a value is constant, so the compiler should not let us write it.
+  facility to write them.  We may use the `const` keyword to tell the compiler
+  that a value is constant.  In theory once data is declared `const` the compiler 
+  will refuse to compile code that would write the data at run time.
 
   The state machine controller of a Turing Machine is static and constant. This is
   noteworthy because our program is the controller definition for our processor. Hence, we
@@ -73,7 +74,7 @@
   All allocators have two main operations on their interface, `allocate` and `deallocate`.
   These are commonly shortened to `alloc`, and `dealloc`. We say that data is a ‘alive’
   after it has been allocated and before it has been deallocated. When the stack is used
-  for memory allocation the allocatin operator is called `push` and and the deallocation
+  for memory allocation the allocation operator is called `push` and and the deallocation
   operator is `pop`, or sometimes `push` and `pull`.  Languages with garbage collection
   typically have implied allocations when variables are declared, and then periodically
   they scan for orphaned objects and deallocate them all at once as a part of a big
@@ -111,7 +112,7 @@
   ‘program stack base’ allocation each thread will have its own copy of the allocated
   data.
 
-  The astute reader will note that 'program stack base' and 'program stack' allocation are
+  The astute reader will note that ‘program stack base’ and ‘program stack’ allocation are
   a first-rest pattern applied to a single program stack.
 
 ** Program stack allocation
@@ -128,11 +129,11 @@
   the specification.]
 
   The compiled code will address arguments and local variables at constant offsets
-  relative to the base of the function's stack frame. Each function call will start wtih
+  relative to the base of the function's stack frame. Each function call will start with
   the allocation of a stack frame, thus giving each function call its own copy of
   arguments and variables. Because a function uses stack relative addressing to find its
   variables on the stack, the same code will be usable without modification against any
-  stack frame isntance. Upon return from a function the stack frame will be deallocated.
+  stack frame instance. Upon return from a function the stack frame will be deallocated.
 
   When we use the ampersand operator, ‘&’, on a local variable we will get its absolute
   address.  No matter how far down in the call nesting we go, this absolute address will
@@ -161,7 +162,7 @@
   the free list. In C it is conventional to use the ‘stdlib’ functions which define only
   one heap to be shared by all functions. Heap overhead such as the free list base pointer
   will be statically allocated. The one stdlib heap will be shared by all threads. Modern
-  versions of the heap have mutex locks already built in so as to assure thread saftey.
+  versions of the heap have mutex locks already built in so as to assure thread safety.
 
 * C terminology for storage allocation classes
 
@@ -1069,12 +1070,12 @@ This example looks like a nice generic statement of the problem. It looks like w
 assign cx_alloc and cx_dealloc to different functions so as to implement any of the
 proposed context management methods.
 
-* Tableaus
+* Tableaux
 
-The method of tableaus is related to the method of dedicated buffers. Instead of
+The method of tableaux is related to the method of dedicated buffers. Instead of
 giving each conveyance a dedicated buffer, which give each convey call a dedicated
 buffer.  We will initially use static buffers and require that the program be static
-and constant.  Later we can losen these constraints and accomodate stack allocation
+and constant.  Later we can loosen these constraints and accommodate stack allocation
 or pads as well.
 
 We start by defining a `Connector`.
@@ -1104,7 +1105,7 @@ tableau.
 When a general purpose conveyance runs it will use `current` for finding its
 arguments and continuation conveyances.
 
-The tableau then allocates all the buffers dedicated to the encapsulted
+The tableau then allocates all the buffers dedicated to the encapsulated
 conveyance calls. This will be allocated in the encapsulating functions stack
 frame.  As we plan to initially place all the conveyances in main(), this will
 be stack base allocated.
@@ -1135,15 +1136,22 @@ be stack base allocated.
   } CopyElements·tableau;
 ````
 
-The above is the tableau for the copy_elements conveyance.  Each field is dedicaated to
-each convyance that may be called while performing the copy_elements operation.
+The above is the tableau for the copy_elements conveyance.  Each field is dedicated to
+each conveyance that may be called while performing the copy_elements operation.
 
 The tableau will then be used as a sort of chalkboard during run time. When a conveyance
-derferences a result argument, and writes a result, that result will be written into an
+dereferences a result argument, and writes a result, that result will be written into an
 argument for another conveyance.
 
 Before we may use a tableau, we must wire up the conveyance connections.  Here this is
 done with a nested function (a gcc extension).
+
+This connection function is called once before the conveyances are run.
+
+With the first version, the tableaux are stack base allocated at compile time.  Once the
+tableaux are allocated they must be wired up.  As our program structure is static this can
+be done even before the program runs.
+
 
 ````
 #define CopyElements·tableau t
@@ -1174,4 +1182,82 @@ void copy_element_init(){
 }
 ````
 
-This connection function is called once before the conveyances are run.
+** General convey to
+
+Lets consider three nesting levels of conveyance encapsulation, grandparent conveyance,
+parent conveyance, and children conveyances.  Let's refer to these with the shorter names
+of: grandparent, parent, and children.
+
+Each conveyance is associated with one tableau. The parent's tableau has a field for the
+context of each child. It has an addition field that holds a pointer that points to its
+own context. The parent's context will be in the grandparent's tableau.
+
+
+````
+  struct CopyElements·Tableau{
+
+    struct CopyElements·Context *this_context; // context is found in the grand parent tableau at this point
+
+    struct MulIb0·Context{
+      struct Inclusive·Args·3opLL0 args;
+      struct Inclusive·Cons·3opLL cons;
+    } mul_ib_0;
+
+    struct MulEiBi0·Context{
+      struct Inclusive·Args·3opLL0 args;
+      struct Inclusive·Cons·3opLL cons;
+    } mul_ei_bi_0;
+
+    struct MulEiBi1·Context{
+      struct Inclusive·Args·3opLL0 args;
+      struct Inclusive·Cons·3opLL cons;
+    } mul_ei_bi_1;
+
+    struct CopyBytes0·Context{
+      struct TM2x·Args·copy_bytes0 args;
+      struct TM2x·Cons·copy_bytes cons;
+    } copy_bytes_0;
+
+  } CopyElements·tableau;
+```` 
+
+For a dedicated conveyance there will only be one grandparent.  However for a
+general purpose conveyance, we may convey into the same parent from multiple
+different grandparent's.
+
+Say we start execution at the grandparent.  The grandparent then desires to convey to a
+general purpose parent. The grandparent does this by first setting the parent's context
+pointer.  The grandparent then conveys to the parent.
+
+According to the ‘copy-down’ algorithm, the parent conveyance shares its leave pointers
+with its children, buy copying them into the correct points in the tableau. Then when
+a child follows one of these connections it leaves directly without having to pass through
+any code in the parent's lexical scope.
+
+The parent conveyance then uses the arguments from the context to perform computation. If the
+result of a computation is for a child conveyance, the parent conveyance writes the
+result into its tableau where the child has its context. If the result of the computation
+is to go to the grandparent, then the conveyance uses the address given to it as an
+argument to know where to write the result. If temporary variables are required, at least
+for now, those are allocated with the arguments.
+
+The parent may leave before conveying to a child by using one of the connections listed
+in its context.  A child may leave in the same manner a child may leave by using one
+of its connections.
+
+The copy-down algorithm could potentially slow down a convey-to.  An alternative algorithm
+is ‘dereference up’.  This algorithm can be applied at wire-up time.  We create a new type
+that fits inside of a `GeneralConveyancePtr`.  This type holds a pointer to the actual
+GeneralConveyancePtr.  Then, instead of copy-down at time of call, the wire-up step adds a
+pointer that points into the parent's connection struct.  Though of course, that might
+also be an indirect pointer. One way we could distinguish between an indirect pointer and
+a direct one, would be to set the lsb of the indirect pointer to 1.  Of course this would
+have to be stripped off before following the pointer. By doing this they most common
+case of leave convey would go through one layer of indirection. This would be traded for
+copy-down. This looks like a good trade off.
+
+
+
+
+
+

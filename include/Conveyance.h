@@ -24,4 +24,10 @@ typedef void **ConveyancePtr;
 #define CX(v ,s ,x) struct CX·##s##·##x *v = &CX·##s.x;
 
 
+struct GeneralConveyancePtr{
+  ConveyancePtr conveayance;
+  void *context;
+};
+
+
 #endif
