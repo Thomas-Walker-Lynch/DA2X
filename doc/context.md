@@ -256,7 +256,7 @@
   1. We required that all paths of execution stemming from the point of entry will lead to
   a `leave_to` macro call. If we hit the `eend` macro, bad things will happen.
 
-  2. The return value must be one of the ConveyancePtrs that was passed into the
+  2. The return value must be one of the `ConveyancePtr`s that was passed into the
   encapsulation.
 
   3. Conveyances must be declared on the first line of a lexical scope they appear in. (If
@@ -374,8 +374,8 @@
 * Pads
 
   A data pad is a fixed length memory buffer shared by multiple conveyances. It may be
-  bound to any number of types. In C we will declare these types in advance as structs,
-  leading to pad type being a union of structs.
+  bound to any number of types. In C we will declare these types in advance as `struct`s,
+  leading to pad type being a union of `struct`s.
 
   Because conveyances do not return, there is no reason to place their arguments nor a
   return address on to the stack.  Instead, to pass arguments to a conveyance we write
@@ -1259,11 +1259,12 @@ dereference-up algorithm this would require one level of indirection to find the
 conveyance.  With the copy-down algorithm this would require that the leave connection by
 copied down to all children that might leave.  It appears the pointer indirection is
 lighter weight.  It is interesting that following the pointer indirection resembles the
-method of dealing with encapsulation we described earlier of conveying back to a
-dedicated conveyance that then leaves. The copy-down approach leads to a cleaner
-network, as the one or more pointer indirections are unnecessary. As the pointer indrections
-are added at time of ‘wire-up’ we could recognize a ‘pointer to pointer’ cases and reduce
-those to just one pointer to the ultimate target.
+method of dealing with encapsulation we described earlier of conveying back to a dedicated
+conveyance that then leaves. The copy-down approach leads to a cleaner network, especially
+where one or more pointer indirections are unnecessary. As the pointer indirections are
+added at time of ‘wire-up’ we could recognize a ‘pointer to pointer’ cases and reduce
+those to just one pointer to the ultimate target, but only in cases that the pointers are
+contants, and not relative to the context.
 
 
 

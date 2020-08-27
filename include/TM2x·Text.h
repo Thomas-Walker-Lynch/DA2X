@@ -259,10 +259,32 @@ cdef(copy_bytes){
 
 } 
 
-// every call a dedicated buffer
+// every call has a dedicated buffer
 
 /* Tableau
 */ 
+  /* would be nice to have the const connections separate, but then we need two context pointers
+  struct CopyElements·Tableau{
+
+    struct TM2x·Args·CopyElements *args; // points to this args struct, set at time of call
+    struct TM2x·Cons·CopyElements *cons; // points to this cons struct, set at time of call
+    
+    struct Cons·CopyElements{
+      struct Inclusive·Cons·3opLL mul_ib_0; // a struct of GeneralConveyancePtrs
+      struct Inclusive·Cons·3opLL mul_ei_bi_0;
+      struct Inclusive·Cons·3opLL mul_ei_bi_1;
+      struct TM2x·Cons·copy_bytes copy_bytes_0;;
+    } cons;
+    struct Args·CopyElements{
+      struct Inclusive·Args·3opLL mul_ib_0; // a struct of GeneralConveyancePtrs
+      struct Inclusive·Args·3opLL mul_ei_bi_0;
+      struct Inclusive·Args·3opLL mul_ei_bi_1;
+      struct TM2x·Args·copy_bytes copy_bytes_0;;
+    } args;
+
+  } CopyElements·tableau;
+  */
+
   struct CopyElements·Tableau{
 
     struct CopyElements·Context *this_context; // location of context in the grandparent tableau
@@ -289,9 +311,9 @@ cdef(copy_bytes){
 
   } CopyElements·tableau;
 
-  #define CopyElements·tableau t
-
   // this is called once, typically before the program runs
+  #pragma push_macro("t")
+  #define CopyElements·tableau t
   void CopyElements·init0(){ 
     // results
     t.mul_ib_0.args.rpt    = &t.copy_bytes_0.args.byte_n;
@@ -304,7 +326,9 @@ cdef(copy_bytes){
         ,.connections = &t.mul_ei_bi_0.cons
         ,.args = &t.mul_ei_bi_0.args
       }
-    t.mul_ib_0.cons.gt_address_t_n = (struct TM2x·Cons·copy_elements)(current->cons)->gt_address_t_n;
+
+...
+    t.mul_ib_0.cons.gt_address_t_n = this_context->cons->gt_address_t_n;
 
     t.mul_ib_1.cons.nominal= (Connector) 
       { .entry = &&Inclusive·mul_ei_bi 
@@ -317,6 +341,7 @@ cdef(copy_bytes){
     t.copy_bytes_0.cons.src_index_gt_n = current.connections->src_index_gt_n;
     t.copy_bytes_0.cons.src_index_gt_n = current.connections->src_index_gt_n;
   }
+  #pragma pop_macro("t")
 
   inline static void CopyElements·init1(){ 
     // results
