@@ -24,46 +24,49 @@
 
 * Persistence
 
-  The adjective ‘static’ is used in computer science to mean that the described thing is
-  resolved by the compiler, linker, or perhaps loader; or by an interpreter without taking
-  into account run time state.
+  The adjective ‘static’ applies to things resolved by the compiler, linker, or perhaps
+  loader; or by an interpreter without taking into account run time state.
 
   The adjective ‘dynamic’ means something is resolved by executing the program, or at
   least will potentially be resolved that way.
 
   In the C language lexical scope is a static concept. We can see it when we read our
   program source, but it will be gone by run time.  At run time we will instead have
-  dynamic scope for such things as stack frames, and lifetimes for such things as
-  memory allocations.
+  dynamic scope for such things as stack frames, and variable lifetimes.
 
   The process of ‘initialization’ is simply the first write to some data after the data
   has been allocated.  When data is exposed after allocation and before the first write,
   there is read before write hazard.  Generally code is malformed if it reads data before
   initializing it. The term ‘static initialization’ means that a variable was given a
-  value by a static process. At run time it will not be a hazard to read a statically
-  initialized variable although the executing program has not first written it.
+  value at compile time. 
 
-  After data is ‘initialized’, if it is never written again, then we say that the data is
-  ‘constant’.  Or more generally if we have a ‘mutability’ service, we might be able to
-  set data to be ‘read only’ for a duration of time, and not read only at other times.  It
-  is fairly common for people to refer to read only data as being constant, but that might
-  not be technically correct.
+  The C language provides syntax for the initialization of data, though what can be done
+  with these C ‘initializers’ is quite limited. When an initializer is applied at compile
+  time to statically allocated data, we say that the data has been statically
+  initialized. After data is ‘initialized’, if it is never written again, then we say that
+  the data is ‘constant’.
 
-  One place static constants occur in C are the offsets for finding the fields of a
-  `struct` when given a pointer to the `struct`. Because these values are derived from
-  type definitions and are static in the C paradigm, they can be compiled directly into
-  the instructions of the code. Generally values that are constant in C are either not
-  recognized as such, or they are constant because the language does not give us a
-  facility to write them.  We may use the `const` keyword to tell the compiler
-  that a value is constant.  In theory once data is declared `const` the compiler 
-  will refuse to compile code that would write the data at run time.
+  The offsets for the fields of a `struct` are statically initialized constants, and may be
+  accessed through the `offsetof` macro.  The compiler may place these directly into
+  program text. In general statically initialized constants provide an opportunity for
+  compiler optimizations.
+
+  If we have a ‘mutability’ service, we might be able to set data to be ‘read only’ for a
+  duration of time, and not read only at other times.  It is fairly common for people to
+  refer to read only data as being constant; however, when mutability can be changed, the
+  compiler can not take advantage of data being constant, so it is not really useful
+  to say that read-only data of this type is ‘constant’.
 
   The state machine controller of a Turing Machine is static and constant. This is
   noteworthy because our program is the controller definition for our processor. Hence, we
-  would not expect that having a constant program would limit the computational power of
-  our programs.  If the function pointers in our program do not change between uses, the
-  structure of our program will be constant.  One way to assure that the function pointers
-  will not change between uses is to make them be constants.
+  would not expect that requiring a program to be a statically initialized constant would
+  limit their computational power.  If the function pointers in our program do not change
+  between uses, the structure of our program will be constant.  One way to assure that the
+  function pointers will not change between uses is to make them constants also. With an a
+  sufficiently expressive statically coded language, it will be possible to write an
+  interpreter where the language being interpreted does not have a not static structure.
+  To do this, our non-static program would be coded as data.  The data would then be
+  changed at run time to modify the structure of the program.
 
 
 * Types of allocation
@@ -87,12 +90,14 @@
   of data in memory.  Each location will be either an absolute address or a relative
   offset, but in either case it will be a constant. In the C language paradigm the goal of
   the compiler, linker, and loader, is to embed these constant location values into the
-  instructions of the program. Data that has an absolute address is said to have been
-  statically allocated.
+  instructions of the program. 
 
-  Statically allocated data is only deallocated when the process terminates and releases
+  Data that has an absolute address determined at compile time is said to have been
+  statically allocated.  Such data is only deallocated when the process terminates and releases
   its virtual memory space. For statically allocated data all threads will see the same
-  data located in the same place, and the same data will be shared by all the threads.
+  data located in the same place.
+
+  Typically the term ‘static data’ is used to refer to statically allocated data.
 
 ** Program stack base allocation
 
@@ -209,28 +214,34 @@
 
   This is a novel concept introduced here in support of the TTCA.
 
-  A conveyance is analogous to a function.  Where as a function is ‘called’, a conveyance
-  is ‘conveyed’.
+  A conveyance is analogous to a function.  Where as a program will ‘call’ a function, a program
+  will ‘convey’ a conveyance. We convey to a conveyance by executing a convey statement.  A convey
+  statement begins with the keyword `convey` and that is followed by the name of the conveyance.
+  
+  ````
+      convey mul_ib;
+  ```` 
 
-  A conveyance is defined by starting with a `cdef` macro and ending with a `cend` macro.
-
-  Due to limitations of C labels which are used in the cdef macro, currently a conveyance
-  may not be declared at global scope. They must be declared within functions.
+  A conveyance is defined by starting with a `CV·def` macro and ending with a `CV·end` macro.
+  I include a set of matching braces so that my editor C-mode does not get confused.
 
   This is the syntax used when defining a conveyance:
 
 
 ````
-      cdef(name){
+      CV·def(name){
 
 
-        cend;
-      }
+        
+      } CV·end(name);
 ````
 
   Unlike functions, conveyances do not return. A conveyance must convey further or exit
-  the program before reaching the cend macro.  If execution reaches the cend macro bad
-  things will happen.
+  the program before reaching the closing brace (i.e. the `CV·end` macro).  If execution
+  reaches the closing brace bad things will happen.
+
+  Due to limitations of C labels which are used in the cdef macro, currently a conveyance
+  may not be declared at global scope. They must be declared within functions.
 
   Functions do a lot of implied work on the stack.  Arguments, local variables, and
   the return address are pushed, and then later the function returns and they are
@@ -291,16 +302,16 @@
 ````
 
   Here `f` accepts as arguments an integer and two `ConveyancePtrs`. The conveyances `a` and `b`
-  are defined inside the lexical scope of `f`, and neither `a` nor `b` convey to a point
-  outside of `f`.
+  are defined inside the lexical scope of `f`, and neither `a` nor `b` convey  a  conveyance
+  defined outside of `f`'s lexical scope.
 
   This function picks one of the passed in conveyance pointers to `leave_to`. Here the
   term ‘leave’ refers to leaving the context defined by the encapsulation.  By contract
   with the programmer, an encapsulating function may only `leave_to` a `ConveyancePtr`
   argument value that was passed in.
 
-  Because `leave_to` returns a conveyance pointer we may convey to a an encapsulation, as
-  shown here:
+  Because `leave_to` returns a conveyance pointer we may convey a conveyance defined outside 
+  of the encapsulation, as shown here:
 
 ````
     int main(){
@@ -604,8 +615,8 @@
 
   c1 is a conveyance, c3 is a local conveyance defined within c1´s lexical scope.  c2 is a
   general use conveyance. At run time c1 will convey c2 before reaching c3.  In turn
-  c2 might convey to c3 or it might convey elsewhere.  If it conveys elsewhere there is
-  a good chance that execution will never reach ce.
+  c2 might convey c3 or it might convey elsewhere.  If it conveys elsewhere there is
+  a good chance that execution will never reach c3.
 
   c1 allocates some context and leaves that behind for c3 to read. Because it is possible
   that we might not ever reach c3 it is unclear as to how we can guarantee that the
@@ -683,7 +694,7 @@
   Relative to our example, a conventional garbage collector would not free the message to c3
   if c2 goes elsewhere because the message is still being pointed at.  The garbage
   collector has no way to know that the in limbo execution in elsewhere will not suddenly
-  convey to c3, or if, on the other hand, it will never convey to c3.
+  convey c3, or if, on the other hand, it will never convey c3.
 
   If we identify an algorithm for deallocating the message sent to c3, then it would be
   possible to use that algorithm to instead zero out the message pointer, or put it on a
@@ -954,14 +965,14 @@
 ````
 Here push and pop are gasket conveyances.  They actually receive the arguments
 on p1, and they ignore p0.  The p1 args are the size of the push or pop, and
-the conveyance to come after.  After the push or pop, they convey to the conveyance
+the conveyance to come after.  After the push or pop, they convey the conveyance
 argument, and as the p0 pad is unchanged the new conveyance receives its arguments.
 
 This is very close to an encapsulated function; however there is no trampoline. It is a
 sort of ‘this is how you wire it up’ for the compiler, and then a direct run
 at run time.
 
-** Conveyance encapsulation using generic cx_alloc and cx_dalloc
+** Conveyance encapsulation using generic cx_alloc and cx_dealloc
 
 The problem with stack usage is that it has to occur in order. It is difficult
 for a processor to execute ahead, or for an optimizer to move code around the
@@ -1143,8 +1154,8 @@ The tableau will then be used as a sort of chalkboard during run time. When a co
 dereferences a result argument, and writes a result, that result will be written into an
 argument for another conveyance.
 
-Before we may use a tableau, we must wire up the conveyance connections.  Here this is
-done with a nested function (a gcc extension).
+Before we may use a tableau, we must wire up the conveyance connections to make a circuit.
+Here this is done with a nested function (a gcc extension).
 
 This connection function is called once before the conveyances are run.
 
@@ -1182,7 +1193,7 @@ void copy_element_init(){
 }
 ````
 
-** General convey to
+** General convey
 
 Lets consider three nesting levels of conveyance encapsulation, grandparent conveyance,
 parent conveyance, and children conveyances.  Let's refer to these with the shorter names
@@ -1219,15 +1230,17 @@ own context. The parent's context will be in the grandparent's tableau.
     } copy_bytes_0;
 
   } CopyElements·tableau;
-```` 
+````
 
 For a dedicated conveyance there will only be one grandparent.  However for a
 general purpose conveyance, we may convey into the same parent from multiple
 different grandparent's.
 
-Say we start execution at the grandparent.  The grandparent then desires to convey to a
+Say we start execution at the grandparent.  The grandparent then desires to convey a
 general purpose parent. The grandparent does this by first setting the parent's context
 pointer.  The grandparent then conveys to the parent.
+
+*** Copy-down
 
 According to the ‘copy-down’ algorithm, the parent conveyance shares its leave pointers
 with its children, buy copying them into the correct points in the tableau. Then when
@@ -1245,31 +1258,202 @@ The parent may leave before conveying to a child by using one of the connections
 in its context.  A child may leave in the same manner a child may leave by using one
 of its connections.
 
-The copy-down algorithm could potentially slow down a convey-to.  An alternative algorithm
-is ‘dereference-up’.  This algorithm can be applied at wire-up time.  We create a new type
-that fits inside of a `GeneralConveyancePtr`.  This type holds a pointer to the actual
-GeneralConveyancePtr.  Then, instead of copy-down at time of call, the wire-up step adds a
-pointer that points into the parent's connection struct.  Though of course, that might
-also be an indirect pointer. One way we could distinguish between an indirect pointer and
-a direct one, would be to set the lsb of the indirect pointer to 1.  Of course this would
-have to be stripped off before following the pointer. 
+*** Short circuits
 
-The most common case of leave convey would be for a child to leave.  With this
-dereference-up algorithm this would require one level of indirection to find the
-conveyance.  With the copy-down algorithm this would require that the leave connection by
-copied down to all children that might leave.  It appears the pointer indirection is
-lighter weight.  It is interesting that following the pointer indirection resembles the
-method of dealing with encapsulation we described earlier of conveying back to a dedicated
-conveyance that then leaves. The copy-down approach leads to a cleaner network, especially
-where one or more pointer indirections are unnecessary. As the pointer indirections are
-added at time of ‘wire-up’ we could recognize a ‘pointer to pointer’ cases and reduce
-those to just one pointer to the ultimate target, but only in cases that the pointers are
-contants, and not relative to the context.
+Once a child leaves a parent conveyance's encapsulation, the tableau belonging to the
+parent is no longer needed.
 
+What if a general conveyance has children, and thus has a tableau, and one of those
+children is itself.  Given that connections are constant, this would lead to an infinitely
+recursive static structure.  Now suppose, that we curry the general use conveyance with
+a constant argument.  Hence the same conveyance behaves differently at different levels.
+It might then be reasonable to write such a program.
 
+*** Dereference-up
 
+With copy-down, we execute a routine before run time to wire up the conveyances. However,
+we can not complete the wiring for general use conveyances because their connections at
+run time depend upon where they are called from.  Hence at run time when we convey to a
+general use conveyance we run another connection routine.  Each conveyance with children
+will have its own routine for doing this.  This run time wiring routine completes the
+wiring for that portion of the network. This is an eloquent lazy evaluation approach to
+wiring the conveyances together.  However, the procrastinated part of the work might have
+a lot of copying to do and thus might slow down execution.  This is because each of the
+parent's connections might have to be copied to many children. Also because this work
+is done at run time the connections map will not be a statically initialized constant.
 
+An alternative algorithm, ‘dereference-up’, to some extent overcomes these drawbacks. With
+dereference-up a `GeneralConveyancePtr` may be either relative to another context, or it
+may be direct. In either case it will be compile time computable and remain constant at
+run time.  When the pointer is relative it may point to another relative pointer, but the
+chain will eventually arrive at a direct pointer.
 
+With dereference-up the time saved by not having a separate just before call connection
+step, is traded for the time spent dereferencing pointers to find the call point in the
+first place. However, some day we we will win in that the connection map can be a
+statically initialized constant.  I say someday, because in the C language, if we can not
+get the map initialization into C's initializer form, we will have no way to give our
+constant initialization code to the compiler.
 
+To implement dereference-up we give each tableau two common fields.  One points to the 
+grandparent's tableau, the other points to the context being used by the child in the 
+parent's tableau. Hence our abstract base class, to borrow a term from C++, will look
+like this:
 
+````
+   struct Tableau{
+     struct Tableau *grandparent;
+     struct Context *child_context;
+     };
+````
 
+Each of the individual conveyance tableau's will have these same first two fields followed
+by all the child context structs, if any.
+
+Suppose we have a parent general use conveyance that holds context for a number of
+children.  This parent will have a number of connections held in its context struct. These
+connections are typically called something like ‘nominal’ and ‘fail’.  They are
+continuations for the conveyance.  
+
+If we were doing copy-down we would copy these connections directly into the corresponding
+children connections.  Then when the child conveys to such a connection it will do so
+directly to where the parent was told to convey.
+
+With dereference-up we instead copy *pointers* to the parent connections into the
+corresponding children connections. Then when a child conveys to such a connection it finds
+a pointer instead of a connection. It then dereferences that pointer to find the actual
+connection. This dereferencing occurs automatically as part of the `general_convey`
+statement.  Thus we say that we have two types of `GeneralConveyance·Ptr` which are in
+union.  A *indirect* `GeneralConveyance·Ptr` which is the pointer we have been discussing,
+and a *direct* `GeneralConveyance·Ptr` which is an actual connection.
+
+A direct `GeneralConveyance·Ptr` has two fields, a pointer to the code to be conveyed, and
+a pointer to the conveyance's context.
+
+When `general_convey` is called it is given a `GeneralConveyance·Ptr` and *another
+argument*.  We will get to this *another argument* in a moment.  The `general_convey`
+arguments pad is stack base allocated and acts as a sort of higher level program counter.
+Hence, the `general_convey` arguments are available to the called conveyance, i.e. the
+child conveyance, while it runs.
+
+When the child goes to convey a connection, it might find in the place of the expected
+connection that instead there is an offset value serving as said pointer.  This offset is
+relative to the parent's context, which is held in the grandparent's tableau. Thus given
+the base of the parent's context, the child may add the offset, and have a derived
+direct pointer to the connection.
+
+So the question is then, how does a child find the parent's context, so that it can
+complete the pointer indirection?  Whatever method used must be capable of chaining further
+to cover the case that the parent's connection is also indirect.
+
+The parent has a pointer to its context when it conveys the child, so it could just pass
+that as the *another argument*,  but then we run into a problem of chaining, as then we
+would need, but not have, a pointer to the context for the grandparent.
+
+As another proposal we might pass a pointer to the parent's tableau as *another argument*, 
+and then make the indirect pointers relative to the tableau instead of relative to the
+context.  Furthermore we would give each tableau a pointer to the next tableau further up
+in the convey chain.  Then when the child runs into an indirect general conveyance pointer,
+it can look up the pointer to the tableau that holds in the parent's context, and then add
+the offset to that to find the next connection in the chain.  
+
+With this approach, this becomes the code for making an indirect pointer, which will
+be a constant:
+
+````
+    #define CV·make_indirect_gcp(gcp ns_grandparent ,ns_parent ,conveyance_name ,continuation_name) \
+      gcp.indirect.offset =                                                 \
+        offsetof(ns_grandparent##·Tableau ,conveyance_name)                 \
+        + offsetof(ns_parent##·Context ,cons)                               \
+        + offsetof(ns_parent##·Cons ,continuation_name);                    \
+      gcp.indirect.same_offset = gcp.indirect.offset;                       \
+      ;
+````
+
+The pointers are made at wire up time, which is before the program runs.  Ideally they
+would be made by the compiler.  At compile time we will know the namsespace for the
+parent, `ns_parent`, as that is where the tableau is that we are initializing.  However, for a
+general use conveyance, the type of the grandparent depends on who is conveying the general
+use conveyance, so there might not be a single value for this at compile time.
+
+OK, so we add a second pointer to the top of the tableau abstract parent type, and this is a
+pointer to the current child conveyance's context.  As the `current_child_context` is now
+in the tableau, it need not be an argument for `general_convey`.  `general_convey` is left
+with a single argument, that of a pointer to the tableau.
+
+* Dereference-up algorithm proposal
+
+Conveyance c0 has a tableau that holds contexts for other general purpose conveyances. c1 is
+such a conveyance.  c0 then conveys c1.  c1 also has a tableau, and it holds contexts for
+other conveyances also, including for c2.
+
+Suppose we executing in c1 and reach the point where we will call `general_convey c2`.
+
+** Before conveying `general_convey`
+
+`general_convey` is in the main lexical scope.  It makes uses an arguments pad, and the pad is
+stack base allocated and also within the main lexical scope.
+
+we must copy `general_convey`'s two arguments to its arguments pad before executing
+`convey general_convey`.  One argument is a pointer to a tableau, and the other is a copy
+of  a `GeneralConveyance·Ptr`.  
+
+Specifically in our example case, the c1 conveyance copies a pointer to its tableau to
+`general_convey`'s arguments pad, and it copies the connection it wants to follow to the
+arguments pad.  It then executes `convey general_convey`.
+
+** direct `general_convey` to a child
+
+In this case c1's tableau holds c2's context (arguments and connections).  Thus c2 is 
+encapsulated by c1. 
+
+For a direct connection, the `convey general` statement executed in c1 does the following:
+1. Copies the connection leading to c2 to `GeneralConvey·args.next`.  This is the second
+   argument.
+2. Places a copy of the c2's context pointer into c1's `ns##·tableau.context_in_use`.
+   This pointer is found in the second argument passed in.
+3. It then conveys c2. 
+
+After these steps there are three pointers to c2's context.  One is at the top of
+the c1's tableau, and the two others are in the original and the copy of the
+connection. Perhaps we can optimize out this redundancy later.
+
+** c2 execution
+
+Among the first things that c2 does is that it copies `GeneralConvey·args.tableau`, which
+points to c1's tableau, into its own `ns##·Tableau.tableau_up`.  This will be needed later
+for resolving indirect `GeneralConveyance·Ptr` values.
+
+c2 was obliged to do this copy, because c1 and `general_convey` do not know where the c2's
+tableau is located, whereas c2 has this information compiled into it. Perhaps we could
+have instead added a child tableau pointer to connections. (another potential other improvement
+to add to the list along with separating out the constant connection network.)
+
+** c2 leaves c1's encapsulation
+
+In this case c2 has an indirect connection that points into c1's connections, and that
+connection leads to a place outside of c1's encapsulation, say at c3.  The indirect
+connection holds an offset that is relative to c1's context.
+
+In preparation to conveying `general_convey` c2 copies arguments.  The first argument
+is a pointer to c2's tableau.  The second argument is a copy of the connection. This
+step is identical to the description in ‘Before conveying `general_convey`. c2 then
+conveys `general_convey`.
+
+The indirect `general_convey` does the following:
+
+1. It uses its first argument to find c2's tableau. It then access the `tableau_up` field
+   to locate c1's tableau.
+2. It copies the pointer to c1's tableau into the first argument. Thus overwriting
+   the tableau pointer to c2's tableau.
+3. It then accesses the `tableau_up` field in c1's tableau to locate c0's tableau.
+   It then uses the `context_in_use` field in c0's tableau to find c1's context. 
+4. Given a pointer to c1's context, `general_convey` adds the offset provided in its
+   second argument to locate c1's leave connection to c3.  `general_convey` then copies
+   this connection into its own second argument.  At this point we are in an analogous
+   position to where we started, but for c1 rather than for c2.
+5. `general_convey` then conveys to `general_convey`. In a well formed program, eventually
+   any chain of indirect pointer will eventually lead to a direct pointer.
+6. Among the first things that c3 does is that it copies `GeneralConvey·args.tableau`, which
+   points to c1's tableau, into its own `ns##·Tableau.tableau_up`.  This will mess up ..
+   

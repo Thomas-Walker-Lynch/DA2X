@@ -268,7 +268,7 @@ CV·def(TM2x·copy_bytes){
 //--------------------------------------------------------------------------------
 // copy elements
 //
-  struct TM2x·CopyElements·Args{
+  struct TM2x·CopyElements·Args {
     TM2x *src;
     address_t src_element_i;
     TM2x *dst;
@@ -277,7 +277,7 @@ CV·def(TM2x·copy_bytes){
     address_t element_byte_n;
   };
 
-  struct TM2x·CopyElements·Cons{
+  struct TM2x·CopyElements·Cons {
     CV·GeneralConvey·Ptr nominal;
     CV·GeneralConvey·Ptr src_index_gt_n;
     CV·GeneralConvey·Ptr dst_index_gt_n;
@@ -285,18 +285,22 @@ CV·def(TM2x·copy_bytes){
 
   CV·make_context(TM2x ,CopyElements);
 
-  struct CopyElements·Tableau{
+  // this tableau holds context for child conveyances.
+  struct TM2x·CopyElements·Tableau {
+    struct Tableau *tableau_up; // the tableau one up in the convey chain
+    struct Context *context_in_use; // after a convey call, points at the child's context
 
+    // context for children
     struct Inclusive·MulIb0·Context   mul_ib_0;
     struct Inclusive·MulEiBi0·Context mul_ei_bi_0;
     struct Inclusive·MulEiBi1·Context mul_ei_bi_1;
     struct TM2x·CopyBytes·Context     copy_bytes_0;
 
-  } CopyElements·tableau;
+  } TM2x·CopyElements·tableau;
 
   #pragma push_macro("t")
   #define t CopyElements·tableau
-  static void CopyElements·connect(){ 
+  static void TM2x·CopyElements·connect(){ 
     // results
     t.mul_ib_0.args.rpt    = &t.copy_bytes_0.args.byte_n;
     t.mul_ei_bi_0.args.rpt = &t.copy_bytes_0.args.src_byte_i;
