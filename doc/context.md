@@ -1457,3 +1457,5 @@ The indirect `general_convey` does the following:
 6. Among the first things that c3 does is that it copies `GeneralConvey·args.tableau`, which
    points to c1's tableau, into its own `ns##·Tableau.tableau_up`.  This will mess up ..
    
+.. copy-down is much simpler to understand and probably to debug, so it is a better place
+to get started.

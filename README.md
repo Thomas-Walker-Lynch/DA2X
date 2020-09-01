@@ -1,8 +1,7 @@
 
-This branch has some code in include/TM2x·Text.h for what a res station version would look like.
-As noted in doc/context.txt, such structures would have dynamic limitations, or some sort of
-allocation/deallocation would be needed for the buffers.
-
+This branch contains scratch work for the dereference up approach to connecting general
+use conveyances. It looks close to an implementation, but has become overly complicated
+for a first pass, so I am abandoning it for now.
 
 # TM2x
 
