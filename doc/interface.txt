@@ -1,0 +1,9 @@
+
+/* Tested, works, but I will add an interface to L2
+struct Text·CLib{
+  ConveyancePtr mallocn;
+} Text·CLib
+={
+  &&CLib·mallocn
+};
+*/

@@ -13,4 +13,6 @@
   #define CAT2(x ,y) CAT(x ,y)
   #define VAR(x) CAT2(x, __LINE__)
 
+#define AS(X ,Y) *&(*(Y*)&X)
+
 #endif

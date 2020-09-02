@@ -17,10 +17,6 @@ gcc -s -std=gnu2x -Wall -O3 -I../include -L../lib  -o Inclusive·test.s Inclusiv
 int main(){
 
   #include "Inclusive·DataTypes.h"
-  union Conveyance·Data{
-    #include "Inclusive·Data.h"
-  };
-  union Conveyance·Data Conveyance·Data0 ,Conveyance·Data1;
   #include "Conveyance·Text.h"
   #include "Inclusive·Text.h"
 
@@ -28,9 +24,9 @@ int main(){
   accumulated_results_pt=&accumulated_results;
   Result·Tallies·init(accumulated_results_pt);
 
-  continue_from test0;
+  convey(test0);
 
-  test0:{
+  CV·def(test0){
     Conveyance nominal ,gt_address_t_n ,report;
 
     address_t malloc_cnt = MallocCounter·count;
@@ -42,42 +38,47 @@ int main(){
     bool f[256]; // flags
     uint i = 0;  // count
 
+#pragma push_macro("ARGS")
+#pragma push_macro("CNXS")
+#define ARGS ((Inclusive·3opLL·Args *)CV·args)
+#define CNXS ((Inclusive·3opLL·Cnxs *)CV·cnxs)
+
     uint64_t r;
     register struct Inclusive·3opLL0 *ar = &Conveyance·Args_pt->Inclusive·3opLL;
-    ar->a0 = 541;
-    ar->a1 = 727;
-    ar->rpt = &r;
-    ar->nominal = &&nominal;
-    ar->gt_address_t_n = &&gt_address_t_n;
-    continue_from Inclusive·mul_ib;
+    ARGS->a0 = 541;
+    ARGS->a1 = 727;
+    ARGS->rpt = &r;
+    CNXS->nominal.convyeance = &&nominal;
+    CNXS->gt_address_t_n.conveyance = &&gt_address_t_n;
+    general_convey(Inclusive·mul_ib);
 
-    nominal:{
+#pragma pop_macro("ARGS")
+#pragma pop_macro("CNXS")
+
+    CV·def(nominal){
       f[i++] = r == 394575;
-      continue_from report;
-      cend;
-    }
-    gt_address_t_n:{
-      f[i++] = false;
-      continue_from report;
-      cend;
-    }
+      convey(report);
+    }CV·end(nominal);
 
-    report:{
+    CV·def(gt_address_t_n){
+      f[i++] = false;
+      convey(report);
+    }CV·end(gt_address_t_n);
+
+    CV·def(report){
       f[i++] = malloc_cnt == MallocCounter·count;
       // f[i++] = constructed_cnt == TM2x·constructed_count;
       Result·Tallies·tally("test_0" ,results_pt ,f ,i);
       Result·Tallies·accumulate(accumulated_results_pt ,results_pt);
-      continue_from tests_finished;
-      cend;
-    }
+      convey(tests_finished);
+    } CV·end(report);
 
-    cend;
-  }
+  } CV·end(test0);
 
-  tests_finished:{
+  CV·cdef(tests_finished){
     Result·Tallies·print("Inclusive·test results" ,accumulated_results_pt);
     return accumulated_results.failed;
-  }
+  }CV·end(tests_finished);
 
 
 }

@@ -1,8 +1,4 @@
 
-This branch contains scratch work for the dereference up approach to connecting general
-use conveyances. It looks close to an implementation, but has become overly complicated
-for a first pass, so I am abandoning it for now.
-
 # TM2x
 
 A dynamic array for C, along with an iterator.

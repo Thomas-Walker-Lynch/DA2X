@@ -12,8 +12,8 @@
 */
   #pragma push_macro("ARGS")
   #pragma push_macro("CNXS")
-  #define ARGS() ((CLib·mallocn·Args *)CV·args)
-  #define CNXS() ((CLib·mallocn·Cnxs *)CV·cnxs)
+  #define ARGS ((CLib·mallocn·Args *)CV·args)
+  #define CNXS ((CLib·mallocn·Cnxs *)CV·cnxs)
 
     CV·def(CLib·mallocn){
       #if TEST

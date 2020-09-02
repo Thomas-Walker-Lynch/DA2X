@@ -1,12 +1,12 @@
 
-* Intro
+# Intro
 
   Our goal here is to identify techniques for implementing ‘conveyances’ while using the C
   language.  The C language is one step away from assembly, and thus only two steps away
   from the processor hardware.  Hopefully this will make the implications of the method to
   processor hardware more clear than did the Common Lisp code of the prior chapters.
 
-* Allocation, Deallocation, Reading, Writing, and Copying
+# Allocation, Deallocation, Reading, Writing, and Copying
 
   An allocation of memory is a place where we may place data.  Allocation is an
   abstract concept analogous to a physical memory device. Like memory, we may write
@@ -22,7 +22,7 @@
   the data was also written somewhere. Thus, there are only two two data movement
   operations in software, that of copying data and that of clobbering data.
 
-* Persistence
+# Persistence
 
   The adjective ‘static’ applies to things resolved by the compiler, linker, or perhaps
   loader; or by an interpreter without taking into account run time state.
@@ -69,7 +69,7 @@
   changed at run time to modify the structure of the program.
 
 
-* Types of allocation
+# Types of allocation
 
   Memory allocation is the art of setting aside memory to be used by a program. The most
   common types of allocation are: static, program stack base, program stack, and heap.
@@ -84,7 +84,7 @@
   operation.  When a heap is used we typically keep a free list.  We alloc blocks and
   take them off the free list, then dealloc them to put them back on the free list.
 
-** Static allocation
+## Static allocation
 
   The compiler will create a symbol table that associates identifiers with the locations
   of data in memory.  Each location will be either an absolute address or a relative
@@ -99,7 +99,7 @@
 
   Typically the term ‘static data’ is used to refer to statically allocated data.
 
-** Program stack base allocation
+## stack base allocation
 
   The program stack is an instance of a stack data structure, though one that is
   automatically managed possibly with help from the operating system and hardware.
@@ -120,7 +120,7 @@
   The astute reader will note that ‘program stack base’ and ‘program stack’ allocation are
   a first-rest pattern applied to a single program stack.
 
-** Program stack allocation
+## Program stack allocation
 
   Static data and program stack base data live for duration of the program.  In contrast,
   stack allocated data comes to life at run time when the corresponding stack frame is
@@ -160,7 +160,7 @@
   mode where arguments are passed through registers. Also stack allocation is considered a
   bottleneck for both optimization and hardware acceleration.
 
-** Heap allocation
+## Heap allocation
 
   With ‘heap’ allocation we have a library of functions that allow us to request blocks of
   memory to be allocated from a free list, then later to be deallocated and put back on
@@ -169,7 +169,7 @@
   will be statically allocated. The one stdlib heap will be shared by all threads. Modern
   versions of the heap have mutex locks already built in so as to assure thread safety.
 
-* C terminology for storage allocation classes
+# C terminology for storage allocation classes
 
   The C programming language specification speaks of ‘storage allocation classes’ that are
   built into the language: `register`, `static`, and `auto`.  
@@ -210,7 +210,7 @@
   terminology used for allocation, yet it differs in places.  We will use the generic
   terminology in this text.  That will then have to be reduced to correct code.
 
-* Conveyances and Continuation
+# Conveyances and Continuation
 
   This is a novel concept introduced here in support of the TTCA.
 
@@ -256,7 +256,7 @@
   ‘fail’.  These arguments are then set at run time to determine the connections between
   the conveyances.
 
-* Encapsulating functions
+# Encapsulating functions
 
   An encapsulating function is a special form function used to hold conveyances. The
   definition of an encapsulating function starts with the `encapsulation(name)` macro, and
@@ -358,7 +358,7 @@
   functions inside of other functions. Nested functions may make use of variables found
   in the outer lexical scope context.
 
-** Bound buffers
+## Bound buffers
 
   Suppose that for each conveyance we statically allocate dedicated memory for context,
   and perhaps also for arguments.  Hence there would be one dedicated buffer per
@@ -382,7 +382,7 @@
   conveyance, and then deallocate them on exit, we have a pattern similar to
   function encapsulation.  We will explore this further down in this document.
 
-* Pads
+# Pads
 
   A data pad is a fixed length memory buffer shared by multiple conveyances. It may be
   bound to any number of types. In C we will declare these types in advance as `struct`s,
@@ -482,7 +482,7 @@
   `index_gt_n`, `nominal`, and `alloc_fail`.
 
 
-* Mixing functions with general use conveyances
+# Mixing functions with general use conveyances
 
   Suppose we have defined a general use conveyance somewhere for purposes of sharing
   it. It might even be part of a conveyance library.  In such a case we might end up with
@@ -554,7 +554,7 @@
   conveyances with side trips’.  As described in this section, when using the C
   language this is a hazardous pattern.
 
-* Only function encapsulated conveyances
+# Only function encapsulated conveyances
 
   If we require that all general use conveyances be function encapsulated, then we
   can use `convey *` to call any of them without having stack pointer hazards.
@@ -581,7 +581,7 @@
   manage the allocation of contexts.  
 
 
-* Conveyance encapsulation
+# Conveyance encapsulation
 
   In this section we discuss the approach of using a conveyance to encapsulate other
   conveyances, thus possibly eliminating all encapsulating functions at a given
@@ -689,7 +689,7 @@
 
   So we have an open question. How does the context get deallocated?
 
-** Have a garbage collector deallocate messages
+## Have a garbage collector deallocate messages
 
   Relative to our example, a conventional garbage collector would not free the message to c3
   if c2 goes elsewhere because the message is still being pointed at.  The garbage
@@ -703,7 +703,7 @@
   as to how we deallocate messages. Any such algorithm could instead do the deallocation
   directly.
 
-** Context pads
+## Context pads
 
   Suppose we use a recycled pad for the context, just as we suggested for argument
   passing.  Because code can be nested, we will need more than one such pad.
@@ -809,7 +809,7 @@
    it is not a general solution. Our TM2x library is pretty easy to analyze, and given
    the efficiency of context pads, I will probably use them there.
 
-*** Context stack
+### Context stack
 
 ````
             .--c1
@@ -835,7 +835,7 @@
    encapsulation.  If we add that, then the only difference between this and function
    encapsulation is that we would not return to the caller.
 
-** Explicit message passing
+## Explicit message passing
 
 ````
             .--c1
@@ -896,7 +896,7 @@
    could be given values.
 
 
-** Conveyance encapsulation with context on the stack
+## Conveyance encapsulation with context on the stack
 
    This approach uses an encapsulating conveyance to wire up the generic conveyances,
    and to provide context for message passing.
@@ -972,7 +972,7 @@ This is very close to an encapsulated function; however there is no trampoline. 
 sort of ‘this is how you wire it up’ for the compiler, and then a direct run
 at run time.
 
-** Conveyance encapsulation using generic cx_alloc and cx_dealloc
+## Conveyance encapsulation using generic cx_alloc and cx_dealloc
 
 The problem with stack usage is that it has to occur in order. It is difficult
 for a processor to execute ahead, or for an optimizer to move code around the
@@ -1081,7 +1081,7 @@ This example looks like a nice generic statement of the problem. It looks like w
 assign cx_alloc and cx_dealloc to different functions so as to implement any of the
 proposed context management methods.
 
-* Tableaux
+# Tableaux
 
 The method of tableaux is related to the method of dedicated buffers. Instead of
 giving each conveyance a dedicated buffer, which give each convey call a dedicated
@@ -1193,7 +1193,7 @@ void copy_element_init(){
 }
 ````
 
-** General convey
+## General convey
 
 Lets consider three nesting levels of conveyance encapsulation, grandparent conveyance,
 parent conveyance, and children conveyances.  Let's refer to these with the shorter names
@@ -1240,7 +1240,7 @@ Say we start execution at the grandparent.  The grandparent then desires to conv
 general purpose parent. The grandparent does this by first setting the parent's context
 pointer.  The grandparent then conveys to the parent.
 
-*** Copy-down
+### Copy-down
 
 According to the ‘copy-down’ algorithm, the parent conveyance shares its leave pointers
 with its children, buy copying them into the correct points in the tableau. Then when
@@ -1258,7 +1258,7 @@ The parent may leave before conveying to a child by using one of the connections
 in its context.  A child may leave in the same manner a child may leave by using one
 of its connections.
 
-*** Short circuits
+### Short circuits
 
 Once a child leaves a parent conveyance's encapsulation, the tableau belonging to the
 parent is no longer needed.
@@ -1269,7 +1269,7 @@ recursive static structure.  Now suppose, that we curry the general use conveyan
 a constant argument.  Hence the same conveyance behaves differently at different levels.
 It might then be reasonable to write such a program.
 
-*** Dereference-up
+### Dereference-up
 
 With copy-down, we execute a routine before run time to wire up the conveyances. However,
 we can not complete the wiring for general use conveyances because their connections at
@@ -1283,17 +1283,19 @@ parent's connections might have to be copied to many children. Also because this
 is done at run time the connections map will not be a statically initialized constant.
 
 An alternative algorithm, ‘dereference-up’, to some extent overcomes these drawbacks. With
-dereference-up a `GeneralConveyancePtr` may be either relative to another context, or it
-may be direct. In either case it will be compile time computable and remain constant at
-run time.  When the pointer is relative it may point to another relative pointer, but the
-chain will eventually arrive at a direct pointer.
+dereference-up a `GeneralConveyancePtr` may be either indirect and relative to another
+context, or it may be direct. In either case it will be compile time computable and remain
+constant at run time.  When the pointer is indirect it may point to another indirect
+pointer, but the chain will eventually arrive at a direct pointer.
 
-With dereference-up the time saved by not having a separate just before call connection
+With dereference-up the time saved by not having a separate ‘just before call’ connection
 step, is traded for the time spent dereferencing pointers to find the call point in the
-first place. However, some day we we will win in that the connection map can be a
-statically initialized constant.  I say someday, because in the C language, if we can not
-get the map initialization into C's initializer form, we will have no way to give our
-constant initialization code to the compiler.
+first place. Indpendent how that tradeoff turns out the connection map can be a statically
+initialized constant, in theory.  I say "in theory", because in the C language, if we can
+not get the map initialization into C's initializer form, we will have no way to give our
+constant initialization code to the compiler. A not so elegant part of copy down is that
+we might end up doing a lot of copies that will never be used. With dereference up we
+only pay cost on the path that we use.
 
 To implement dereference-up we give each tableau two common fields.  One points to the 
 grandparent's tableau, the other points to the context being used by the child in the 
@@ -1381,7 +1383,7 @@ pointer to the current child conveyance's context.  As the `current_child_contex
 in the tableau, it need not be an argument for `general_convey`.  `general_convey` is left
 with a single argument, that of a pointer to the tableau.
 
-* Dereference-up algorithm proposal
+# Dereference-up algorithm proposal
 
 Conveyance c0 has a tableau that holds contexts for other general purpose conveyances. c1 is
 such a conveyance.  c0 then conveys c1.  c1 also has a tableau, and it holds contexts for
@@ -1389,7 +1391,7 @@ other conveyances also, including for c2.
 
 Suppose we executing in c1 and reach the point where we will call `general_convey c2`.
 
-** Before conveying `general_convey`
+## Before conveying `general_convey`
 
 `general_convey` is in the main lexical scope.  It makes uses an arguments pad, and the pad is
 stack base allocated and also within the main lexical scope.
@@ -1402,7 +1404,7 @@ Specifically in our example case, the c1 conveyance copies a pointer to its tabl
 `general_convey`'s arguments pad, and it copies the connection it wants to follow to the
 arguments pad.  It then executes `convey general_convey`.
 
-** direct `general_convey` to a child
+## direct `general_convey` to a child
 
 In this case c1's tableau holds c2's context (arguments and connections).  Thus c2 is 
 encapsulated by c1. 
@@ -1418,7 +1420,7 @@ After these steps there are three pointers to c2's context.  One is at the top o
 the c1's tableau, and the two others are in the original and the copy of the
 connection. Perhaps we can optimize out this redundancy later.
 
-** c2 execution
+## c2 execution
 
 Among the first things that c2 does is that it copies `GeneralConvey·args.tableau`, which
 points to c1's tableau, into its own `ns##·Tableau.tableau_up`.  This will be needed later
@@ -1429,7 +1431,7 @@ tableau is located, whereas c2 has this information compiled into it. Perhaps we
 have instead added a child tableau pointer to connections. (another potential other improvement
 to add to the list along with separating out the constant connection network.)
 
-** c2 leaves c1's encapsulation
+## c2 leaves c1's encapsulation
 
 In this case c2 has an indirect connection that points into c1's connections, and that
 connection leads to a place outside of c1's encapsulation, say at c3.  The indirect
@@ -1457,5 +1459,8 @@ The indirect `general_convey` does the following:
 6. Among the first things that c3 does is that it copies `GeneralConvey·args.tableau`, which
    points to c1's tableau, into its own `ns##·Tableau.tableau_up`.  This will mess up ..
    
-.. copy-down is much simpler to understand and probably to debug, so it is a better place
-to get started.
+This is too complex to start with .. an obvious simplification would be to put prior 
+context pointers on the stack  and then pop and use them when derefering up..
+   
+.. copy-down is simpler to understand and probably to debug, so it is a better place to
+get started.

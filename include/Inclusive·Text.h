@@ -38,9 +38,14 @@ overflow?
   #pragma push_macro("ARGS")
   #pragma push_macro("ARGS_1")
   #pragma push_macro("CNXS")
-  #define ARGS() ((Inclusive·3opLL·Args *)CV·args)
-  #define ARGS_1() ((Inclusive·3opLL·Args_1 *)CV·args)
-  #define CNXS() ((Inclusive·3opLL·Cnxs *)CV·cnxs)
+
+//#define ARGS AS(CV·args ,Inclusive·3opLL·Args *)
+//#define ARGS_1 AS(CV·args ,Inclusive·3opLL·Args_1 *)
+//#define CNXS AS(CV·cnxs ,Inclusive·3opLL·Cnxs *)
+
+  #define ARGS *&((Inclusive·3opLL·Args *)CV·args)
+  #define ARGS_1 *&((Inclusive·3opLL·Args_1 *)CV·args)
+  #define CNXS *&((Inclusive·3opLL·Cnxs *)CV·cnxs)
 
     CV·def(Inclusive·mul_ib){
       ARGS_1->r = ARGS->a_0 * ARGS->a_1 + ARGS->a_0 + ARGS->a_1;
@@ -72,9 +77,9 @@ overflow?
   #pragma push_macro("ARGS")
   #pragma push_macro("ARGS_1")
   #pragma push_macro("CNXS")
-  #define ARGS() ((Inclusive·3opLL·Args *)CV·args)
-  #define ARGS_1() ((Inclusive·3opLL·Args_1 *)CV·args)
-  #define CNXS() ((Inclusive·3opLL·Cnxs *)CV·cnxs)
+  #define ARGS ((Inclusive·3opLL·Args *)CV·args)
+  #define ARGS_1 ((Inclusive·3opLL·Args_1 *)CV·args)
+  #define CNXS ((Inclusive·3opLL·Cnxs *)CV·cnxs)
 
     CV·def(Inclusive·mul_ei_bi){
       ARGS_1->r = ARGS->a_0 * ARGS->a_1 + ARGS->a_0;

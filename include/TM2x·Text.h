@@ -1,6 +1,10 @@
 // 'thread static' allocation class
 address_t TM2x·constructed_count = 0;
 
+#ifdef TM2x·TEST
+  address_t TM2x·Test·allocation_n;
+#endif
+
 address_t TM2x·constructed(TM2x *tape){
   return TM2x·constructed_count;
 }
@@ -16,8 +20,11 @@ address_t TM2x·constructed(TM2x *tape){
 
   #pragma push_macro("ARGS")
   #pragma push_macro("CNXS")
-  #define ARGS() ((TM2x·Destruct·Args *)CV·args)
-  #define CNXS() ((TM2x·Destruct·Cnxs *)CV·cnxs)
+#define ARGS  AS(CV·args ,(TM2x·Destruct·Args *))
+#define CNXS  AS(CV·cnxs ,(TM2x·Destruct·Cnxs *))
+
+//  #define ARGS ((TM2x·Destruct·Args *)CV·args)
+//  #define CNXS ((TM2x·Destruct·Cnxs *)CV·cnxs)
 
     CV·def(TM2x·destruct){
       free(ARGS->tape->base_pt);
@@ -30,8 +37,8 @@ address_t TM2x·constructed(TM2x *tape){
 
   #pragma push_macro("ARGS")
   #pragma push_macro("CNXS")
-  #define ARGS() ((TM2x·DeallocHeap·Args *)CV·args)
-  #define CNXS() ((TM2x·DeallocHeap·Cnxs *)CV·cnxs)
+  #define ARGS ((TM2x·DeallocHeap·Args *)CV·args)
+  #define CNXS ((TM2x·DeallocHeap·Cnxs *)CV·cnxs)
 
     // we are to deallocate the header from the heap
     CV·def(TM2x·dealloc_heap){
