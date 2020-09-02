@@ -1,23 +1,56 @@
 /*
-  This is not a traditional header, and can not be used as such.
-
-  #include this file inside of a Data union with other conveyance's locals .h files. 
-
-  union0{
-   ...
-   #include "TM2x·Data"
-  }Data;
-
-  A conveyance may make use of multiple interpretations of the Args pad.  The first
-  interpretation is the initial one sent with the arguments on it.  This is interpretation
-  0. As the conveyance no longer needs access to an argument, it may case the arguments
-  pointer to a different interpretation.
-  
-  In places the field order and packing can matter, because sometimes the code just
-  changes the type of a pointer so as to 'inherit' some of the existing fields.
+  Include this in an encapsulating function before the text includes.
 
 */
 
+//--------------------------------------------------------------------------------
+// allocation
+//
+  typedef struct{
+    TM2x *tape;
+  } TM2x·Destruct·Args;
+
+  typedef struct{
+    CV·GeneralConvey·Ptr nominal;
+  } TM2x·Destruct·Cnxs;
+
+  typedef struct{
+    TM2x *tape;
+  } TM2x·DeallocHeap·Args;
+
+  typedef struct{
+    ConveyancePtr nominal;
+  } TM2x·DeallocHeap·Cnxs;
+
+
+//--------------------------------------------------------------------------------
+// copy elements
+//
+  typedef struct {
+    TM2x *src;
+    address_t src_element_i;
+    TM2x *dst;
+    address_t dst_element_i;
+    address_t element_n;  // index of nth element of the copy region
+    address_t element_byte_n;
+  } TM2x·CopyElements·Args;
+
+  typedef struct {
+    CV·GeneralConvey·Ptr nominal;
+    CV·GeneralConvey·Ptr src_index_gt_n;
+    CV·GeneralConvey·Ptr dst_index_gt_n;
+  } TM2x·CopyElements·Cnxs;
+
+
+#if 0
+
+
+
+
+
+
+//--------------------------------------------------------------------------------
+// deprecated
 
 struct TM2x·alloc_heap_0{
   TM2x **tape;
@@ -243,3 +276,4 @@ struct TM2x·write_bytes_0{
 };
 
 
+#endif

@@ -1,36 +1,48 @@
 // 'thread static' allocation class
 address_t TM2x·constructed_count = 0;
 
-/*--------------------------------------------------------------------------------
-  We call allocation and deallocation of the header structure allocation and deallocation for the TM2x.
+address_t TM2x·constructed(TM2x *tape){
+  return TM2x·constructed_count;
+}
 
-  We call allocation and deallocation of the data array on the heap, construction and destruction of the TM2x.
+
+/*--------------------------------------------------------------------------------
+
+  Here ‘allocation’ and ‘deallocation’ refer to the header struct. Where as ‘construction’
+  and ‘destruction’ refer to the allocation deallocation of the data part of the array,
+  and setting the value of data pointer in the header struct.
+
 */
 
-  struct TM2x·destruct·Args{
-    TM2x *tape;
-  };
+  #pragma push_macro("ARGS")
+  #pragma push_macro("CNXS")
+  #define ARGS() ((TM2x·Destruct·Args *)CV·args)
+  #define CNXS() ((TM2x·Destruct·Cnxs *)CV·cnxs)
 
-  struct TM2x·destruct·Cons{
-    CV·GeneralConvey·Ptr nominal;
-  };
+    CV·def(TM2x·destruct){
+      free(ARGS->tape->base_pt);
+      general_conveay(CNXS->nominal);  
+    } CV·end(TM2x·destruct);
 
-  CV·def(TM2x·destruct){
-    free(CV·GeneralConvey·args.this_context->args.tape->base_pt);
-    TM2x·constructed_count--;
-    CV·GeneralConvey·args.this_context = 
-    CV·GeneralConvey·args.next.context = 
-    CV·GeneralConvey·args.next.conveyance = 
-    convey CV·general_convey
-    convey *ar->nominal;  
-  }CV·end(TM2x·destruct);
+  #pragma pop_macro("ARGS")
+  #pragma pop_macro("CNXS")
 
-  // nc
-  CV·def(TM2x·dealloc_heap){
-    AR(ar ,TM2x·destruct ,0);
-    free(ar->tape);
-    convey *ar->nominal;
-  } CV·end(TM2x·dealloc_heap);
+
+  #pragma push_macro("ARGS")
+  #pragma push_macro("CNXS")
+  #define ARGS() ((TM2x·DeallocHeap·Args *)CV·args)
+  #define CNXS() ((TM2x·DeallocHeap·Cnxs *)CV·cnxs)
+
+    // we are to deallocate the header from the heap
+    CV·def(TM2x·dealloc_heap){
+      free(ARGS->tape);
+      general_convey(CNXS->nominal;
+    } CV·end(TM2x·dealloc_heap);
+
+  #pragma pop_macro("ARGS")
+  #pragma pop_macro("CNXS")
+
+#if 0
 
   // Deallocation for dynamically allocated headers.
   // TM2x0
@@ -268,74 +280,57 @@ CV·def(TM2x·copy_bytes){
 //--------------------------------------------------------------------------------
 // copy elements
 //
-  struct TM2x·CopyElements·Args {
-    TM2x *src;
-    address_t src_element_i;
-    TM2x *dst;
-    address_t dst_element_i;
-    address_t element_n;  // index of nth element of the copy region
-    address_t element_byte_n;
-  };
 
-  struct TM2x·CopyElements·Cons {
-    CV·GeneralConvey·Ptr nominal;
-    CV·GeneralConvey·Ptr src_index_gt_n;
-    CV·GeneralConvey·Ptr dst_index_gt_n;
-  };
+  struct {
+    Inclusive·3opLL·Args mul_ib_0;
+    Inclusive·3opLL·Args mul_ei_bi_0;
+    Inclusive·3opLL·Args mul_ei_bi_1;
+    TM2x·CopyBytes·Args copy_bytes_0;
+  } TM2x·CopyElements·child_args;
 
-  CV·make_context(TM2x ,CopyElements);
+  struct {
+    Inclusive·3opLL·Cnxs mul_ib_0;
+    Inclusive·3opLL·Cnxs mul_ei_bi_0;
+    Inclusive·3opLL·Cnxs mul_ei_bi_1;
+    TM2x·CopyBytes·Cnxs copy_bytes_0;
+  } TM2x·CopyElements·child_cxs;
 
-  // this tableau holds context for child conveyances.
-  struct TM2x·CopyElements·Tableau {
-    struct Tableau *tableau_up; // the tableau one up in the convey chain
-    struct Context *context_in_use; // after a convey call, points at the child's context
+  #pragma push_macro("CA")
+  #pragma push_macro("CC")
+  #define CA CopyElements·child_args;
+  #define CC CopyElements·child_cnxs;
 
-    // context for children
-    struct Inclusive·MulIb0·Context   mul_ib_0;
-    struct Inclusive·MulEiBi0·Context mul_ei_bi_0;
-    struct Inclusive·MulEiBi1·Context mul_ei_bi_1;
-    struct TM2x·CopyBytes·Context     copy_bytes_0;
+    static void TM2x·CopyElements·dataflow_static(){
+      CA.mul_ib_0.rpt    = &CA.copy_bytes_0.byte_n;// scales element_n to byte_n
+      CA.mul_ei_bi_0.rpt = &CA.copy_bytes_0.src_byte_i;// scale src element index to src byte index
+      CA.mul_ei_bi_1.rpt = &CA.copy_bytes_0.dst_byte_i;// scale dst element index to dst byte index
+    }
+    CopyElements·dataflow_static();
 
-  } TM2x·CopyElements·tableau;
+    static void TM2x·CopyElements·connect_static(){ 
+      CC.mul_ib_0.nominal   = init_cnx( Inclusive ,mul_ei_bi_0 );
+      CC.mul_ei_bi_0.nominal= init_cnx( Inclusive ,mul_ei_bi_1 );
+    }
+    CopyElements·connect_static();
 
-  #pragma push_macro("t")
-  #define t CopyElements·tableau
-  static void TM2x·CopyElements·connect(){ 
-    // results
-    t.mul_ib_0.args.rpt    = &t.copy_bytes_0.args.byte_n;
-    t.mul_ei_bi_0.args.rpt = &t.copy_bytes_0.args.src_byte_i;
-    t.mul_ei_bi_1.args.rpt = &t.copy_bytes_0.args.copy_bytes_0.dst_byte_i;
+    static inline TM2x·CopyElements·connect_finish(){
+         CC.mul_ib_0.gt_address_t_n = ((TM2x·CopyElements·Cnxs *)CV·cnxs)->src_index_gt_n;
+      CC.mul_ei_bi_0.gt_address_t_n = ((TM2x·CopyElements·Cnxs *)CV·cnxs)->src_index_gt_n;
+      CC.mul_ei_bi_1.gt_address_t_n = ((TM2x·CopyElements·Cnxs *)CV·cnxs)->dst_index_gt_n;
+      CC.mul_ei_bi_1.nominal        = ((TM2x·CopyElements·Cnxs *)CV·cnxs)->nominal;
+    } CV·end(TM2x·CopyElements·connect_finish);
 
-    // connectors
-    t.mul_ib_0.cons.nominal= (Connector) 
-      { .entry = &&Inclusive·mul_ei_bi 
-        ,.connections = &t.mul_ei_bi_0.cons
-        ,.args = &t.mul_ei_bi_0.args
-      }
-    make_relative_gcp(t.mul_ib_0.cons.gt_address_t_n ,TM2x ,copy_elements ,gt_address_t_n);
+    CV·def(TM2x·copy_elements){
+      TM2x·CopyElements·connect_finish();
+      CV·args = (CV·Args *) &CA.mul_ib_0;
+      CV·cnxs = (CV·Cnxs *) &CC.mul_ib_0;
+      convey(Inclusive·mul_ib);
+    } CV·end(TM2x·copy_elements);
 
-    t.mul_ib_1.cons.nominal= (Connector) 
-      { .entry = &&Inclusive·mul_ei_bi 
-        ,.connections = &t.mul_ei_bi_1.cons
-        ,.args = &t.mul_ei_bi_1.args
-      }
-    make_relative_gcp(t.mul_ib_1.cons.gt_address_t_n ,TM2x ,copy_elements ,gt_address_t_n);
+  #pragma pop_macro("CC")
+  #pragma pop_macro("CA")
 
-    make_relative_gcp(t.copy_bytes_0.cons.mominal ,TM2x ,copy_elements ,nominal);
-    make_relative_gcp(t.copy_bytes_0.cons.src_index_gt_n ,TM2x ,copy_elements ,src_index_gt_n);
-    make_relative_gcp(t.copy_bytes_0.cons.dst_index_gt_n ,TM2x ,copy_elements ,dst_index_gt_n);
-  }
-  #pragma pop_macro("t")
-  CopyElements·connect();
-
-  CV·def(copy_elements){
-
-    // CV·GeneralConvey·args.this_context was set as part of conveying here
-    CV·GeneralConvey·args.next.conveyance = && Inclusive·mul_ib;
-    CV·GeneralConvey·args.next.context = &CopyElements·Tableau.mul_ib_0;
-    convey CV·general_convey;
-
-  } CV·end(copy_elements);
+#endif
 
 #if 0
 
@@ -601,12 +596,12 @@ we are writing the dst tape.
 
 */
 CV·def(write_bytes){
-          TM2x *dst             = Args.TM2x·write_bytes.dst          
-     address_t  dst_byte_i      = Args.TM2x·write_bytes.dst_byte_i   
-          void *src_pt          = Args.TM2x·write_bytes.src_pt       
-     address_t  byte_n          = Args.TM2x·write_bytes.byte_n       
-  ConveyancePtr  nominal         = Args.TM2x·write_bytes.nominal      
-  ConveyancePtr  alloc_fail      = Args.TM2x·write_bytes.alloc_fail   
+          TM2x *dst               = Args.TM2x·write_bytes.dst          
+     address_t  dst_byte_i        = Args.TM2x·write_bytes.dst_byte_i   
+          void *src_pt            = Args.TM2x·write_bytes.src_pt       
+     address_t  byte_n            = Args.TM2x·write_bytes.byte_n       
+  ConveyancePtr  nominal          = Args.TM2x·write_bytes.nominal      
+  ConveyancePtr  alloc_fail       = Args.TM2x·write_bytes.alloc_fail   
   ConveyancePtr  src_index_gt_n   = Args.TM2x·write_bytes.src_index_gt_n
   ConveyancePtr  dst_index_gt_n   = Args.TM2x·write_bytes.dst_index_gt_n
 }

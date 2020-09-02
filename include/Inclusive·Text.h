@@ -1,17 +1,3 @@
-
-/*
-struct Text·Inclusive{
-  ConveyancePtr mul_ib;
-  ConveyancePtr mul_ei_bi;
-} Text·Inclusive
-={
-  &&Inclusive·mul_ib
-  ,&&Inclusive·mul_ei_bi
-};
-*/
-
-goto Inclusive·end;
-
 /*
   mul_ib = mul inclusive bounds.
 
@@ -49,18 +35,22 @@ overflow?
     yikes, but we just make it ( 2^n * 2^n - 1 leads to the result more directly)
 
 */
+  #pragma push_macro("ARGS")
+  #pragma push_macro("ARGS_1")
+  #pragma push_macro("CNXS")
+  #define ARGS() ((Inclusive·3opLL·Args *)CV·args)
+  #define ARGS_1() ((Inclusive·3opLL·Args_1 *)CV·args)
+  #define CNXS() ((Inclusive·3opLL·Cnxs *)CV·cnxs)
 
-Inclusive·mul_ib:{
-  Conveyance·swap();
-  LC(lc0 ,Inclusive·3opLL ,0);
-  LC(lc1 ,Inclusive·3opLL ,1);
-  AR(ar ,Inclusive·3opLL  ,2);
+    CV·def(Inclusive·mul_ib){
+      ARGS_1->r = ARGS->a_0 * ARGS->a_1 + ARGS->a_0 + ARGS->a_1;
+      if( ARGS_1->r > address_t_n ) CV·general_convey(CNXS->gt_address_t_n);
+      CV·general_convey(CNXS->nominal);
+    } CV·end(Inclusive·mul_ib);
 
-  lc1->r = lc0->a0 * lc0->a1 + lc0->a0 + lc0->a1;
-  if( lc1->r > address_t_n ) convey *lc0->gt_address_t_n;
-  ar->rpt = lc1->r;
-  convey *lc0->nominal;
-}
+  #pragma pop_macro("ARGS")
+  #pragma pop_macro("ARGS_1")
+  #pragma pop_macro("CNXS")
 
 
 /*
@@ -79,17 +69,19 @@ Inclusive·mul_ib:{
    (2^n - 1) * (2^n) = 2^2n - 2^n ; 2^n >= 1, so no ov possible
 
 */
-Inclusive·mul_ei_bi:{
-  Conveyance·swap();
-  LC(lc0 ,Inclusive·3opLL0 ,0);
-  LC(lc1 ,Inclusive·3opLL1 ,0);
-  AR(ar ,Inclusive·3opLL  ,2);
+  #pragma push_macro("ARGS")
+  #pragma push_macro("ARGS_1")
+  #pragma push_macro("CNXS")
+  #define ARGS() ((Inclusive·3opLL·Args *)CV·args)
+  #define ARGS_1() ((Inclusive·3opLL·Args_1 *)CV·args)
+  #define CNXS() ((Inclusive·3opLL·Cnxs *)CV·cnxs)
 
-  lc1->r = lc0->a0 * lc0->a1 + lc0->a0;
-  if( lc1->r > address_t_n ) convey *lc0->gt_address_t_n;
-  ar->rpt = lc1->r;
-  convey *lc0->nominal;
-}
+    CV·def(Inclusive·mul_ei_bi){
+      ARGS_1->r = ARGS->a_0 * ARGS->a_1 + ARGS->a_0;
+      if( ARGS_1->r > address_t_n ) CV·general_convey(CNXS->gt_address_t_n);
+      CV·general_convey(CNXS->nominal);
+    } CV·end(Inclusive·mul_ib);
 
-
-Inclusive·end:;
+  #pragma pop_macro("ARGS")
+  #pragma pop_macro("ARGS_1")
+  #pragma pop_macro("CNXS")

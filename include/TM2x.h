@@ -66,10 +66,6 @@
   // tape becomes a pointer to a static allocation of a TM2x struct
   #define TM2x·AllocStatic(tape) TM2x TM2x· ## tape ,*tape; tape = &TM2x· ## tape;
 
-  INLINE_PREFIX address_t TM2x·constructed(TM2x *tape){
-    return TM2x·constructed_count;
-  }
-
 
 #endif
 

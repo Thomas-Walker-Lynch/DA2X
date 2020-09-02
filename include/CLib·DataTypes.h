@@ -1,8 +1,11 @@
 
 // struct CLib·mallocn *ar = &Conveyance·Args_pt->CLib·mallocn;
-struct CLib·mallocn_0{
+typedef struct {
   void **pt;
   address_t n;
+} CLib·Mallocn·Args;
+
+typedef struct {
   ConveyancePtr nominal;
   ConveyancePtr fail;
-};
+} CLib·Mallocn·Cnxs;
