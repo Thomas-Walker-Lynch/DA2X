@@ -17,28 +17,24 @@ address_t TM2x·constructed(TM2x *tape){
   and setting the value of data pointer in the header struct.
 
 */
-
-  #pragma push_macro("ARGS")
-  #pragma push_macro("CNXS")
-#define ARGS  AS(CV·args ,(TM2x·Destruct·Args *))
-#define CNXS  AS(CV·cnxs ,(TM2x·Destruct·Cnxs *))
-
-//  #define ARGS ((TM2x·Destruct·Args *)CV·args)
-//  #define CNXS ((TM2x·Destruct·Cnxs *)CV·cnxs)
+  #pragma push_macro("ARG")
+  #pragma push_macro("CNX")
+  #define ARG(x) CV·ARG(TM2x·Destruct·Args ,x)
+  #define CNX(x) CV·CNX(TM2x·Destruct·Cnxs ,x)
 
     CV·def(TM2x·destruct){
-      free(ARGS->tape->base_pt);
-      general_conveay(CNXS->nominal);  
+      free(ARG(tape)->base_pt);
+      general_conveay(CNX(nominal));  
     } CV·end(TM2x·destruct);
 
-  #pragma pop_macro("ARGS")
-  #pragma pop_macro("CNXS")
+  #pragma pop_macro("ARG")
+  #pragma pop_macro("CNX")
 
 
-  #pragma push_macro("ARGS")
-  #pragma push_macro("CNXS")
-  #define ARGS ((TM2x·DeallocHeap·Args *)CV·args)
-  #define CNXS ((TM2x·DeallocHeap·Cnxs *)CV·cnxs)
+  #pragma push_macro("ARG")
+  #pragma push_macro("CNX")
+  #define ARG(x) CV·ARG(TM2x·DeallocHeap·Args ,x)
+  #define CNX(x) CV·CNX(TM2x·DeallocHeap·Cnxs ,x)
 
     // we are to deallocate the header from the heap
     CV·def(TM2x·dealloc_heap){
@@ -46,8 +42,8 @@ address_t TM2x·constructed(TM2x *tape){
       general_convey(CNXS->nominal;
     } CV·end(TM2x·dealloc_heap);
 
-  #pragma pop_macro("ARGS")
-  #pragma pop_macro("CNXS")
+  #pragma pop_macro("ARG")
+  #pragma pop_macro("CNX")
 
 #if 0
 

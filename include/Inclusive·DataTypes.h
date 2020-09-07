@@ -17,9 +17,9 @@
   } Inclusive·3opLL·Args_1;
 
 typedef struct {
-  CV·GeneralConveyance·Ptr nominal;
-  CV·GeneralConveyance·Ptr gt_address_t_n;
-} Inclusive·3opLL·Cnxs;
+  CV·Lnk nominal;
+  CV·Lnk gt_address_t_n;
+} Inclusive·3opLL·Lnks;
 
 
 

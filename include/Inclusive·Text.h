@@ -37,25 +37,28 @@ overflow?
 */
   #pragma push_macro("ARGS")
   #pragma push_macro("ARGS_1")
-  #pragma push_macro("CNXS")
+  #pragma push_macro("LNKS")
 
-//#define ARGS AS(CV·args ,Inclusive·3opLL·Args *)
-//#define ARGS_1 AS(CV·args ,Inclusive·3opLL·Args_1 *)
-//#define CNXS AS(CV·cnxs ,Inclusive·3opLL·Cnxs *)
-
-  #define ARGS *&((Inclusive·3opLL·Args *)CV·args)
-  #define ARGS_1 *&((Inclusive·3opLL·Args_1 *)CV·args)
-  #define CNXS *&((Inclusive·3opLL·Cnxs *)CV·cnxs)
+  #define ARGS ((Inclusive·3opLL·Args *)(CV·lnk->args))
+  #define ARGS_1 ((Inclusive·3opLL·Args_1 *)(CV·lnk->args))
+  #define LNKS ((Inclusive·3opLL·Lnks *)(CV·lnk->lnks))
 
     CV·def(Inclusive·mul_ib){
       ARGS_1->r = ARGS->a_0 * ARGS->a_1 + ARGS->a_0 + ARGS->a_1;
-      if( ARGS_1->r > address_t_n ) CV·general_convey(CNXS->gt_address_t_n);
-      CV·general_convey(CNXS->nominal);
+      if( ARGS_1->r > address_t_n ){
+        CV·convey_indirect(LNKS->gt_address_t_n);
+      }
+      *(ARGS->rpt) = ARGS_1->r;
+
+      CV·convey_indirect(LNKS->nominal)
+
+      //      CV·lnk = &((Inclusive·3opLL·Lnks *)(CV·lnk->lnks))->nominal;
+      //      goto *CV·lnk->conveyance;
     } CV·end(Inclusive·mul_ib);
 
   #pragma pop_macro("ARGS")
   #pragma pop_macro("ARGS_1")
-  #pragma pop_macro("CNXS")
+  #pragma pop_macro("LNKS")
 
 
 /*
@@ -70,23 +73,32 @@ overflow?
         a0 = 1,  a1 = 3   --> 4
         a0 = 2,  a1 = 3   --> 8
 
-   smaller tha0 mul_ib so no ov possible, also
+   smaller than mul_ib so no ov possible, also
    (2^n - 1) * (2^n) = 2^2n - 2^n ; 2^n >= 1, so no ov possible
 
 */
   #pragma push_macro("ARGS")
   #pragma push_macro("ARGS_1")
-  #pragma push_macro("CNXS")
-  #define ARGS ((Inclusive·3opLL·Args *)CV·args)
-  #define ARGS_1 ((Inclusive·3opLL·Args_1 *)CV·args)
-  #define CNXS ((Inclusive·3opLL·Cnxs *)CV·cnxs)
+  #pragma push_macro("LNKS")
+
+  #define ARGS ((Inclusive·3opLL·Args *)(CV·lnk->args))
+  #define ARGS_1 ((Inclusive·3opLL·Args_1 *)(CV·lnk->args))
+  #define LNKS ((Inclusive·3opLL·Lnks *)(CV·lnk->lnks))
 
     CV·def(Inclusive·mul_ei_bi){
       ARGS_1->r = ARGS->a_0 * ARGS->a_1 + ARGS->a_0;
-      if( ARGS_1->r > address_t_n ) CV·general_convey(CNXS->gt_address_t_n);
-      CV·general_convey(CNXS->nominal);
-    } CV·end(Inclusive·mul_ib);
+      if( ARGS_1->r > address_t_n ){
+        CV·convey_indirect(LNKS->gt_address_t_n);
+      }
+      *(ARGS->rpt) = ARGS_1->r;
+
+      CV·convey_indirect(LNKS->nominal)
+
+      //      CV·lnk = &((Inclusive·3opLL·Lnks *)(CV·lnk->lnks))->nominal;
+      //      goto *CV·lnk->conveyance;
+    } CV·end(Inclusive·mul_ei_bi);
 
   #pragma pop_macro("ARGS")
   #pragma pop_macro("ARGS_1")
-  #pragma pop_macro("CNXS")
+  #pragma pop_macro("LNKS")
+

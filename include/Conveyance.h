@@ -9,32 +9,30 @@ typedef void **CV·Ptr;
 #define CV·def(c) goto CV·##c;c:{
 #define CV·end(c) abort();} CV·##c:;
 
-// connections
-typedef struct {
-} CV·Cnxs;
-
 // arguments
 typedef struct {
 } CV·Args;
 
+// connections
+typedef struct {
+} CV·Lnks;
+
 typedef struct{
   CV·Ptr conveyance;
   CV·Args *args;
-  CV·Cnxs *cnxs;
-} CV·GeneralConveyance·Ptr;
+  CV·Lnks *lnks;
+} CV·Lnk;
 
-#define CV·init_cnx(ns ,conveyance_name)           \
+#define CV·init_lnk(ns ,conveyance_name)           \
   {                                             \
     .conveyance = &&ns##·##convyeance_name      \
       ,.args = &CA.##conveyance_name            \
-      ,.cnxs = &CC.##conveyance_name            \
+      ,.lnks = &CC.##conveyance_name            \
       }
 
-#define CV·general_convey(gcptr)                \
-  ({                                            \
-    CV·args = (CV·Args *)gcptr.args;            \
-    CV·cnxs = (CV·Cnxs *)gcptr.cnxs;            \
-    CV·convey(gcptr->conveyance);               \
-  })
+#define CV·convey_indirect(lnk) \
+  CV·lnk  = &(lnk);                             \
+  CV·convey(*CV·lnk->conveyance);
+
 
 #endif

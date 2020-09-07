@@ -13,7 +13,5 @@
 
 */
 
-
-  CV·Args *CV·args;
-  CV·Cnxs *CV·cnxs;
-
+// the connection that lead to the currently running code
+CV·Lnk *CV·lnk;
