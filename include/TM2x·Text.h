@@ -12,38 +12,65 @@ address_t TM2x·constructed(TM2x *tape){
 
 /*--------------------------------------------------------------------------------
 
-  Here ‘allocation’ and ‘deallocation’ refer to the header struct. Where as ‘construction’
-  and ‘destruction’ refer to the allocation deallocation of the data part of the array,
-  and setting the value of data pointer in the header struct.
+  Here alloc, construct, destruct, dealloc cycle
 
 */
-  #pragma push_macro("ARG")
-  #pragma push_macro("CNX")
-  #define ARG(x) CV·ARG(TM2x·Destruct·Args ,x)
-  #define CNX(x) CV·CNX(TM2x·Destruct·Cnxs ,x)
+  // see the TM2x·alloc_static macro in TM2x.h 
+  CV·def(TM2x·alloc_heap){
 
-    CV·def(TM2x·destruct){
-      free(ARG(tape)->base_pt);
-      general_conveay(CNX(nominal));  
-    } CV·end(TM2x·destruct);
+    CLib·Malloc·Args m_args;
+    CLib·Malloc·Lnks m_lnks;
+    CLib·Mallocn·Lnk m_lnk;
+    m_lnk.args = &m_args;
+    m_lnk.lnks = &m_lnks;
+    m_lnk.conveyance = &&CLib·mallocn;
 
-  #pragma pop_macro("ARG")
-  #pragma pop_macro("CNX")
+    TM2x·AllocHeap·Lnk *lnk = (TM2x·AllocHeap·Lnk *)CV·lnk;
+    m_args.pt = (void **)lnk->args->tape;
+    m_args.n  = byte_n_of(TM2x);
+    m_lnk.nominal = lnk->lnks->nominal;
+    m_lnk.fail = lnk->lnks->fail;
+
+    CV·convey_indirect(m_lnk);
+
+  } CV·end(TM2x·alloc_heap);
+
+  // Given an exent in bytes, sets aside heap memory for the data.
+  CV·def(TM2x·construct_bytes){
+    TM2x·constructed_count++; // to assist with debugging
+
+    CLib·Malloc·Args m_args;
+    CLib·Malloc·Lnks m_lnks;
+    CLib·Mallocn·Lnk m_lnk;
+    m_lnk.args = &m_args;
+    m_lnk.lnks = &m_lnks;
+    m_lnk.conveyance = &&CLib·mallocn;
+
+    TM2x·ConstructBytes·Lnk *lnk = (TM2x·ConstructBytes·Lnk *)CV·lnk;
+    lnk->args->tape->byte_n = lnk->args->byte_n;
+
+    m_args.pt = (void **)lnk->tape->base;
+    m_args.n  = power_2_extent_w_lower_bound(lnk->args->byte_n);
+    m_lnk.nominal = lnk->lnks->nominal;
+    m_lnk.alloc_fail = lnk->lnks->alloc_fail;
+
+    CV·convey_indirect(m_lnk);
+
+  } CV·end(TM2x·construct_bytes);
 
 
-  #pragma push_macro("ARG")
-  #pragma push_macro("CNX")
-  #define ARG(x) CV·ARG(TM2x·DeallocHeap·Args ,x)
-  #define CNX(x) CV·CNX(TM2x·DeallocHeap·Cnxs ,x)
+  CV·def(TM2x·destruct){
+    TM2x·Destruct·Lnk *lnk = (TM2x·Destruct·Lnk *)CV·lnk;
+    free(lnk->args->tape->base_pt);
+    convey_indirect(lnk->nominal);  
+  } CV·end(TM2x·destruct);
 
-    // we are to deallocate the header from the heap
-    CV·def(TM2x·dealloc_heap){
-      free(ARGS->tape);
-      general_convey(CNXS->nominal;
-    } CV·end(TM2x·dealloc_heap);
-
-  #pragma pop_macro("ARG")
-  #pragma pop_macro("CNX")
+  // we are to deallocate the header from the heap
+  CV·def(TM2x·dealloc_heap){
+    TM2x·DallocHeap·Lnk *lnk = (TM2x·DeallocHeap·Lnk *)CV·lnk;
+    free(lnk->args->tape);
+    convey_indirect(lnk->lnxs->nominal);
+  } CV·end(TM2x·dealloc_heap);
 
 #if 0
 
@@ -96,24 +123,6 @@ CV·def(TM2x·alloc_heap){
 
 //----------------------------------------
 //  Construct an allocated array. 
-//  Given the exent in bytes, sets aside heap memory for the data.
-// nc
-CV·def(TM2x·construct_bytes){
-  TM2x·constructed_count++; // to assist with debugging
-
-  Conveyance·swap();
-  LC(lc ,TM2x·construct_bytes ,1);
-  lc->tape->byte_n = lc->byte_n;
-  lc->alloc_byte_n = power_2_extent_w_lower_bound(lc->byte_n);
-
-  AR(ar ,CLib·mallocn ,0);
-  ar->pt      = (void **)&(lc->tape->base_pt);
-  ar->n       = lc->alloc_byte_n;
-  ar->nominal = lc->nominal;
-  ar->fail    = lc->alloc_fail;
-  convey CLib·mallocn;
-
-} CV·end(TM2x·construct_bytes);
 
 // TM2x0
 CV·def(TM2x·construct_elements){

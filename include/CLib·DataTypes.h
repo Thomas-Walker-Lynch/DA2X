@@ -6,6 +6,12 @@ typedef struct {
 } CLib·Mallocn·Args;
 
 typedef struct {
-  ConveyancePtr nominal;
-  ConveyancePtr fail;
-} CLib·Mallocn·Cnxs;
+  CV·Lnk nominal;
+  CV·Lnk fail;
+} CLib·Mallocn·Lnks;
+
+typedef struct{
+  CV·Ptr conveyance;
+  CLib·Mallocn·Args *args;
+  CLib·Mallocn·Lnks *lnks;
+} Clib·Mallocn·Lnk;

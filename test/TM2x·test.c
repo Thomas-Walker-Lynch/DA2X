@@ -4,135 +4,106 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#define TM2x·TEST
-#include "TM2x.h"
+#include "misc.h"
 #include "MallocCounter.h"
 #include "Result.h"
 #include "Conveyance.h"
 #include "Inclusive.h"
 
+#define TM2x·TEST
+#include "TM2x.h"
+
+#include "CLib·DataTypes.h"
+#include "Inclusive·DataTypes.h"
+#include "TM2x·DataTypes.h"
+
 int main(){
-
-  // ----------------------------------------
-  // Includes Conveyance library, and local conveyances
-
-  #include "CLib·DataTypes.h"
-  #include "Inclusive·DataTypes.h"
-  #include "TM2x·DataTypes.h"
-  struct test_args0{
-    ConveyancePtr continuation;
-  };
-
-  union Conveyance·Data{
-    #include "CLib·Data.h"
-    #include "Inclusive·Data.h"
-    #include "TM2x·Data.h"
-    struct test_args0 test_args;
-  };
-  union Conveyance·Data Conveyance·Data0 ,Conveyance·Data1;
-
-  #include "TM2x·Context.h"
-  union {
-    struct CX·TM2x·Test·test_0 {
-      address_t malloc_cnt;
-      address_t constructed_cnt;
-      Result·Tallies results;
-      bool f[256];
-      uint i;
-      TM2x *tape;
-      ConveyancePtr continuation;
-    } test_0;
-  } CX·TM2x·Test;
 
   #include "Conveyance·Text.h"
   #include "CLib·Text.h"
   #include "Inclusive·Text.h"
   #include "TM2x·Text.h"
 
-  // ----------------------------------------
-  //  test code
-
   Result·Tallies accumulated_results ,*accumulated_results_pt;
   accumulated_results_pt=&accumulated_results;
   Result·Tallies·init(accumulated_results_pt);
 
-  ConveyancePtr tests[] = {&&test_0 ,&&test_1 ,&&tests_finished};
-  ConveyancePtr *test_pt = tests;
+  CV·convey(test_0);
 
-  test_commutator:{
-    AR(ar ,test_args ,0);
-    ar->continuation = &&test_commutator;
-    test_pt++;
-    continue_from **(test_pt - 1);
-  }
+  // allocate, construct, destruct, deallocate an array
+  CV·def(test_0):{
+    CV·Conveyance nominal ,fail ,cleanup ,report;
 
-  // Sort of smoke tests, allocates and constructs and array of bytes, checks the allocation size.
-  // Uses many features of conveyances, including a relay.
-  test_0:{
-    Conveyance nominal ,fail ,cleanup ,report;
+    address_t malloc_cnt = MallocCounter·count;
+    address_t constructed_cnt = TM2x·constructed_count;
+    Result·Tallies results ,*results_pt;
+    results_pt = &results;
+    Result·Tallies·init(results_pt);
+    bool f[256]; // flags
+    uint i = 0;  // count
 
-    Conveyance·swap();
-    LC(lc ,test_args, 0);
-    CX(cx ,TM2x·Test ,test_0);
-    cx->malloc_cnt = MallocCounter·count;
-    cx->constructed_cnt = TM2x·constructed_count;
-    cx->i = 0;
-    cx->continuation = lc->continuation;
-    Result·Tallies·init(&cx->results);
+    // tableau
+    //
+      TM2x·AllocHeap·Args ah_args;
+      TM2x·AllocHeap·Lnks ah_lnks;
+      TM2x·AllocHeap·Lnk ah_lnk;
+      ah_lnk.args = &ah_args;
+      ah_lnk.lnks = &ah_lnks;
+      ah_lnk.conveyance = &&TM2x·alloc_heap;
 
-    //allocate
-    AR(ar ,TM2x·alloc_heap ,0);
-    ar->tape = &cx->tape;
-    ar->nominal = &&nominal;
-    ar->fail = &&fail;
-    continue_from TM2x·alloc_heap;
+      TM2x·ConstructBytes·Args cb_args;
+      TM2x·ConstructBytes·Lnks cb_lnks;
+      TM2x·ConstructBytes·Lnk cb_lnk;
+      cb_lnk.args = &cb_args;
+      cb_lnk.lnks = &cb_lnks;
+      cb_lnk.conveyance = &&TM2x·construct_bytes;
 
-    nominal:{
-      Conveyance nominal;
+      TM2x·Destruct·Args da_args;
+      TM2x·Destruct·Lnks da_lnks;
+      TM2x·Destruct·Lnk da_lnk;
+      da_lnk.args = &da_args;
+      da_lnk.lnks = &da_lnks;
+      da_lnk.conveyance = &&TM2x·destruct;
+
+      TM2x·DeallocateHeap·Args dh_args;
+      TM2x·DeallocateHeap·Lnks dh_lnks;
+      TM2x·DeallocateHeap·Lnk dh_lnk;
+      dh_lnk.args = &dh_args;
+      dh_lnk.lnks = &dh_lnks;
+      dh_lnk.conveyance = &&TM2x·deallocate_heap;
+
+      ah_lnks.nominal = cb_lnk;
+      ah_lnks.fail.conveyance = &&fail;
+
+      cb_lnks.nominal = da_lnk;
+      cb_lnks.alloc_fail = &&fail;
+
+      da_lnks.nominal = dh_lnk;
+      dh_lnks.nominal.conveyance = &&nominal;
+
+    CV·convey_indirect(ah_lnk);
+
+    CV·def(nominal){
       cx->f[cx->i++] = true;
+      CV·convey(report);
+    }CV·end(nominal);
 
-      //construct
-      AR(ar ,TM2x·construct_bytes ,0);
-      ar->tape = cx->tape;
-      ar->byte_n = 48;
-      ar->nominal = &&nominal;
-      ar->alloc_fail = &&fail;
-      continue_from TM2x·construct_bytes;
-
-      nominal:{
-        cx->f[cx->i++] = Test·CLib·allocation_n == 63;
-        continue_from cleanup;
-        cend;
-      }
-      cend;
-    }
-
-    fail:{
+    CV·def(fail){
       cx->f[cx->i++] = false;
-      continue_from cleanup;
-      cend;
-    }
+      CV·convey(report);
+    } CV·end(fail);
 
-    cleanup:{
-      // destruct and deallocate
-      AR(ar ,TM2x·destruct_dealloc_heap ,0);
-      ar->tape = cx->tape;
-      ar->nominal = &&report;
-      continue_from TM2x·destruct_dealloc_heap;
-      cend;
-    }
-
-    report:{
+    CV·def(report){
       cx->f[cx->i++] = cx->malloc_cnt == MallocCounter·count;
       cx->f[cx->i++] = cx->constructed_cnt == TM2x·constructed_count;
       Result·Tallies·tally("test_0" ,&cx->results ,cx->f ,cx->i);
       Result·Tallies·accumulate(accumulated_results_pt ,&cx->results);
-      continue_from *cx->continuation;
-      cend;
-    }
+      CV·convey(&&tests_finished);
+    } CV·end(report)
 
-    cend;
-  }
+  }CV·end(test_0)
+
+#if 0
 
   // Sort of smoke tests, allocates and constructs and array of elements, checks the allocation size.
   // This the first that makes use of a context pad.
@@ -204,11 +175,12 @@ int main(){
     cend;
   }
 
-  tests_finished:{
+#endif
+
+  CV·(tests_finished){
     Result·Tallies·print("TM2x·test results" ,accumulated_results_pt);
     return accumulated_results.failed;
-  }
-
+  } CV·(tests_finished);
 
   abort();
 

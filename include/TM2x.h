@@ -64,7 +64,7 @@
   }
 
   // tape becomes a pointer to a static allocation of a TM2x struct
-  #define TM2x·AllocStatic(tape) TM2x TM2x· ## tape ,*tape; tape = &TM2x· ## tape;
+  #define TM2x·alloc_static(tape) TM2x TM2x· ## tape ,*tape; tape = &TM2x· ## tape;
 
 
 #endif

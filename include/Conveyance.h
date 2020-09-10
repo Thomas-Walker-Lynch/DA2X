@@ -31,7 +31,7 @@ typedef struct{
       }
 
 #define CV·convey_indirect(lnk) \
-  CV·lnk  = &(lnk);                             \
+  CV·lnk  = (CV·Lnk *)&(lnk);                \
   CV·convey(*CV·lnk->conveyance);
 
 
