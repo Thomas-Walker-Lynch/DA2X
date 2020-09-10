@@ -14,4 +14,4 @@ typedef struct{
   CV·Ptr conveyance;
   CLib·Mallocn·Args *args;
   CLib·Mallocn·Lnks *lnks;
-} Clib·Mallocn·Lnk;
+} CLib·Mallocn·Lnk;

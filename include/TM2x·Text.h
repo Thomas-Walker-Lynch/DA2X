@@ -2,7 +2,7 @@
 address_t TM2x·constructed_count = 0;
 
 #ifdef TM2x·TEST
-  address_t TM2x·Test·allocation_n;
+  address_t TM2x·Test·allocation_n = 0;
 #endif
 
 address_t TM2x·constructed(TM2x *tape){
@@ -18,8 +18,8 @@ address_t TM2x·constructed(TM2x *tape){
   // see the TM2x·alloc_static macro in TM2x.h 
   CV·def(TM2x·alloc_heap){
 
-    CLib·Malloc·Args m_args;
-    CLib·Malloc·Lnks m_lnks;
+    CLib·Mallocn·Args m_args;
+    CLib·Mallocn·Lnks m_lnks;
     CLib·Mallocn·Lnk m_lnk;
     m_lnk.args = &m_args;
     m_lnk.lnks = &m_lnks;
@@ -28,8 +28,8 @@ address_t TM2x·constructed(TM2x *tape){
     TM2x·AllocHeap·Lnk *lnk = (TM2x·AllocHeap·Lnk *)CV·lnk;
     m_args.pt = (void **)lnk->args->tape;
     m_args.n  = byte_n_of(TM2x);
-    m_lnk.nominal = lnk->lnks->nominal;
-    m_lnk.fail = lnk->lnks->fail;
+    m_lnks.nominal = lnk->lnks->nominal;
+    m_lnks.fail = lnk->lnks->fail;
 
     CV·convey_indirect(m_lnk);
 
@@ -39,8 +39,8 @@ address_t TM2x·constructed(TM2x *tape){
   CV·def(TM2x·construct_bytes){
     TM2x·constructed_count++; // to assist with debugging
 
-    CLib·Malloc·Args m_args;
-    CLib·Malloc·Lnks m_lnks;
+    CLib·Mallocn·Args m_args;
+    CLib·Mallocn·Lnks m_lnks;
     CLib·Mallocn·Lnk m_lnk;
     m_lnk.args = &m_args;
     m_lnk.lnks = &m_lnks;
@@ -49,10 +49,10 @@ address_t TM2x·constructed(TM2x *tape){
     TM2x·ConstructBytes·Lnk *lnk = (TM2x·ConstructBytes·Lnk *)CV·lnk;
     lnk->args->tape->byte_n = lnk->args->byte_n;
 
-    m_args.pt = (void **)lnk->tape->base;
+    m_args.pt = (void **)lnk->args->tape->base_pt;
     m_args.n  = power_2_extent_w_lower_bound(lnk->args->byte_n);
-    m_lnk.nominal = lnk->lnks->nominal;
-    m_lnk.alloc_fail = lnk->lnks->alloc_fail;
+    m_lnks.nominal = lnk->lnks->nominal;
+    m_lnks.fail = lnk->lnks->alloc_fail;
 
     CV·convey_indirect(m_lnk);
 
@@ -62,14 +62,14 @@ address_t TM2x·constructed(TM2x *tape){
   CV·def(TM2x·destruct){
     TM2x·Destruct·Lnk *lnk = (TM2x·Destruct·Lnk *)CV·lnk;
     free(lnk->args->tape->base_pt);
-    convey_indirect(lnk->nominal);  
+    CV·convey_indirect(lnk->lnks->nominal);  
   } CV·end(TM2x·destruct);
 
   // we are to deallocate the header from the heap
   CV·def(TM2x·dealloc_heap){
-    TM2x·DallocHeap·Lnk *lnk = (TM2x·DeallocHeap·Lnk *)CV·lnk;
+    TM2x·DeallocHeap·Lnk *lnk = (TM2x·DeallocHeap·Lnk *)CV·lnk;
     free(lnk->args->tape);
-    convey_indirect(lnk->lnxs->nominal);
+    CV·convey_indirect(lnk->lnks->nominal);
   } CV·end(TM2x·dealloc_heap);
 
 #if 0

@@ -10,20 +10,13 @@
   Implementations use non-inclusive bounding artihmetic to accomodate the C library, 
   but this is not carried past the interface.
 */
-  #pragma push_macro("ARGS")
-  #pragma push_macro("CNXS")
-  #define ARGS ((CLib·mallocn·Args *)CV·args)
-  #define CNXS ((CLib·mallocn·Cnxs *)CV·cnxs)
-
-    CV·def(CLib·mallocn){
-      #if TEST
-        Test·CLib·allocation_n = lc->n;
-      #endif
-      if( ARGS->n == address_t_n ) general_convey(CNXS->fail); 
-      *ARGS->pt = malloc(ARGS->n + 1);
-      if(!*ARGS->pt) general_convey(CNXS->fail); 
-      general_convey(CNXS->nominal);
-    } CV·end(Clib·mallocn);
-
-  #pragma pop_macro("ARGS")
-  #pragma pop_macro("CNXS")
+  CV·def(CLib·mallocn){
+    CLib·Mallocn·Lnk *lnk = (CLib·Mallocn·Lnk *)CV·lnk;
+    #if TEST
+      Test·CLib·allocation_n = lnk->args->n;
+    #endif
+    if( lnk->args->n == address_t_n ) CV·convey_indirect(lnk->lnks->fail); 
+    *lnk->args->pt = malloc(lnk->args->n + 1);
+    if(!*lnk->args->pt) CV·convey_indirect(lnk->lnks->fail); 
+    CV·convey_indirect(lnk->lnks->nominal);
+  } CV·end(CLib·mallocn);
