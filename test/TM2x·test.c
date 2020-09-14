@@ -47,31 +47,37 @@ int main(){
       TM2x·AllocHeap·Args ah_args;
       TM2x·AllocHeap·Lnks ah_lnks;
       TM2x·AllocHeap·Lnk ah_lnk;
-      ah_lnk.args = &ah_args;
-      ah_lnk.lnks = &ah_lnks;
-      ah_lnk.conveyance = &&TM2x·alloc_heap;
 
       TM2x·ConstructBytes·Args cb_args;
       TM2x·ConstructBytes·Lnks cb_lnks;
       TM2x·ConstructBytes·Lnk cb_lnk;
-      cb_lnk.args = &cb_args;
-      cb_lnk.lnks = &cb_lnks;
-      cb_lnk.conveyance = &&TM2x·construct_bytes;
 
       TM2x·Destruct·Args da_args;
       TM2x·Destruct·Lnks da_lnks;
       TM2x·Destruct·Lnk da_lnk;
-      da_lnk.args = &da_args;
-      da_lnk.lnks = &da_lnks;
-      da_lnk.conveyance = &&TM2x·destruct;
 
       TM2x·DeallocHeap·Args dh_args;
       TM2x·DeallocHeap·Lnks dh_lnks;
       TM2x·DeallocHeap·Lnk dh_lnk;
+
+      ah_lnk.args = &ah_args;
+      ah_lnk.lnks = &ah_lnks;
+      ah_lnk.conveyance = &&TM2x·alloc_heap;
+
+      cb_lnk.args = &cb_args;
+      cb_lnk.lnks = &cb_lnks;
+      cb_lnk.conveyance = &&TM2x·construct_bytes;
+
+      da_lnk.args = &da_args;
+      da_lnk.lnks = &da_lnks;
+      da_lnk.conveyance = &&TM2x·destruct;
+
       dh_lnk.args = &dh_args;
       dh_lnk.lnks = &dh_lnks;
       dh_lnk.conveyance = &&TM2x·dealloc_heap;
 
+    // connections
+    //
       ah_lnks.nominal = AS(cb_lnk ,CV·Lnk);
       ah_lnks.fail.conveyance = &&fail;
 
@@ -80,6 +86,11 @@ int main(){
 
       da_lnks.nominal = AS(dh_lnk ,CV·Lnk);
       dh_lnks.nominal.conveyance = &&nominal;
+
+    // results
+    //
+      ah_args.pt = &cb_args.tm2x;
+
 
     CV·convey_indirect(ah_lnk);
 

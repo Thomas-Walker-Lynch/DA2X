@@ -9,17 +9,23 @@ typedef void **CV·Ptr;
 #define CV·def(c) goto CV·##c;c:{
 #define CV·end(c) abort();} CV·##c:;
 
-// arguments
+// actual argument data
 typedef struct {
 } CV·Args;
+
+// pointers to places to put result data
+typedef struct {
+} CV·Ress;
 
 // connections
 typedef struct {
 } CV·Lnks;
 
+// a link to a conveyance for indirect calls
 typedef struct{
   CV·Ptr conveyance;
   CV·Args *args;
+  CV·Ress *ress;
   CV·Lnks *lnks;
 } CV·Lnk;
 

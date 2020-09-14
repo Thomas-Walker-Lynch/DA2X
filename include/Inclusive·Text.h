@@ -42,7 +42,7 @@ overflow?
     if( lnk->args->r > address_t_n ){
       CV·convey_indirect(lnk->lnks->gt_address_t_n);
     }
-    *(lnk->args->rpt) = lnk->args->r;
+    *(lnk->ress->r) = lnk->args->r;
     CV·convey_indirect(lnk->lnks->nominal);
 
   } CV·end(Inclusive·mul_ib);
@@ -71,7 +71,7 @@ overflow?
     if( lnk->args->r > address_t_n ){
       CV·convey_indirect(lnk->lnks->gt_address_t_n);
     }
-    *(lnk->args->rpt) = lnk->args->r;
+    *(lnk->ress->r) = lnk->args->r;
     CV·convey_indirect(lnk->lnks->nominal);
 
   } CV·end(Inclusive·mul_ei_bi);

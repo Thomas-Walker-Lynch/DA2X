@@ -43,7 +43,9 @@ int main(){
       Inclusive·3opLL·Args mul_ib_args;
       mul_ib_args.a_0 = 541;
       mul_ib_args.a_1 = 727;
-      mul_ib_args.rpt = &r;
+
+      Inclusive·3opLL·Ress mul_ib_ress;
+      mul_ib_ress.r = &r;
 
       Inclusive·3opLL·Lnks mul_ib_lnks;
       mul_ib_lnks.nominal.conveyance = &&nominal;
@@ -54,6 +56,7 @@ int main(){
       Inclusive·3opLL·Lnk lnk_0;
       lnk_0.conveyance = &&Inclusive·mul_ib;
       lnk_0.args = &mul_ib_args;
+      lnk_0.ress = &mul_ib_ress;
       lnk_0.lnks = &mul_ib_lnks;
 
     CV·convey_indirect( lnk_0 );

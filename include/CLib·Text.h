@@ -15,8 +15,12 @@
     #if TEST
       Test·CLib·allocation_n = lnk->args->n;
     #endif
-    if( lnk->args->n == address_t_n ) CV·convey_indirect(lnk->lnks->fail); 
-    *lnk->args->pt = malloc(lnk->args->n + 1);
-    if(!*lnk->args->pt) CV·convey_indirect(lnk->lnks->fail); 
+    if( lnk->args->n == address_t_n ){
+      CV·convey_indirect(lnk->lnks->fail);
+    }
+    *lnk->ress->allocated_data = malloc(lnk->args->n + 1);
+    if(!*lnk->args->pt){
+      CV·convey_indirect(lnk->lnks->fail);
+    }
     CV·convey_indirect(lnk->lnks->nominal);
   } CV·end(CLib·mallocn);

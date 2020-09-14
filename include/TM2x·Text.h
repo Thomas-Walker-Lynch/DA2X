@@ -22,12 +22,13 @@ address_t TM2x·constructed(TM2x *tape){
     CLib·Mallocn·Lnks m_lnks;
     CLib·Mallocn·Lnk m_lnk;
     m_lnk.args = &m_args;
+    m_lnk.ress = &m_ress;
     m_lnk.lnks = &m_lnks;
     m_lnk.conveyance = &&CLib·mallocn;
 
     TM2x·AllocHeap·Lnk *lnk = (TM2x·AllocHeap·Lnk *)CV·lnk;
-    m_args.pt = (void **)lnk->args->tape;
     m_args.n  = byte_n_of(TM2x);
+    m_ress.allocated_data = (void **)&lnk->args->tm2x;
     m_lnks.nominal = lnk->lnks->nominal;
     m_lnks.fail = lnk->lnks->fail;
 
@@ -47,9 +48,9 @@ address_t TM2x·constructed(TM2x *tape){
     m_lnk.conveyance = &&CLib·mallocn;
 
     TM2x·ConstructBytes·Lnk *lnk = (TM2x·ConstructBytes·Lnk *)CV·lnk;
-    lnk->args->tape->byte_n = lnk->args->byte_n;
+    lnk->args->tm2x->byte_n = lnk->args->byte_n;
 
-    m_args.pt = (void **)lnk->args->tape->base_pt;
+    m_args.pt = (void **)&lnk->args->tm2x->base_pt;
     m_args.n  = power_2_extent_w_lower_bound(lnk->args->byte_n);
     m_lnks.nominal = lnk->lnks->nominal;
     m_lnks.fail = lnk->lnks->alloc_fail;

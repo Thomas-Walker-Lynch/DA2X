@@ -1,7 +1,10 @@
 
   typedef struct{
-    TM2x **tape;
   } TM2x·AllocHeap·Args;
+
+  typedef struct{
+    TM2x **tm2x;
+  } TM2x·AllocHeap·Ress;
 
   typedef struct{
     CV·Lnk nominal;
@@ -11,14 +14,18 @@
   typedef struct{
     CV·Ptr conveyance;
     TM2x·AllocHeap·Args *args;
+    TM2x·AllocHeap·Ress *ress;
     TM2x·AllocHeap·Lnks *lnks;
   } TM2x·AllocHeap·Lnk;
 
 
   typedef struct{
-    TM2x *tape;
+    TM2x *tm2x;
     address_t byte_n;   // extent of the array, in bytes
   } TM2x·ConstructBytes·Args;
+
+  typedef struct{
+  } TM2x·ConstructBytes·Ress;
 
   typedef struct{
     CV·Lnk nominal;
@@ -28,6 +35,7 @@
   typedef struct{
     CV·Ptr conveyance;
     TM2x·ConstructBytes·Args *args;
+    TM2x·ConstructBytes·Ress *ress;
     TM2x·ConstructBytes·Lnks *lnks;
   } TM2x·ConstructBytes·Lnk;
 
@@ -37,15 +45,18 @@
   } TM2x·Destruct·Args;
 
   typedef struct{
+  } TM2x·Destruct·Ress;
+
+  typedef struct{
     CV·Lnk nominal;
   } TM2x·Destruct·Lnks;
 
   typedef struct{
     CV·Ptr conveyance;
     TM2x·Destruct·Args *args;
+    TM2x·Destruct·Ress *ress;
     TM2x·Destruct·Lnks *lnks;
   } TM2x·Destruct·Lnk;
-
 
   typedef struct{
     TM2x *tape;
@@ -58,6 +69,7 @@
   typedef struct{
     CV·Ptr conveyance;
     TM2x·DeallocHeap·Args *args;
+    TM2x·DeallocHeap·Ress *ress;
     TM2x·DeallocHeap·Lnks *lnks;
   } TM2x·DeallocHeap·Lnk;
 

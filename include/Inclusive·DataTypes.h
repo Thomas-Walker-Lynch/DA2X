@@ -11,8 +11,11 @@ typedef struct {
     };
     uint128_t r;
   };
-  address_t *rpt;
 } Inclusive·3opLL·Args;
+
+typedef struct {
+  address_t *r;
+} Inclusive·3opLL·Ress;
 
 typedef struct {
   CV·Lnk nominal;
@@ -23,5 +26,6 @@ typedef struct {
 typedef struct{
   CV·Ptr conveyance;
   Inclusive·3opLL·Args *args;
+  Inclusive·3opLL·Ress *ress;
   Inclusive·3opLL·Lnks *lnks;
 } Inclusive·3opLL·Lnk;
