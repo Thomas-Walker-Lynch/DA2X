@@ -7,7 +7,7 @@
 #include "misc.h"
 #include "MallocCounter.h"
 #include "Result.h"
-#include "Conveyance.h"
+#include "Sequence.h"
 #include "Inclusive.h"
 
 #define TM2x·TEST
@@ -19,7 +19,7 @@
 
 int main(){
 
-  #include "Conveyance·Text.h"
+  #include "Sequence·Text.h"
   #include "CLib·Text.h"
   #include "Inclusive·Text.h"
   #include "TM2x·Text.h"
@@ -28,11 +28,11 @@ int main(){
   accumulated_results_pt=&accumulated_results;
   Result·Tallies·init(accumulated_results_pt);
 
-  CV·convey(test_0);
+  SQ·continue(test_0);
 
   // allocate, construct, destruct, deallocate an array
-  CV·def(test_0){
-    CV·Conveyance nominal ,fail ,cleanup ,report;
+  SQ·def(test_0){
+    SQ·Sequence nominal ,fail ,cleanup ,report;
 
     address_t malloc_cnt = MallocCounter·count;
     address_t constructed_cnt = TM2x·constructed_count;
@@ -62,63 +62,63 @@ int main(){
 
       ah_lnk.args = &ah_args;
       ah_lnk.lnks = &ah_lnks;
-      ah_lnk.conveyance = &&TM2x·alloc_heap;
+      ah_lnk.sequence = &&TM2x·alloc_heap;
 
       cb_lnk.args = &cb_args;
       cb_lnk.lnks = &cb_lnks;
-      cb_lnk.conveyance = &&TM2x·construct_bytes;
+      cb_lnk.sequence = &&TM2x·construct_bytes;
 
       da_lnk.args = &da_args;
       da_lnk.lnks = &da_lnks;
-      da_lnk.conveyance = &&TM2x·destruct;
+      da_lnk.sequence = &&TM2x·destruct;
 
       dh_lnk.args = &dh_args;
       dh_lnk.lnks = &dh_lnks;
-      dh_lnk.conveyance = &&TM2x·dealloc_heap;
+      dh_lnk.sequence = &&TM2x·dealloc_heap;
 
     // connections
     //
-      ah_lnks.nominal = AS(cb_lnk ,CV·Lnk);
-      ah_lnks.fail.conveyance = &&fail;
+      ah_lnks.nominal = AS(cb_lnk ,SQ·Lnk);
+      ah_lnks.fail.sequence = &&fail;
 
-      cb_lnks.nominal = AS(da_lnk ,CV·Lnk);
-      cb_lnks.alloc_fail.conveyance = &&fail;
+      cb_lnks.nominal = AS(da_lnk ,SQ·Lnk);
+      cb_lnks.alloc_fail.sequence = &&fail;
 
-      da_lnks.nominal = AS(dh_lnk ,CV·Lnk);
-      dh_lnks.nominal.conveyance = &&nominal;
+      da_lnks.nominal = AS(dh_lnk ,SQ·Lnk);
+      dh_lnks.nominal.sequence = &&nominal;
 
     // results
     //
       ah_args.pt = &cb_args.tm2x;
 
 
-    CV·convey_indirect(ah_lnk);
+    SQ·continue_indirect(ah_lnk);
 
-    CV·def(nominal){
+    SQ·def(nominal){
       f[i++] = true;
-      CV·convey(report);
-    }CV·end(nominal);
+      SQ·continue(report);
+    }SQ·end(nominal);
 
-    CV·def(fail){
+    SQ·def(fail){
       f[i++] = false;
-      CV·convey(report);
-    } CV·end(fail);
+      SQ·continue(report);
+    } SQ·end(fail);
 
-    CV·def(report){
+    SQ·def(report){
       f[i++] = malloc_cnt == MallocCounter·count;
       f[i++] = constructed_cnt == TM2x·constructed_count;
       Result·Tallies·tally("test_0" ,&results ,f ,i);
       Result·Tallies·accumulate(accumulated_results_pt ,&results);
-      CV·convey(tests_finished);
-    } CV·end(report)
+      SQ·continue(tests_finished);
+    } SQ·end(report)
 
-  }CV·end(test_0)
+  }SQ·end(test_0)
 
 
-  CV·def(tests_finished){
+  SQ·def(tests_finished){
     Result·Tallies·print("TM2x·test results" ,accumulated_results_pt);
     return accumulated_results.failed;
-  } CV·end(tests_finished);
+  } SQ·end(tests_finished);
 
   abort();
 

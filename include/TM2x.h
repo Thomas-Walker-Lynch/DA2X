@@ -6,7 +6,7 @@
 #include <assert.h>
 #include "misc.h"
 #include "Inclusive.h"
-#include "Conveyance.h"
+#include "Sequence.h"
 
 //--------------------------------------------------------------------------------
 // The TM2x dynamic array header struct

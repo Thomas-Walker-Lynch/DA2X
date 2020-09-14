@@ -10,15 +10,15 @@ gcc -std=gnu2x -Wall -O0 -ggdb  -o broken broken.c
 #include <stdint.h>
 #include <stdbool.h>
 
-typedef void **CV·Ptr; 
-CV·Ptr target_pt;
+typedef void **SQ·Ptr; 
+SQ·Ptr target_pt;
 uint i = 0;
 
 int main(){
 
   goto test0;
 
-  inline void do_jmp(CV·Ptr target_pt){
+  inline void do_jmp(SQ·Ptr target_pt){
     goto *target_pt;
   }
   

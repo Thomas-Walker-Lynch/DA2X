@@ -1,54 +1,54 @@
 
 
 Suppose that a programmer makes use of functions in his or her program, but then
-calls conveyances from the TM library.  Or more generally we might ask, may
-we adopt a hybrid programming approach that mixes functions and conveyance calls?
+calls sequences from the TM library.  Or more generally we might ask, may
+we adopt a hybrid programming approach that mixes functions and sequence calls?
 
-1. encapsulated conveyances
+1. encapsulated sequences
 
-According to this technique, conveyance definitions are defined within a function that
-makes use of them. No conveyance continuation is taken which causes control to leave the
+According to this technique, sequence definitions are defined within a function that
+makes use of them. No sequence continuation is taken which causes control to leave the
 function code that was defined in within the lexical scope of the function.
 
 When these constraints are followed, no C90 restriction on the use of labels will
 be violated.  
 
-As all conveyances must be encapsulated in the function that uses them,  we can define
-conveyance within functions and share the functions in a library, but we can not
-share a library of conveyances.  This is because continuing from a conveyance found in
+As all sequences must be encapsulated in the function that uses them,  we can define
+sequence within functions and share the functions in a library, but we can not
+share a library of sequences.  This is because continuing from a sequence found in
 a library would cause control to leave the function.
 
-See the 'pinnacle-function-encapsulated-conveyances' branch of the TM2x for examples
+See the 'pinnacle-function-encapsulated-sequences' branch of the TM2x for examples
 of this technique.
 
 
-2.  encapsulated use of conveyance libraries
+2.  encapsulated use of sequence libraries
 
-In the general case we would define some conveyances in a library.  They would probably
+In the general case we would define some sequences in a library.  They would probably
 have their argument pads placed in a union at the top of main.  The programmer then calls
-functions from main.  Those functions then continue into conveyances in the library.  Such
-a thing violates the constraints for 'encapsulated conveyances', so we are in new territory.  
+functions from main.  Those functions then continue into sequences in the library.  Such
+a thing violates the constraints for 'encapsulated sequences', so we are in new territory.  
 
-The first problem a programmer will notice is that conveyance continuations do not return.
-Hence unless the continuations from those conveyances continue to brings control back to
+The first problem a programmer will notice is that sequence continuations do not return.
+Hence unless the continuations from those sequences continue to brings control back to
 the original function, the original function will never have an opportunity to return.  So
 this is what we mean by 'encapsulated use' - it is a constraint that requires the
-conveyances to continue back into the function they were called from.
+sequences to continue back into the function they were called from.
 
 So we must at least require 'encapsulated use'.
 
-Suppose a library conveyance is included as text in main.  This is currently the
-conventional way to make use of a conveyance library.  Then if that code has any stack
+Suppose a library sequence is included as text in main.  This is currently the
+conventional way to make use of a sequence library.  Then if that code has any stack
 allocated temporary variable usage associated wnith it, and references to that data are
 stack relative, then the stack pointer value will matter.  If a the caller is in
 a function, the stack will be pointing to the frame for that function, not the frame that
-the conveyance was compiled against, so in these conditions things would go wrong.
+the sequence was compiled against, so in these conditions things would go wrong.
 
-Conveyances are not intended to make use of the stack, but stack allocation of temporaries
+Sequences are not intended to make use of the stack, but stack allocation of temporaries
 is so embedded in the C language that a person can easily imagine cases that would be
 problematic.  Take for example a line of code like this:
 
-      register struct TM2x·dealloc_heap0 *lc0 = &Conveyance·Locals_pt->dealloc_heap;
+      register struct TM2x·dealloc_heap0 *lc0 = &Sequence·Locals_pt->dealloc_heap;
 
 This is intended to define a namespace and to replace a #define that would have copied the
 text directly to variables that use the namespace.  We do not expect that lc0 actually
@@ -60,18 +60,18 @@ If the compiler allocates space on the stack for such things as lc0, and a call 
 function arrives to this code with a different stack pointer, then things might indeed go
 wrong.  We have already seen gcc allocate such variables in advance relative to the stack
 of the main function.  If such variables were then loaded in a stack relative manner, then
-a call from a function deeper down the stack to a conveyance would have the wrong stack pointer
+a call from a function deeper down the stack to a sequence would have the wrong stack pointer
 for relative addressing from the stack to find such things as lc0.
 
-So, we can not say if a call from a function to a conveyance in a library, one probably
+So, we can not say if a call from a function to a sequence in a library, one probably
 loaded in main, from a function written by a programmer, will in fact behave
 correctly. The intention is that it would, but conceivably the C compiler could connive
 against us, and do so without violating the C90 spec.
 
 3. Conclusion
 
-A programmer may only 1) use conveyances rather than functions, where the conveyances
+A programmer may only 1) use sequences rather than functions, where the sequences
 are included at the same scope level as the library, and/or 2) use functions
-that encapsulate conveyances  3) use functions that do not use conveyances.
+that encapsulate sequences  3) use functions that do not use sequences.
 
 

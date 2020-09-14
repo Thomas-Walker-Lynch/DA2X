@@ -35,17 +35,17 @@ overflow?
     yikes, but we just make it ( 2^n * 2^n - 1 leads to the result more directly)
 
 */
-  CV·def(Inclusive·mul_ib){
+  SQ·def(Inclusive·mul_ib){
 
-    Inclusive·3opLL·Lnk *lnk = (Inclusive·3opLL·Lnk *)CV·lnk;
+    Inclusive·3opLL·Lnk *lnk = (Inclusive·3opLL·Lnk *)SQ·lnk;
     lnk->args->r = lnk->args->a_0 * lnk->args->a_1 + lnk->args->a_0 + lnk->args->a_1;
     if( lnk->args->r > address_t_n ){
-      CV·convey_indirect(lnk->lnks->gt_address_t_n);
+      SQ·continue_indirect(lnk->lnks->gt_address_t_n);
     }
     *(lnk->ress->r) = lnk->args->r;
-    CV·convey_indirect(lnk->lnks->nominal);
+    SQ·continue_indirect(lnk->lnks->nominal);
 
-  } CV·end(Inclusive·mul_ib);
+  } SQ·end(Inclusive·mul_ib);
 
 
 /*
@@ -64,14 +64,14 @@ overflow?
    (2^n - 1) * (2^n) = 2^2n - 2^n ; 2^n >= 1, so no ov possible
 
 */
-  CV·def(Inclusive·mul_ei_bi){
+  SQ·def(Inclusive·mul_ei_bi){
 
-    Inclusive·3opLL·Lnk *lnk = (Inclusive·3opLL·Lnk *)CV·lnk;
+    Inclusive·3opLL·Lnk *lnk = (Inclusive·3opLL·Lnk *)SQ·lnk;
     lnk->args->r = lnk->args->a_0 * lnk->args->a_1 + lnk->args->a_0;
     if( lnk->args->r > address_t_n ){
-      CV·convey_indirect(lnk->lnks->gt_address_t_n);
+      SQ·continue_indirect(lnk->lnks->gt_address_t_n);
     }
     *(lnk->ress->r) = lnk->args->r;
-    CV·convey_indirect(lnk->lnks->nominal);
+    SQ·continue_indirect(lnk->lnks->nominal);
 
-  } CV·end(Inclusive·mul_ei_bi);
+  } SQ·end(Inclusive·mul_ei_bi);

@@ -5,23 +5,23 @@
 
   Conveyeances make no direct use of the stack.
 
-  Conveyances do not return.  Hence, when continuing from a conveyance we do not push on to
-  the stack a return address. Conveyances do not push nor pop arguments to or from the stack,
+  Sequences do not return.  Hence, when continuing from a sequence we do not push on to
+  the stack a return address. Sequences do not push nor pop arguments to or from the stack,
   nor do they  push a temporary variable frame on to the stack. 
 
-  Arguments are passed to a conveyance through a static structure.  On any given thread, the
-  program counter is pointing at exactly one instruction.  Hence, only once conveyance may
-  be used at a time, so the argument structures for all conveyances are placed into
+  Arguments are passed to a sequence through a static structure.  On any given thread, the
+  program counter is pointing at exactly one instruction.  Hence, only once sequence may
+  be used at a time, so the argument structures for all sequences are placed into
   union. This union is called Args.
 
-  Each conveyance may have local variables.  These are held in a structure. Again, because
-  the program counter may be on only one instruction at a time, all conveyances have their
+  Each sequence may have local variables.  These are held in a structure. Again, because
+  the program counter may be on only one instruction at a time, all sequences have their
   local variable structures in union.  This union is called Locals.
 
   Despite there being no stack, it is possible to pass continuation parameters so a
-  conveyance could continue back into itself.  If a continuation continues directly back
+  sequence could continue back into itself.  If a continuation continues directly back
   into itself, the Args and Locals may be shared with the prior invocation.  This would be
-  the case of A -> A, for a conveyance called A.  However if we ahve A -> B -> A, messages
+  the case of A -> A, for a sequence called A.  However if we ahve A -> B -> A, messages
   may not be passed in this manner, as the continuation into B will write into the Args and
   Locals and my clobber anything left there.  It is generally considered bad form for a
   programmer to study B so as to see what would and would not be clobbered.  In any case
@@ -39,7 +39,7 @@
 
   The Args and Locals unions are included into main.  This puts them at the bottom
   of the stack were they can not be popped off until the program exist.  All
-  conveyances share these.  Due to being on the stack each thread will naturally operate
+  sequences share these.  Due to being on the stack each thread will naturally operate
   on separate Args and Locals frames.
 
 ## TM2x·constructed_count
@@ -63,17 +63,17 @@
 
 ## the Args to Local copy
 
-  It is pretty common that the first thing done at the top of a Conveyance is
-  to copy the Args struct to the Locals struct.  This frees the Conveyance to
-  then build up an Args struct for a continuation Conveyance. This event is
+  It is pretty common that the first thing done at the top of a Sequence is
+  to copy the Args struct to the Locals struct.  This frees the Sequence to
+  then build up an Args struct for a continuation Sequence. This event is
   analogyous to the processor itself updating its flip-flops on a clock tick.
 
   The compiler optimizer has a good view of what is going on in the current
   flow.  It can see and eliminate redundant transfers, particularly when a
-  conveyance is not shared.
+  sequence is not shared.
 
   In hardware we could simply use two swapping buffers. The buffers would be
-  of fixed size, and a conveyance that needs a larger buffer would handle
+  of fixed size, and a sequence that needs a larger buffer would handle
   that through a continuation.
 
   We can emulate the buffer swap by keeping pointers to each of the Args and

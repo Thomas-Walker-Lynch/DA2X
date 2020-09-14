@@ -69,23 +69,23 @@ the 2x in the name.
 
 ## Usage
 
-  In the main of the program that is intended to use conveyance libraries, #include all the `...args.h`
+  In the main of the program that is intended to use sequence libraries, #include all the `...args.h`
   header files in a union called 'Args'.  Immediately after that declare another union called `Text`
   and #include the `...text.h` files there.  In the test directory you can find some examples.
 
-## Conveyances
+## Sequences
 
-  The library is a collection of segments of code that are called as 'conveyances'.
+  The library is a collection of segments of code that are called as 'sequences'.
 
   Each convenyance has one entry point and potentially multiple exit points.  The entry point
-  is the name of the conveyance, and the exit points are called continuations.  A conveyance
-  does not have a return statement, which is why it is not called a function.  A conveyance is
+  is the name of the sequence, and the exit points are called continuations.  A sequence
+  does not have a return statement, which is why it is not called a function.  A sequence is
   guaranteed to follow a continuation before reaching the closing brace.
 
   One enters a convenyance by banching to it. We call such a branch a 'continuation'.
 
-  The header file `Conveyance.h` provides some syntax hacks to give the programmer a feeling that
-  C has direct support for conveyances.
+  The header file `Sequence.h` provides some syntax hacks to give the programmer a feeling that
+  C has direct support for sequences.
 
 ## What is an Array
 

@@ -7,7 +7,7 @@
 #include <stdint.h>
 #include <limits.h>
 #include "misc.h"
-#include "Conveyance.h"
+#include "Sequence.h"
 
   #define address_t uint64_t
   #define address_bit_length 64

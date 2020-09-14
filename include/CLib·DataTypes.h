@@ -1,5 +1,5 @@
 
-// struct CLib·mallocn *ar = &Conveyance·Args_pt->CLib·mallocn;
+// struct CLib·mallocn *ar = &Sequence·Args_pt->CLib·mallocn;
 typedef struct {
   address_t n;
 } CLib·Mallocn·Args;
@@ -9,12 +9,12 @@ typedef struct {
 } CLib·Mallocn·Ress;
 
 typedef struct {
-  CV·Lnk nominal;
-  CV·Lnk fail;
+  SQ·Lnk nominal;
+  SQ·Lnk fail;
 } CLib·Mallocn·Lnks;
 
 typedef struct{
-  CV·Ptr conveyance;
+  SQ·Ptr sequence;
   CLib·Mallocn·Args *args;
   CLib·Mallocn·Lnks *lnks;
 } CLib·Mallocn·Lnk;

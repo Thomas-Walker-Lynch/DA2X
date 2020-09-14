@@ -18,13 +18,13 @@ typedef struct {
 } Inclusive·3opLL·Ress;
 
 typedef struct {
-  CV·Lnk nominal;
-  CV·Lnk gt_address_t_n;
+  SQ·Lnk nominal;
+  SQ·Lnk gt_address_t_n;
 } Inclusive·3opLL·Lnks;
 
-// retypes CV·Lnk
+// retypes SQ·Lnk
 typedef struct{
-  CV·Ptr conveyance;
+  SQ·Ptr sequence;
   Inclusive·3opLL·Args *args;
   Inclusive·3opLL·Ress *ress;
   Inclusive·3opLL·Lnks *lnks;
