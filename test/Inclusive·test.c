@@ -36,16 +36,17 @@ int main(){
     Result·Tallies·init(results_pt);
     bool f[256]; // flags
     uint i = 0;  // count
-    uint64_t r;
+
+    address_t a_0 = 541;
+    address_t a_1 = 727;
 
     // child argguments and connections
     //
       Inclusive·3opLL·Args mul_ib_args;
-      mul_ib_args.a_0 = 541;
-      mul_ib_args.a_1 = 727;
+      mul_ib_args.a_0 = &a_0;
+      mul_ib_args.a_1 = &a_1;
 
       Inclusive·3opLL·Ress mul_ib_ress;
-      mul_ib_ress.r = &r;
 
       Inclusive·3opLL·Lnks mul_ib_lnks;
       mul_ib_lnks.nominal.sequence = &&nominal;
@@ -64,7 +65,7 @@ int main(){
     // mul_ib continuations
     //
       SQ·def(nominal){
-        f[i++] = r == 394575;
+        f[i++] = mul_ib_ress.r == 394575;
         SQ·continue(report);
       }SQ·end(nominal);
 

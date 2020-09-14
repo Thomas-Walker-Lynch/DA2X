@@ -41,7 +41,7 @@
 
 
   typedef struct{
-    TM2x *tape;
+    TM2x *tm2x;
   } TM2x·Destruct·Args;
 
   typedef struct{
@@ -58,9 +58,14 @@
     TM2x·Destruct·Lnks *lnks;
   } TM2x·Destruct·Lnk;
 
+
   typedef struct{
-    TM2x *tape;
+    TM2x *tm2x;
   } TM2x·DeallocHeap·Args;
+
+  typedef struct{
+    TM2x *tm2x;
+  } TM2x·DeallocHeap·Ress;
 
   typedef struct{
     SQ·Lnk nominal;

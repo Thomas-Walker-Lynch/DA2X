@@ -19,7 +19,7 @@
       SQ·continue_indirect(lnk->lnks->fail);
     }
     *lnk->ress->allocated_data = malloc(lnk->args->n + 1);
-    if(!*lnk->args->pt){
+    if(!*lnk->ress->allocated_data){
       SQ·continue_indirect(lnk->lnks->fail);
     }
     SQ·continue_indirect(lnk->lnks->nominal);

@@ -16,5 +16,6 @@ typedef struct {
 typedef struct{
   SQ·Ptr sequence;
   CLib·Mallocn·Args *args;
+  CLib·Mallocn·Ress *ress;
   CLib·Mallocn·Lnks *lnks;
 } CLib·Mallocn·Lnk;

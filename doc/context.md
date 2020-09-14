@@ -1,26 +1,24 @@
 
 # Intro
 
-  Our goal here is to identify techniques for implementing ‘sequences’ while using the C
-  language.  The C language is one step away from assembly, and thus only two steps away
-  from the processor hardware.  Hopefully this will make the implications of the method to
-  processor hardware more clear than did the Common Lisp code of the prior chapters.
+  Our goal here is to identify techniques for implementing in the C language function like
+  entities that we call 'sequences’. The C language is one step away from assembly, and
+  thus only two steps away from the processor hardware.  Hopefully this will make the
+  implications for processor hardware more clear than when we used the Common Lisp code in
+  prior chapters.
 
 # Allocation, Deallocation, Reading, Writing, and Copying
 
-  An allocation of memory is a place where we may place data.  Allocation is an
-  abstract concept analogous to a physical memory device. Like memory, we may write
-  data to an allocation, and then later read it back.
+  A memory allocation of is a place to put data.  An allocation is in an a sense an
+  abstraction of physical memory device. Like for memory, an allocation has a fixed size,
+  and data may be written to it and then later read it back.
 
   Data refers to the values of the bits found in an allocation.  All data used in a
-  computer is either copied from a source allocation to a destination allocation, or it is
-  clobbered.
-
-  In software the terms ‘read’ and ‘write’ describe the two ends of a copy operation. When
-  we say that an allocation is written, we had to get the data for the write by reading it
-  from somewhere.  Similarly when we say data was read, that statement only has meaning if
-  the data was also written somewhere. Thus, there are only two two data movement
-  operations in software, that of copying data and that of clobbering data.
+  computer is copied from a source allocation to a destination allocation.  The data at
+  the source is not affected, while the formerly at the destination is clobbered.  There
+  are no additional data movement operations.  The terms ‘read’ and ‘write’ simply focus
+  on what is happening at one or the other ends of the copy, but do not change what is
+  happending at the other end.
 
 # Persistence
 

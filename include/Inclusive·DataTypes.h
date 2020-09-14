@@ -4,17 +4,12 @@
 */
 
 typedef struct {
-  union {
-    struct{
-      address_t a_0;
-      address_t a_1;
-    };
-    uint128_t r;
-  };
+  address_t *a_0;
+  address_t *a_1;
 } Inclusive·3opLL·Args;
 
 typedef struct {
-  address_t *r;
+  address_t r;
 } Inclusive·3opLL·Ress;
 
 typedef struct {

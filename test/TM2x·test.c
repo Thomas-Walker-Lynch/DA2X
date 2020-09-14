@@ -42,41 +42,59 @@ int main(){
     bool f[256]; // flags
     uint i = 0;  // count
 
-    // tableau
+    // Args
     //
-      TM2x·AllocHeap·Args ah_args;
-      TM2x·AllocHeap·Lnks ah_lnks;
-      TM2x·AllocHeap·Lnk ah_lnk;
-
+      TM2x·AllocHeap·Args      ah_args;
       TM2x·ConstructBytes·Args cb_args;
+      TM2x·Destruct·Args       da_args;
+      TM2x·DeallocHeap·Args    dh_args;
+
+      cb_args.byte_n = 9;
+
+    // results
+    //
+      TM2x·AllocHeap·Ress ah_ress;
+      //      TM2x·ConstructBytes·Ress cb_ress;
+      //      TM2x·Destruct·Ress da_ress;
+      //      TM2x·DeallocHeap·Ress dh_ress;
+
+      ah_ress.tm2x = &cb_args.tm2x;
+      ..           = &da_args.tm2x; // share result to multiple places ..
+
+    // Lnks
+    //
+      TM2x·AllocHeap·Lnks      ah_lnks;
       TM2x·ConstructBytes·Lnks cb_lnks;
-      TM2x·ConstructBytes·Lnk cb_lnk;
+      TM2x·Destruct·Lnks       da_lnks;
+      TM2x·DeallocHeap·Lnks    dh_lnks;
 
-      TM2x·Destruct·Args da_args;
-      TM2x·Destruct·Lnks da_lnks;
-      TM2x·Destruct·Lnk da_lnk;
-
-      TM2x·DeallocHeap·Args dh_args;
-      TM2x·DeallocHeap·Lnks dh_lnks;
-      TM2x·DeallocHeap·Lnk dh_lnk;
-
+    // construct each Lnk
+    //
+      TM2x·AllocHeap·Lnk       ah_lnk;
       ah_lnk.args = &ah_args;
+      ah_lnk.ress = &ah_ress;
       ah_lnk.lnks = &ah_lnks;
       ah_lnk.sequence = &&TM2x·alloc_heap;
 
+      TM2x·ConstructBytes·Lnk  cb_lnk;
       cb_lnk.args = &cb_args;
+      //      cb_lnk.ress = &cb_ress;
       cb_lnk.lnks = &cb_lnks;
       cb_lnk.sequence = &&TM2x·construct_bytes;
 
+      TM2x·Destruct·Lnk        da_lnk;
       da_lnk.args = &da_args;
+      //      da_lnk.ress = &da_ress;
       da_lnk.lnks = &da_lnks;
       da_lnk.sequence = &&TM2x·destruct;
 
+      TM2x·DeallocHeap·Lnk     dh_lnk;
       dh_lnk.args = &dh_args;
+      //      dh_lnk.ress = &dh_ress;
       dh_lnk.lnks = &dh_lnks;
       dh_lnk.sequence = &&TM2x·dealloc_heap;
 
-    // connections
+    // connect links
     //
       ah_lnks.nominal = AS(cb_lnk ,SQ·Lnk);
       ah_lnks.fail.sequence = &&fail;
@@ -86,10 +104,6 @@ int main(){
 
       da_lnks.nominal = AS(dh_lnk ,SQ·Lnk);
       dh_lnks.nominal.sequence = &&nominal;
-
-    // results
-    //
-      ah_args.pt = &cb_args.tm2x;
 
 
     SQ·continue_indirect(ah_lnk);

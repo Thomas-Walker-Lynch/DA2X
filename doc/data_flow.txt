@@ -1,0 +1,25 @@
+
+Relaative to tableau type context ..
+
+All variables are loaded onto a processor by using their address in memory.  There is no
+such thing as a variable not accessed through a pointer.  When we can not optimize a pointer
+away, we then end up using the address of the pointer to get the address for the data.
+
+In the first implemenation we pushed results.  Accordingly each sequence held its
+arguments as state. These arguments were written by prior sequences when they produced
+results. Then each  sequence was passed address(es) for where to put its 
+result(s).  However, with this approach, results must be copied to multiple places when more
+than one sequence makes use of the same result.  I.e. when there is fan-out. The prevents
+us from bolting two sequences together directly.  Instead when there is fan-out, we need a
+tee in analogy to the unix tee, so as to send the result to multiple sequences argument
+fields.
+
+In contrast, if we pull inputs, we do not need a tee.  Each squence is given the addresse
+for each argument telling the sequence where to find the input data. When a result is
+created it is held as state. In this manner no tee operation is needed.
+The fan-out occurs naturall as a side effect of multiple sequences reading the same
+result value.  With this ‘pull inputs’ approach all arguments will be addresses, while results are state.
+
+If we have temporary variables in a sequence, those are reusable state.  Unlike results we
+do not need to hold them until another sequence uses them. For now I will declare tham as
+C locals in the sequence.  Thus they will end being stack base allocated.
