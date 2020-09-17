@@ -39,6 +39,7 @@ int main(){
 
     address_t a_0 = 541;
     address_t a_1 = 727;
+    address_t r;
 
     // child argguments and connections
     //
@@ -47,6 +48,7 @@ int main(){
       mul_ib_args.a_1 = &a_1;
 
       Inclusive·3opLL·Ress mul_ib_ress;
+      mul_ib_ress.r = &r;
 
       Inclusive·3opLL·Lnks mul_ib_lnks;
       mul_ib_lnks.nominal.sequence = &&nominal;
@@ -65,7 +67,7 @@ int main(){
     // mul_ib continuations
     //
       SQ·def(nominal){
-        f[i++] = mul_ib_ress.r == 394575;
+        f[i++] = r == 394575;
         SQ·continue(report);
       }SQ·end(nominal);
 

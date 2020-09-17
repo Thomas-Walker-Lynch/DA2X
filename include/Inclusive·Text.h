@@ -38,11 +38,11 @@ overflow?
   SQ·def(Inclusive·mul_ib){
 
     Inclusive·3opLL·Lnk *lnk = (Inclusive·3opLL·Lnk *)SQ·lnk;
-    uint128_t t = *lnk->args->a_0 * *lnk->args->a_1 + *lnk->args->a_0 + *lnk->args->a_1;
+    register uint128_t t = *lnk->args->a_0 * *lnk->args->a_1 + *lnk->args->a_0 + *lnk->args->a_1;
     if( t > address_t_n ){
       SQ·continue_indirect(lnk->lnks->gt_address_t_n);
     }
-    lnk->ress->r = t;
+    *lnk->ress->r = t;
     SQ·continue_indirect(lnk->lnks->nominal);
 
   } SQ·end(Inclusive·mul_ib);
@@ -71,7 +71,7 @@ overflow?
     if( t > address_t_n ){
       SQ·continue_indirect(lnk->lnks->gt_address_t_n);
     }
-    lnk->ress->r = t;
+    *lnk->ress->r = t;
     SQ·continue_indirect(lnk->lnks->nominal);
 
   } SQ·end(Inclusive·mul_ei_bi);

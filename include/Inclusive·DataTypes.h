@@ -9,7 +9,7 @@ typedef struct {
 } Inclusive·3opLL·Args;
 
 typedef struct {
-  address_t r;
+  address_t *r;
 } Inclusive·3opLL·Ress;
 
 typedef struct {

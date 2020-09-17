@@ -3,7 +3,7 @@
   } TM2x·AllocHeap·Args;
 
   typedef struct{
-    TM2x **tm2x;
+    TM2x *tm2x;
   } TM2x·AllocHeap·Ress;
 
   typedef struct{
@@ -21,7 +21,7 @@
 
   typedef struct{
     TM2x *tm2x;
-    address_t byte_n;   // extent of the array, in bytes
+    address_t *byte_n;   // extent of the array, in bytes
   } TM2x·ConstructBytes·Args;
 
   typedef struct{
@@ -41,7 +41,7 @@
 
 
   typedef struct{
-    TM2x *tm2x;
+    TM2x **tm2x;
   } TM2x·Destruct·Args;
 
   typedef struct{
@@ -60,11 +60,10 @@
 
 
   typedef struct{
-    TM2x *tm2x;
+    TM2x **tm2x;
   } TM2x·DeallocHeap·Args;
 
   typedef struct{
-    TM2x *tm2x;
   } TM2x·DeallocHeap·Ress;
 
   typedef struct{

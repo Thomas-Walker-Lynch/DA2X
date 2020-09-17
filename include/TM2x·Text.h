@@ -23,7 +23,8 @@ address_t TM2x·constructed_count = 0;
     m_lnk.lnks = &m_lnks;
     m_lnk.sequence = &&CLib·mallocn;
 
-    m_args.n  = byte_n_of(TM2x);
+    address_t n = byte_n_of(TM2x); // stack base allocated, so we can safely use its address
+    m_args.n  = &n;
     m_ress.allocated_data = (void **)&lnk->ress->tm2x;
     m_lnks.nominal = lnk->lnks->nominal;
     m_lnks.fail = lnk->lnks->fail;

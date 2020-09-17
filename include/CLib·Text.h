@@ -12,15 +12,18 @@
 */
   SQ·def(CLib·mallocn){
     CLib·Mallocn·Lnk *lnk = (CLib·Mallocn·Lnk *)SQ·lnk;
+    register address_t n = *lnk->args->n;
+    register void * = allocation;
     #if TEST
-      Test·CLib·allocation_n = lnk->args->n;
+      Test·CLib·allocation_n = n;
     #endif
-    if( lnk->args->n == address_t_n ){
+    if( n == address_t_n ){
       SQ·continue_indirect(lnk->lnks->fail);
     }
-    *lnk->ress->allocated_data = malloc(lnk->args->n + 1);
-    if(!*lnk->ress->allocated_data){
+    allocation = malloc(n + 1);
+    if(allocation){
       SQ·continue_indirect(lnk->lnks->fail);
     }
+    *lnk_ress->allocation = allocation;
     SQ·continue_indirect(lnk->lnks->nominal);
   } SQ·end(CLib·mallocn);

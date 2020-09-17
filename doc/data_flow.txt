@@ -1,25 +1,65 @@
 
-Relaative to tableau type context ..
+In C a pointer is a address to typed data.  The value of the pointer is the address, and the type
+is part of the C's static type accounting.
 
-All variables are loaded onto a processor by using their address in memory.  There is no
-such thing as a variable not accessed through a pointer.  When we can not optimize a pointer
-away, we then end up using the address of the pointer to get the address for the data.
+int i;
+int *j = &i; 
 
-In the first implemenation we pushed results.  Accordingly each sequence held its
-arguments as state. These arguments were written by prior sequences when they produced
-results. Then each  sequence was passed address(es) for where to put its 
-result(s).  However, with this approach, results must be copied to multiple places when more
-than one sequence makes use of the same result.  I.e. when there is fan-out. The prevents
-us from bolting two sequences together directly.  Instead when there is fan-out, we need a
-tee in analogy to the unix tee, so as to send the result to multiple sequences argument
-fields.
+In the first line of this example data is allocated.  This allocation is associated with the
+symbol `i`, and it is given the integer type. Often this allocation will be in a stack frame
+for the encompassing function.
 
-In contrast, if we pull inputs, we do not need a tee.  Each squence is given the addresse
-for each argument telling the sequence where to find the input data. When a result is
-created it is held as state. In this manner no tee operation is needed.
-The fan-out occurs naturall as a side effect of multiple sequences reading the same
-result value.  With this ‘pull inputs’ approach all arguments will be addresses, while results are state.
+In the second line of this example data is again allocated. This allocation is associated
+with the symbol `j`, and it is an address type.  The address is initialized to be the location
+of the data associated with the symbol `i`.
 
-If we have temporary variables in a sequence, those are reusable state.  Unlike results we
-do not need to hold them until another sequence uses them. For now I will declare tham as
-C locals in the sequence.  Thus they will end being stack base allocated.
+The processor may only access memory through addresses.  In a load/store architecture
+there will be a load instruction for doing this and the address is an operand of the load
+instruction.  In other architectures the processor may do some computation to derive the
+address used directly by the load, and the load operation may be implied as a side
+effect. So for our exmaple above, if `i` has been allocated on the stack frame, then
+the ‘association with symbol i’ will be the address of `i`.
+
+After data is loaded it will be in a processor register.  If the data is part of
+the observable state of the program, and it is modified by the computation, it must
+be written back to memory.  A store instruction performs the inverse operation to the
+load instruction.
+
+If the a data's life time is short, and it is not part of observable state, the
+data may be created in a processor register and never be written back to memory.
+
+Given all of this, we can see that the C model for data and pointers is only partially
+accurate to what actually happens.
+
+--
+
+In the first implemenation we bound sequences to an allocation for their argument data,
+and we pushed results into the argument allocation of other sequences arguments.
+Accordingly each sequence held its arguments as state.  Each sequence was passed only
+address(es) for where to put its result(s). Thus when a sequence was executed, its
+arguments had already been written by prior sequences when they had produced results.  We
+call this the ‘results push’ approach.
+
+With the ‘push results’ approach we sometimes had to copy results to multiple places when
+more than one downstream sequence would use the same result.  I.e. when there was
+‘fan-out’. However a sequence itself would have no knowledge of how the sequences were to
+be connected together.  This prevented us from bolting two sequences together directly.
+Instead when there was fan-out, we were obliged to provide a tee in analogy to the unix
+tee, so as to send the result to multiple sequences argument fields. Alternatively we
+could have made the result address a list, and required that all sequeces iterate through
+a result list when they made a result.
+
+In contrast, if we instead pull inputs, we do not need such a tee, nor a list and
+iteration.  With this approach, each sequence is given the addresse for each argument
+telling the sequence where to find the input data. When a result is created it is held as
+state. Then fan-out occurs naturally as a side effect of multiple sequences reading the
+same result value.  With this ‘pull inputs’ approach all arguments will be addresses,
+while results are state.
+
+As a third approach, we separate control from data allocation. A sequence receives
+addresses for both its input arguments and its results. Although results are pushed,
+each one is pushed to only one location.
+
+Although sequences access input arguments and output results through their addresses,
+this does not mean that at run time there is more pointer indirection than would be
+the case of data allocations were more tightly bound, not the pointer discussion above.

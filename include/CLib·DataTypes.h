@@ -1,11 +1,11 @@
 
 // struct CLib·mallocn *ar = &Sequence·Args_pt->CLib·mallocn;
 typedef struct {
-  address_t n;
+  address_t *n;
 } CLib·Mallocn·Args;
 
 typedef struct {
-  void **allocated_data;
+  void *allocation;
 } CLib·Mallocn·Ress;
 
 typedef struct {
