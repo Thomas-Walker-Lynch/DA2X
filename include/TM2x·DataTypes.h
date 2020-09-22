@@ -3,7 +3,7 @@
   } TM2x·AllocHeap·Args;
 
   typedef struct{
-    TM2x *tm2x;
+    TM2x **tm2x;
   } TM2x·AllocHeap·Ress;
 
   typedef struct{
@@ -41,7 +41,7 @@
 
 
   typedef struct{
-    TM2x **tm2x;
+    TM2x *tm2x;
   } TM2x·Destruct·Args;
 
   typedef struct{
@@ -60,7 +60,7 @@
 
 
   typedef struct{
-    TM2x **tm2x;
+    TM2x *tm2x;
   } TM2x·DeallocHeap·Args;
 
   typedef struct{

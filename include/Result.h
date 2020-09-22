@@ -27,7 +27,7 @@ void Result·Tallies·tally(char *mess ,Result·Tallies *rp ,bool *flags ,uint n
   flags++;
   i++;
   }
-  fprintf(stderr ,"%s: %u flags ,%u passed. %u failed.\n" ,mess ,n ,rp->passed ,rp->failed);
+  fprintf(stderr ,"%s: %u flags, %u passed, %u failed.\n" ,mess ,n ,rp->passed ,rp->failed);
 }
 
 void Result·Tallies·accumulate(Result·Tallies *acc ,Result·Tallies *rp){
@@ -36,7 +36,7 @@ void Result·Tallies·accumulate(Result·Tallies *acc ,Result·Tallies *rp){
 }
 
 void Result·Tallies·print(char *mess ,Result·Tallies *rp){
-  fprintf(stderr ,"%s: %u passed. %u failed.\n" ,mess ,rp->passed ,rp->failed);
+  fprintf(stderr ,"%s: %u passed, %u failed.\n" ,mess ,rp->passed ,rp->failed);
 }
 
 #endif

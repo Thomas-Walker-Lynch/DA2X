@@ -1,0 +1,8 @@
+
+good properties of instruciton sequences:
+
+1. results are not written until we know the relative continuation will be taken.
+   i.e. we do not write the result for a nominal continuation and then take the fail continuation.
+
+2. we assume that result pointers might, or might not, point to the same place as result
+   pointers.

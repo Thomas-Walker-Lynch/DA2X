@@ -5,7 +5,7 @@ typedef struct {
 } CLib·Mallocn·Args;
 
 typedef struct {
-  void *allocation;
+  void **allocation;
 } CLib·Mallocn·Ress;
 
 typedef struct {

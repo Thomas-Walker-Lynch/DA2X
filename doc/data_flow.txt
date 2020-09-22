@@ -1,65 +1,115 @@
+# Pointers
 
 In C a pointer is a address to typed data.  The value of the pointer is the address, and the type
 is part of the C's static type accounting.
 
 int i;
-int *j = &i; 
+int k;
+int *j = &k; 
 
-In the first line of this example data is allocated.  This allocation is associated with the
-symbol `i`, and it is given the integer type. Often this allocation will be in a stack frame
-for the encompassing function.
+On the first line of this example data is allocated.  This allocation is associated with the
+symbol `i`, and it is given the integer type. Often times we will see an allocation like this
+inside of a function, and the allocation will be in the function's stack frame.  On the
+second line we again allocate an integer.
 
-In the second line of this example data is again allocated. This allocation is associated
-with the symbol `j`, and it is an address type.  The address is initialized to be the location
-of the data associated with the symbol `i`.
+On the third line we have another allocation, though this time we are allocating an address
+rather than an integer. This allocation is associated
+with the symbol `j`.  `j` itself will have the type ‘address’ although in C there is no
+keyword for creating an address type.  This is because C insists that you make a contract
+with the compiler that you will only address data of a given type. Here the type of the data
+being address must be an integer.  We then initialize `j` to the address of `k`.  The compiler
+will compile this statement because we kept our contract.  `k`  is indeed an integer.
 
-The processor may only access memory through addresses.  In a load/store architecture
-there will be a load instruction for doing this and the address is an operand of the load
-instruction.  In other architectures the processor may do some computation to derive the
-address used directly by the load, and the load operation may be implied as a side
-effect. So for our exmaple above, if `i` has been allocated on the stack frame, then
-the ‘association with symbol i’ will be the address of `i`.
+At execution time when the processor needs to load data from memory, it must know the
+address of that data.  In a load/store architecture a processor executes loads data by
+executing a load where the operand of the instruction is the address of the data we desire
+to load. Hence, all data in memory will be accessed through addresses, even when no
+pointer has been declared. So for our exmaple above, if `i` has been allocated on
+the stack frame, then the ‘association with symbol i’ will be embodied at run time as the
+address of `i`.
 
-After data is loaded it will be in a processor register.  If the data is part of
-the observable state of the program, and it is modified by the computation, it must
-be written back to memory.  A store instruction performs the inverse operation to the
-load instruction.
+After data is loaded it will be in a processor register.  If the data is part of the
+observable state of the program, and it is modified by the computation, it must be written
+back to memory.  A store instruction performs the inverse operation to the load
+instruction.  If the a data's life time is short, and it is not part of observable state,
+the data may be created in a processor register and never be written back to memory.  When
+observable state is loaded into a register, we end up with two allocations that are
+mirrored.  What is done to one must also be done to the other.
 
-If the a data's life time is short, and it is not part of observable state, the
-data may be created in a processor register and never be written back to memory.
+Given all of this, we can see that the C model for data and pointers is only representative
+of what happens at run time.
 
-Given all of this, we can see that the C model for data and pointers is only partially
-accurate to what actually happens.
+# Sequence parameters and results
 
---
+## Parameters are state, distribute results
 
-In the first implemenation we bound sequences to an allocation for their argument data,
-and we pushed results into the argument allocation of other sequences arguments.
-Accordingly each sequence held its arguments as state.  Each sequence was passed only
-address(es) for where to put its result(s). Thus when a sequence was executed, its
-arguments had already been written by prior sequences when they had produced results.  We
-call this the ‘results push’ approach.
+With this approach, a sequence has compiled in knowledge of where its parameters have been
+allocated.  It also has compiled in knowledge of where the result addresses have been
+allocated.  
 
-With the ‘push results’ approach we sometimes had to copy results to multiple places when
-more than one downstream sequence would use the same result.  I.e. when there was
-‘fan-out’. However a sequence itself would have no knowledge of how the sequences were to
-be connected together.  This prevented us from bolting two sequences together directly.
-Instead when there was fan-out, we were obliged to provide a tee in analogy to the unix
-tee, so as to send the result to multiple sequences argument fields. Alternatively we
-could have made the result address a list, and required that all sequeces iterate through
-a result list when they made a result.
+To call a sequence, we first write into the sequence's parameter structure the input
+data, and we write into the sequence's result structure addresses as to where to put each
+result.  When the sequence executes it reads the parameter values, computes, and then
+writes the results at the indicated addresses.
 
-In contrast, if we instead pull inputs, we do not need such a tee, nor a list and
-iteration.  With this approach, each sequence is given the addresse for each argument
-telling the sequence where to find the input data. When a result is created it is held as
-state. Then fan-out occurs naturally as a side effect of multiple sequences reading the
-same result value.  With this ‘pull inputs’ approach all arguments will be addresses,
-while results are state.
+There is a problem with this approach when a given result needs to be written to more than
+one place, i.e. when there is fan-out.  To accomodate fan-out we must ether include
+special sequences for distributing a given result to multiple places, or we have to
+support results as lists of addresses, rather than just as an address. Both of thoese
+options are expensive.
 
-As a third approach, we separate control from data allocation. A sequence receives
-addresses for both its input arguments and its results. Although results are pushed,
-each one is pushed to only one location.
+## Parameter values are gathered, results are state
 
-Although sequences access input arguments and output results through their addresses,
-this does not mean that at run time there is more pointer indirection than would be
-the case of data allocations were more tightly bound, not the pointer discussion above.
+With tihs approach, a sequence has compiled in knowledge of where its result data has been
+allocated.  It also has compiled in knoweldge of where to find a struct of addresses that
+point to its parameters.
+
+When the sequence executes it reads the parameter values from the indicated
+addresses. These address points into the result structs of other sequences.  The sequence
+then writes each result to its result struct.
+
+With this approach there is no fan-out problem. Fan-out occurs naturally as a consequence
+of more than one sequence reading the same result as a parameter value when it runs.
+
+## Result tableau
+
+With the tableau approach, all result state is placed on the tableau.  A sequence accesses
+both its parameters and its results through addresses.  Because parameter values are
+gathered there is no fan-out problem.  This is similar to the ‘parameter values are
+gathered, results are state’ approach, the only difference being that we write the results
+indirectly.  Actually as all data is accessed indirectly by the compiler, at run time this
+apporach might be identical to the ‘parameter values are gathered, results are state’
+approach.
+
+The conceptual reason for using a result tableau is to make result state independent of the
+sequence code.
+
+### Dynamic allocation
+
+As all result data is access through pointers, the tableau need not be contiguous. We may
+allocate parts of the tableau variously on the heap, stack, or static memory.
+
+In the fundamental case the result tableau is statically allocated, and then all of the
+instruction sequences point into it.  However not all programs can be written this way.
+Sometimes we will need to dynamically allocate data.
+
+We can handle dynamically allocated data in one of two ways.  One way is that we are
+building out the result tableau.  We simply have an instruction sequence interface that
+defines a language for building the result tableau.  The compiler executes the
+as much of it as it can at compile time, and the rest is done at run time.  According
+to this model, an allocator distributes  its result pointer to all of the instruction
+sequence links that point into the tableau.
+
+Another way to think of allocation is that the allocation pointer is the result written
+into the tableau.  All instruction sequences that use this result first dereference the
+pointer.
+
+With the result distribution approach we run into the same problem as described above for
+result distribution in general, namely that we potentially need a different distribution
+sequence to follow each call to the allocator.
+
+Hence I have implemented the approach where the allocator is going to produce a result
+that is a pointer written into the tableau.  If the programmer desires for  that pointer
+to be distributed, he or she may continue the allocator call with a sequnce to distribute
+the pointer by continueing the sequence in the usual way.
+

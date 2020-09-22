@@ -1,10 +1,6 @@
 // 'thread static' allocation class
 address_t TM2x·constructed_count = 0;
 
-#ifdef TM2x·TEST
-  address_t TM2x·Test·allocation_n = 0;
-#endif
-
 /*--------------------------------------------------------------------------------
 
   Here alloc, construct, destruct, dealloc cycle
@@ -25,7 +21,7 @@ address_t TM2x·constructed_count = 0;
 
     address_t n = byte_n_of(TM2x); // stack base allocated, so we can safely use its address
     m_args.n  = &n;
-    m_ress.allocated_data = (void **)&lnk->ress->tm2x;
+    m_ress.allocation = (void **)lnk->ress->tm2x;
     m_lnks.nominal = lnk->lnks->nominal;
     m_lnks.fail = lnk->lnks->fail;
 
@@ -33,10 +29,14 @@ address_t TM2x·constructed_count = 0;
 
   } SQ·end(TM2x·alloc_heap);
 
-  // Given an exent in bytes, sets aside heap memory for the data.
+  // allocates data on the heap
   SQ·def(TM2x·construct_bytes){
     TM2x·constructed_count++; // to assist with debugging
     TM2x·ConstructBytes·Lnk *lnk = (TM2x·ConstructBytes·Lnk *)SQ·lnk;
+
+    // local result tableau (stack base allocated, like everything else)
+    //
+      address_t alloc_byte_n;
 
     CLib·Mallocn·Args m_args;
     CLib·Mallocn·Ress m_ress;
@@ -47,10 +47,11 @@ address_t TM2x·constructed_count = 0;
     m_lnk.lnks = &m_lnks;
     m_lnk.sequence = &&CLib·mallocn;
 
-    lnk->args->tm2x->byte_n = lnk->args->byte_n;
+    lnk->args->tm2x->byte_n = *lnk->args->byte_n;
+    alloc_byte_n = power_2_extent_w_lower_bound(*lnk->args->byte_n);
 
-    m_args.n  = power_2_extent_w_lower_bound(lnk->args->byte_n);
-    m_ress.allocated_data = (void **)&lnk->args->tm2x->base_pt;
+    m_args.n  = &alloc_byte_n;
+    m_ress.allocation = (void **)&lnk->args->tm2x->base_pt;
     m_lnks.nominal = lnk->lnks->nominal;
     m_lnks.fail = lnk->lnks->alloc_fail;
 
@@ -60,6 +61,7 @@ address_t TM2x·constructed_count = 0;
 
 
   SQ·def(TM2x·destruct){
+    TM2x·constructed_count--; // to assist with debugging
     TM2x·Destruct·Lnk *lnk = (TM2x·Destruct·Lnk *)SQ·lnk;
     free(lnk->args->tm2x->base_pt);
     SQ·continue_indirect(lnk->lnks->nominal);  
