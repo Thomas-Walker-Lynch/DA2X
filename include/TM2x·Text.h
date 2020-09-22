@@ -34,26 +34,25 @@ address_t TM2x·constructed_count = 0;
     TM2x·constructed_count++; // to assist with debugging
     TM2x·ConstructBytes·Lnk *lnk = (TM2x·ConstructBytes·Lnk *)SQ·lnk;
 
+    lnk->args->tm2x->byte_n = *lnk->args->byte_n;
+
     // local result tableau (stack base allocated, like everything else)
     //
-      address_t alloc_byte_n;
+      address_t alloc_byte_n = power_2_extent_w_lower_bound(*lnk->args->byte_n);
 
-    CLib·Mallocn·Args m_args;
-    CLib·Mallocn·Ress m_ress;
-    CLib·Mallocn·Lnks m_lnks;
-    CLib·Mallocn·Lnk m_lnk;
-    m_lnk.args = &m_args;
-    m_lnk.ress = &m_ress;
-    m_lnk.lnks = &m_lnks;
-    m_lnk.sequence = &&CLib·mallocn;
+      CLib·Mallocn·Args m_args;
+      CLib·Mallocn·Ress m_ress;
+      CLib·Mallocn·Lnks m_lnks;
+      CLib·Mallocn·Lnk m_lnk;
+      m_lnk.args = &m_args;
+      m_lnk.ress = &m_ress;
+      m_lnk.lnks = &m_lnks;
+      m_lnk.sequence = &&CLib·mallocn;
 
-    lnk->args->tm2x->byte_n = *lnk->args->byte_n;
-    alloc_byte_n = power_2_extent_w_lower_bound(*lnk->args->byte_n);
-
-    m_args.n  = &alloc_byte_n;
-    m_ress.allocation = (void **)&lnk->args->tm2x->base_pt;
-    m_lnks.nominal = lnk->lnks->nominal;
-    m_lnks.fail = lnk->lnks->alloc_fail;
+      m_args.n  = &alloc_byte_n;
+      m_ress.allocation = (void **)&lnk->args->tm2x->base_pt;
+      m_lnks.nominal = lnk->lnks->nominal;
+      m_lnks.fail = lnk->lnks->alloc_fail;
 
     SQ·continue_indirect(m_lnk);
 
