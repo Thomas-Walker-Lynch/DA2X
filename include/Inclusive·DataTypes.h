@@ -7,16 +7,13 @@ typedef struct {
   address_t *a_0;
   address_t *a_1;
 } Inclusive·3opLL·Args;
-
 typedef struct {
   address_t *r;
 } Inclusive·3opLL·Ress;
-
 typedef struct {
   SQ·Lnk nominal;
   SQ·Lnk gt_address_t_n;
 } Inclusive·3opLL·Lnks;
-
 // retypes SQ·Lnk
 typedef struct{
   SQ·Ptr sequence;

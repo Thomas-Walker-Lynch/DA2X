@@ -1,5 +1,5 @@
-#ifndef TM2x·LIB_H
-#define TM2x·LIB_H
+#ifndef TM2x_H
+#define TM2x_H
 #include <stdlib.h> // size_t
 #include <string.h> // memcpy
 #include <stdbool.h>
@@ -26,31 +26,31 @@
 //
 
   // base pointers
-  INLINE_PREFIX char *TM2x·byte_0_pt(TM2x *tape){
-    return tape->base_pt;
+  INLINE_PREFIX char *TM2x·byte_0_pt(TM2x *tm2x){
+    return tm2x->base_pt;
   }
-  INLINE_PREFIX void *TM2x·element_0_pt(TM2x *tape){
-    return tape->base_pt;
+  INLINE_PREFIX void *TM2x·element_0_pt(TM2x *tm2x){
+    return tm2x->base_pt;
   }
 
   // max offsets
-  INLINE_PREFIX address_t TM2x·byte_n(TM2x *tape){
-    return tape->byte_n;
+  INLINE_PREFIX address_t TM2x·byte_n(TM2x *tm2x){
+    return tm2x->byte_n;
   }
   // The index of the last element in the array.  Note that the
   // (element_byte_n + 1) in the denominator must be representable:
-  INLINE_PREFIX address_t TM2x·element_n(TM2x *tape ,address_t element_byte_n){
-    return tape->byte_n/(element_byte_n + 1);
+  INLINE_PREFIX address_t TM2x·element_n(TM2x *tm2x ,address_t element_byte_n){
+    return tm2x->byte_n/(element_byte_n + 1);
   }
 
   // nth pointers
-  INLINE_PREFIX char *TM2x·byte_n_pt(TM2x *tape){
-    return tape->base_pt + tape->byte_n;
+  INLINE_PREFIX char *TM2x·byte_n_pt(TM2x *tm2x){
+    return tm2x->base_pt + tm2x->byte_n;
   }
-  INLINE_PREFIX void *TM2x·element_n_pt(TM2x *tape ,address_t element_byte_n){
-    return TM2x·byte_n_pt(tape) - element_byte_n;
+  INLINE_PREFIX void *TM2x·element_n_pt(TM2x *tm2x ,address_t element_byte_n){
+    return TM2x·byte_n_pt(tm2x) - element_byte_n;
   }
-  #define TM2x·Element_N_Pt(tape ,type) TM2x·element_n_pt(tape ,byte_n_of(type))
+  #define TM2x·Element_N_Pt(tm2x ,type) TM2x·element_n_pt(tm2x ,byte_n_of(type))
 
 
 //--------------------------------------------------------------------------------
@@ -63,8 +63,8 @@
     return power_2_extent(byte_n);
   }
 
-  // tape becomes a pointer to a static allocation of a TM2x struct
-  #define TM2x·alloc_static(tape) TM2x TM2x· ## tape ,*tape; tape = &TM2x· ## tape;
+  // tm2x becomes a pointer to a static allocation of a TM2x struct
+  #define TM2x·alloc_static(tm2x) TM2x TM2x· ## tm2x ,*tm2x; tm2x = &TM2x· ## tm2x;
 
 
 #endif

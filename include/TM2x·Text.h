@@ -3,10 +3,11 @@ address_t TM2x·constructed_count = 0;
 
 /*--------------------------------------------------------------------------------
 
-  Here alloc, construct, destruct, dealloc cycle
+  Memory management. See also the TM2x·alloc_static macro in TM2x.h 
 
 */
-  // see the TM2x·alloc_static macro in TM2x.h 
+
+  // allocate a TM2x header on the heap
   SQ·def(TM2x·alloc_heap){
     TM2x·AllocHeap·Lnk *lnk = (TM2x·AllocHeap·Lnk *)SQ·lnk;
 
@@ -58,7 +59,7 @@ address_t TM2x·constructed_count = 0;
 
   } SQ·end(TM2x·construct_bytes);
 
-
+  // TM2x header may be constructed again and reused
   SQ·def(TM2x·destruct){
     TM2x·constructed_count--; // to assist with debugging
     TM2x·Destruct·Lnk *lnk = (TM2x·Destruct·Lnk *)SQ·lnk;
@@ -73,222 +74,90 @@ address_t TM2x·constructed_count = 0;
     SQ·continue_indirect(lnk->lnks->nominal);
   } SQ·end(TM2x·dealloc_heap);
 
+
+  // TM2x0
+  SQ·def(TM2x·construct_elements){
+    TM2x·ConstructElements·Lnk *lnk = (TM2x·ConstructElements·Lnk *)SQ·lnk;
+
+    // local links
+    //
+      Inclusive·3opLL·Args m_args;
+      Inclusive·3opLL·Ress m_ress;
+      Inclusive·3opLL·Lnks m_lnks;
+      Inclusive·3opLL·Lnk m_lnk;
+      m_lnk.args = &m_args;
+      m_lnk.ress = &m_ress;
+      m_lnk.lnks = &m_lnks;
+      m_lnk.sequence = &&Inclusive·mul_ei_bi;
+
+      TM2x·ConstructBytes·Args cb_args;
+      TM2x·ConstructBytes·Ress cb_ress;
+      TM2x·ConstructBytes·Lnks cb_lnks;
+      TM2x·ConstructBytes·Lnk cb_lnk;
+      cb_lnk.args = &cb_args;
+      cb_lnk.ress = &cb_ress;
+      cb_lnk.lnks = &cb_lnks;
+      cb_lnk.sequence = &&TM2x·construct_bytes;
+
+      m_lnks.nominal = AS(cb_lnk ,SQ·Lnk);
+      m_lnks.gt_address_t_n = lnk->lnks->index_gt_n;
+
+      cb_lnks.nominal = lnk->lnks->nominal;
+      cb_lnks.alloc_fail = lnk->lnks->alloc_fail;
+
+    // local data
+    //
+      address_t byte_n;
+
+      m_args.a_0 = lnk->args->element_n;
+      m_args.a_1 = lnk->args->element_byte_n;
+      m_ress.r = &byte_n;
+
+      cb_args.tm2x = lnk->args->tm2x;
+      cb_args.byte_n = &byte_n;
+
+    SQ·continue_indirect(m_lnk);
+
+  } SQ·end(TM2x·construct_elements);
+
 #if 0
 
-  // Deallocation for dynamically allocated headers.
-  // TM2x0
-  SQ·def(TM2x·destruct_dealloc_heap){
-    Sequence destruct ,dealloc;
 
-    Sequence·swap();
-    LC(lc ,TM2x·destruct_dealloc_heap ,0);
+//--------------------------------------------------------------------------------
+// copying data
+//
+  SQ·def(TM2x·copy_bytes){
+    TM2x·CopyBytes·Lnk *lnk = (TM2x·CopyBytes·Lnk *)SQ·lnk;
 
-    CX(cx ,TM2x0 ,destruct_dealloc_heap);
-    cx->tm2x = lc->tm2x;
-    cx->nominal = lc->nominal;
+    tm2x *src = lnk->args->src;
+    tm2x *dst = lnk->args->dst;
 
-    continue destruct;
+    address_t src_byte_0 = *lnk->args->src_byte_0;
+    address_t dst_byte_0 = *lnk->args->dst_byte_0;
 
-    SQ·def(destruct){
-      AR(ar ,TM2x·destruct ,0);
-      ar->tm2x = lc->tm2x;
-      ar->nominal = &&dealloc;
-      continue TM2x·destruct(); // nc
-      SQ·end;
-    }
+    address_t byte_n = *lnk->args->byte_n;
 
-    SQ·def(dealloc){
-      free(cx->tm2x);
-      continue *cx->nominal; 
-      SQ·end;
-    }
+    if( 
+       TM2x·byte_n(src) < byte_n
+       ||
+       TM2x·byte_n(src) - byte_n < src_byte_0
+        )
+      continue_indirect(lnk->lnks->src_index_gt_n);
 
-  }SQ·end(TM2x·destruct_dealloc_heap); 
+    if( 
+       TM2x·byte_n(dst) < byte_n
+       ||
+       TM2x·byte_n(dst) - byte_n < dst_byte_0
+        )
+      continue_indirect(lnk->lnks->dst_index_gt_n);
 
+    memcpyn(TM2x·byte_0_pt(dst) + dst_byte_0, TM2x·byte_0_pt(src) + src_byte_0, byte_n);
 
-//----------------------------------------
-//  Dynamic allocation of the TM2x header.  For static allocation use the AllocoStatic()
-//  macro.  This does not allocate data for the array itself.
-// nc
-SQ·def(TM2x·alloc_heap){
-  Sequence·swap();
-  LC(lc ,TM2x·alloc_heap ,0);
-
-  AR(ar ,CLib·mallocn ,0);
-  ar->pt      = (void **)lc->tm2x;
-  ar->n       = byte_n_of(TM2x);
-  ar->nominal = lc->nominal;
-  ar->fail    = lc->fail;
-  continue CLib·mallocn();
-} SQ·end(TM2x·alloc_heap);
-
-//----------------------------------------
-//  Construct an allocated array. 
-
-// TM2x0
-SQ·def(TM2x·construct_elements){
-  Sequence scale ,construct_bytes;
-
-  Sequence·swap();
-  LC(lc ,TM2x·construct_elements ,0);
-
-  CX(cx ,TM2x0 ,construct_elements);
-  cx->tm2x = lc->tm2x;
-  cx->nominal = lc->nominal;
-  cx->alloc_fail = lc->alloc_fail;
-
-  continue scale;
-
-  SQ·def(scale){
-    AR(ar ,Inclusive·3opLL ,0);
-    ar->a0 = lc->element_n;
-    ar->a1 = lc->element_byte_n;
-    ar->nominal = &&construct_bytes;
-    ar->index_gt_n = lc->index_gt_n;
-    continue Inclusive·mul_ib; // nc
-    SQ·end;
-  };
-
-  SQ·def(construct_bytes){
-    Sequence·swap();
-    LC(lc ,Inclusive·3opLL  ,2);
-    
-    AR(ar ,TM2x·construct_bytes ,0);
-    ar->tm2x       = cx->tm2x;
-    ar->byte_n     = lc->byte_n;
-    ar->nominal    = cx->nominal;
-    ar->alloc_fail = cx->alloc_fail;
-    continue TM2x·construct_bytes(&&nominal ,&&alloc_fail); // nc
-    SQ·end;
-  };
-
-}  SQ·end(TM2x·construct_elements);
-
-// TM2x0
-SQ·def(TM2x·construct_write_bytes){
-  Sequence construct ,write;
-  Sequence·swap();
-  LC(lc ,TM2x·construct_write_bytes ,0);
-
-  CX(cx ,TM2x0 ,construct_write_bytes);
-  cx->tm2x      = lc->tm2x;
-  cx->source_pt = lc->source_pt;
-  cx->byte_n    = lc->byte_n;
-  cx->nominal   = lc->nominal;
-
-  continue construct;
-
-  SQ·def(construct){
-    AR(ar ,TM2x·construct_bytes.tm2x ,0);
-    ar->tm2x = lc->tm2x;
-    ar->byte_n = lc->byte_n;
-    ar->nominal = &&write;
-    ar->alloc_fail = lc->fail;
-    continue TM2x·construct_bytes; // nc
-    SQ·end;
-  }
-  
-  SQ·def(write){
-    memcpyn(TM2x·byte_0_pt(cx->tm2x), cx->source_pt, cx->byte_n);
-    continue *cx->nominal;
-    SQ·end;
-  }
-
-} SQ·end(TM2x·construct_write_bytes);
+  } 
 
 
-// uses context TM2x1
-// depends on: mul_ib ,construct_write_bytes
-// dependency with context: construct_write_bytes
-SQ·def(TM2x·construct_write_elements){
-  Sequence scale ,construct_write_bytes;
-  Sequence·swap();
-  LC(lc ,TM2x·construct_write_elements ,0);
 
-  CX(cx ,TM2x1 ,construct_write_elements);
-  cx->tm2x      = lc->tm2x;
-  cx->source_pt = lc->source_pt;
-  cx->nominal   = lc->nominal;
-  cx->fail      = lc->fail;
 
-  continue scale;
-
-  SQ·def(scale){
-    AR(ar ,Inclusive·3opLL ,0);
-    ar->a0             = lc->element_n;
-    ar->a1             = lc->element_byte_n;
-    ar->rpt            = &cx->byte_n;
-    ar->nominal        = &&construct_write_bytes;
-    ar->gt_address_t_n = lc->index_gt_n;
-    continue Inclusive·mul_ib;
-    SQ·end;
-  }
-
-  SQ·def(construct_write_bytes){
-    AR(ar ,TM2x·construct_write_bytes ,0);
-    ar->tm2x      = cx->tm2x;
-    ar->source_pt = cx->source_pt;
-    ar->byte_n    = cx->byte_n;
-    ar->nominal   = cx->nominal;
-    ar->fail      = cx->fail;
-    continue TM2x·construct_write_bytes;
-    SQ·end;
-  }
-
-} SQ·end(TM2x·construct_write_elements);
-
-//  Writes one element.
-SQ·defTM2x·construct_write){
-  Sequence nominal;
-  Sequence·swap();
-  LC(lc ,TM2x·construct_write ,0);
-
-  AR(ar ,TM2x·construct_write_bytes ,0);
-  ar->tm2x      = lc->tm2x;
-  ar->source_pt = lc->element_pt;
-  ar->byte_n    = lc->element_byte_n;
-  ar->nominal   = lc->nominal;
-  ar->fail      = lc->fail;
-  continue TM2x·construct_write_bytes;
-  
-} SQ·end(TM2x·construct_write);
-
-// construct and initialize tm2x from another TM
-INLINE_PREFIX ContinuationPtr construct_write_TM2x{
-  Sequence·swap();
-  LC(lc  ,TM2x·construct_write_TM2x ,0);
-
-  AR(ar ,TM2x·construct_write_bytes ,0);
-  ar->tm2x      = lc->tm2x;
-  ar->source_pt = TM2x·byte_0_pt(lc->tm2x_source);
-  ar->byte_n    = TM2x·byte_n(lc->tm2x_source);
-  ar->nominal   = lc->nominal;
-  ar->fail      = lc->fail;
-  continue TM2x·construct_write_bytes;
-
-  SQ·end;
-};
-
-SQ·def(TM2x·copy_bytes){
-  AR(ar  ,TM2x·copy_bytes ,0);
-
-  if( 
-     TM2x·byte_n(ar->src) < ar->byte_n
-     ||
-     TM2x·byte_n(ar->src) - ar->byte_n < ar->src_byte_i
-      )
-    continue ar->src_index_gt_n;
-
-  if( 
-     TM2x·byte_n(ar->dst) < ar->byte_n
-     ||
-     TM2x·byte_n(ar->dst) - ar->byte_n < ar->dst_byte_i
-      )
-    continue ar->dst_index_gt_n;
-  
-  memcpyn(TM2x·byte_0_pt(ar->dst) + ar->dst_byte_i, TM2x·byte_0_pt(ar->src) + ar->src_byte_i, ar->byte_n);
-
-} 
 
 //--------------------------------------------------------------------------------
 // copy elements

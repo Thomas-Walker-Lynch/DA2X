@@ -1,16 +1,13 @@
 
   typedef struct{
   } TM2x·AllocHeap·Args;
-
   typedef struct{
     TM2x **tm2x;
   } TM2x·AllocHeap·Ress;
-
   typedef struct{
     SQ·Lnk nominal;
     SQ·Lnk fail;
   } TM2x·AllocHeap·Lnks;
-
   typedef struct{
     SQ·Ptr sequence;
     TM2x·AllocHeap·Args *args;
@@ -23,15 +20,12 @@
     TM2x *tm2x;
     address_t *byte_n;   // extent of the array, in bytes
   } TM2x·ConstructBytes·Args;
-
   typedef struct{
   } TM2x·ConstructBytes·Ress;
-
   typedef struct{
     SQ·Lnk nominal;
     SQ·Lnk alloc_fail;
   } TM2x·ConstructBytes·Lnks;
-
   typedef struct{
     SQ·Ptr sequence;
     TM2x·ConstructBytes·Args *args;
@@ -42,15 +36,32 @@
 
   typedef struct{
     TM2x *tm2x;
-  } TM2x·Destruct·Args;
+    address_t *element_n;  // extent of the array, in elements
+    address_t *element_byte_n; // extent of the element, in bytes
+  } TM2x·ConstructElements·Args;
+  typedef struct{
+  } TM2x·ConstructElements·Ress;
+  typedef struct{
+    SQ·Lnk nominal;
+    SQ·Lnk index_gt_n;
+    SQ·Lnk alloc_fail;
+  } TM2x·ConstructElements·Lnks;
+  typedef struct{
+    SQ·Ptr sequence;
+    TM2x·ConstructElements·Args *args;
+    TM2x·ConstructElements·Ress *ress;
+    TM2x·ConstructElements·Lnks *lnks;
+  } TM2x·ConstructElements·Lnk;
+
 
   typedef struct{
+    TM2x *tm2x;
+  } TM2x·Destruct·Args;
+  typedef struct{
   } TM2x·Destruct·Ress;
-
   typedef struct{
     SQ·Lnk nominal;
   } TM2x·Destruct·Lnks;
-
   typedef struct{
     SQ·Ptr sequence;
     TM2x·Destruct·Args *args;
@@ -62,20 +73,42 @@
   typedef struct{
     TM2x *tm2x;
   } TM2x·DeallocHeap·Args;
-
   typedef struct{
   } TM2x·DeallocHeap·Ress;
-
   typedef struct{
     SQ·Lnk nominal;
   } TM2x·DeallocHeap·Lnks;
-
   typedef struct{
     SQ·Ptr sequence;
     TM2x·DeallocHeap·Args *args;
     TM2x·DeallocHeap·Ress *ress;
     TM2x·DeallocHeap·Lnks *lnks;
   } TM2x·DeallocHeap·Lnk;
+
+
+  typedef struct{
+    TM2x *src;
+    address_t src_byte_0;
+    TM2x *dst;
+    address_t dst_byte_0;
+    address_t byte_n;
+  } TM2x·CopyBytes·Args;
+  typedef struct{
+  } TM2x·CopyBytes·Ress;
+  typedef struct{
+    SQ·Lnk nominal;
+    SQ·Lnk src_index_gt_n;
+    SQ·Lnk dst_index_gt_n;
+  } TM2x·CopyBytes·Lnks;
+  typedef struct{
+    SQ·Ptr sequence;
+    TM2x·CopyBytes·Args *args;
+    TM2x·CopyBytes·Ress *ress;
+    TM2x·CopyBytes·Lnks *lnks;
+  } TM2x·CopyBytes·Lnk;
+
+
+
 
 #if 0
 
@@ -107,56 +140,6 @@
 
 //--------------------------------------------------------------------------------
 // deprecated
-
-struct TM2x·alloc_heap_0{
-  TM2x **tape;
-  SQ·Lnk nominal;
-  SQ·Lnk fail;
-};
-
-struct TM2x·construct_bytes_0{
-  TM2x *tape;
-  address_t byte_n;   // extent of the array, in bytes
-  SQ·Lnk nominal;
-  SQ·Lnk alloc_fail;
-};
-struct TM2x·construct_bytes_1{
-  TM2x *tape;
-  address_t byte_n;   // extent of the array, in bytes
-  SQ·Lnk nominal;
-  SQ·Lnk alloc_fail;
-
-  address_t alloc_byte_n;
-};
-
-struct TM2x·Args·construct_elements{
-  TM2x *tape;
-  address_t element_n;  // extent of the array, in elements
-  address_t element_byte_n; // extent of the element, in bytes
-};
-
-struct TM2x·Cons·construct_elements{
-  SQ·Lnk nominal;
-  SQ·Lnk index_gt_n;
-  SQ·Lnk alloc_fail;
-};
-
-struct TM2x·Context·construct_elements{
-  struct TM2x·Args·construct_elements args;
-  struct TM2x·Cons·construct_elements cons;
-}
-
-
-struct TM2x·construct_elements_1{
-  TM2x *tape;
-  address_t element_n;  // extent of the array, in elements
-  address_t element_byte_n; // extent of the element, in bytes
-  SQ·Lnk nominal;
-  SQ·Lnk index_gt_n;
-  SQ·Lnk alloc_fail;
-
-  address_t byte_n;
-};
 
 struct TM2x·construct_write_0{
   TM2x *tape;
