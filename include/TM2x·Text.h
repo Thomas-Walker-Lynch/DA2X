@@ -129,41 +129,45 @@ address_t TM2x·constructed_count = 0;
 
   } SQ·end(TM2x·construct_elements);
 
-#if 0
-
-
 //--------------------------------------------------------------------------------
 // copying data
 //
+
   SQ·def(TM2x·copy_bytes){
-    TM2x·CopyBytes·Lnk *lnk = (TM2x·CopyBytes·Lnk *)SQ·lnk;
 
-    tm2x *src = lnk->args->src;
-    tm2x *dst = lnk->args->dst;
-
-    address_t src_byte_0 = *lnk->args->src_byte_0;
-    address_t dst_byte_0 = *lnk->args->dst_byte_0;
-
-    address_t byte_n = *lnk->args->byte_n;
+    // some aliases
+    //
+      TM2x·CopyBytes·Lnk *lnk = (TM2x·CopyBytes·Lnk *)SQ·lnk;
+      TM2x *src = lnk->args->src;
+      TM2x *dst = lnk->args->dst;
+      address_t src_byte_0 = *lnk->args->src_byte_0;
+      address_t dst_byte_0 = *lnk->args->dst_byte_0;
+      address_t byte_n = *lnk->args->byte_n;
 
     if( 
        TM2x·byte_n(src) < byte_n
        ||
        TM2x·byte_n(src) - byte_n < src_byte_0
-        )
-      continue_indirect(lnk->lnks->src_index_gt_n);
+        ){
+      SQ·continue_indirect(lnk->lnks->src_index_gt_n);
+    }
 
     if( 
        TM2x·byte_n(dst) < byte_n
        ||
        TM2x·byte_n(dst) - byte_n < dst_byte_0
-        )
-      continue_indirect(lnk->lnks->dst_index_gt_n);
+        ){
+      SQ·continue_indirect(lnk->lnks->dst_index_gt_n);
+    }
 
     memcpyn(TM2x·byte_0_pt(dst) + dst_byte_0, TM2x·byte_0_pt(src) + src_byte_0, byte_n);
+    SQ·continue_indirect(lnk->lnks->nominal);
 
-  } 
+  } SQ·end(TM2x·copy_bytes);
 
+
+
+#if 0
 
 
 

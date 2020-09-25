@@ -87,11 +87,11 @@
 
 
   typedef struct{
-    TM2x *src;
-    address_t src_byte_0;
-    TM2x *dst;
-    address_t dst_byte_0;
-    address_t byte_n;
+         TM2x *src;
+    address_t *src_byte_0;
+         TM2x *dst;
+    address_t *dst_byte_0;
+    address_t *byte_n;
   } TM2x·CopyBytes·Args;
   typedef struct{
   } TM2x·CopyBytes·Ress;

@@ -13,7 +13,7 @@ all: $(TARGETS)
 Inclusive·test: Inclusive·test.c  $(INCLUDES)
 	$(CC) $(CFLAGS) -o Inclusive·test Inclusive·test.c 
 
-TM2x·test: TM2x·test.c TM2x·test_0.h TM2x·test_1.h $(LIB) $(INCLUDES)
+TM2x·test: TM2x·test.c TM2x·test_0.h TM2x·test_1.h TM2x·test_2.h $(LIB) $(INCLUDES)
 	$(CC) $(CFLAGS) -o TM2x·test TM2x·test.c -lTM2x
 
 #TM2xHd·test: TM2xHd·test.c $(LIB) $(INCLUDES)

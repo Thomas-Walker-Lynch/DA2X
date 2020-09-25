@@ -1,11 +1,11 @@
 /*
-Similar to test_0, but uses construct_elements instead of construct_elements to construct
-the array.
+Copies bytes from one tape machine to another.  When instead we want to copy from a C array,
+we may create a tape machine header that points to the C array, and then do the copy.
+
 
 */
 
-  // allocate, construct, destruct, deallocate an array
-  SQ·def(test_1){
+  SQ·def(test_2){
     SQ·Sequence ah_dist ,nominal ,fail ,cleanup ,report;
     SQ·Sequence SQ·ah_dist ,SQ·nominal ,SQ·fail ,SQ·cleanup ,SQ·report;
 
@@ -15,14 +15,20 @@ the array.
     results_pt = &results;
     Result·Tallies·init(results_pt);
     bool f[256]; // flags
-    uint i = 0;  // count
+    uint fi = 0;  // count
+
+    // ----------------------------------------
+    // the source machine
+    //
+      char cs[] = {'h' ,'e' ,'l' ,'l' ,'o'};
+      TM2x src = { .base_pt = cs ,.byte_n = 4};
 
     // ----------------------------------------
     // result tableau
     //
-      address_t element_n = 9;
-      address_t element_byte_n = 3; // extent of 32 bit int in elements
-      TM2x *tm2x; // set by alloc_heap, then distributed
+      address_t byte_n = 4;
+      TM2x *dst; // set by alloc_heap, then distributed
+      address_t offset = 0;
 
     // ----------------------------------------
     // Links
@@ -36,12 +42,19 @@ the array.
       ah_lnk.lnks = &ah_lnks;
       ah_lnk.sequence = &&TM2x·alloc_heap;
 
-      TM2x·ConstructElements·Args ce_args;
-      TM2x·ConstructElements·Lnks ce_lnks;
-      TM2x·ConstructElements·Lnk  ce_lnk;
-      ce_lnk.args = &ce_args;
-      ce_lnk.lnks = &ce_lnks;
-      ce_lnk.sequence = &&TM2x·construct_elements;
+      TM2x·ConstructBytes·Args cb_args;
+      TM2x·ConstructBytes·Lnks cb_lnks;
+      TM2x·ConstructBytes·Lnk  cb_lnk;
+      cb_lnk.args = &cb_args;
+      cb_lnk.lnks = &cb_lnks;
+      cb_lnk.sequence = &&TM2x·construct_bytes;
+
+      TM2x·CopyBytes·Args cpb_args;
+      TM2x·CopyBytes·Lnks cpb_lnks;
+      TM2x·CopyBytes·Lnk  cpb_lnk;
+      cpb_lnk.args = &cpb_args;
+      cpb_lnk.lnks = &cpb_lnks;
+      cpb_lnk.sequence = &&TM2x·copy_bytes;
 
       TM2x·Destruct·Args       da_args;
       TM2x·Destruct·Lnks       da_lnks;
@@ -60,8 +73,12 @@ the array.
       ah_lnks.nominal.sequence = &&ah_dist;
       ah_lnks.fail.sequence = &&fail;
 
-      ce_lnks.nominal = AS(da_lnk ,SQ·Lnk);
-      ce_lnks.alloc_fail.sequence = &&fail;
+      cb_lnks.nominal = AS(cpb_lnk ,SQ·Lnk);
+      cb_lnks.alloc_fail.sequence = &&fail;
+
+      cpb_lnks.nominal = AS(da_lnk ,SQ·Lnk);
+      cpb_lnks.src_index_gt_n.sequence = &&fail;
+      cpb_lnks.dst_index_gt_n.sequence = &&fail;
 
       da_lnks.nominal = AS(dh_lnk ,SQ·Lnk);
       dh_lnks.nominal.sequence = &&nominal;
@@ -70,44 +87,47 @@ the array.
     // ----------------------------------------
     // sequence results point into the tableau
     //
-      ah_ress.tm2x = &tm2x;
+      ah_ress.tm2x = &dst;
 
     // ----------------------------------------
     // seqeuence args point into the tableau
     //
-      ce_args.element_n = &element_n;
-      ce_args.element_byte_n = &element_byte_n;
+      cb_args.byte_n = &byte_n;
+     
+      cpb_args.src = &src;
+      cpb_args.src_byte_0 = &offset;
+      cpb_args.dst_byte_0 = &offset;
+      cpb_args.byte_n = &byte_n;
 
-      // The alloc_heap result is a pointer to the allocation.  The distribution sequence that
-      // follows it distributes this pointer to the parameters of other rourtines. Consequently
-      // those parameters are not set here.
+      // .dst arguments are assigned in the ah_dist sequence
 
     SQ·continue_indirect(ah_lnk);
 
     SQ·def(ah_dist){ // distribute the allocation
-      ce_args.tm2x = tm2x;
-      da_args.tm2x = tm2x;
-      dh_args.tm2x = tm2x;
-      SQ·continue_indirect(ce_lnk); // continue to construct elements
+      cb_args.tm2x = dst;
+      cpb_args.dst = dst;
+      da_args.tm2x = dst;
+      dh_args.tm2x = dst;
+      SQ·continue_indirect(cb_lnk); // continue to construct bytes
     }SQ·end(ah_dist);
 
     SQ·def(nominal){
-      f[i++] = Test·CLib·allocation_n == 63;
-      f[i++] = true;
+      f[fi++] = Test·CLib·allocation_n == 15;
+      f[fi++] = true;
       SQ·continue(report);
     }SQ·end(nominal);
 
     SQ·def(fail){
-      f[i++] = false;
+      f[fi++] = false;
       SQ·continue(report);
     } SQ·end(fail);
 
     SQ·def(report){
-      f[i++] = malloc_cnt == MallocCounter·count;
-      f[i++] = constructed_cnt == TM2x·constructed_count;
-      Result·Tallies·tally("test_0" ,&results ,f ,i);
+      f[fi++] = malloc_cnt == MallocCounter·count;
+      f[fi++] = constructed_cnt == TM2x·constructed_count;
+      Result·Tallies·tally("test_0" ,&results ,f ,fi);
       Result·Tallies·accumulate(accumulated_results_pt ,&results);
-      SQ·continue(test_2);
+      SQ·continue(tests_finished);
     } SQ·end(report)
 
-  }SQ·end(test_1)
+  }SQ·end(test_2)
