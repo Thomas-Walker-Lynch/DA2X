@@ -79,7 +79,13 @@ address_t TM2x·constructed_count = 0;
   SQ·def(TM2x·construct_elements){
     TM2x·ConstructElements·Lnk *lnk = (TM2x·ConstructElements·Lnk *)SQ·lnk;
 
-    // local links
+    // ----------------------------------------
+    // result tableau
+    //
+      address_t byte_n;
+
+    // ----------------------------------------
+    // Links
     //
       Inclusive·3opLL·Args m_args;
       Inclusive·3opLL·Ress m_ress;
@@ -105,13 +111,16 @@ address_t TM2x·constructed_count = 0;
       cb_lnks.nominal = lnk->lnks->nominal;
       cb_lnks.alloc_fail = lnk->lnks->alloc_fail;
 
-    // local data
+    // ----------------------------------------
+    // sequence results point into the tableau
     //
-      address_t byte_n;
+      m_ress.r = &byte_n;
 
+    // ----------------------------------------
+    // seqeuence args point into the tableau
+    //
       m_args.a_0 = lnk->args->element_n;
       m_args.a_1 = lnk->args->element_byte_n;
-      m_ress.r = &byte_n;
 
       cb_args.tm2x = lnk->args->tm2x;
       cb_args.byte_n = &byte_n;

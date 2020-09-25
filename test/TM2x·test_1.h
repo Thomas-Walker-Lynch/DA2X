@@ -25,50 +25,33 @@ the array.
       TM2x *tm2x; // set by alloc_heap, then distributed
 
     // ----------------------------------------
-    // sequence results point into the tableau
+    // Links
     //
+      TM2x·AllocHeap·Args ah_args;
       TM2x·AllocHeap·Ress ah_ress;
-      ah_ress.tm2x = &tm2x;
-
-    // ----------------------------------------
-    // seqeuence args point into the tableau
-    // 
-      TM2x·AllocHeap·Args         ah_args;
-      TM2x·ConstructElements·Args ce_args;
-      TM2x·Destruct·Args          da_args;
-      TM2x·DeallocHeap·Args       dh_args;
-
-      ce_args.element_n = &element_n;
-      ce_args.element_byte_n = &element_byte_n;
-
-      // The alloc_heap result is a pointer to the allocation.  The distribution sequence that
-      // follows it distributes this pointer to the parameters of other rourtines. Consequently
-      // those parameters are not set here.
-
-    // ----------------------------------------
-    // Lnks
-    //
-      TM2x·AllocHeap·Lnks      ah_lnks;
-      TM2x·ConstructElements·Lnks ce_lnks;
-      TM2x·Destruct·Lnks       da_lnks;
-      TM2x·DeallocHeap·Lnks    dh_lnks;
-
-      TM2x·AllocHeap·Lnk       ah_lnk;
+      TM2x·AllocHeap·Lnks ah_lnks;
+      TM2x·AllocHeap·Lnk  ah_lnk;
       ah_lnk.args = &ah_args;
       ah_lnk.ress = &ah_ress;
       ah_lnk.lnks = &ah_lnks;
       ah_lnk.sequence = &&TM2x·alloc_heap;
 
+      TM2x·ConstructElements·Args ce_args;
+      TM2x·ConstructElements·Lnks ce_lnks;
       TM2x·ConstructElements·Lnk  ce_lnk;
       ce_lnk.args = &ce_args;
       ce_lnk.lnks = &ce_lnks;
       ce_lnk.sequence = &&TM2x·construct_elements;
 
+      TM2x·Destruct·Args       da_args;
+      TM2x·Destruct·Lnks       da_lnks;
       TM2x·Destruct·Lnk        da_lnk;
       da_lnk.args = &da_args;
       da_lnk.lnks = &da_lnks;
       da_lnk.sequence = &&TM2x·destruct;
 
+      TM2x·DeallocHeap·Args    dh_args;
+      TM2x·DeallocHeap·Lnks    dh_lnks;
       TM2x·DeallocHeap·Lnk     dh_lnk;
       dh_lnk.args = &dh_args;
       dh_lnk.lnks = &dh_lnks;
@@ -82,6 +65,22 @@ the array.
 
       da_lnks.nominal = AS(dh_lnk ,SQ·Lnk);
       dh_lnks.nominal.sequence = &&nominal;
+
+
+    // ----------------------------------------
+    // sequence results point into the tableau
+    //
+      ah_ress.tm2x = &tm2x;
+
+    // ----------------------------------------
+    // seqeuence args point into the tableau
+    //
+      ce_args.element_n = &element_n;
+      ce_args.element_byte_n = &element_byte_n;
+
+      // The alloc_heap result is a pointer to the allocation.  The distribution sequence that
+      // follows it distributes this pointer to the parameters of other rourtines. Consequently
+      // those parameters are not set here.
 
     SQ·continue_indirect(ah_lnk);
 
