@@ -6,8 +6,8 @@ we may create a tape machine header that points to the C array, and then do the 
 */
 
   SQ·def(test_2){
-    SQ·Sequence ah_dist ,nominal ,fail ,cleanup ,report;
-    SQ·Sequence SQ·ah_dist ,SQ·nominal ,SQ·fail ,SQ·cleanup ,SQ·report;
+    SQ·Sequence ah_dist ,check_copy ,nominal ,fail ,cleanup ,report;
+    SQ·Sequence SQ·ah_dist ,SQ·check_copy ,SQ·nominal ,SQ·fail ,SQ·cleanup ,SQ·report;
 
     address_t malloc_cnt = MallocCounter·count;
     address_t constructed_cnt = TM2x·constructed_count;
@@ -76,7 +76,7 @@ we may create a tape machine header that points to the C array, and then do the 
       cb_lnks.nominal = AS(cpb_lnk ,SQ·Lnk);
       cb_lnks.alloc_fail.sequence = &&fail;
 
-      cpb_lnks.nominal = AS(da_lnk ,SQ·Lnk);
+      cpb_lnks.nominal.sequence = &&check_copy;
       cpb_lnks.src_index_gt_n.sequence = &&fail;
       cpb_lnks.dst_index_gt_n.sequence = &&fail;
 
@@ -110,6 +110,11 @@ we may create a tape machine header that points to the C array, and then do the 
       dh_args.tm2x = dst;
       SQ·continue_indirect(cb_lnk); // continue to construct bytes
     }SQ·end(ah_dist);
+
+    SQ·def(check_copy){
+      f[fi++] = !bcmp(dst->base_pt ,cs ,5);
+      SQ·continue_indirect(da_lnk); // continue to construct bytes
+    }SQ·end(check_copy);
 
     SQ·def(nominal){
       f[fi++] = Test·CLib·allocation_n == 15;
