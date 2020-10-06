@@ -1,11 +1,11 @@
 /*
-Copies bytes from one tape machine to another.  When instead we want to copy from a C array,
-we may create a tape machine header that points to the C array, and then do the copy.
+Copies elements from one machine to another.
 
+Currnenly this is just a copy of the copy_bytes test.
 
 */
 
-  SQ·def(test_2){
+  SQ·def(test_3){
     SQ·Sequence ah_dist ,check_copy ,nominal ,fail ,cleanup ,report;
     SQ·Sequence SQ·ah_dist ,SQ·check_copy ,SQ·nominal ,SQ·fail ,SQ·cleanup ,SQ·report;
 
@@ -130,9 +130,9 @@ we may create a tape machine header that points to the C array, and then do the 
     SQ·def(report){
       f[fi++] = malloc_cnt == MallocCounter·count;
       f[fi++] = constructed_cnt == TM2x·constructed_count;
-      Result·Tallies·tally("test_2" ,&results ,f ,fi);
+      Result·Tallies·tally("test_3" ,&results ,f ,fi);
       Result·Tallies·accumulate(accumulated_results_pt ,&results);
-      SQ·continue(test_3);
+      SQ·continue(tests_finished);
     } SQ·end(report)
 
-  }SQ·end(test_2)
+  }SQ·end(test_3)

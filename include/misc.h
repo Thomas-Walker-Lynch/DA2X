@@ -17,8 +17,8 @@
   #define CAT2(x ,y) CAT(x ,y)
   #define VAR(x) CAT2(x, __LINE__)
 
-// read X as through it is type Y, no questions asked
+// read X as through it is type T, no questions asked
 //
-  #define AS(X ,Y) (*(Y*)&X)
+  #define AS(X ,T) (*(T*)&X)
 
 #endif

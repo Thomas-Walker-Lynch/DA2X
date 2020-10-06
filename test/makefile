@@ -20,8 +20,11 @@ TM2x·test: TM2x·test.c TM2x·test_0.h TM2x·test_1.h TM2x·test_2.h $(LIB) $(I
 #	$(CC) $(CFLAGS) -o TM2xHd·test TM2xHd·test.c -lTM2x
 
 .PHONY: test
-test: TM2x·test TM2xHd·test
-	./TM2x·test && ./TM2xHd·test
+test: TM2x·test
+	./TM2x·test
+
+#test: TM2x·test TM2xHd·test
+#	./TM2x·test && ./TM2xHd·test
 
 .PHONY: clean
 clean:

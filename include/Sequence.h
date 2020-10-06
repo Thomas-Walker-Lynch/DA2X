@@ -29,9 +29,22 @@ typedef struct{
   SQ·Lnks *lnks;
 } SQ·Lnk;
 
+#define SQ·make_Lnk(name ,type ,target)        \
+  type##·##Args name##_args; \
+  type##·##Ress name##_ress;\
+  type##·##Lnks name##_lnks;\
+  type##·##Lnk name##_lnk;\
+  name##_lnk.args = &name##_args;\
+  name##_lnk.ress = &name##_ress;\
+  name##_lnk.lnks = &name##_lnks;\
+  name##_lnk.sequence = target;
+
 #define SQ·continue_indirect(lnk) \
   SQ·lnk  = (SQ·Lnk *)&(lnk);                \
   SQ·continue(*SQ·lnk->sequence);
+
+
+
 
 
 #endif

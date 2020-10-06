@@ -108,6 +108,28 @@
   } TM2x·CopyBytes·Lnk;
 
 
+  typedef struct{
+         TM2x *src;
+    address_t *src_element_0;
+         TM2x *dst;
+    address_t *dst_element_0;
+    address_t *element_n;
+    address_t *element_byte_n;
+  } TM2x·CopyElements·Args;
+  typedef struct{
+  } TM2x·CopyElements·Ress;
+  typedef struct{
+    SQ·Lnk nominal;
+    SQ·Lnk src_index_gt_n;
+    SQ·Lnk dst_index_gt_n;
+  } TM2x·CopyElements·Lnks;
+  typedef struct{
+    SQ·Ptr sequence;
+    TM2x·CopyElements·Args *args;
+    TM2x·CopyElements·Ress *ress;
+    TM2x·CopyElements·Lnks *lnks;
+  } TM2x·CopyElements·Lnk;
+
 
 
 #if 0

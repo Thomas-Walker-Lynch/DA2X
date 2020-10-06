@@ -59,6 +59,48 @@ address_t TM2x·constructed_count = 0;
 
   } SQ·end(TM2x·construct_bytes);
 
+  SQ·def(TM2x·construct_elements){
+    TM2x·ConstructElements·Lnk *lnk = (TM2x·ConstructElements·Lnk *)SQ·lnk;
+
+    // ----------------------------------------
+    // result tableau
+    //
+      address_t byte_n;  // result of mul_ei_bi
+
+    // ----------------------------------------
+    // Links
+    //
+      SQ·make_Lnk(scale_ext ,Inclusive·3opLL ,&&Inclusive·mul_ei_bi);
+      SQ·make_Lnk(construct_bytes ,TM2x·ConstructBytes ,&&TM2x·construct_bytes);
+
+      scale_ext_lnks = (Inclusive·3opLL·Lnks)
+        { .nominal = AS(construct_bytes_lnk ,SQ·Lnk)
+          ,.gt_address_t_n = lnk->lnks->index_gt_n
+        };
+
+      construct_bytes_lnks = (TM2x·ConstructBytes·Lnks)
+        { .nominal = lnk->lnks->nominal
+          ,.alloc_fail = lnk->lnks->alloc_fail
+        };
+
+    // ----------------------------------------
+    // sequence results point into the tableau
+    //
+      scale_ext_ress.r = &byte_n;
+
+    // ----------------------------------------
+    // seqeuence args point into the tableau
+    //
+      scale_ext_args.a_0 = lnk->args->element_n;
+      scale_ext_args.a_1 = lnk->args->element_byte_n;
+
+      construct_bytes_args.tm2x = lnk->args->tm2x;
+      construct_bytes_args.byte_n = &byte_n;
+
+    SQ·continue_indirect(scale_ext_lnk);
+
+  } SQ·end(TM2x·construct_elements);
+
   // TM2x header may be constructed again and reused
   SQ·def(TM2x·destruct){
     TM2x·constructed_count--; // to assist with debugging
@@ -75,64 +117,17 @@ address_t TM2x·constructed_count = 0;
   } SQ·end(TM2x·dealloc_heap);
 
 
-  // TM2x0
-  SQ·def(TM2x·construct_elements){
-    TM2x·ConstructElements·Lnk *lnk = (TM2x·ConstructElements·Lnk *)SQ·lnk;
+/*--------------------------------------------------------------------------------
+ copying data
 
-    // ----------------------------------------
-    // result tableau
-    //
-      address_t byte_n;
+    If we copied as much as possible, then took the overflow upon hitting a bound,
+    we would end up redoing the copy if the array expansion reallocates the array
+    into a bigger heap block.
 
-    // ----------------------------------------
-    // Links
-    //
-      Inclusive·3opLL·Args m_args;
-      Inclusive·3opLL·Ress m_ress;
-      Inclusive·3opLL·Lnks m_lnks;
-      Inclusive·3opLL·Lnk m_lnk;
-      m_lnk.args = &m_args;
-      m_lnk.ress = &m_ress;
-      m_lnk.lnks = &m_lnks;
-      m_lnk.sequence = &&Inclusive·mul_ei_bi;
+    With this implementation we do no copy until we see that the copy would fit.  If
+    it does not fit we take the overflow continuation.
 
-      TM2x·ConstructBytes·Args cb_args;
-      TM2x·ConstructBytes·Ress cb_ress;
-      TM2x·ConstructBytes·Lnks cb_lnks;
-      TM2x·ConstructBytes·Lnk cb_lnk;
-      cb_lnk.args = &cb_args;
-      cb_lnk.ress = &cb_ress;
-      cb_lnk.lnks = &cb_lnks;
-      cb_lnk.sequence = &&TM2x·construct_bytes;
-
-      m_lnks.nominal = AS(cb_lnk ,SQ·Lnk);
-      m_lnks.gt_address_t_n = lnk->lnks->index_gt_n;
-
-      cb_lnks.nominal = lnk->lnks->nominal;
-      cb_lnks.alloc_fail = lnk->lnks->alloc_fail;
-
-    // ----------------------------------------
-    // sequence results point into the tableau
-    //
-      m_ress.r = &byte_n;
-
-    // ----------------------------------------
-    // seqeuence args point into the tableau
-    //
-      m_args.a_0 = lnk->args->element_n;
-      m_args.a_1 = lnk->args->element_byte_n;
-
-      cb_args.tm2x = lnk->args->tm2x;
-      cb_args.byte_n = &byte_n;
-
-    SQ·continue_indirect(m_lnk);
-
-  } SQ·end(TM2x·construct_elements);
-
-//--------------------------------------------------------------------------------
-// copying data
-//
-
+*/
   SQ·def(TM2x·copy_bytes){
 
     // some aliases
@@ -165,133 +160,133 @@ address_t TM2x·constructed_count = 0;
 
   } SQ·end(TM2x·copy_bytes);
 
+  SQ·def(TM2x·copy_elements){
+    TM2x·CopyElements·Lnk *lnk = (TM2x·CopyElements·Lnk *)SQ·lnk;
+
+    // ----------------------------------------
+    // local result tableau
+    //
+      address_t src_byte_0;  
+      address_t dst_byte_0;  
+      address_t ext_byte_n;  
+
+    // ----------------------------------------
+    // Links
+    //
+      SQ·make_Lnk(scale_src ,Inclusive·3opLL ,&&Inclusive·mul_ei_bi);
+      SQ·make_Lnk(scale_dst ,Inclusive·3opLL ,&&Inclusive·mul_ei_bi);
+      SQ·make_Lnk(scale_ext ,Inclusive·3opLL ,&&Inclusive·mul_ib);
+      SQ·make_Lnk(copy_bytes ,TM2x·CopyBytes ,&&TM2x·copy_bytes);
+
+      scale_src_lnks = (Inclusive·3opLL·Lnks)
+        {  .nominal = AS(scale_dst_lnk ,SQ·Lnk)
+          ,.gt_address_t_n = lnk->lnks->src_index_gt_n
+        };
+
+      scale_dst_lnks = (Inclusive·3opLL·Lnks)
+        {  .nominal = AS(scale_ext_lnk ,SQ·Lnk)
+          ,.gt_address_t_n = lnk->lnks->dst_index_gt_n
+        };
+
+      scale_ext_lnks = (Inclusive·3opLL·Lnks)
+        {  .nominal = AS(copy_bytes_lnk ,SQ·Lnk)
+          ,.gt_address_t_n = lnk->lnks->src_index_gt_n
+        };
+
+      copy_bytes_lnks = (TM2x·CopyBytes·Lnks)
+        {  .nominal = lnk->lnks->nominal
+          ,.src_index_gt_n = lnk->lnks->src_index_gt_n
+          ,.dst_index_gt_n = lnk->lnks->dst_index_gt_n
+        };
+
+    // ----------------------------------------
+    // sequence results point into the tableau
+    //
+      scale_src_ress.r = &src_byte_0;
+      scale_dst_ress.r = &dst_byte_0;
+      scale_ext_ress.r = &ext_byte_n;
+
+    // ----------------------------------------
+    // seqeuence args point into this tableau or the parent tableau
+    //
+      scale_src_args = (Inclusive·3opLL·Args)
+        {  .a_0 = lnk->args->src_element_0
+          ,.a_1 = lnk->args->element_byte_n
+        };
+
+      scale_dst_args = (Inclusive·3opLL·Args)
+        {  .a_0 = lnk->args->dst_element_0
+          ,.a_1 = lnk->args->element_byte_n
+        };
+
+      scale_ext_args = (Inclusive·3opLL·Args)
+        {  .a_0 = lnk->args->element_n
+          ,.a_1 = lnk->args->element_byte_n
+        };
+
+      copy_bytes_args  = (TM2x·CopyBytes·Args)
+        {  .src        = lnk->args->src
+          ,.src_byte_0 = &src_byte_0
+          ,.dst        = lnk->args->dst
+          ,.dst_byte_0 = &dst_byte_0
+          ,.byte_n     = &ext_byte_n
+        };
+
+    SQ·continue_indirect(scale_src_lnk);
+
+  } SQ·end(TM2x·copy_elements);
+
+
+SQ·def(resize_bytes){
+  // shorten the arg names, give the optimizer something more to do
+  TM2x *tm2x = Args.TM2x·resize_bytes.tm2x;
+  address_t after_byte_n = Args.TM2x·resize_bytes.after_byte_n;
+  SequencePtr nominal = Args.TM2x·resize_bytes.nominal;
+  SequencePtr alloc_fail = Args.TM2x·resize_bytes.alloc_fail;
+
+  address_t before_alloc_n = power_2_extent_w_lower_bound(tm2x->byte_n);
+  address_t after_alloc_n = power_2_extent_w_lower_bound(after_byte_n);
+
+  if( after_alloc_n == before_alloc_n ){
+    tm2x->byte_n = after_byte_n;
+    continue_via_trampoline nominal;
+  }
+
+  char *after_base_pt;
+
+  #include "Args.CLib·mallocn.h"
+  Args.CLib·mallocn.pt      = (void **)&after_base_pt;
+  Args.CLib·mallocn.n       = after_alloc_n;
+  Args.CLib·mallocn.nominal = &&malloc_nominal;
+  Args.CLib·mallocn.fail    = &&malloc_fail; 
+  #include "CLib·mallocn.h"
+  continue CLib·mallocn;
+
+  SQ·def(malloc_nominal){
+    #ifdef TM2x·TEST
+      TM2x·Test·allocation_n = after_alloc_n;
+    #endif
+    address_t copy_n = after_byte_n < tm2x->byte_n ? after_byte_n : tm2x->byte_n;
+    memcpyn( after_base_pt ,tm2x->base_pt ,copy_n);
+    free(tm2x->base_pt);
+    tm2x->base_pt = after_base_pt;
+    tm2x->byte_n = after_byte_n;
+    continue *nominal;
+  } SQ·end(malloc_nominal){
+
+  SQ·def(malloc_fail){
+   continue *alloc_fail;
+  } SQ·end(malloc_fail);
+  
+} SQ·end(resize_bytes);
+
+
+
 
 
 #if 0
 
 
-
-
-//--------------------------------------------------------------------------------
-// copy elements
-//
-
-  struct {
-    Inclusive·3opLL·Args mul_ib_0;
-    Inclusive·3opLL·Args mul_ei_bi_0;
-    Inclusive·3opLL·Args mul_ei_bi_1;
-    TM2x·CopyBytes·Args copy_bytes_0;
-  } TM2x·CopyElements·child_args;
-
-  struct {
-    Inclusive·3opLL·Cnxs mul_ib_0;
-    Inclusive·3opLL·Cnxs mul_ei_bi_0;
-    Inclusive·3opLL·Cnxs mul_ei_bi_1;
-    TM2x·CopyBytes·Cnxs copy_bytes_0;
-  } TM2x·CopyElements·child_cxs;
-
-  #pragma push_macro("CA")
-  #pragma push_macro("CC")
-  #define CA CopyElements·child_args;
-  #define CC CopyElements·child_cnxs;
-
-    static void TM2x·CopyElements·dataflow_static(){
-      CA.mul_ib_0.rpt    = &CA.copy_bytes_0.byte_n;// scales element_n to byte_n
-      CA.mul_ei_bi_0.rpt = &CA.copy_bytes_0.src_byte_i;// scale src element index to src byte index
-      CA.mul_ei_bi_1.rpt = &CA.copy_bytes_0.dst_byte_i;// scale dst element index to dst byte index
-    }
-    CopyElements·dataflow_static();
-
-    static void TM2x·CopyElements·connect_static(){ 
-      CC.mul_ib_0.nominal   = init_cnx( Inclusive ,mul_ei_bi_0 );
-      CC.mul_ei_bi_0.nominal= init_cnx( Inclusive ,mul_ei_bi_1 );
-    }
-    CopyElements·connect_static();
-
-    static inline TM2x·CopyElements·connect_finish(){
-         CC.mul_ib_0.gt_address_t_n = ((TM2x·CopyElements·Cnxs *)SQ·cnxs)->src_index_gt_n;
-      CC.mul_ei_bi_0.gt_address_t_n = ((TM2x·CopyElements·Cnxs *)SQ·cnxs)->src_index_gt_n;
-      CC.mul_ei_bi_1.gt_address_t_n = ((TM2x·CopyElements·Cnxs *)SQ·cnxs)->dst_index_gt_n;
-      CC.mul_ei_bi_1.nominal        = ((TM2x·CopyElements·Cnxs *)SQ·cnxs)->nominal;
-    } SQ·end(TM2x·CopyElements·connect_finish);
-
-    SQ·def(TM2x·copy_elements){
-      TM2x·CopyElements·connect_finish();
-      SQ·args = (SQ·Args *) &CA.mul_ib_0;
-      SQ·cnxs = (SQ·Cnxs *) &CC.mul_ib_0;
-      continue(Inclusive·mul_ib);
-    } SQ·end(TM2x·copy_elements);
-
-  #pragma pop_macro("CC")
-  #pragma pop_macro("CA")
-
-#endif
-
-#if 0
-
-
-/*
-Copy elements at index of the given tm2x, to the location specified by dst_element_pt.
-
-Set element_n to 0 to read the one element from location specified by the given index.
-
-Our attention is focused on the tm2x, so we call this a 'read' operation.
-
-*/
-
-SQ·def(index·read){
-  TM2x *tm2x               = Args.TM2x·index·read.tm2x;              
-  address_t index          = Args.TM2x·index·read.index;         
-  address_t element_n      = Args.TM2x·index·read.element_byte_n;
-  address_t element_byte_n = Args.TM2x·index·read.element_byte_n;
-  void *dst_element_pt     = Args.TM2x·index·read.dst_element_pt;    
-  SequencePtr nominal    = Args.TM2x·index·read.nominal;
-  SequencePtr index_gt_n = Args.TM2x·index·read.index_gt_n;
-
-  // byte_n relative to element_0_pt.
-  address_t region_byte_n;
-  inclusive·mul_ib·args.an = element_n;
-  inclusive·mul_ib·args.bn = element_byte_n;
-  inclusive·mul_ib·args.cn = &region_byte_n;
-  inclusive·mul_ib·args.nominal = &&mul_ib·nominal;
-  inclusive·mul_ib·args.gt_address_n = index_gt_n;
-  continue inclusive·mul_ib;
-
-  SQ·def(mul_ib·nominal){
-    address_t byte_i;
-    inclusive·mul_ib·args.an = index;
-    inclusive·mul_ib·args.bn = element_byte_n;
-    inclusive·mul_ib·args.cn = &byte_i
-    inclusive·mul_ib·args.nominal = &&mul_ib·nominal;
-    inclusive·mul_ib·args.gt_address_n = index_gt_n;
-    continue inclusive·mul_ib;
-
-
-    void *src_element_pt;
-    Args.TM2x·index·to_pt.tm2x           = tm2x;
-    Args.TM2x·index·to_pt.index          = index;     
-    Args.TM2x·index·to_pt.element_byte_n = element_byte_n;
-    Args.TM2x·index·to_pt.pt             = &src_element_pt;              
-    Args.TM2x·index·to_pt.nominal        = &&index_nominal;        
-    Args.TM2x·index·to_pt.index_gt_n     = index_gt_n;
-    continue TM2x·index·to_pt;
-  }
-
-  SQ·def(index_nominal){
-
-
-    SQ·def(mul_ib·nominal){
-      if( 
-
-    }
-
-
-    memcpyn(dst_element_pt, src_element_pt, element_byte_n);
-    SQ·end;
-  }
-
-  SQ·end;
-}
 
 INLINE_PREFIX ContinuationPtr index·to_pt{
   TM2x *tm2x               = Args.TM2x·index·to_pt.tm2x;
@@ -317,9 +312,6 @@ INLINE_PREFIX ContinuationPtr index·to_pt{
 
   SQ·end;
 }
-
-
-
 
 
 
