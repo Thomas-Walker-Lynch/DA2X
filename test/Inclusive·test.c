@@ -57,7 +57,7 @@ int main(){
     // a link to mul_ib
     //
       Inclusive·3opLL·Lnk lnk_0;
-      lnk_0.sequence = &&Inclusive·mul_ib;
+      lnk_0.sequence = &&Inclusive·mul_ext;
       lnk_0.args = &mul_ib_args;
       lnk_0.ress = &mul_ib_ress;
       lnk_0.lnks = &mul_ib_lnks;

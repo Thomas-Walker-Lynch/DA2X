@@ -403,13 +403,13 @@
     p0->a0 = p1->element_n;
     p0->a1 = p1->element_byte_n;
     p0->rpt = &cx->byte_n;
-    continue *Inclusive·mul_ib(nominal ,gt_address_t_n);
+    continue *Inclusive·mul_ext(nominal ,gt_address_t_n);
 
   ````
 
   In this example, the P0 macro sets up a pointer to point to the arguments pad. The
-  arguments are then copied to the pad, and finally we continue the `Inclusive·mul_ib`
-  encapsulation.  Later in our document we will meet `Inclusive·mul_ib` again, though
+  arguments are then copied to the pad, and finally we continue the `Inclusive·mul_ext`
+  encapsulation.  Later in our document we will meet `Inclusive·mul_ext` again, though
   as a sequence rather than as an encapsulating function.
 
   The following example is what the `alloc_array_elements` encapsulation might look like in
@@ -440,7 +440,7 @@
       p0->a0 = p1->element_n;
       p0->a1 = p1->element_byte_n;
       p0->rpt = &byte_n;
-      continue Inclusive·mul_ib(&&alloc_array_bytes ,&&local_index_gt_n);
+      continue Inclusive·mul_ext(&&alloc_array_bytes ,&&local_index_gt_n);
       cend;
     };
 
@@ -474,9 +474,9 @@
 
   It is too bad we need the local sequences, `local_index_gt_n`, `local_nominal`, and
   `local_alloc_fail`.  Their sole purpose is to maintain the integrity of the
-  encapsulation.  By having `TM2x·alloc_array_bytes` and `Inclusive·mul_ib` first
+  encapsulation.  By having `TM2x·alloc_array_bytes` and `Inclusive·mul_ext` first
   continue locally we assure that the stack frame gets popped.  If we did not need to pop
-  the stack frame, `TM2x·alloc_array_bytes` and `Inclusive·mul_ib` could continue directly to
+  the stack frame, `TM2x·alloc_array_bytes` and `Inclusive·mul_ext` could continue directly to
   `index_gt_n`, `nominal`, and `alloc_fail`.
 
 
@@ -500,7 +500,7 @@
       p0->rpt = &cx->byte_n;
       p0->nominal = &&alloc_array_bytes;
       p0->gt_address_t_n = p1->index_gt_n;
-      continue Inclusive·mul_ib;
+      continue Inclusive·mul_ext;
 
       cdef(alloc_array_bytes){
         leave_to nominal;
@@ -515,21 +515,21 @@
   Here p1 is another data pad. cx is defined in the containing function, although that is
   not shown.
 
-  This time `Inclusive·mul_ib` is a general use sequence from a library. It was included
+  This time `Inclusive·mul_ext` is a general use sequence from a library. It was included
   into main.  It accepts two values, `a` and `b`, and writes a result to `rtp`.  This
   general use sequence has two continuation arguments, `nominal` and `gt_address_t_n`.
-  If the product would overflow the result type, `Inclusive·mul_ib` continues with
+  If the product would overflow the result type, `Inclusive·mul_ext` continues with
   `gt_address_t_n` and no result is written.  Otherwise, it writes the result and
   continues with `nominal`.
 
-  The line `continue Inclusive·mul_ib` will take us out of the containing function to
+  The line `continue Inclusive·mul_ext` will take us out of the containing function to
   execute code found in main. This violates our encapsulation contract, which is why we
   used the term ‘containing function’ instead of ‘encapsulating function’.
 
-  The `Inclusive·mul_ib` sequence will have been compiled against the stack frame of
-  main, but when we take the continuation from `f` to `Inclusive·mul_ib` our stack pointer
+  The `Inclusive·mul_ext` sequence will have been compiled against the stack frame of
+  main, but when we take the continuation from `f` to `Inclusive·mul_ext` our stack pointer
   will be pointing to the stack frame for `f`, which is the wrong value for
-  `Inclusive·mul_ib`. If the `Inclusive·mul_ib` sequence does not use the stack, then
+  `Inclusive·mul_ext`. If the `Inclusive·mul_ext` sequence does not use the stack, then
   things might work out; however, this would be hard to accomplish in the C language,
   because stack usage is deeply ingrained with the creation of locals and temporary
   variables. Even if we declare a value to hold a pointer to where local data is really
@@ -538,7 +538,7 @@
   that it ends up in a register. The compiler is free to make it a local `auto`
   class variable despite our request to make it a register.
 
-  Assuming that by some miracle things went well `Inclusive·mul_ib` then continues to either
+  Assuming that by some miracle things went well `Inclusive·mul_ext` then continues to either
   `alloc_array_bytes` or to `p1->index_gt_n`.
 
   The sequence `alloc_array_bytes` was defined in the lexical scope for `f`.  Hence
@@ -621,18 +621,18 @@
   context gets deallocated.
 
   Here is a concrete example of this pattern. Here `TM2x·alloc_array_elements` corresponds to c1.
-  `Inclusive·mul_ib` corresponds to c2, and `alloc_array_bytes` corresponds to c3.
+  `Inclusive·mul_ext` corresponds to c2, and `alloc_array_bytes` corresponds to c3.
   `TM2x·alloc_array_elements` is an encapsulating sequence. `alloc_array_bytes` is local
-  sequence, and `Inclusive·mul_ib` is a general purpose sequence.  
+  sequence, and `Inclusive·mul_ext` is a general purpose sequence.  
 
   Note that execution flow from in `TM2x·alloc_array_elements` never reaches
   `alloc_array_bytes`, rather we reach the end of dynamic scope for
-  `TM2x·alloc_array_elements` when it continues to `Inclusive·mul_ib`, yet the static scope
+  `TM2x·alloc_array_elements` when it continues to `Inclusive·mul_ext`, yet the static scope
   continues to the closing bracket, so `alloc_array_bytes` is defined within the lexical
   scope of of `TM2x·alloc_array_elements`.  What this accomplishes for us is to make the
   `alloc_array_bytes` entry point viewable to only `TM2x·alloc_array_elements`.
   `TM2x·alloc_array_elements` then uses its ability to see this entry point to give a value
-  to the `Inclusive·mul_ib`'s `nominal` sequence argument.
+  to the `Inclusive·mul_ext`'s `nominal` sequence argument.
 
 ````
     cdef(TM2x·alloc_array_elements){
@@ -653,7 +653,7 @@
       p0->rpt = &cx->byte_n;
       p0->nominal = &&alloc_array_bytes;
       p0->gt_address_t_n = p1->index_gt_n;
-      continue Inclusive·mul_ib;
+      continue Inclusive·mul_ext;
 
       cdef(alloc_array_bytes){
         P0(p0 ,TM2x·alloc_array_bytes ,0);
@@ -681,7 +681,7 @@
   deallocated.
 
   After setting up the `p0` pad, this code continues to general purpose sequence
-  `Inclusive·mul_ib`, which has its `nominal` sequence argument set to
+  `Inclusive·mul_ext`, which has its `nominal` sequence argument set to
   `alloc_array_bytes`.  Note that its `gt_address_t_n` sequence argument has been set to
   go elsewhere.
 
@@ -915,7 +915,7 @@
         p0->rpt            = &cx->byte_n;
         p0->nominal        = &&src_byte_i;
         p0->gt_address_t_n = pop(byte_n_of(struct c0 ,cx->src_index_gt_n);    // goes elsewhere
-        continue Inclusive·mul_ib;
+        continue Inclusive·mul_ext;
       }
 
       // c2
@@ -926,7 +926,7 @@
         p0->rpt            = &cx->src_byte_i;
         p0->nominal        = &&dst_byte_i;
         p0->gt_address_t_n = pop(byte_n_of(struct c0 ,cx->src_index_gt_n);  // goes elsewhere
-        continue Inclusive·mul_ei_bi;
+        continue Inclusive·mul_idx;
         cend;
       }
 
@@ -938,7 +938,7 @@
         p0->rpt            = &cx->dst_byte_i;
         p0->nominal        = &&copy_bytes;
         p0->gt_address_t_n = pop(byte_n_of(struct c0 ,cx->dst_index_gt_n);   // goes elsewhere
-        continue Inclusive·mul_ei_bi;
+        continue Inclusive·mul_idx;
         cend;
       }
 
@@ -996,7 +996,7 @@ stack push and pop.
         p0->rpt            = &cx->byte_n;
         p0->nominal        = &&src_byte_i;
         p0->gt_address_t_n = cx_dealloc(byte_n_of(struct c0) ,cx->src_index_gt_n);    // goes elsewhere
-        continue Inclusive·mul_ib;
+        continue Inclusive·mul_ext;
       }
 
       // c1
@@ -1009,7 +1009,7 @@ stack push and pop.
         p0->gt_address_t_n = &&leave
         p1->n              = byte_n_of(struct c0);
         p1->sequence     = cx->src_index_gt_n
-        continue Inclusive·mul_ib;
+        continue Inclusive·mul_ext;
       }
 
       cdef(leave){
@@ -1027,7 +1027,7 @@ stack push and pop.
         p0->rpt            = &cx->src_byte_i;
         p0->nominal        = &&dst_byte_i;
         p0->gt_address_t_n = cx_dealloc(byte_n_of(struct c0) ,cx->src_index_gt_n);  // goes elsewhere
-        continue Inclusive·mul_ei_bi;
+        continue Inclusive·mul_idx;
         cend;
       }
 
@@ -1039,7 +1039,7 @@ stack push and pop.
         p0->rpt            = &cx->dst_byte_i;
         p0->nominal        = &&copy_bytes;
         p0->gt_address_t_n = cx_dealloc(byte_n_of(struct c0) ,cx->dst_index_gt_n);   // goes elsewhere
-        continue Inclusive·mul_ei_bi;
+        continue Inclusive·mul_idx;
         cend;
       }
 
@@ -1172,14 +1172,14 @@ void copy_element_init(){
 
   // connectors
   t.mul_ib_0.cons.nominal= (Connector) 
-    { .entry = &&Inclusive·mul_ei_bi 
+    { .entry = &&Inclusive·mul_idx 
       ,.connections = &t.mul_ei_bi_0.cons
       ,.args = &t.mul_ei_bi_0.args
     }
   t.mul_ib_0.cons.gt_address_t_n = (struct TM2x·Cons·copy_elements)(current->cons)->gt_address_t_n;
 
   t.mul_ib_1.cons.nominal= (Connector) 
-    { .entry = &&Inclusive·mul_ei_bi 
+    { .entry = &&Inclusive·mul_idx 
       ,.connections = &t.mul_ei_bi_1.cons
       ,.args = &t.mul_ei_bi_1.args
     }

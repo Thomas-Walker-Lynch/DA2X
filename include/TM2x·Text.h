@@ -238,6 +238,8 @@ address_t TM2x·alloc_array_count = 0;
   } SQ·end(TM2x·copy_elements);
 
 
+#if 0
+
 SQ·def(resize_bytes){
   // shorten the arg names, give the optimizer something more to do
   TM2x *tm2x = Args.TM2x·resize_bytes.tm2x;
@@ -285,7 +287,7 @@ SQ·def(resize_bytes){
 
 
 
-#if 0
+
 
 
 
