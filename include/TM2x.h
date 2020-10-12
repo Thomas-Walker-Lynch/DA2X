@@ -64,7 +64,7 @@
   }
 
   // tm2x becomes a pointer to a static allocation of a TM2x struct
-  #define TM2x·alloc_static(tm2x) TM2x TM2x· ## tm2x ,*tm2x; tm2x = &TM2x· ## tm2x;
+  #define TM2x·alloc_header_static(tm2x) TM2x TM2x· ## tm2x ,*tm2x; tm2x = &TM2x· ## tm2x;
 
 
 #endif

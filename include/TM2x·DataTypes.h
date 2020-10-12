@@ -1,73 +1,73 @@
 
   typedef struct{
-  } TM2x·AllocHeap·Args;
+  } TM2x·AllocHeaderHeap·Args;
   typedef struct{
     TM2x **tm2x;
-  } TM2x·AllocHeap·Ress;
+  } TM2x·AllocHeaderHeap·Ress;
   typedef struct{
     SQ·Lnk nominal;
     SQ·Lnk fail;
-  } TM2x·AllocHeap·Lnks;
+  } TM2x·AllocHeaderHeap·Lnks;
   typedef struct{
     SQ·Ptr sequence;
-    TM2x·AllocHeap·Args *args;
-    TM2x·AllocHeap·Ress *ress;
-    TM2x·AllocHeap·Lnks *lnks;
-  } TM2x·AllocHeap·Lnk;
+    TM2x·AllocHeaderHeap·Args *args;
+    TM2x·AllocHeaderHeap·Ress *ress;
+    TM2x·AllocHeaderHeap·Lnks *lnks;
+  } TM2x·AllocHeaderHeap·Lnk;
 
 
   typedef struct{
     TM2x *tm2x;
     address_t *byte_n;   // extent of the array, in bytes
-  } TM2x·ConstructBytes·Args;
+  } TM2x·AllocArrayBytes·Args;
   typedef struct{
-  } TM2x·ConstructBytes·Ress;
+  } TM2x·AllocArrayBytes·Ress;
   typedef struct{
     SQ·Lnk nominal;
     SQ·Lnk alloc_fail;
-  } TM2x·ConstructBytes·Lnks;
+  } TM2x·AllocArrayBytes·Lnks;
   typedef struct{
     SQ·Ptr sequence;
-    TM2x·ConstructBytes·Args *args;
-    TM2x·ConstructBytes·Ress *ress;
-    TM2x·ConstructBytes·Lnks *lnks;
-  } TM2x·ConstructBytes·Lnk;
+    TM2x·AllocArrayBytes·Args *args;
+    TM2x·AllocArrayBytes·Ress *ress;
+    TM2x·AllocArrayBytes·Lnks *lnks;
+  } TM2x·AllocArrayBytes·Lnk;
 
 
   typedef struct{
     TM2x *tm2x;
     address_t *element_n;  // extent of the array, in elements
     address_t *element_byte_n; // extent of the element, in bytes
-  } TM2x·ConstructElements·Args;
+  } TM2x·AllocArrayElements·Args;
   typedef struct{
-  } TM2x·ConstructElements·Ress;
+  } TM2x·AllocArrayElements·Ress;
   typedef struct{
     SQ·Lnk nominal;
     SQ·Lnk index_gt_n;
     SQ·Lnk alloc_fail;
-  } TM2x·ConstructElements·Lnks;
+  } TM2x·AllocArrayElements·Lnks;
   typedef struct{
     SQ·Ptr sequence;
-    TM2x·ConstructElements·Args *args;
-    TM2x·ConstructElements·Ress *ress;
-    TM2x·ConstructElements·Lnks *lnks;
-  } TM2x·ConstructElements·Lnk;
+    TM2x·AllocArrayElements·Args *args;
+    TM2x·AllocArrayElements·Ress *ress;
+    TM2x·AllocArrayElements·Lnks *lnks;
+  } TM2x·AllocArrayElements·Lnk;
 
 
   typedef struct{
     TM2x *tm2x;
-  } TM2x·Destruct·Args;
+  } TM2x·DeallocArray·Args;
   typedef struct{
-  } TM2x·Destruct·Ress;
+  } TM2x·DeallocArray·Ress;
   typedef struct{
     SQ·Lnk nominal;
-  } TM2x·Destruct·Lnks;
+  } TM2x·DeallocArray·Lnks;
   typedef struct{
     SQ·Ptr sequence;
-    TM2x·Destruct·Args *args;
-    TM2x·Destruct·Ress *ress;
-    TM2x·Destruct·Lnks *lnks;
-  } TM2x·Destruct·Lnk;
+    TM2x·DeallocArray·Args *args;
+    TM2x·DeallocArray·Ress *ress;
+    TM2x·DeallocArray·Lnks *lnks;
+  } TM2x·DeallocArray·Lnk;
 
 
   typedef struct{
@@ -224,17 +224,17 @@ struct TM2x·copy_elements_0{
   SQ·Lnk dst_index_gt_n;
 };
 
-struct TM2x·dealloc_heap_0{
+struct TM2x·dealloc_header_heap_0{
   TM2x *tape;
   SQ·Lnk nominal;
 };
 
-struct TM2x·destruct_0{
+struct TM2x·dealloc_array_0{
   TM2x *tape;
   SQ·Lnk nominal;
 };
 
-struct TM2x·destruct_dealloc_heap_0{
+struct TM2x·dealloc_array_dealloc_header_heap_0{
   TM2x *tape;
   SQ·Lnk nominal;
 };

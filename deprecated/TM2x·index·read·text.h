@@ -19,21 +19,21 @@ TM2x·index·read:{
 
   // byte_n relative to element_0_pt.
   address_t region_byte_n;
-  inclusive·mul_ib·args.an = element_n;
-  inclusive·mul_ib·args.bn = element_byte_n;
-  inclusive·mul_ib·args.cn = &region_byte_n;
-  inclusive·mul_ib·args.nominal = &&mul_ib·nominal;
-  inclusive·mul_ib·args.gt_address_n = index_gt_n;
-  continue_from inclusive·mul_ib;
+  inclusive·mul_ext·args.an = element_n;
+  inclusive·mul_ext·args.bn = element_byte_n;
+  inclusive·mul_ext·args.cn = &region_byte_n;
+  inclusive·mul_ext·args.nominal = &&mul_ext·nominal;
+  inclusive·mul_ext·args.gt_address_n = index_gt_n;
+  continue_from inclusive·mul_ext;
 
-  mul_ib·nominal:{
+  mul_ext·nominal:{
     address_t byte_i;
-    inclusive·mul_ib·args.an = index;
-    inclusive·mul_ib·args.bn = element_byte_n;
-    inclusive·mul_ib·args.cn = &byte_i
-    inclusive·mul_ib·args.nominal = &&mul_ib·nominal;
-    inclusive·mul_ib·args.gt_address_n = index_gt_n;
-    continue_from inclusive·mul_ib;
+    inclusive·mul_ext·args.an = index;
+    inclusive·mul_ext·args.bn = element_byte_n;
+    inclusive·mul_ext·args.cn = &byte_i
+    inclusive·mul_ext·args.nominal = &&mul_ext·nominal;
+    inclusive·mul_ext·args.gt_address_n = index_gt_n;
+    continue_from inclusive·mul_ext;
     
 
     void *src_element_pt;
@@ -49,7 +49,7 @@ TM2x·index·read:{
   index_nominal:{
 
 
-    mul_ib·nominal:{
+    mul_ext·nominal:{
       if( 
 
     }

@@ -48,7 +48,7 @@ Sequences are not intended to make use of the stack, but stack allocation of tem
 is so embedded in the C language that a person can easily imagine cases that would be
 problematic.  Take for example a line of code like this:
 
-      register struct TM2x·dealloc_heap0 *lc0 = &Sequence·Locals_pt->dealloc_heap;
+      register struct TM2x·dealloc_header_heap0 *lc0 = &Sequence·Locals_pt->dealloc_header_heap;
 
 This is intended to define a namespace and to replace a #define that would have copied the
 text directly to variables that use the namespace.  We do not expect that lc0 actually

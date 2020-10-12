@@ -26,14 +26,14 @@
       TM2x *tape;
       continuation nominal;
       continuation fail;
-    } alloc_heap;
+    } alloc_header_heap;
 
     struct ConstructBytes{
       TM2x *tape;
       address_t byte_n;
       continuation nominal;
       continuation alloc_fail;
-    } construct_bytes;
+    } alloc_array_bytes;
 
     struct ConstructBytes{
       TM2x *tape;
@@ -42,7 +42,7 @@
       continuation nominal;
       continuation alloc_fail;
       continuation index_gt_n;
-    } construct_bytes;
+    } alloc_array_bytes;
 
     struct ConstructWrite{
       TM2x *tape;
@@ -104,7 +104,7 @@
     struct DeallocHeap{
       TM2x **tape;
       continuation nominal;
-    } dealloc_heap;
+    } dealloc_header_heap;
 
     struct Destruct{
       TM2x *tape;

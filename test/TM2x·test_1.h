@@ -1,5 +1,5 @@
 /*
-Similar to test_0, but uses construct_elements instead of construct_elements to construct
+Similar to test_0, but uses alloc_array_elements instead of alloc_array_elements to construct
 the array.
 
 */
@@ -10,7 +10,7 @@ the array.
     SQ·Sequence SQ·ah_dist ,SQ·nominal ,SQ·fail ,SQ·cleanup ,SQ·report;
 
     address_t malloc_cnt = MallocCounter·count;
-    address_t constructed_cnt = TM2x·constructed_count;
+    address_t constructed_cnt = TM2x·alloc_array_count;
     Result·Tallies results ,*results_pt;
     results_pt = &results;
     Result·Tallies·init(results_pt);
@@ -22,40 +22,40 @@ the array.
     //
       address_t element_n = 9;
       address_t element_byte_n = 3; // extent of 32 bit int in elements
-      TM2x *tm2x; // set by alloc_heap, then distributed
+      TM2x *tm2x; // set by alloc_header_heap, then distributed
 
     // ----------------------------------------
     // Links
     //
-      TM2x·AllocHeap·Args ah_args;
-      TM2x·AllocHeap·Ress ah_ress;
-      TM2x·AllocHeap·Lnks ah_lnks;
-      TM2x·AllocHeap·Lnk  ah_lnk;
+      TM2x·AllocHeaderHeap·Args ah_args;
+      TM2x·AllocHeaderHeap·Ress ah_ress;
+      TM2x·AllocHeaderHeap·Lnks ah_lnks;
+      TM2x·AllocHeaderHeap·Lnk  ah_lnk;
       ah_lnk.args = &ah_args;
       ah_lnk.ress = &ah_ress;
       ah_lnk.lnks = &ah_lnks;
-      ah_lnk.sequence = &&TM2x·alloc_heap;
+      ah_lnk.sequence = &&TM2x·alloc_header_heap;
 
-      TM2x·ConstructElements·Args ce_args;
-      TM2x·ConstructElements·Lnks ce_lnks;
-      TM2x·ConstructElements·Lnk  ce_lnk;
+      TM2x·AllocArrayElements·Args ce_args;
+      TM2x·AllocArrayElements·Lnks ce_lnks;
+      TM2x·AllocArrayElements·Lnk  ce_lnk;
       ce_lnk.args = &ce_args;
       ce_lnk.lnks = &ce_lnks;
-      ce_lnk.sequence = &&TM2x·construct_elements;
+      ce_lnk.sequence = &&TM2x·alloc_array_elements;
 
-      TM2x·Destruct·Args       da_args;
-      TM2x·Destruct·Lnks       da_lnks;
-      TM2x·Destruct·Lnk        da_lnk;
+      TM2x·DeallocArray·Args       da_args;
+      TM2x·DeallocArray·Lnks       da_lnks;
+      TM2x·DeallocArray·Lnk        da_lnk;
       da_lnk.args = &da_args;
       da_lnk.lnks = &da_lnks;
-      da_lnk.sequence = &&TM2x·destruct;
+      da_lnk.sequence = &&TM2x·dealloc_array;
 
       TM2x·DeallocHeap·Args    dh_args;
       TM2x·DeallocHeap·Lnks    dh_lnks;
       TM2x·DeallocHeap·Lnk     dh_lnk;
       dh_lnk.args = &dh_args;
       dh_lnk.lnks = &dh_lnks;
-      dh_lnk.sequence = &&TM2x·dealloc_heap;
+      dh_lnk.sequence = &&TM2x·dealloc_header_heap;
 
       ah_lnks.nominal.sequence = &&ah_dist;
       ah_lnks.fail.sequence = &&fail;
@@ -78,7 +78,7 @@ the array.
       ce_args.element_n = &element_n;
       ce_args.element_byte_n = &element_byte_n;
 
-      // The alloc_heap result is a pointer to the allocation.  The distribution sequence that
+      // The alloc_header_heap result is a pointer to the allocation.  The distribution sequence that
       // follows it distributes this pointer to the parameters of other rourtines. Consequently
       // those parameters are not set here.
 
@@ -104,7 +104,7 @@ the array.
 
     SQ·def(report){
       f[i++] = malloc_cnt == MallocCounter·count;
-      f[i++] = constructed_cnt == TM2x·constructed_count;
+      f[i++] = constructed_cnt == TM2x·alloc_array_count;
       Result·Tallies·tally("test_1" ,&results ,f ,i);
       Result·Tallies·accumulate(accumulated_results_pt ,&results);
       SQ·continue(test_2);

@@ -25,8 +25,8 @@ the 2x in the name.
   I am very thankful to have a unicode character as supported in the C90 spec to use to
   separate the namespace from the rest of the identifier:
 
-    conventional:  `TM2x::alloc_heap`
-           using:  `TM2x·alloc_heap`
+    conventional:  `TM2x::alloc_header_heap`
+           using:  `TM2x·alloc_header_heap`
 
    Of course, the double colon is not available fo idnetifier names in C.
 

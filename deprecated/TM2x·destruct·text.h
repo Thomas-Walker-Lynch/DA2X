@@ -1,10 +1,10 @@
 
 
-  extern address_t TM2x·constructed_count;
+  extern address_t TM2x·alloc_array_count;
 
-  TM2x·destruct:{
-    free(TM2x·destruct·args.tape->base_pt);
-    TM2x·constructed_count--;
-    continue_from *TM2x·destruct·args.nominal;
+  TM2x·dealloc_array:{
+    free(TM2x·dealloc_array·args.tape->base_pt);
+    TM2x·alloc_array_count--;
+    continue_from *TM2x·dealloc_array·args.nominal;
     cend
   }

@@ -10,7 +10,7 @@ Currnenly this is just a copy of the copy_bytes test.
     SQ·Sequence SQ·ah_dist ,SQ·check_copy ,SQ·nominal ,SQ·fail ,SQ·cleanup ,SQ·report;
 
     address_t malloc_cnt = MallocCounter·count;
-    address_t constructed_cnt = TM2x·constructed_count;
+    address_t constructed_cnt = TM2x·alloc_array_count;
     Result·Tallies results ,*results_pt;
     results_pt = &results;
     Result·Tallies·init(results_pt);
@@ -27,27 +27,27 @@ Currnenly this is just a copy of the copy_bytes test.
     // result tableau
     //
       address_t byte_n = 4;  // input constant
-      TM2x *dst;             // result of alloc_heap, it gets distributed
+      TM2x *dst;             // result of alloc_header_heap, it gets distributed
       address_t offset = 0;  // input constant
 
     // ----------------------------------------
     // Links
     //
-      TM2x·AllocHeap·Args ah_args;
-      TM2x·AllocHeap·Ress ah_ress;
-      TM2x·AllocHeap·Lnks ah_lnks;
-      TM2x·AllocHeap·Lnk  ah_lnk;
+      TM2x·AllocHeaderHeap·Args ah_args;
+      TM2x·AllocHeaderHeap·Ress ah_ress;
+      TM2x·AllocHeaderHeap·Lnks ah_lnks;
+      TM2x·AllocHeaderHeap·Lnk  ah_lnk;
       ah_lnk.args = &ah_args;
       ah_lnk.ress = &ah_ress;
       ah_lnk.lnks = &ah_lnks;
-      ah_lnk.sequence = &&TM2x·alloc_heap;
+      ah_lnk.sequence = &&TM2x·alloc_header_heap;
 
-      TM2x·ConstructBytes·Args cb_args;
-      TM2x·ConstructBytes·Lnks cb_lnks;
-      TM2x·ConstructBytes·Lnk  cb_lnk;
+      TM2x·AllocArrayBytes·Args cb_args;
+      TM2x·AllocArrayBytes·Lnks cb_lnks;
+      TM2x·AllocArrayBytes·Lnk  cb_lnk;
       cb_lnk.args = &cb_args;
       cb_lnk.lnks = &cb_lnks;
-      cb_lnk.sequence = &&TM2x·construct_bytes;
+      cb_lnk.sequence = &&TM2x·alloc_array_bytes;
 
       TM2x·CopyBytes·Args cpb_args;
       TM2x·CopyBytes·Lnks cpb_lnks;
@@ -56,19 +56,19 @@ Currnenly this is just a copy of the copy_bytes test.
       cpb_lnk.lnks = &cpb_lnks;
       cpb_lnk.sequence = &&TM2x·copy_bytes;
 
-      TM2x·Destruct·Args       da_args;
-      TM2x·Destruct·Lnks       da_lnks;
-      TM2x·Destruct·Lnk        da_lnk;
+      TM2x·DeallocArray·Args       da_args;
+      TM2x·DeallocArray·Lnks       da_lnks;
+      TM2x·DeallocArray·Lnk        da_lnk;
       da_lnk.args = &da_args;
       da_lnk.lnks = &da_lnks;
-      da_lnk.sequence = &&TM2x·destruct;
+      da_lnk.sequence = &&TM2x·dealloc_array;
 
       TM2x·DeallocHeap·Args    dh_args;
       TM2x·DeallocHeap·Lnks    dh_lnks;
       TM2x·DeallocHeap·Lnk     dh_lnk;
       dh_lnk.args = &dh_args;
       dh_lnk.lnks = &dh_lnks;
-      dh_lnk.sequence = &&TM2x·dealloc_heap;
+      dh_lnk.sequence = &&TM2x·dealloc_header_heap;
 
       ah_lnks.nominal.sequence = &&ah_dist;
       ah_lnks.fail.sequence = &&fail;
@@ -129,7 +129,7 @@ Currnenly this is just a copy of the copy_bytes test.
 
     SQ·def(report){
       f[fi++] = malloc_cnt == MallocCounter·count;
-      f[fi++] = constructed_cnt == TM2x·constructed_count;
+      f[fi++] = constructed_cnt == TM2x·alloc_array_count;
       Result·Tallies·tally("test_3" ,&results ,f ,fi);
       Result·Tallies·accumulate(accumulated_results_pt ,&results);
       SQ·continue(tests_finished);

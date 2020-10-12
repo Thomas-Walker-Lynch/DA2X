@@ -1,6 +1,6 @@
 
 /*
-  mul_ib = mul inclusive bounds.
+  mul_ext = mul inclusive bounds.
 
   gives the product of two extent values.
 
@@ -14,12 +14,12 @@
         an = 1,  bn = 3   --> 7
 
 */
-inclusive·mul_ib:{
-  address_t an = inclusive·mul_ib·args.an;
-  address_t bn = inclusive·mul_ib·args.bn;
-  address_t *cn = inclusive·mul_ib·args.cn;
-  continuation nominal = inclusive·mul_ib·args.nominal;
-  continuation gt_address_n = inclusive·mul_ib·args.gt_address_n;
+inclusive·mul_ext:{
+  address_t an = inclusive·mul_ext·args.an;
+  address_t bn = inclusive·mul_ext·args.bn;
+  address_t *cn = inclusive·mul_ext·args.cn;
+  continuation nominal = inclusive·mul_ext·args.nominal;
+  continuation gt_address_n = inclusive·mul_ext·args.gt_address_n;
 
   uint128_t d_an = an, d_bn = bn, d_cn;
   d_cn = d_an * d_bn + d_an + d_bn;
@@ -30,7 +30,7 @@ inclusive·mul_ib:{
 
 
 /*
-  mul_ei_bi  convert element index to a byte index
+  mul_idx  convert element index to a byte index
 
   Given an element index and the extent of the element, computes the byte index.
 
@@ -42,12 +42,12 @@ inclusive·mul_ib:{
         an = 2,  bn = 3   --> 8
 
 */
-inclusive·mul_ei_bi:{
+inclusive·mul_idx:{
   address_t an = inclusive·3op·args.an;
   address_t bn = inclusive·3op·args.bn;
   address_t *cn = inclusive·3op·args.cn;
-  continuation nominal = inclusive·mul_ei_bi·args.nominal;
-  continuation gt_address_n = inclusive·mul_ei_bi·args.gt_address_n;
+  continuation nominal = inclusive·mul_idx·args.nominal;
+  continuation gt_address_n = inclusive·mul_idx·args.gt_address_n;
 
   uint128_t d_an = an, d_bn = bn, d_cn;
   d_cn = d_an * d_bn + d_an;

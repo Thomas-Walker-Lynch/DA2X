@@ -7,7 +7,7 @@
   extern address_t TM2x·test_after_allocation_n;
 #endif
 
-extern address_t TM2x·constructed_count;
+extern address_t TM2x·alloc_array_count;
 
 TM2x·resize_bytes:{
   // shorten the arg names, give the optimizer something more to do

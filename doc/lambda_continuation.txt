@@ -67,7 +67,7 @@ when they become available.
 continuation embedding in library routines
 
 For the TM library I have lower scope embedded calls to other continuations.  This
-is for performance reasons.  For exmaple, the alloc_heap call embeds mallocn rather
+is for performance reasons.  For exmaple, the alloc_header_heap call embeds mallocn rather
 than continuing from a higher level instance of it.  Both calls pretty much reduce
 to malloc, so the higher level call would not save much code space if any.  Other
 continuations in the library could be given alternative impelementations that call

@@ -7,7 +7,7 @@
   extern address_t TM2x·test_after_allocation_n;
 #endif
 
-extern address_t TM2x·constructed_count;
+extern address_t TM2x·alloc_array_count;
 
 TM2x·F_PREFIX continuation TM2x·resize_elements:{
   TM2x *tape                = TM2x·resize_elements·args.tape;
@@ -18,15 +18,15 @@ TM2x·F_PREFIX continuation TM2x·resize_elements:{
   continuation index_gt_n    = TM2x·resize_elements·args.index_gt_n;
 
   address_t after_byte_n;
-  #include "inclusive·mul_ib·args.h"
-  inclusive·mul_ib·args.an = after_element_n;
-  inclusive·mul_ib·args.bn = element_byte_n;
-  inclusive·mul_ib·args.cn = &after_byte_n;
-  inclusive·mul_ib·args.nominal = &&mul_ib·nominal;
-  inclusive·mul_ib·args.gt_address_n = index_gt_n;
-  continue_from inclusive·mul_ib;
+  #include "inclusive·mul_ext·args.h"
+  inclusive·mul_ext·args.an = after_element_n;
+  inclusive·mul_ext·args.bn = element_byte_n;
+  inclusive·mul_ext·args.cn = &after_byte_n;
+  inclusive·mul_ext·args.nominal = &&mul_ext·nominal;
+  inclusive·mul_ext·args.gt_address_n = index_gt_n;
+  continue_from inclusive·mul_ext;
 
-  mul_ib·nominal:{
+  mul_ext·nominal:{
    resize_bytes·args.tape = tape;
    resize_bytes·args.after_byte_n = after_byte_n;
    resize_bytes·args.nominal = nominal;

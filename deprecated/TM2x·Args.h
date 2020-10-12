@@ -14,23 +14,23 @@
       TM2x **tape;
       Sequence nominal;
       Sequence fail;
-    } TM2x·alloc_heap;
+    } TM2x·alloc_header_heap;
 
     struct TM2x·Args·ConstructBytes{
       TM2x *tape;
       address_t byte_n;   // extent of the array, in bytes
       Sequence nominal;
       Sequence alloc_fail;
-    } TM2x·construct_bytes;
+    } TM2x·alloc_array_bytes;
 
-    struct TM2x·Args·ConstructElements{
+    struct TM2x·Args·AllocArrayElements{
       TM2x *tape;
       address_t element_n;  // extent of the array, in elements
       address_t element_byte_n; // extent of the element, in bytes
       Sequence nominal;
       Sequence index_gt_n;
       Sequence alloc_fail;
-    } TM2x·construct_elements;
+    } TM2x·alloc_array_elements;
 
     struct TM2x·Args·ConstructWrite{
       TM2x *tape;
@@ -91,12 +91,12 @@
     struct TM2x·Args·DeallocHeap{
       TM2x **tape;
       Sequence nominal;
-    } TM2x·dealloc_heap;
+    } TM2x·dealloc_header_heap;
 
     struct TM2x·Args·Destruct{
       TM2x *tape;
       Sequence nominal;
-    } TM2x·destruct;
+    } TM2x·dealloc_array;
 
     struct TM2x·Args·Index·Read{
       TM2x *tape;

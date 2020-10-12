@@ -2,12 +2,12 @@
 #define INCLUSIVE_H
 
 /*
-  mul_ib = mul inclusive bounds.
+  mul_ext = mul inclusive bounds.
 
   gives the product of two extent values.
 
   When an is the extent of a region measured in elements, and bn is the
-  extent of an element in bytes, then mul_ib is will the extent of the
+  extent of an element in bytes, then mul_ext is will the extent of the
   region in bytes.
 
     (an + 1) (bn + 1) -1
@@ -20,13 +20,13 @@
 */
 #pragma push_macro("S1")
 #undef S1
-#define S1 Args.Inclusive·mul_ib
-Inclusive·mul_ib:{
-  address_t an = inclusive·mul_ib·args.an;
-  address_t bn = inclusive·mul_ib·args.bn;
-  address_t *cn = inclusive·mul_ib·args.cn;
-  continuation nominal = inclusive·mul_ib·args.nominal;
-  continuation gt_address_n = inclusive·mul_ib·args.gt_address_n;
+#define S1 Args.Inclusive·mul_ext
+Inclusive·mul_ext:{
+  address_t an = inclusive·mul_ext·args.an;
+  address_t bn = inclusive·mul_ext·args.bn;
+  address_t *cn = inclusive·mul_ext·args.cn;
+  continuation nominal = inclusive·mul_ext·args.nominal;
+  continuation gt_address_n = inclusive·mul_ext·args.gt_address_n;
 
   uint128_t d_an = an, d_bn = bn, d_cn;
   d_cn = d_an * d_bn + d_an + d_bn;
@@ -37,7 +37,7 @@ Inclusive·mul_ib:{
 #pragma pop_macro("S1")
 
 /*
-  mul_ei_bi  convert element index to a byte index
+  mul_idx  convert element index to a byte index
 
   Given an element index and the extent of elements in bytes, computes the byte index.
 
@@ -49,12 +49,12 @@ Inclusive·mul_ib:{
         an = 2,  bn = 3   --> 8
 
 */
-inclusive·mul_ei_bi:{
+inclusive·mul_idx:{
   address_t an = inclusive·3op·args.an;
   address_t bn = inclusive·3op·args.bn;
   address_t *cn = inclusive·3op·args.cn;
-  continuation nominal = inclusive·mul_ei_bi·args.nominal;
-  continuation gt_address_n = inclusive·mul_ei_bi·args.gt_address_n;
+  continuation nominal = inclusive·mul_idx·args.nominal;
+  continuation gt_address_n = inclusive·mul_idx·args.gt_address_n;
 
   uint128_t d_an = an, d_bn = bn, d_cn;
   d_cn = d_an * d_bn + d_an;

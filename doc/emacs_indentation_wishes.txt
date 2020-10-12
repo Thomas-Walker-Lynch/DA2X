@@ -36,7 +36,7 @@ should be indented
 
  e.g.
 
-  TM2x·alloc_heap:{
+  TM2x·alloc_header_heap:{
     //  #include "CLib·mallocn·args.h"
     #define pt      tape
     #define n       byte_n_of(TM2x)

@@ -1,5 +1,5 @@
 // 'thread static' allocation class
-address_t TM2x·constructed_count = 0;
+address_t TM2x·alloc_array_count = 0;
 
 /*--------------------------------------------------------------------------------
 
@@ -8,8 +8,8 @@ address_t TM2x·constructed_count = 0;
 */
 
   // allocate a TM2x header on the heap
-  SQ·def(TM2x·alloc_heap){
-    TM2x·AllocHeap·Lnk *lnk = (TM2x·AllocHeap·Lnk *)SQ·lnk;
+  SQ·def(TM2x·alloc_header_heap){
+    TM2x·AllocHeaderHeap·Lnk *lnk = (TM2x·AllocHeaderHeap·Lnk *)SQ·lnk;
 
     CLib·Mallocn·Args m_args;
     CLib·Mallocn·Ress m_ress;
@@ -28,12 +28,12 @@ address_t TM2x·constructed_count = 0;
 
     SQ·continue_indirect(m_lnk);
 
-  } SQ·end(TM2x·alloc_heap);
+  } SQ·end(TM2x·alloc_header_heap);
 
   // allocates data on the heap
-  SQ·def(TM2x·construct_bytes){
-    TM2x·constructed_count++; // to assist with debugging
-    TM2x·ConstructBytes·Lnk *lnk = (TM2x·ConstructBytes·Lnk *)SQ·lnk;
+  SQ·def(TM2x·alloc_array_bytes){
+    TM2x·alloc_array_count++; // to assist with debugging
+    TM2x·AllocArrayBytes·Lnk *lnk = (TM2x·AllocArrayBytes·Lnk *)SQ·lnk;
 
     lnk->args->tm2x->byte_n = *lnk->args->byte_n;
 
@@ -57,28 +57,28 @@ address_t TM2x·constructed_count = 0;
 
     SQ·continue_indirect(m_lnk);
 
-  } SQ·end(TM2x·construct_bytes);
+  } SQ·end(TM2x·alloc_array_bytes);
 
-  SQ·def(TM2x·construct_elements){
-    TM2x·ConstructElements·Lnk *lnk = (TM2x·ConstructElements·Lnk *)SQ·lnk;
+  SQ·def(TM2x·alloc_array_elements){
+    TM2x·AllocArrayElements·Lnk *lnk = (TM2x·AllocArrayElements·Lnk *)SQ·lnk;
 
     // ----------------------------------------
     // result tableau
     //
-      address_t byte_n;  // result of mul_ei_bi
+      address_t byte_n;  // result of mul_idx
 
     // ----------------------------------------
     // Links
     //
-      SQ·make_Lnk(scale_ext ,Inclusive·3opLL ,&&Inclusive·mul_ei_bi);
-      SQ·make_Lnk(construct_bytes ,TM2x·ConstructBytes ,&&TM2x·construct_bytes);
+      SQ·make_Lnk(scale_ext ,Inclusive·3opLL ,&&Inclusive·mul_idx);
+      SQ·make_Lnk(alloc_array_bytes ,TM2x·AllocArrayBytes ,&&TM2x·alloc_array_bytes);
 
       scale_ext_lnks = (Inclusive·3opLL·Lnks)
-        { .nominal = AS(construct_bytes_lnk ,SQ·Lnk)
+        { .nominal = AS(alloc_array_bytes_lnk ,SQ·Lnk)
           ,.gt_address_t_n = lnk->lnks->index_gt_n
         };
 
-      construct_bytes_lnks = (TM2x·ConstructBytes·Lnks)
+      alloc_array_bytes_lnks = (TM2x·AllocArrayBytes·Lnks)
         { .nominal = lnk->lnks->nominal
           ,.alloc_fail = lnk->lnks->alloc_fail
         };
@@ -94,38 +94,39 @@ address_t TM2x·constructed_count = 0;
       scale_ext_args.a_0 = lnk->args->element_n;
       scale_ext_args.a_1 = lnk->args->element_byte_n;
 
-      construct_bytes_args.tm2x = lnk->args->tm2x;
-      construct_bytes_args.byte_n = &byte_n;
+      alloc_array_bytes_args.tm2x = lnk->args->tm2x;
+      alloc_array_bytes_args.byte_n = &byte_n;
 
     SQ·continue_indirect(scale_ext_lnk);
 
-  } SQ·end(TM2x·construct_elements);
+  } SQ·end(TM2x·alloc_array_elements);
 
   // TM2x header may be constructed again and reused
-  SQ·def(TM2x·destruct){
-    TM2x·constructed_count--; // to assist with debugging
-    TM2x·Destruct·Lnk *lnk = (TM2x·Destruct·Lnk *)SQ·lnk;
+  SQ·def(TM2x·dealloc_array){
+    TM2x·alloc_array_count--; // to assist with debugging
+    TM2x·DeallocArray·Lnk *lnk = (TM2x·DeallocArray·Lnk *)SQ·lnk;
     free(lnk->args->tm2x->base_pt);
     SQ·continue_indirect(lnk->lnks->nominal);  
-  } SQ·end(TM2x·destruct);
+  } SQ·end(TM2x·dealloc_array);
 
   // we are to deallocate the header from the heap
-  SQ·def(TM2x·dealloc_heap){
+  SQ·def(TM2x·dealloc_header_heap){
     TM2x·DeallocHeap·Lnk *lnk = (TM2x·DeallocHeap·Lnk *)SQ·lnk;
     free(lnk->args->tm2x);
     SQ·continue_indirect(lnk->lnks->nominal);
-  } SQ·end(TM2x·dealloc_heap);
+  } SQ·end(TM2x·dealloc_header_heap);
 
 
 /*--------------------------------------------------------------------------------
  copying data
 
-    If we copied as much as possible, then took the overflow upon hitting a bound,
-    we would end up redoing the copy if the array expansion reallocates the array
-    into a bigger heap block.
+    If we copied as much as possible, then took the overflow upon hitting a bound, we
+    would end up redoing the copy if the array expansion reallocates the array into a
+    bigger heap block.  This due to 'resize', even by a small amount, possibly allocating
+    a new array.
 
-    With this implementation we do no copy until we see that the copy would fit.  If
-    it does not fit we take the overflow continuation.
+    With this implementation we do no copy until we see that the copy will fit.  If it
+    does not fit we take the overflow continuation.
 
 */
   SQ·def(TM2x·copy_bytes){
@@ -173,9 +174,9 @@ address_t TM2x·constructed_count = 0;
     // ----------------------------------------
     // Links
     //
-      SQ·make_Lnk(scale_src ,Inclusive·3opLL ,&&Inclusive·mul_ei_bi);
-      SQ·make_Lnk(scale_dst ,Inclusive·3opLL ,&&Inclusive·mul_ei_bi);
-      SQ·make_Lnk(scale_ext ,Inclusive·3opLL ,&&Inclusive·mul_ib);
+      SQ·make_Lnk(scale_src ,Inclusive·3opLL ,&&Inclusive·mul_idx);
+      SQ·make_Lnk(scale_dst ,Inclusive·3opLL ,&&Inclusive·mul_idx);
+      SQ·make_Lnk(scale_ext ,Inclusive·3opLL ,&&Inclusive·mul_ext);
       SQ·make_Lnk(copy_bytes ,TM2x·CopyBytes ,&&TM2x·copy_bytes);
 
       scale_src_lnks = (Inclusive·3opLL·Lnks)
@@ -297,14 +298,14 @@ INLINE_PREFIX ContinuationPtr index·to_pt{
   SequencePtr index_gt_n = Args.TM2x·index·to_pt.index_gt_n;
 
   address_t byte_i;
-  inclusive·mul_ib·args.an = index;
-  inclusive·mul_ib·args.bn = element_byte_n;
-  inclusive·mul_ib·args.cn = &byte_i;
-  inclusive·mul_ib·args.nominal = &&mul_ib·nominal;
-  inclusive·mul_ib·args.gt_address_n = index_gt_n;
-  continue inclusive·mul_ib;
+  inclusive·mul_ext·args.an = index;
+  inclusive·mul_ext·args.bn = element_byte_n;
+  inclusive·mul_ext·args.cn = &byte_i;
+  inclusive·mul_ext·args.nominal = &&mul_ext·nominal;
+  inclusive·mul_ext·args.gt_address_n = index_gt_n;
+  continue inclusive·mul_ext;
 
-  SQ·def(mul_ib·nominal){
+  SQ·def(mul_ext·nominal){
     if( byte_i > TM2x·byte_n(tm2x) ) continue index_gt_n;
     *pt = (void *)(TM2x·byte_0_pt(tm2x) + byte_i);
     SQ·end;
@@ -391,7 +392,7 @@ SQ·def(read_pop){
   extern address_t TM2x·Test·allocation_n;
 #endif
 
-extern address_t TM2x·constructed_count;
+extern address_t TM2x·alloc_array_count;
 
 SQ·def(resize_bytes){
   // shorten the arg names, give the optimizer something more to do
@@ -453,15 +454,15 @@ SQ·def(F_PREFIX SequencePtr TM2x·resize_elements){
   SequencePtr index_gt_n    = Args.TM2x·resize_elements.index_gt_n;
 
   address_t after_byte_n;
-  #include "inclusive·mul_ib·args.h"
-  inclusive·mul_ib·args.an = after_element_n;
-  inclusive·mul_ib·args.bn = element_byte_n;
-  inclusive·mul_ib·args.cn = &after_byte_n;
-  inclusive·mul_ib·args.nominal = &&mul_ib·nominal;
-  inclusive·mul_ib·args.gt_address_n = index_gt_n;
-  continue inclusive·mul_ib;
+  #include "inclusive·mul_ext·args.h"
+  inclusive·mul_ext·args.an = after_element_n;
+  inclusive·mul_ext·args.bn = element_byte_n;
+  inclusive·mul_ext·args.cn = &after_byte_n;
+  inclusive·mul_ext·args.nominal = &&mul_ext·nominal;
+  inclusive·mul_ext·args.gt_address_n = index_gt_n;
+  continue inclusive·mul_ext;
 
-  SQ·def(mul_ib·nominal){
+  SQ·def(mul_ext·nominal){
     resize_bytes·args.tm2x = tm2x;
     resize_bytes·args.after_byte_n = after_byte_n;
     resize_bytes·args.nominal = nominal;

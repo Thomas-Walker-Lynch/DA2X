@@ -22,14 +22,14 @@ void TM2xHd·f0(void *context ,void *item_pt ,address_t element_byte_n){
 
 Result·Tallies test_0(){
   address_t malloc_cnt = MallocCounter·count;
-  address_t constructed_cnt = TM2x·constructed_count;
+  address_t constructed_cnt = TM2x·alloc_array_count;
   bool f[256];
   uint32_t i = 0;
 
   Result·Tallies r ,*rp; rp = &r;
   Result·Tallies·init(rp);
   TM2x *a0;
-  continue_into TM2x·alloc_heap_construct(&a0 ,0 ,byte_n_of(uint32_t) ,&&nominal_0 ,&&fail_0 ,&&fail_0);
+  continue_into TM2x·alloc_header_heap_construct(&a0 ,0 ,byte_n_of(uint32_t) ,&&nominal_0 ,&&fail_0 ,&&fail_0);
   nominal_0:{
     f[i] = true;
     continue_from end_0;
@@ -66,9 +66,9 @@ Result·Tallies test_0(){
   f[i++] = c->result;
   f[i++] = c->ref == 100;
 
-  TM2x·dealloc_heap(a0);
+  TM2x·dealloc_header_heap(a0);
   f[i++] = malloc_cnt == MallocCounter·count;
-  f[i++] = constructed_cnt == TM2x·constructed_count;
+  f[i++] = constructed_cnt == TM2x·alloc_array_count;
   Result·Tallies·tally("test_0" ,rp ,f ,i);
   return r;
 }
@@ -141,14 +141,14 @@ continuation TM2xHd·p4
 
 Result·Tallies test_1(){
   address_t malloc_cnt = MallocCounter·count;
-  address_t constructed_cnt = TM2x·constructed_count;
+  address_t constructed_cnt = TM2x·alloc_array_count;
   bool f[256];
   uint32_t i = 0;
 
   Result·Tallies r ,*rp; rp = &r;
   Result·Tallies·init(rp);
   TM2x *a0;
-  continue_into TM2x·alloc_heap_construct(&a0 ,0 ,byte_n_of(uint32_t) ,&&nominal_0 ,&&fail_0 ,&&fail_0);
+  continue_into TM2x·alloc_header_heap_construct(&a0 ,0 ,byte_n_of(uint32_t) ,&&nominal_0 ,&&fail_0 ,&&fail_0);
   nominal_0:{
     f[i] = true;
     continue_from end_0;
@@ -256,23 +256,23 @@ Result·Tallies test_1(){
     i++;
   }
   
-  TM2x·dealloc_heap(a0);
+  TM2x·dealloc_header_heap(a0);
   f[i++] = malloc_cnt == MallocCounter·count;
-  f[i++] = constructed_cnt == TM2x·constructed_count;
+  f[i++] = constructed_cnt == TM2x·alloc_array_count;
   Result·Tallies·tally("test_1" ,rp ,f ,i);
   return r;
 }
 
 Result·Tallies test_2(){
   address_t malloc_cnt = MallocCounter·count;
-  address_t constructed_cnt = TM2x·constructed_count;
+  address_t constructed_cnt = TM2x·alloc_array_count;
   Result·Tallies r ,*rp; rp = &r;
   Result·Tallies·init(rp);
   bool f[256];
   uint32_t i = 0;
 
   TM2x *a0;
-  continue_into TM2x·alloc_heap_construct(&a0 ,0 ,byte_n_of(uint32_t) ,&&nominal_0 ,&&fail_0 ,&&fail_0);
+  continue_into TM2x·alloc_header_heap_construct(&a0 ,0 ,byte_n_of(uint32_t) ,&&nominal_0 ,&&fail_0 ,&&fail_0);
   nominal_0:{
     f[i] = true;
     continue_from end_0;
@@ -305,16 +305,16 @@ Result·Tallies test_2(){
   TM2xHd·apply_to_each(a0 ,hd ,byte_n_of(uint32_t) ," " ,TM2xHd·f_print_int);
   fputc('\n' ,stderr);
 
-  TM2x·dealloc_heap(a0);
+  TM2x·dealloc_header_heap(a0);
   f[i++] = malloc_cnt == MallocCounter·count;
-  f[i++] = constructed_cnt == TM2x·constructed_count;
+  f[i++] = constructed_cnt == TM2x·alloc_array_count;
   Result·Tallies·tally("test_2" ,rp ,f ,i);
   return r;
 }
 
 Result·Tallies test_3(){
   address_t malloc_cnt = MallocCounter·count;
-  address_t constructed_cnt = TM2x·constructed_count;
+  address_t constructed_cnt = TM2x·alloc_array_count;
   Result·Tallies r ,*rp; rp = &r;
   Result·Tallies·init(rp);
   bool f[256];
@@ -518,7 +518,7 @@ Result·Tallies test_3(){
       TM2xHd·rewind(a3 ,hd);
       TM2xHd·apply_to_each(a3 ,hd ,byte_n_of(uint) ," " ,TM2xHd·f_print_int);
       fputc('\n' ,stderr);
-      TM2x·destruct(a3);
+      TM2x·dealloc_array(a3);
       continue_from end;
     }
 
@@ -537,11 +537,11 @@ Result·Tallies test_3(){
     }
   }
 
-  TM2x·destruct(a0);
-  TM2x·destruct(a1);
-  TM2x·destruct(a2);
+  TM2x·dealloc_array(a0);
+  TM2x·dealloc_array(a1);
+  TM2x·dealloc_array(a2);
   f[i++] = malloc_cnt == MallocCounter·count;
-  f[i++] = constructed_cnt == TM2x·constructed_count;
+  f[i++] = constructed_cnt == TM2x·alloc_array_count;
   Result·Tallies·tally("test_3" ,rp ,f ,i);
   return r;
 }

@@ -412,7 +412,7 @@
   encapsulation.  Later in our document we will meet `Inclusive·mul_ib` again, though
   as a sequence rather than as an encapsulating function.
 
-  The following example is what the `construct_elements` encapsulation might look like in
+  The following example is what the `alloc_array_elements` encapsulation might look like in
   the TM2x library. We make use of two pads.  One for arguments and one for local
   variables.  We often swap these upon entering an encapsulation so that we might more
   easily build the arguments pad for the next sequence.  The P1 macro sets up a pointer
@@ -420,15 +420,15 @@
 
 
   ````
-  encapsulation(construct_elements)
+  encapsulation(alloc_array_elements)
     (
      ContinuationPtr nominal
      ,ContinuationPtr index_gt_n
      ,ContinuationPtr alloc_fail
      ){
-    Sequence scale ,construct_bytes ,local_index_gt_n ,local_nominal ,local_alloc_fail;
+    Sequence scale ,alloc_array_bytes ,local_index_gt_n ,local_nominal ,local_alloc_fail;
     Sequence·swap();
-    P1(p1 ,TM2x·construct_elements ,1);
+    P1(p1 ,TM2x·alloc_array_elements ,1);
 
     tape = p1->tape;
     address_t byte_n;
@@ -440,15 +440,15 @@
       p0->a0 = p1->element_n;
       p0->a1 = p1->element_byte_n;
       p0->rpt = &byte_n;
-      continue Inclusive·mul_ib(&&construct_bytes ,&&local_index_gt_n);
+      continue Inclusive·mul_ib(&&alloc_array_bytes ,&&local_index_gt_n);
       cend;
     };
 
-    cdef(construct_bytes){
-      P0(p0 ,TM2x·construct_bytes ,0);
+    cdef(alloc_array_bytes){
+      P0(p0 ,TM2x·alloc_array_bytes ,0);
       p0->tape       = tape;
       p0->byte_n     = byte_n;
-      continue TM2x·construct_bytes(&&local_nominal ,&&local_alloc_fail);
+      continue TM2x·alloc_array_bytes(&&local_nominal ,&&local_alloc_fail);
       cend;
     };
 
@@ -474,9 +474,9 @@
 
   It is too bad we need the local sequences, `local_index_gt_n`, `local_nominal`, and
   `local_alloc_fail`.  Their sole purpose is to maintain the integrity of the
-  encapsulation.  By having `TM2x·construct_bytes` and `Inclusive·mul_ib` first
+  encapsulation.  By having `TM2x·alloc_array_bytes` and `Inclusive·mul_ib` first
   continue locally we assure that the stack frame gets popped.  If we did not need to pop
-  the stack frame, `TM2x·construct_bytes` and `Inclusive·mul_ib` could continue directly to
+  the stack frame, `TM2x·alloc_array_bytes` and `Inclusive·mul_ib` could continue directly to
   `index_gt_n`, `nominal`, and `alloc_fail`.
 
 
@@ -498,11 +498,11 @@
       p0->a0 = p1->element_n;
       p0->a1 = p1->element_byte_n;
       p0->rpt = &cx->byte_n;
-      p0->nominal = &&construct_bytes;
+      p0->nominal = &&alloc_array_bytes;
       p0->gt_address_t_n = p1->index_gt_n;
       continue Inclusive·mul_ib;
 
-      cdef(construct_bytes){
+      cdef(alloc_array_bytes){
         leave_to nominal;
         cend;
       };
@@ -539,10 +539,10 @@
   class variable despite our request to make it a register.
 
   Assuming that by some miracle things went well `Inclusive·mul_ib` then continues to either
-  `construct_bytes` or to `p1->index_gt_n`.
+  `alloc_array_bytes` or to `p1->index_gt_n`.
 
-  The sequence `construct_bytes` was defined in the lexical scope for `f`.  Hence
-  continueing to it will restore order to the universe.  `construct_bytes` then returns
+  The sequence `alloc_array_bytes` was defined in the lexical scope for `f`.  Hence
+  continueing to it will restore order to the universe.  `alloc_array_bytes` then returns
   from the function via `leave_to nominal`.
 
   Had we instead continueed `p1->index_gt_n`, the stack to code correspondence would
@@ -620,28 +620,28 @@
   that we might not ever reach c3 it is unclear as to how we can guarantee that the
   context gets deallocated.
 
-  Here is a concrete example of this pattern. Here `TM2x·construct_elements` corresponds to c1.
-  `Inclusive·mul_ib` corresponds to c2, and `construct_bytes` corresponds to c3.
-  `TM2x·construct_elements` is an encapsulating sequence. `construct_bytes` is local
+  Here is a concrete example of this pattern. Here `TM2x·alloc_array_elements` corresponds to c1.
+  `Inclusive·mul_ib` corresponds to c2, and `alloc_array_bytes` corresponds to c3.
+  `TM2x·alloc_array_elements` is an encapsulating sequence. `alloc_array_bytes` is local
   sequence, and `Inclusive·mul_ib` is a general purpose sequence.  
 
-  Note that execution flow from in `TM2x·construct_elements` never reaches
-  `construct_bytes`, rather we reach the end of dynamic scope for
-  `TM2x·construct_elements` when it continues to `Inclusive·mul_ib`, yet the static scope
-  continues to the closing bracket, so `construct_bytes` is defined within the lexical
-  scope of of `TM2x·construct_elements`.  What this accomplishes for us is to make the
-  `construct_bytes` entry point viewable to only `TM2x·construct_elements`.
-  `TM2x·construct_elements` then uses its ability to see this entry point to give a value
+  Note that execution flow from in `TM2x·alloc_array_elements` never reaches
+  `alloc_array_bytes`, rather we reach the end of dynamic scope for
+  `TM2x·alloc_array_elements` when it continues to `Inclusive·mul_ib`, yet the static scope
+  continues to the closing bracket, so `alloc_array_bytes` is defined within the lexical
+  scope of of `TM2x·alloc_array_elements`.  What this accomplishes for us is to make the
+  `alloc_array_bytes` entry point viewable to only `TM2x·alloc_array_elements`.
+  `TM2x·alloc_array_elements` then uses its ability to see this entry point to give a value
   to the `Inclusive·mul_ib`'s `nominal` sequence argument.
 
 ````
-    cdef(TM2x·construct_elements){
-      Sequence construct_bytes;
+    cdef(TM2x·alloc_array_elements){
+      Sequence alloc_array_bytes;
       Sequence·swap();
-      P1(p1 ,TM2x·construct_elements ,1);
+      P1(p1 ,TM2x·alloc_array_elements ,1);
 
       // CX is a macro that points `cx` at a context pad and gives it type
-      CX(cx ,TM2x0 ,construct_elements);
+      CX(cx ,TM2x0 ,alloc_array_elements);
       cx->tape       = p1->tape;
       cx->nominal    = p1->nominal;
       cx->alloc_fail = p1->alloc_fail;
@@ -651,17 +651,17 @@
       p0->a0 = p1->element_n;
       p0->a1 = p1->element_byte_n;
       p0->rpt = &cx->byte_n;
-      p0->nominal = &&construct_bytes;
+      p0->nominal = &&alloc_array_bytes;
       p0->gt_address_t_n = p1->index_gt_n;
       continue Inclusive·mul_ib;
 
-      cdef(construct_bytes){
-        P0(p0 ,TM2x·construct_bytes ,0);
+      cdef(alloc_array_bytes){
+        P0(p0 ,TM2x·alloc_array_bytes ,0);
         p0->tape       = cx->tape;
         p0->byte_n     = cx->byte_n;
         p0->nominal    = cx->nominal;
         p0->alloc_fail = cx->alloc_fail;
-        continue TM2x·construct_bytes;
+        continue TM2x·alloc_array_bytes;
         cend;
       };
 
@@ -671,7 +671,7 @@
 
   In this example we use pads for sending arguments.  By convention arguments are always placed
   on `p0`, while `p1` is used as a scratch pad. The swap statement swaps the `p0` and the
-  `p1` pads; hence after the swap `TM2x·construct_elements`'s arguments are found on the `p1`
+  `p1` pads; hence after the swap `TM2x·alloc_array_elements`'s arguments are found on the `p1`
   pad.  This swapping is reminiscent of D flip-flops in hardware.  It registers our inputs to
   a place they will not be overwritten while we set up the inputs for the next
   computation.
@@ -682,7 +682,7 @@
 
   After setting up the `p0` pad, this code continues to general purpose sequence
   `Inclusive·mul_ib`, which has its `nominal` sequence argument set to
-  `construct_bytes`.  Note that its `gt_address_t_n` sequence argument has been set to
+  `alloc_array_bytes`.  Note that its `gt_address_t_n` sequence argument has been set to
   go elsewhere.
 
   So we have an open question. How does the context get deallocated?

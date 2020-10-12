@@ -1,10 +1,10 @@
 /*
-  mul_ib = mul inclusive bounds.
+  mul_ext = mul inclusive bounds.
 
   gives the product of two extent values.
 
   When an is the extent of a region measured in elements, and bn is the
-  extent of an element in bytes, then mul_ib is will the extent of the
+  extent of an element in bytes, then mul_ext is will the extent of the
   region in bytes.
 
     (an + 1) (bn + 1) -1
@@ -35,7 +35,7 @@ overflow?
     yikes, but we just make it ( 2^n * 2^n - 1 leads to the result more directly)
 
 */
-  SQ·def(Inclusive·mul_ib){
+  SQ·def(Inclusive·mul_ext){
 
     Inclusive·3opLL·Lnk *lnk = (Inclusive·3opLL·Lnk *)SQ·lnk;
     register uint128_t t = *lnk->args->a_0 * *lnk->args->a_1 + *lnk->args->a_0 + *lnk->args->a_1;
@@ -45,11 +45,11 @@ overflow?
     *lnk->ress->r = t;
     SQ·continue_indirect(lnk->lnks->nominal);
 
-  } SQ·end(Inclusive·mul_ib);
+  } SQ·end(Inclusive·mul_ext);
 
 
 /*
-  mul_ei_bi  convert element index to a byte index
+  mul_idx  convert element index to a byte index
 
   Given a0 element index a0d the extent of elements in bytes, computes the byte index.
 
@@ -60,11 +60,11 @@ overflow?
         a0 = 1,  a1 = 3   --> 4
         a0 = 2,  a1 = 3   --> 8
 
-   smaller than mul_ib so no ov possible, also
+   smaller than mul_ext so no ov possible, also
    (2^n - 1) * (2^n) = 2^2n - 2^n ; 2^n >= 1, so no ov possible
 
 */
-  SQ·def(Inclusive·mul_ei_bi){
+  SQ·def(Inclusive·mul_idx){
 
     Inclusive·3opLL·Lnk *lnk = (Inclusive·3opLL·Lnk *)SQ·lnk;
     uint128_t t = *lnk->args->a_0 * *lnk->args->a_1 + *lnk->args->a_0;
@@ -74,4 +74,4 @@ overflow?
     *lnk->ress->r = t;
     SQ·continue_indirect(lnk->lnks->nominal);
 
-  } SQ·end(Inclusive·mul_ei_bi);
+  } SQ·end(Inclusive·mul_idx);
