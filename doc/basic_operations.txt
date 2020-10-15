@@ -1,0 +1,17 @@
+
+A. Typically we use a non destructive programming approach when modifying the structure of a
+tape:
+
+  1. create a new destination tape of the correct length
+  2. copy elements from possibly multiple source to the destination tape.
+
+if desired, 
+  3. copy the destination header to the source header
+  4. deallocate the destination header
+
+In step 2, the copy may chose any elements and put them anywhere on the destination tape.
+Hence, insertions and deletions may be done.
+
+B. If the operation can be performed on a single tape, so a destination tape and the allocation
+for the destination is not needed, then the one tape may be modified.  If resize is needed,
+then we make use of a temporary tape as in A.

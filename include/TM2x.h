@@ -50,16 +50,17 @@
   INLINE_PREFIX void *TM2x·element_n_pt(TM2x·Tape*tm2x ,address_t element_byte_n){
     return TM2x·byte_n_pt(tm2x) - element_byte_n;
   }
+
   #define TM2x·Element_N_Pt(tm2x ,type) TM2x·element_n_pt(tm2x ,byte_n_of(type))
 
 
 //--------------------------------------------------------------------------------
 // allocation
 //
-  #define MINIMUM_ALLOC_EXTENT 15
+  #define MINIMUM_ALLOC_N power_2_extent(15)
 
-  INLINE_PREFIX address_t power_2_extent_w_lower_bound(address_t byte_n){
-    if( byte_n < MINIMUM_ALLOC_EXTENT) return MINIMUM_ALLOC_EXTENT;
+  INLINE_PREFIX address_t alloc_n(address_t byte_n){
+    if( byte_n <= MINIMUM_ALLOC_N) return MINIMUM_ALLOC_N;
     return power_2_extent(byte_n);
   }
 

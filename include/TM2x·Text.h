@@ -40,7 +40,7 @@ address_t TM2x·alloc_array_count = 0;
 
     // local result tableau (stack base allocated, like everything else)
     //
-      address_t alloc_byte_n = power_2_extent_w_lower_bound(*lnk->args->byte_n);
+      address_t alloc_byte_n = alloc_n(*lnk->args->byte_n);
 
       CLib·Mallocn·Args m_args;
       CLib·Mallocn·Ress m_ress;
@@ -267,8 +267,8 @@ SQ·def(resize_bytes){
   SequencePtr nominal = Args.TM2x·resize_bytes.nominal;
   SequencePtr alloc_fail = Args.TM2x·resize_bytes.alloc_fail;
 
-  address_t before_alloc_n = power_2_extent_w_lower_bound(tm2x->byte_n);
-  address_t after_alloc_n = power_2_extent_w_lower_bound(after_byte_n);
+  address_t before_alloc_n = alloc_n(tm2x->byte_n);
+  address_t after_alloc_n = alloc_n(after_byte_n);
 
   if( after_alloc_n == before_alloc_n ){
     tm2x->byte_n = after_byte_n;
@@ -423,8 +423,8 @@ SQ·def(resize_bytes){
   SequencePtr nominal = Args.TM2x·resize_bytes.nominal;
   SequencePtr alloc_fail = Args.TM2x·resize_bytes.alloc_fail;
 
-  address_t before_alloc_n = power_2_extent_w_lower_bound(tm2x->byte_n);
-  address_t after_alloc_n = power_2_extent_w_lower_bound(after_byte_n);
+  address_t before_alloc_n = alloc_n(tm2x->byte_n);
+  address_t after_alloc_n = alloc_n(after_byte_n);
 
   if( after_alloc_n == before_alloc_n ){
     tm2x->byte_n = after_byte_n;
