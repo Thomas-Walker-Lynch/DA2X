@@ -8,7 +8,7 @@ we are writing the dst tape.
 
 */
 TM2x·write_bytes:{
-          TM2x *dst             = TM2x·write_bytes·args.dst          
+          TM2x·Tape*dst             = TM2x·write_bytes·args.dst          
      address_t  dst_byte_i      = TM2x·write_bytes·args.dst_byte_i   
           void *src_pt          = TM2x·write_bytes·args.src_pt       
      address_t  byte_n          = TM2x·write_bytes·args.byte_n       

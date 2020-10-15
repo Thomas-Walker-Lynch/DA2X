@@ -21,13 +21,13 @@ we may create a tape machine header that points to the C array, and then do the 
     // the source machine
     //
       char cs[] = {'h' ,'e' ,'l' ,'l' ,'o'};
-      TM2x src = { .base_pt = cs ,.byte_n = 4};
+      TM2x·Tape src = { .base_pt = cs ,.byte_n = 4};
 
     // ----------------------------------------
     // result tableau
     //
       address_t byte_n = 4;  // input constant
-      TM2x *dst;             // result of alloc_header_heap, it gets distributed
+      TM2x·Tape *dst;             // result of alloc_header_heap, it gets distributed
       address_t offset = 0;  // input constant
 
     // ----------------------------------------
@@ -49,12 +49,12 @@ we may create a tape machine header that points to the C array, and then do the 
       cb_lnk.lnks = &cb_lnks;
       cb_lnk.sequence = &&TM2x·alloc_array_bytes;
 
-      TM2x·CopyBytes·Args cpb_args;
-      TM2x·CopyBytes·Lnks cpb_lnks;
-      TM2x·CopyBytes·Lnk  cpb_lnk;
+      TM2x·CopyContiguousBytes·Args cpb_args;
+      TM2x·CopyContiguousBytes·Lnks cpb_lnks;
+      TM2x·CopyContiguousBytes·Lnk  cpb_lnk;
       cpb_lnk.args = &cpb_args;
       cpb_lnk.lnks = &cpb_lnks;
-      cpb_lnk.sequence = &&TM2x·copy_bytes;
+      cpb_lnk.sequence = &&TM2x·copy_contiguous_bytes;
 
       TM2x·DeallocArray·Args       da_args;
       TM2x·DeallocArray·Lnks       da_lnks;
@@ -63,9 +63,9 @@ we may create a tape machine header that points to the C array, and then do the 
       da_lnk.lnks = &da_lnks;
       da_lnk.sequence = &&TM2x·dealloc_array;
 
-      TM2x·DeallocHeap·Args    dh_args;
-      TM2x·DeallocHeap·Lnks    dh_lnks;
-      TM2x·DeallocHeap·Lnk     dh_lnk;
+      TM2x·DeallocHeaderHeap·Args    dh_args;
+      TM2x·DeallocHeaderHeap·Lnks    dh_lnks;
+      TM2x·DeallocHeaderHeap·Lnk     dh_lnk;
       dh_lnk.args = &dh_args;
       dh_lnk.lnks = &dh_lnks;
       dh_lnk.sequence = &&TM2x·dealloc_header_heap;

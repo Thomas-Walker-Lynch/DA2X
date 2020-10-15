@@ -1,6 +1,6 @@
 
 struct{
-   TM2x *tape;
+   TM2x·Tape*tape;
    address_t element_byte_n;
    continuation nominal;
    continuation pop_last;

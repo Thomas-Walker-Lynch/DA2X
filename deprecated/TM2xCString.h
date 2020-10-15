@@ -6,7 +6,7 @@
 // iniitialize the character array from a cstring
 //
   TM2x·F_PREFIX continuation TM2x·construct_write_cstring
-  ( TM2x *tape 
+  ( TM2x·Tape*tape 
     ,char *pt
     ,continuation nominal
     ,continuation null_pt

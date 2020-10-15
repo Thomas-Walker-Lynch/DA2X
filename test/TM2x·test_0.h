@@ -1,5 +1,5 @@
 /*
-Allocates a TM2x header struct on the heap.  Constructs an array.  Destructs the array.
+Allocates a TM2x·Tapeheader struct on the heap.  Constructs an array.  Destructs the array.
 Deallocates the header.
 
 
@@ -22,7 +22,7 @@ Deallocates the header.
     // result tableau
     //
       address_t byte_n = 9;
-      TM2x *tm2x; // set by alloc_header_heap, then distributed
+      TM2x·Tape*tm2x; // set by alloc_header_heap, then distributed
 
     // ----------------------------------------
     // Links
@@ -50,9 +50,9 @@ Deallocates the header.
       da_lnk.lnks = &da_lnks;
       da_lnk.sequence = &&TM2x·dealloc_array;
 
-      TM2x·DeallocHeap·Args    dh_args;
-      TM2x·DeallocHeap·Lnks    dh_lnks;
-      TM2x·DeallocHeap·Lnk     dh_lnk;
+      TM2x·DeallocHeaderHeap·Args    dh_args;
+      TM2x·DeallocHeaderHeap·Lnks    dh_lnks;
+      TM2x·DeallocHeaderHeap·Lnk     dh_lnk;
       dh_lnk.args = &dh_args;
       dh_lnk.lnks = &dh_lnks;
       dh_lnk.sequence = &&TM2x·dealloc_header_heap;

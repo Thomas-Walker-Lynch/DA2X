@@ -413,7 +413,7 @@
   as a sequence rather than as an encapsulating function.
 
   The following example is what the `alloc_array_elements` encapsulation might look like in
-  the TM2x library. We make use of two pads.  One for arguments and one for local
+  the TM2x·Tapelibrary. We make use of two pads.  One for arguments and one for local
   variables.  We often swap these upon entering an encapsulation so that we might more
   easily build the arguments pad for the next sequence.  The P1 macro sets up a pointer
   to point to this second pad.
@@ -804,7 +804,7 @@
    structures we are willing to analyze.
 
    Hence, context pads can be a solution to statically analyzable code structures, but
-   it is not a general solution. Our TM2x library is pretty easy to analyze, and given
+   it is not a general solution. Our TM2x·Tapelibrary is pretty easy to analyze, and given
    the efficiency of context pads, I will probably use them there.
 
 ### Context stack
@@ -862,7 +862,7 @@
    execution. This approach would require even more memory than dedicating a context pad
    to each sequence.  It would also be unusual to do such a thing when we are not
    synchronizing data between separate threads of execution. It is a too heavy of a
-   solution for something like our TM2x library.
+   solution for something like our TM2x·Tapelibrary.
 
    We will also need some means of allocating and deallocating messages. If explicit
    deallocation is required, c3 cannot be solely responsible for deallocating the message
@@ -936,15 +936,15 @@
         p0->a0             = cx->dst_element_i;
         p0->a1             = cx->element_byte_n;
         p0->rpt            = &cx->dst_byte_i;
-        p0->nominal        = &&copy_bytes;
+        p0->nominal        = &&copy_contiguous_bytes;
         p0->gt_address_t_n = pop(byte_n_of(struct c0 ,cx->dst_index_gt_n);   // goes elsewhere
         continue Inclusive·mul_idx;
         cend;
       }
 
       // c4
-      cdef(copy_bytes){
-        P0(p0 ,TM2x·construct_copy_bytes ,0);
+      cdef(copy_contiguous_bytes){
+        P0(p0 ,TM2x·construct_copy_contiguous_bytes ,0);
         p0->src             = cx->src;
         p0->src_byte_i      = cx->src_byte_i;
         p0->dst             = cx->dst;
@@ -953,7 +953,7 @@
         p0->nominal         = pop(byte_n_of(struct c0 ,cx->nominal);         // goes elsewhere
         p0->src_index_gt_n  = pop(byte_n_of(struct c0 ,cx->src_index_gt_n);  // goes elsewhere
         p0->dst_index_gt_n  = pop(byte_n_of(struct c0 ,cx->dst_index_gt_n);  // goes elsewhere
-        continue TM2x·copy_bytes;
+        continue TM2x·copy_contiguous_bytes;
         cend;
       }
 
@@ -1037,15 +1037,15 @@ stack push and pop.
         p0->a0             = cx->dst_element_i;
         p0->a1             = cx->element_byte_n;
         p0->rpt            = &cx->dst_byte_i;
-        p0->nominal        = &&copy_bytes;
+        p0->nominal        = &&copy_contiguous_bytes;
         p0->gt_address_t_n = cx_dealloc(byte_n_of(struct c0) ,cx->dst_index_gt_n);   // goes elsewhere
         continue Inclusive·mul_idx;
         cend;
       }
 
       // c4
-      cdef(copy_bytes){
-        P0(p0 ,TM2x·construct_copy_bytes ,0);
+      cdef(copy_contiguous_bytes){
+        P0(p0 ,TM2x·construct_copy_contiguous_bytes ,0);
         p0->src             = cx->src;
         p0->src_byte_i      = cx->src_byte_i;
         p0->dst             = cx->dst;
@@ -1054,7 +1054,7 @@ stack push and pop.
         p0->nominal         = cx_dealloc(byte_n_of(struct c0) ,cx->nominal);         // goes elsewhere
         p0->src_index_gt_n  = cx_dealloc(byte_n_of(struct c0) ,cx->src_index_gt_n);  // goes elsewhere
         p0->dst_index_gt_n  = cx_dealloc(byte_n_of(struct c0) ,cx->dst_index_gt_n);  // goes elsewhere
-        continue TM2x·copy_bytes;
+        continue TM2x·copy_contiguous_bytes;
         cend;
       }
 
@@ -1120,7 +1120,7 @@ frame.  As we plan to initially place all the sequences in main(), this will
 be stack base allocated.
 
 ````
-  struct CopyElements·Tableau{
+  struct CopyContiguousElements·Tableau{
 
     struct{
       struct Inclusive·Args·3opLL0 args;
@@ -1138,15 +1138,15 @@ be stack base allocated.
     } mul_ei_bi_1;
 
     struct{
-      struct TM2x·Args·copy_bytes0 args;
-      struct TM2x·Cons·copy_bytes cons;
-    } copy_bytes_0;
+      struct TM2x·Args·copy_contiguous_bytes0 args;
+      struct TM2x·Cons·copy_contiguous_bytes cons;
+    } copy_contiguous_bytes_0;
 
-  } CopyElements·tableau;
+  } CopyContiguousElements·tableau;
 ````
 
-The above is the tableau for the copy_elements sequence.  Each field is dedicated to
-each sequence that may be called while performing the copy_elements operation.
+The above is the tableau for the copy_contiguous_elements sequence.  Each field is dedicated to
+each sequence that may be called while performing the copy_contiguous_elements operation.
 
 The tableau will then be used as a sort of chalkboard during run time. When a sequence
 dereferences a result argument, and writes a result, that result will be written into an
@@ -1163,12 +1163,12 @@ be done even before the program runs.
 
 
 ````
-#define CopyElements·tableau
+#define CopyContiguousElements·tableau
 void copy_element_init(){ 
   // results
-  t.mul_ib_0.args.rpt    = &t.copy_bytes_0.args.byte_n;
-  t.mul_ei_bi_0.args.rpt = &t.copy_bytes_0.args.src_byte_i;
-  t.mul_ei_bi_1.args.rpt = &t.copy_bytes_0.args.copy_bytes_0.dst_byte_i;
+  t.mul_ib_0.args.rpt    = &t.copy_contiguous_bytes_0.args.byte_n;
+  t.mul_ei_bi_0.args.rpt = &t.copy_contiguous_bytes_0.args.src_byte_i;
+  t.mul_ei_bi_1.args.rpt = &t.copy_contiguous_bytes_0.args.copy_contiguous_bytes_0.dst_byte_i;
 
   // connectors
   t.mul_ib_0.cons.nominal= (Connector) 
@@ -1176,18 +1176,18 @@ void copy_element_init(){
       ,.connections = &t.mul_ei_bi_0.cons
       ,.args = &t.mul_ei_bi_0.args
     }
-  t.mul_ib_0.cons.gt_address_t_n = (struct TM2x·Cons·copy_elements)(current->cons)->gt_address_t_n;
+  t.mul_ib_0.cons.gt_address_t_n = (struct TM2x·Cons·copy_contiguous_elements)(current->cons)->gt_address_t_n;
 
   t.mul_ib_1.cons.nominal= (Connector) 
     { .entry = &&Inclusive·mul_idx 
       ,.connections = &t.mul_ei_bi_1.cons
       ,.args = &t.mul_ei_bi_1.args
     }
-  t.mul_ib_1.cons.gt_address_t_n = (struct TM2x·Cons·copy_elements)(current->cons)->gt_address_t_n;
+  t.mul_ib_1.cons.gt_address_t_n = (struct TM2x·Cons·copy_contiguous_elements)(current->cons)->gt_address_t_n;
 
-  t.copy_bytes_0.cons.mominal = current.connections.nominal;
-  t.copy_bytes_0.cons.src_index_gt_n = current.connections->src_index_gt_n;
-  t.copy_bytes_0.cons.src_index_gt_n = current.connections->src_index_gt_n;
+  t.copy_contiguous_bytes_0.cons.mominal = current.connections.nominal;
+  t.copy_contiguous_bytes_0.cons.src_index_gt_n = current.connections->src_index_gt_n;
+  t.copy_contiguous_bytes_0.cons.src_index_gt_n = current.connections->src_index_gt_n;
 }
 ````
 
@@ -1203,9 +1203,9 @@ own context. The parent's context will be in the grandparent's tableau.
 
 
 ````
-  struct CopyElements·Tableau{
+  struct CopyContiguousElements·Tableau{
 
-    struct CopyElements·Context *this_context; // context is found in the grand parent tableau at this point
+    struct CopyContiguousElements·Context *this_context; // context is found in the grand parent tableau at this point
 
     struct MulIb0·Context{
       struct Inclusive·Args·3opLL0 args;
@@ -1222,12 +1222,12 @@ own context. The parent's context will be in the grandparent's tableau.
       struct Inclusive·Cons·3opLL cons;
     } mul_ei_bi_1;
 
-    struct CopyBytes0·Context{
-      struct TM2x·Args·copy_bytes0 args;
-      struct TM2x·Cons·copy_bytes cons;
-    } copy_bytes_0;
+    struct CopyContiguousBytes0·Context{
+      struct TM2x·Args·copy_contiguous_bytes0 args;
+      struct TM2x·Cons·copy_contiguous_bytes cons;
+    } copy_contiguous_bytes_0;
 
-  } CopyElements·tableau;
+  } CopyContiguousElements·tableau;
 ````
 
 For a dedicated sequence there will only be one grandparent.  However for a

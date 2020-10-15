@@ -1,7 +1,7 @@
 
   
 struct{
-  TM2x *tape;
+  TM2x·Tape*tape;
   address_t index;
   address_t element_n;
   address_t element_byte_n;

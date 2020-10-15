@@ -9,7 +9,7 @@ Our attention is focused on the tape, so we call this a 'read' operation.
 */
   
 TM2x·index·read:{
-  TM2x *tape                = TM2x·index·read·args.tape;              
+  TM2x·Tape*tape                = TM2x·index·read·args.tape;              
   address_t index           = TM2x·index·read·args.index;         
   address_t element_n       = TM2x·index·read·args.element_byte_n;
   address_t element_byte_n  = TM2x·index·read·args.element_byte_n;

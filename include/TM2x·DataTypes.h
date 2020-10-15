@@ -2,7 +2,7 @@
   typedef struct{
   } TM2x·AllocHeaderHeap·Args;
   typedef struct{
-    TM2x **tm2x;
+    TM2x·Tape**tm2x;
   } TM2x·AllocHeaderHeap·Ress;
   typedef struct{
     SQ·Lnk nominal;
@@ -17,7 +17,7 @@
 
 
   typedef struct{
-    TM2x *tm2x;
+    TM2x·Tape*tm2x;
     address_t *byte_n;   // extent of the array, in bytes
   } TM2x·AllocArrayBytes·Args;
   typedef struct{
@@ -35,7 +35,7 @@
 
 
   typedef struct{
-    TM2x *tm2x;
+    TM2x·Tape*tm2x;
     address_t *element_n;  // extent of the array, in elements
     address_t *element_byte_n; // extent of the element, in bytes
   } TM2x·AllocArrayElements·Args;
@@ -55,7 +55,7 @@
 
 
   typedef struct{
-    TM2x *tm2x;
+    TM2x·Tape*tm2x;
   } TM2x·DeallocArray·Args;
   typedef struct{
   } TM2x·DeallocArray·Ress;
@@ -71,177 +71,87 @@
 
 
   typedef struct{
-    TM2x *tm2x;
-  } TM2x·DeallocHeap·Args;
+    TM2x·Tape*tm2x;
+  } TM2x·DeallocHeaderHeap·Args;
   typedef struct{
-  } TM2x·DeallocHeap·Ress;
+  } TM2x·DeallocHeaderHeap·Ress;
   typedef struct{
     SQ·Lnk nominal;
-  } TM2x·DeallocHeap·Lnks;
+  } TM2x·DeallocHeaderHeap·Lnks;
   typedef struct{
     SQ·Ptr sequence;
-    TM2x·DeallocHeap·Args *args;
-    TM2x·DeallocHeap·Ress *ress;
-    TM2x·DeallocHeap·Lnks *lnks;
-  } TM2x·DeallocHeap·Lnk;
+    TM2x·DeallocHeaderHeap·Args *args;
+    TM2x·DeallocHeaderHeap·Ress *ress;
+    TM2x·DeallocHeaderHeap·Lnks *lnks;
+  } TM2x·DeallocHeaderHeap·Lnk;
 
 
   typedef struct{
-         TM2x *src;
+         TM2x·Tape*src;
+         TM2x·Tape*dst;
+  } TM2x·CopyHeader·Args;
+  typedef struct{
+  } TM2x·CopyHeader·Ress;
+  typedef struct{
+    SQ·Lnk nominal;
+  } TM2x·CopyHeader·Lnks;
+  typedef struct{
+    SQ·Ptr sequence;
+    TM2x·CopyHeader·Args *args;
+    TM2x·CopyHeader·Ress *ress;
+    TM2x·CopyHeader·Lnks *lnks;
+  } TM2x·CopyHeader·Lnk;
+
+
+
+  typedef struct{
+         TM2x·Tape*src;
     address_t *src_byte_0;
-         TM2x *dst;
+         TM2x·Tape*dst;
     address_t *dst_byte_0;
     address_t *byte_n;
-  } TM2x·CopyBytes·Args;
+  } TM2x·CopyContiguousBytes·Args;
   typedef struct{
-  } TM2x·CopyBytes·Ress;
+  } TM2x·CopyContiguousBytes·Ress;
   typedef struct{
     SQ·Lnk nominal;
     SQ·Lnk src_index_gt_n;
     SQ·Lnk dst_index_gt_n;
-  } TM2x·CopyBytes·Lnks;
+  } TM2x·CopyContiguousBytes·Lnks;
   typedef struct{
     SQ·Ptr sequence;
-    TM2x·CopyBytes·Args *args;
-    TM2x·CopyBytes·Ress *ress;
-    TM2x·CopyBytes·Lnks *lnks;
-  } TM2x·CopyBytes·Lnk;
+    TM2x·CopyContiguousBytes·Args *args;
+    TM2x·CopyContiguousBytes·Ress *ress;
+    TM2x·CopyContiguousBytes·Lnks *lnks;
+  } TM2x·CopyContiguousBytes·Lnk;
 
 
   typedef struct{
-         TM2x *src;
+         TM2x·Tape*src;
     address_t *src_element_0;
-         TM2x *dst;
+         TM2x·Tape*dst;
     address_t *dst_element_0;
     address_t *element_n;
     address_t *element_byte_n;
-  } TM2x·CopyElements·Args;
+  } TM2x·CopyContiguousElements·Args;
   typedef struct{
-  } TM2x·CopyElements·Ress;
+  } TM2x·CopyContiguousElements·Ress;
   typedef struct{
     SQ·Lnk nominal;
     SQ·Lnk src_index_gt_n;
     SQ·Lnk dst_index_gt_n;
-  } TM2x·CopyElements·Lnks;
+  } TM2x·CopyContiguousElements·Lnks;
   typedef struct{
     SQ·Ptr sequence;
-    TM2x·CopyElements·Args *args;
-    TM2x·CopyElements·Ress *ress;
-    TM2x·CopyElements·Lnks *lnks;
-  } TM2x·CopyElements·Lnk;
-
-
+    TM2x·CopyContiguousElements·Args *args;
+    TM2x·CopyContiguousElements·Ress *ress;
+    TM2x·CopyContiguousElements·Lnks *lnks;
+  } TM2x·CopyContiguousElements·Lnk;
 
 #if 0
 
-//--------------------------------------------------------------------------------
-// copy elements
-//
-  typedef struct {
-    TM2x *src;
-    address_t src_element_i;
-    TM2x *dst;
-    address_t dst_element_i;
-    address_t element_n;  // index of nth element of the copy region
-    address_t element_byte_n;
-  } TM2x·CopyElements·Args;
-
-  typedef struct {
-    SQ·Lnk nominal;
-    SQ·Lnk src_index_gt_n;
-    SQ·Lnk dst_index_gt_n;
-  } TM2x·CopyElements·Lnks;
-
-
-
-
-
-
-
-
-
-//--------------------------------------------------------------------------------
-// deprecated
-
-struct TM2x·construct_write_0{
-  TM2x *tape;
-  TM2x *tape_source;
-  SQ·Lnk nominal;
-  SQ·Lnk fail;
-};
-
-struct TM2x·construct_write_bytes_0{
-  TM2x *tape;
-  void *source_pt;
-  address_t byte_n;
-  SQ·Lnk nominal;
-  SQ·Lnk fail;
-};
-
-
-struct TM2x·construct_write_elements_0{
-  TM2x *tape;
-  void *source_pt;
-  address_t element_n;
-  address_t element_byte_n;
-  SQ·Lnk nominal;
-  SQ·Lnk index_gt_n;
-  SQ·Lnk fail;
-
-  address_t byte_n;
-};
-
-struct TM2x·construct_write_TM2x_0{
-  TM2x *tape;
-  TM2x *tape_source;
-  SQ·Lnk nominal;
-  SQ·Lnk fail;
-};
-
-struct TM2x·copy_bytes_0{
-  TM2x *src;
-  address_t src_byte_i;
-  TM2x *dst;
-  address_t dst_byte_i;
-  address_t byte_n;
-  SQ·Lnk nominal;
-  SQ·Lnk src_index_gt_n;
-  SQ·Lnk dst_index_gt_n;
-};
-struct TM2x·copy_bytes_1{
-  uint_128 end_n;
-};
-
-struct TM2x·copy_elements_0{
-  TM2x *src;
-  address_t src_element_i;
-  TM2x *dst;
-  address_t dst_element_i;
-  address_t element_n;  // index of nth element of the copy region
-  address_t element_byte_n;
-  SQ·Lnk nominal;
-  SQ·Lnk src_index_gt_n;
-  SQ·Lnk dst_index_gt_n;
-};
-
-struct TM2x·dealloc_header_heap_0{
-  TM2x *tape;
-  SQ·Lnk nominal;
-};
-
-struct TM2x·dealloc_array_0{
-  TM2x *tape;
-  SQ·Lnk nominal;
-};
-
-struct TM2x·dealloc_array_dealloc_header_heap_0{
-  TM2x *tape;
-  SQ·Lnk nominal;
-};
-
-
 struct TM2x·index·read_0{
-  TM2x *tape;
+  TM2x·Tape*tape;
   address_t index;
   address_t element_n;
   address_t element_byte_n;
@@ -251,7 +161,7 @@ struct TM2x·index·read_0{
 };
 
 struct TM2x·index·to_pt_0{
-  TM2x *tape ;
+  TM2x·Tape*tape ;
   address_t index;
   address_t element_byte_n;
   void **pt;
@@ -260,7 +170,7 @@ struct TM2x·index·to_pt_0{
 };
 
 struct TM2x·pop_0{
-  TM2x *tape;
+  TM2x·Tape*tape;
   address_t element_byte_n;
   SQ·Lnk nominal;
   SQ·Lnk pop_last;
@@ -268,7 +178,7 @@ struct TM2x·pop_0{
 };
 
 struct TM2x·push_0{
-  TM2x *tape;
+  TM2x·Tape*tape;
   void *element_base_pt;
   address_t element_byte_n;
   SQ·Lnk nominal;
@@ -276,7 +186,7 @@ struct TM2x·push_0{
 };
 
 struct TM2x·push_bytes_0{
-  TM2x *tape;
+  TM2x·Tape*tape;
   void *source_pt;
   address_t source_byte_n;
   SQ·Lnk nominal;
@@ -284,7 +194,7 @@ struct TM2x·push_bytes_0{
 };
 
 struct TM2x·push_elements_0{
-  TM2x *tape ;
+  TM2x·Tape*tape ;
   void *base_pt;
   address_t element_n ;
   address_t element_byte_n ;
@@ -294,14 +204,14 @@ struct TM2x·push_elements_0{
 };
 
 struct TM2x·push_TM2x_0{
-  TM2x *tape ;
-  TM2x *tape_source;
+  TM2x·Tape*tape ;
+  TM2x·Tape*tape_source;
   SQ·Lnk nominal;
   SQ·Lnk alloc_fail;
 };
 
 struct TM2x·read_pop_0{
-  TM2x *tape ;
+  TM2x·Tape*tape ;
   void *dst_element_pt ;
   address_t element_byte_n;
   SQ·Lnk nominal;
@@ -310,14 +220,14 @@ struct TM2x·read_pop_0{
 };
 
 struct TM2x·resize_bytes_0{
-  TM2x *tape;
+  TM2x·Tape*tape;
   address_t after_byte_n;
   SQ·Lnk nominal;
   SQ·Lnk alloc_fail;
 };
 
 struct TM2x·resize_elements_0{
-  TM2x *tape;
+  TM2x·Tape*tape;
   address_t after_element_n;
   address_t element_byte_n;
   SQ·Lnk nominal;
@@ -327,7 +237,7 @@ struct TM2x·resize_elements_0{
 
 struct TM2x·write_bytes_0{
   void *src_pt;
-  TM2x *dst;
+  TM2x·Tape*dst;
   address_t dst_byte_i;
   address_t byte_n;
   SQ·Lnk nominal;

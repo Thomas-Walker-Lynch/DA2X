@@ -39,7 +39,7 @@ should be indented
   TM2x·alloc_header_heap:{
     //  #include "CLib·mallocn·args.h"
     #define pt      tape
-    #define n       byte_n_of(TM2x)
+    #define n       byte_n_of(TM2x·Tape)
     #define nominal malloc_nominal
     #define fail    malloc_fail
     #include "CLib·mallocn.h"

@@ -1,7 +1,7 @@
 
 struct{
-  TM2x *tape;
-  TM2x *tape_source;
+  TM2x·Tape*tape;
+  TM2x·Tape*tape_source;
   continuation nominal;
   continuation fail;
 } TM2x·construct_write;

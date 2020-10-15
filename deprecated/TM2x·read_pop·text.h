@@ -1,6 +1,6 @@
 
 TM2x·read_pop:{
-  TM2x *tape                 = TM2x·read_pop·args.TM2x *tape;            
+  TM2x·Tape*tape                 = TM2x·read_pop·args.TM2x·Tape*tape;            
   void *dst_element_pt       = TM2x·read_pop·args.void *dst_element_pt;  
   address_t element_byte_n   = TM2x·read_pop·args.address_t element_byte_n;
   continuation nominal       = TM2x·read_pop·args.continuation nominal;   
