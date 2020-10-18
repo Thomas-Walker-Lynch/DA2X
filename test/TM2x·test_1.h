@@ -27,10 +27,10 @@ the array.
     // ----------------------------------------
     // Links
     //
-      TM2x·AllocHeaderHeap·Args ah_args;
-      TM2x·AllocHeaderHeap·Ress ah_ress;
-      TM2x·AllocHeaderHeap·Lnks ah_lnks;
-      TM2x·AllocHeaderHeap·Lnk  ah_lnk;
+      TM2x·AllocTapeHeap·Args ah_args;
+      TM2x·AllocTapeHeap·Ress ah_ress;
+      TM2x·AllocTapeHeap·Lnks ah_lnks;
+      TM2x·AllocTapeHeap·Lnk  ah_lnk;
       ah_lnk.args = &ah_args;
       ah_lnk.ress = &ah_ress;
       ah_lnk.lnks = &ah_lnks;
@@ -50,9 +50,9 @@ the array.
       da_lnk.lnks = &da_lnks;
       da_lnk.sequence = &&TM2x·dealloc_array;
 
-      TM2x·DeallocHeaderHeap·Args    dh_args;
-      TM2x·DeallocHeaderHeap·Lnks    dh_lnks;
-      TM2x·DeallocHeaderHeap·Lnk     dh_lnk;
+      TM2x·DeallocTapeHeap·Args    dh_args;
+      TM2x·DeallocTapeHeap·Lnks    dh_lnks;
+      TM2x·DeallocTapeHeap·Lnk     dh_lnk;
       dh_lnk.args = &dh_args;
       dh_lnk.lnks = &dh_lnks;
       dh_lnk.sequence = &&TM2x·dealloc_Tape_heap;

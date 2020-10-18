@@ -1,19 +1,19 @@
 
   typedef struct{
-  } TM2x·AllocHeaderHeap·Args;
+  } TM2x·AllocTapeHeap·Args;
   typedef struct{
     TM2x·Tape **tm2x;
-  } TM2x·AllocHeaderHeap·Ress;
+  } TM2x·AllocTapeHeap·Ress;
   typedef struct{
     SQ·Lnk nominal;
     SQ·Lnk fail;
-  } TM2x·AllocHeaderHeap·Lnks;
+  } TM2x·AllocTapeHeap·Lnks;
   typedef struct{
     SQ·Ptr sequence;
-    TM2x·AllocHeaderHeap·Args *args;
-    TM2x·AllocHeaderHeap·Ress *ress;
-    TM2x·AllocHeaderHeap·Lnks *lnks;
-  } TM2x·AllocHeaderHeap·Lnk;
+    TM2x·AllocTapeHeap·Args *args;
+    TM2x·AllocTapeHeap·Ress *ress;
+    TM2x·AllocTapeHeap·Lnks *lnks;
+  } TM2x·AllocTapeHeap·Lnk;
 
 
   typedef struct{
@@ -72,34 +72,34 @@
 
   typedef struct{
     TM2x·Tape *tm2x;
-  } TM2x·DeallocHeaderHeap·Args;
+  } TM2x·DeallocTapeHeap·Args;
   typedef struct{
-  } TM2x·DeallocHeaderHeap·Ress;
+  } TM2x·DeallocTapeHeap·Ress;
   typedef struct{
     SQ·Lnk nominal;
-  } TM2x·DeallocHeaderHeap·Lnks;
+  } TM2x·DeallocTapeHeap·Lnks;
   typedef struct{
     SQ·Ptr sequence;
-    TM2x·DeallocHeaderHeap·Args *args;
-    TM2x·DeallocHeaderHeap·Ress *ress;
-    TM2x·DeallocHeaderHeap·Lnks *lnks;
-  } TM2x·DeallocHeaderHeap·Lnk;
+    TM2x·DeallocTapeHeap·Args *args;
+    TM2x·DeallocTapeHeap·Ress *ress;
+    TM2x·DeallocTapeHeap·Lnks *lnks;
+  } TM2x·DeallocTapeHeap·Lnk;
 
   typedef struct{
          TM2x·Tape *src;
          TM2x·Tape *dst;
-  } TM2x·CopyHeader·Args;
+  } TM2x·CopyTape·Args;
   typedef struct{
-  } TM2x·CopyHeader·Ress;
+  } TM2x·CopyTape·Ress;
   typedef struct{
     SQ·Lnk nominal;
-  } TM2x·CopyHeader·Lnks;
+  } TM2x·CopyTape·Lnks;
   typedef struct{
     SQ·Ptr sequence;
-    TM2x·CopyHeader·Args *args;
-    TM2x·CopyHeader·Ress *ress;
-    TM2x·CopyHeader·Lnks *lnks;
-  } TM2x·CopyHeader·Lnk;
+    TM2x·CopyTape·Args *args;
+    TM2x·CopyTape·Ress *ress;
+    TM2x·CopyTape·Lnks *lnks;
+  } TM2x·CopyTape·Lnk;
 
   typedef struct{
          TM2x·Tape *src;

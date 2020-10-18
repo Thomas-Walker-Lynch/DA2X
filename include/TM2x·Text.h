@@ -10,7 +10,7 @@ address_t TM2x·alloc_array_count = 0;
   // allocate a TM2x·Tape header on the heap
   // See also the TM2x·alloc_Tape_static macro in TM2x.h 
   SQ·def(TM2x·alloc_Tape_heap){
-    TM2x·AllocHeaderHeap·Lnk *lnk = (TM2x·AllocHeaderHeap·Lnk *)SQ·lnk;
+    TM2x·AllocTapeHeap·Lnk *lnk = (TM2x·AllocTapeHeap·Lnk *)SQ·lnk;
 
     CLib·Mallocn·Args m_args;
     CLib·Mallocn·Ress m_ress;
@@ -112,7 +112,7 @@ address_t TM2x·alloc_array_count = 0;
 
   // we are to deallocate the header from the heap
   SQ·def(TM2x·dealloc_Tape_heap){
-    TM2x·DeallocHeaderHeap·Lnk *lnk = (TM2x·DeallocHeaderHeap·Lnk *)SQ·lnk;
+    TM2x·DeallocTapeHeap·Lnk *lnk = (TM2x·DeallocTapeHeap·Lnk *)SQ·lnk;
     free(lnk->args->tm2x);
     SQ·continue_indirect(lnk->lnks->nominal);
   } SQ·end(TM2x·dealloc_Tape_heap);
@@ -143,7 +143,7 @@ address_t TM2x·alloc_array_count = 0;
   // often the opposite.
   SQ·def(TM2x·copy_header){
     // some aliases
-    TM2x·CopyHeader·Lnk *lnk = (TM2x·CopyHeader·Lnk *)SQ·lnk;
+    TM2x·CopyTape·Lnk *lnk = (TM2x·CopyTape·Lnk *)SQ·lnk;
     TM2x·Tape *src = lnk->args->src;
     TM2x·Tape *dst = lnk->args->dst;
 
