@@ -21,7 +21,7 @@ Deallocates the header.
     // ----------------------------------------
     // result tableau
     //
-      address_t byte_n = 9;
+      address_t n = 9;
       TM2x·Tape *tm2x; // set by alloc_Tape_heap, then distributed
 
     // ----------------------------------------
@@ -75,7 +75,7 @@ Deallocates the header.
     // ----------------------------------------
     // seqeuence args point into the tableau
     //
-      cb_args.byte_n = &byte_n;
+      cb_args.n = &n;
 
       // The alloc_Tape_heap result is a pointer to the allocation.  The distribution sequence that
       // follows it distributes this pointer to the parameters of other rourtines. Consequently

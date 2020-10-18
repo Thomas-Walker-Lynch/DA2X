@@ -129,11 +129,11 @@ the 2x in the name.
 
   Here are two examples:
     ```
-          array_byte_n
+          array_n
           array_n_Element_pt
     ```
 
-  Here the variable `array_byte_n` will hold a natural number that is the subscript of the
+  Here the variable `array_n` will hold a natural number that is the subscript of the
   last byte in the array. As the array may expand, this value may be modified.  We call
   this value the 'extent' of the array, here measured in bytes.  Generally the extent of
   an array measured in bytes, plus 1, will be the 'size' or the 'length' of the array.
@@ -158,7 +158,7 @@ the 2x in the name.
    To access the nth byte in the array, the last byte, we write:
 
    ```
-       0_pt[byte_n]
+       0_pt[n]
    ```
 
    And to access the ith element when that element is an 'int':

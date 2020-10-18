@@ -1,9 +1,9 @@
 include/TM2x.h:  // (n_Element + 1) in the denominator must be representable:
 include/TM2x.h:  INLINE_PREFIX address_t TM2x·n_Element(TM2x·Tape *tm2x ,address_t n_Element){
-include/TM2x.h:    return tm2x->byte_n/(n_Element + 1);
+include/TM2x.h:    return tm2x->n/(n_Element + 1);
 include/TM2x.h:  INLINE_PREFIX void *TM2x·n_Element_pt(TM2x·Tape *tm2x ,address_t n_Element){
-include/TM2x.h:    return TM2x·byte_n_pt(tm2x) - n_Element;
-include/TM2x.h:  #define TM2x·Element_N_Pt(tm2x ,type) TM2x·n_Element_pt(tm2x ,byte_n_of(type))
+include/TM2x.h:    return TM2x·n_pt(tm2x) - n_Element;
+include/TM2x.h:  #define TM2x·Element_N_Pt(tm2x ,type) TM2x·n_Element_pt(tm2x ,n_of(type))
 include/TM2x·DataTypes.h:    address_t *n_Element;  // extent of the array, in elements
 include/TM2x·DataTypes.h:    address_t *n_Element; // extent of the element, in bytes
 include/TM2x·DataTypes.h:    address_t *n_Element;

@@ -18,7 +18,7 @@
 
   typedef struct{
     TM2x·Tape *tm2x;
-    address_t *byte_n;   // extent of the array, in bytes
+    address_t *n;   // extent of the array, in bytes
   } TM2x·AllocArray·Args;
   typedef struct{
   } TM2x·AllocArray·Ress;
@@ -106,7 +106,7 @@
     address_t *src_0;
          TM2x·Tape *dst;
     address_t *dst_0;
-    address_t *byte_n;
+    address_t *n;
   } TM2x·CopyContiguous·Args;
   typedef struct{
   } TM2x·CopyContiguous·Ress;
@@ -204,7 +204,7 @@ struct TM2x·push_0{
 struct TM2x·push_bytes_0{
   TM2x·Tape *tape;
   void *source_pt;
-  address_t source_byte_n;
+  address_t source_n;
   SQ·Lnk nominal;
   SQ·Lnk alloc_fail;
 };
@@ -237,7 +237,7 @@ struct TM2x·read_pop_0{
 
 struct TM2x·resize_bytes_0{
   TM2x·Tape *tape;
-  address_t after_byte_n;
+  address_t after_n;
   SQ·Lnk nominal;
   SQ·Lnk alloc_fail;
 };
@@ -255,7 +255,7 @@ struct TM2x·write_bytes_0{
   void *src_pt;
   TM2x·Tape *dst;
   address_t dst_i;
-  address_t byte_n;
+  address_t n;
   SQ·Lnk nominal;
   SQ·Lnk alloc_fail;
   SQ·Lnk src_index_gt_n;

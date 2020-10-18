@@ -76,8 +76,8 @@ kept it around.
 
   There is another thing we can do to flag special cases. Note that if an array takes up
   the whole of memory, then it must be based at `memory_0`. Hence, we could enumerate
-  special states for the array, including that it is empty, by setting `byte_n` in the
-  header struct to `memory_byte_n` and then enumerate alternative states using a non-zero
+  special states for the array, including that it is empty, by setting `n` in the
+  header struct to `memory_n` and then enumerate alternative states using a non-zero
   `base_pt` values. 
 
   However, this approach to an empty flag only works when we assume that memory is finite,

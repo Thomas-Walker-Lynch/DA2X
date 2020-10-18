@@ -39,7 +39,7 @@
     ,SequencePtr is_true  
     ,SequencePtr is_false
     ){
-    if( hd->element_pt <= TM2x·byte_n_pt(tape) && hd->element_pt >= TM2x·0_pt(tape) ) continue_via_trampoline is_true;
+    if( hd->element_pt <= TM2x·n_pt(tape) && hd->element_pt >= TM2x·0_pt(tape) ) continue_via_trampoline is_true;
     continue_via_trampoline is_false;
   }
   TM2xHd·F_PREFIX SequencePtr TM2xHd·at_n_Element
@@ -89,7 +89,7 @@
   TM2xHd·F_PREFIX void TM2xHd·read(TM2xHd *hd ,address_t element_n_Byte ,void *dst_pt){
     memcpyn(dst_pt, hd->element_pt, element_n_Byte);
   }
-  #define TM2xHd·Read(hd ,item) TM2xHd·read(hd ,byte_no_of(type_of(item)) ,&item)
+  #define TM2xHd·Read(hd ,item) TM2xHd·read(hd ,no_of(type_of(item)) ,&item)
   #define TM2xHd·Read_Expr(hd ,type) *((type *)hd->element_pt)
 
   TM2xHd·F_PREFIX void TM2xHd·write(TM2xHd *hd ,address_t element_n_Byte ,void *src_element_pt){
@@ -247,7 +247,7 @@
     }
   }
   #define TM2xHd·Push_Not_Exists(tape_dst ,item ,pred ,wrote_it ,already_on_tape ,allocate_failed) \
-    continue_into TM2xHd·push_not_exists(tape_dst ,&item ,byte_n_of(type_of(item)) ,pred ,wrote_it ,already_on_tape ,allocate_failed)
+    continue_into TM2xHd·push_not_exists(tape_dst ,&item ,n_of(type_of(item)) ,pred ,wrote_it ,already_on_tape ,allocate_failed)
 
   // -accumulates elements from set_src which are not already in set_acc into set_acc.
   // -returns whether set_src was a subset of set_acc even before the union (make this a separate SequencePtr?)

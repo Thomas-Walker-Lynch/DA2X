@@ -29,7 +29,7 @@ Result·Tallies test_0(){
   Result·Tallies r ,*rp; rp = &r;
   Result·Tallies·init(rp);
   TM2x·Tape *a0;
-  continue_into TM2x·alloc_Tape_heap_construct(&a0 ,0 ,byte_n_of(uint32_t) ,&&nominal_0 ,&&fail_0 ,&&fail_0);
+  continue_into TM2x·alloc_Tape_heap_construct(&a0 ,0 ,n_of(uint32_t) ,&&nominal_0 ,&&fail_0 ,&&fail_0);
   nominal_0:{
     f[i] = true;
     continue_from end_0;
@@ -62,7 +62,7 @@ Result·Tallies test_0(){
   c->ref = 10;
   c->result = true;
   TM2xHd·AllocStaticRewind(a0 ,hd);
-  TM2xHd·apply_to_each(a0 ,hd ,byte_n_of(uint32_t) ,c ,TM2xHd·f0);
+  TM2xHd·apply_to_each(a0 ,hd ,n_of(uint32_t) ,c ,TM2xHd·f0);
   f[i++] = c->result;
   f[i++] = c->ref == 100;
 
@@ -148,7 +148,7 @@ Result·Tallies test_1(){
   Result·Tallies r ,*rp; rp = &r;
   Result·Tallies·init(rp);
   TM2x·Tape *a0;
-  continue_into TM2x·alloc_Tape_heap_construct(&a0 ,0 ,byte_n_of(uint32_t) ,&&nominal_0 ,&&fail_0 ,&&fail_0);
+  continue_into TM2x·alloc_Tape_heap_construct(&a0 ,0 ,n_of(uint32_t) ,&&nominal_0 ,&&fail_0 ,&&fail_0);
   nominal_0:{
     f[i] = true;
     continue_from end_0;
@@ -177,7 +177,7 @@ Result·Tallies test_1(){
   }
 
   TM2xHd·AllocStaticRewind(a0 ,hd);
-  continue_into TM2xHd·all(a0 ,hd ,byte_n_of(uint32_t) ,NULL ,TM2xHd·p0 ,&&true_for_all_1 ,&&an_exception_1);
+  continue_into TM2xHd·all(a0 ,hd ,n_of(uint32_t) ,NULL ,TM2xHd·p0 ,&&true_for_all_1 ,&&an_exception_1);
   true_for_all_1:{
     f[i] = true;
     continue_from end_1;
@@ -191,7 +191,7 @@ Result·Tallies test_1(){
   }
 
   TM2xHd·rewind(a0 ,hd);
-  continue_into TM2xHd·all(a0 ,hd ,byte_n_of(uint32_t) ,NULL ,TM2xHd·p1 ,&&true_for_all_2 ,&&an_exception_2);
+  continue_into TM2xHd·all(a0 ,hd ,n_of(uint32_t) ,NULL ,TM2xHd·p1 ,&&true_for_all_2 ,&&an_exception_2);
   true_for_all_2:{
     f[i] = false;
     continue_from end_2;
@@ -205,7 +205,7 @@ Result·Tallies test_1(){
   }
 
   TM2xHd·rewind(a0 ,hd);
-  continue_into TM2xHd·exists(a0 ,hd ,byte_n_of(uint32_t) ,NULL ,TM2xHd·p3 ,&&found_3 ,&&not_found_3);
+  continue_into TM2xHd·exists(a0 ,hd ,n_of(uint32_t) ,NULL ,TM2xHd·p3 ,&&found_3 ,&&not_found_3);
   found_3:{
     f[i] = TM2xHd·Read_Expr(hd ,uint32_t) == 355;
     continue_from end_3;
@@ -219,7 +219,7 @@ Result·Tallies test_1(){
   }
 
   TM2xHd·rewind(a0 ,hd);
-  continue_into TM2xHd·exists(a0 ,hd ,byte_n_of(uint32_t) ,NULL ,TM2xHd·p4 ,&&found_4 ,&&not_found_4);
+  continue_into TM2xHd·exists(a0 ,hd ,n_of(uint32_t) ,NULL ,TM2xHd·p4 ,&&found_4 ,&&not_found_4);
   found_4:{
     f[i] = false;
     continue_from end_4;
@@ -233,7 +233,7 @@ Result·Tallies test_1(){
   }
 
   TM2xHd·AllocStaticRewind(a0 ,hd1);
-  continue_into TM2xHd·exists(a0 ,hd1 ,byte_n_of(uint32_t) ,NULL ,TM2xHd·p2 ,&&found_5 ,&&not_found_5);
+  continue_into TM2xHd·exists(a0 ,hd1 ,n_of(uint32_t) ,NULL ,TM2xHd·p2 ,&&found_5 ,&&not_found_5);
   found_5:{
       uint t0 = TM2xHd·Read_Expr(hd1 ,uint32_t);
       {
@@ -272,7 +272,7 @@ Result·Tallies test_2(){
   uint32_t i = 0;
 
   TM2x·Tape *a0;
-  continue_into TM2x·alloc_Tape_heap_construct(&a0 ,0 ,byte_n_of(uint32_t) ,&&nominal_0 ,&&fail_0 ,&&fail_0);
+  continue_into TM2x·alloc_Tape_heap_construct(&a0 ,0 ,n_of(uint32_t) ,&&nominal_0 ,&&fail_0 ,&&fail_0);
   nominal_0:{
     f[i] = true;
     continue_from end_0;
@@ -302,7 +302,7 @@ Result·Tallies test_2(){
 
   // prints: 
   TM2xHd·AllocStaticRewind(a0 ,hd);
-  TM2xHd·apply_to_each(a0 ,hd ,byte_n_of(uint32_t) ," " ,TM2xHd·f_print_int);
+  TM2xHd·apply_to_each(a0 ,hd ,n_of(uint32_t) ," " ,TM2xHd·f_print_int);
   fputc('\n' ,stderr);
 
   TM2x·dealloc_Tape_heap(a0);
@@ -325,7 +325,7 @@ Result·Tallies test_3(){
   TM2x·AllocStatic(a0);
   {
     continuations nominal ,fail ,end;
-    TM2x·construct_write(a0 ,&j ,byte_n_of(j) ,&&nominal ,&&fail);
+    TM2x·construct_write(a0 ,&j ,n_of(j) ,&&nominal ,&&fail);
     nominal:{
       f[i] = true;
       continue_from end;
@@ -356,7 +356,7 @@ Result·Tallies test_3(){
 
   fprintf(stderr, "a0:");
   TM2xHd·AllocStaticRewind(a0 ,hd);
-  TM2xHd·apply_to_each(a0 ,hd ,byte_n_of(uint) ," " ,TM2xHd·f_print_int);
+  TM2xHd·apply_to_each(a0 ,hd ,n_of(uint) ," " ,TM2xHd·f_print_int);
   fputc('\n' ,stderr);
 
   j=50;
@@ -390,7 +390,7 @@ Result·Tallies test_3(){
 
   fprintf(stderr, "a1:");
   TM2xHd·rewind(a1 ,hd);
-  TM2xHd·apply_to_each(a1 ,hd ,byte_n_of(uint) ," " ,TM2xHd·f_print_int);
+  TM2xHd·apply_to_each(a1 ,hd ,n_of(uint) ," " ,TM2xHd·f_print_int);
   fputc('\n' ,stderr);
 
   j=30;
@@ -465,7 +465,7 @@ Result·Tallies test_3(){
 
   fprintf(stderr, "a2:");
   TM2xHd·rewind(a2 ,hd);
-  TM2xHd·apply_to_each(a2 ,hd ,byte_n_of(uint) ," " ,TM2xHd·f_print_int);
+  TM2xHd·apply_to_each(a2 ,hd ,n_of(uint) ," " ,TM2xHd·f_print_int);
   fputc('\n' ,stderr);
   // add test distinct == false
   TM2x·AllocStatic(a3);
@@ -475,7 +475,7 @@ Result·Tallies test_3(){
       ( a3 
         ,a0 
         ,a1
-        ,byte_n_of(uint) 
+        ,n_of(uint) 
         ,TM2xHd·pred_bytes_eq
         ,&&nominal 
         ,&&empty
@@ -486,7 +486,7 @@ Result·Tallies test_3(){
       f[i++] = true;
       fprintf(stderr, "a3 = intersection a1 a0: ");
       TM2xHd·rewind(a3 ,hd);
-      TM2xHd·apply_to_each(a3 ,hd ,byte_n_of(uint) ," " ,TM2xHd·f_print_int);
+      TM2xHd·apply_to_each(a3 ,hd ,n_of(uint) ," " ,TM2xHd·f_print_int);
       fputc('\n' ,stderr);
       bool subset;
       TM2xHd·AllocStaticRewind(a2 ,a2_hd);
@@ -496,7 +496,7 @@ Result·Tallies test_3(){
           ( a3 
             ,a2 
             ,a2_hd
-            ,byte_n_of(uint) 
+            ,n_of(uint) 
             ,TM2xHd·pred_bytes_eq 
             ,&subset
             ,&&nominal 
@@ -516,7 +516,7 @@ Result·Tallies test_3(){
       }
       fprintf(stderr, "a3 union a2: ");
       TM2xHd·rewind(a3 ,hd);
-      TM2xHd·apply_to_each(a3 ,hd ,byte_n_of(uint) ," " ,TM2xHd·f_print_int);
+      TM2xHd·apply_to_each(a3 ,hd ,n_of(uint) ," " ,TM2xHd·f_print_int);
       fputc('\n' ,stderr);
       TM2x·dealloc_array(a3);
       continue_from end;

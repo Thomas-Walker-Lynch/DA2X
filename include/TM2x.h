@@ -15,7 +15,7 @@
 //   this thread safe.
   typedef struct {
     char *base_pt;
-    address_t byte_n;
+    address_t n;
   } TM2x·Tape ;
 
 //--------------------------------------------------------------------------------
@@ -33,24 +33,24 @@
   }
 
   // max offsets
-  INLINE_PREFIX address_t TM2x·byte_n(TM2x·Tape *tm2x){
-    return tm2x->byte_n;
+  INLINE_PREFIX address_t TM2x·n(TM2x·Tape *tm2x){
+    return tm2x->n;
   }
   // The index of the last element in the array.  Note that the
   // (element_n_Byte + 1) in the denominator must be representable:
   INLINE_PREFIX address_t TM2x·n_Element(TM2x·Tape *tm2x ,address_t element_n_Byte){
-    return tm2x->byte_n/(element_n_Byte + 1);
+    return tm2x->n/(element_n_Byte + 1);
   }
 
   // nth pointers
-  INLINE_PREFIX char *TM2x·byte_n_pt(TM2x·Tape *tm2x){
-    return tm2x->base_pt + tm2x->byte_n;
+  INLINE_PREFIX char *TM2x·n_pt(TM2x·Tape *tm2x){
+    return tm2x->base_pt + tm2x->n;
   }
   INLINE_PREFIX void *TM2x·n_Element_pt(TM2x·Tape *tm2x ,address_t element_n_Byte){
-    return TM2x·byte_n_pt(tm2x) - element_n_Byte;
+    return TM2x·n_pt(tm2x) - element_n_Byte;
   }
 
-  #define TM2x·Element_N_Pt(tm2x ,type) TM2x·n_Element_pt(tm2x ,byte_n_of(type))
+  #define TM2x·Element_N_Pt(tm2x ,type) TM2x·n_Element_pt(tm2x ,n_of(type))
 
 
 //--------------------------------------------------------------------------------
@@ -58,9 +58,9 @@
 //
   #define TM2x·MINIMUM_ALLOC_N power_2_extent(15)
 
-  INLINE_PREFIX address_t TM2x·alloc_n(address_t byte_n){
-    if( byte_n <= TM2x·MINIMUM_ALLOC_N) return TM2x·MINIMUM_ALLOC_N;
-    return power_2_extent(byte_n);
+  INLINE_PREFIX address_t TM2x·alloc_n(address_t n){
+    if( n <= TM2x·MINIMUM_ALLOC_N) return TM2x·MINIMUM_ALLOC_N;
+    return power_2_extent(n);
   }
 
   // tm2x becomes a pointer to a static allocation of a TM2x·Tape struct

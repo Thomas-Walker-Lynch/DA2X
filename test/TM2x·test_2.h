@@ -21,12 +21,12 @@ we may create a tape machine header that points to the C array, and then do the 
     // the source machine
     //
       char cs[] = {'h' ,'e' ,'l' ,'l' ,'o'};
-      TM2x·Tape src = { .base_pt = cs ,.byte_n = 4};
+      TM2x·Tape src = { .base_pt = cs ,.n = 4};
 
     // ----------------------------------------
     // result tableau
     //
-      address_t byte_n = 4;  // input constant
+      address_t n = 4;  // input constant
       TM2x·Tape *dst;             // result of alloc_Tape_heap, it gets distributed
       address_t offset = 0;  // input constant
 
@@ -92,12 +92,12 @@ we may create a tape machine header that points to the C array, and then do the 
     // ----------------------------------------
     // seqeuence args point into the tableau
     //
-      cb_args.byte_n = &byte_n;
+      cb_args.n = &n;
      
       cpb_args.src = &src;
       cpb_args.src_0 = &offset;
       cpb_args.dst_0 = &offset;
-      cpb_args.byte_n = &byte_n;
+      cpb_args.n = &n;
 
       // .dst arguments are assigned in the ah_dist sequence
 

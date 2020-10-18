@@ -17,7 +17,7 @@
   // memory address, i.e. UINT64_MAX.  That is what I have put here.
   #define address_t_n UINT64_MAX
 
-  #define byte_n_of(type) sizeof(type)-1
+  #define n_of(type) sizeof(type)-1
 
   // the n+1 could overflow:
   #define memcpyn(dst ,src ,n) memcpy(dst ,src ,n+1) 
@@ -27,9 +27,9 @@
 
   typedef unsigned __int128 uint128_t;
 
-  INLINE_PREFIX address_t power_2_extent(address_t byte_n){
-    if( byte_n == 0 ) return 1;
-    return (1 << (address_bit_length - __builtin_clz(byte_n))) - 1;
+  INLINE_PREFIX address_t power_2_extent(address_t n){
+    if( n == 0 ) return 1;
+    return (1 << (address_bit_length - __builtin_clz(n))) - 1;
   }
 
 
