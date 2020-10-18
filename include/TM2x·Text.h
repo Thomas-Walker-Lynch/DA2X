@@ -7,7 +7,7 @@ address_t TM2x·alloc_array_count = 0;
 
 */
 
-  // allocate a TM2x·Tapeheader on the heap
+  // allocate a TM2x·Tape header on the heap
   // See also the TM2x·alloc_Tape_static macro in TM2x.h 
   SQ·def(TM2x·alloc_Tape_heap){
     TM2x·AllocHeaderHeap·Lnk *lnk = (TM2x·AllocHeaderHeap·Lnk *)SQ·lnk;
@@ -21,7 +21,7 @@ address_t TM2x·alloc_array_count = 0;
     m_lnk.lnks = &m_lnks;
     m_lnk.sequence = &&CLib·mallocn;
 
-    address_t n = byte_n_of(TM2x·Tape); // stack base allocated, so we can safely use its address
+    address_t n = byte_n_of(TM2x·Tape ); // stack base allocated, so we can safely use its address
     m_args.n  = &n;
     m_ress.allocation = (void **)lnk->ress->tm2x;
     m_lnks.nominal = lnk->lnks->nominal;
@@ -102,7 +102,7 @@ address_t TM2x·alloc_array_count = 0;
 
   } SQ·end(TM2x·alloc_array_elements);
 
-  // TM2x·Tapeheader may be constructed again and reused
+  // TM2x·Tape header may be constructed again and reused
   SQ·def(TM2x·dealloc_array){
     TM2x·alloc_array_count--; // to assist with debugging
     TM2x·DeallocArray·Lnk *lnk = (TM2x·DeallocArray·Lnk *)SQ·lnk;
@@ -144,8 +144,8 @@ address_t TM2x·alloc_array_count = 0;
   SQ·def(TM2x·copy_header){
     // some aliases
     TM2x·CopyHeader·Lnk *lnk = (TM2x·CopyHeader·Lnk *)SQ·lnk;
-    TM2x·Tape*src = lnk->args->src;
-    TM2x·Tape*dst = lnk->args->dst;
+    TM2x·Tape *src = lnk->args->src;
+    TM2x·Tape *dst = lnk->args->dst;
 
     dst->base_pt = src->base_pt;
     dst->byte_n = src->byte_n;
@@ -156,8 +156,8 @@ address_t TM2x·alloc_array_count = 0;
     // some aliases
     //
       TM2x·CopyContiguousBytes·Lnk *lnk = (TM2x·CopyContiguousBytes·Lnk *)SQ·lnk;
-      TM2x·Tape*src = lnk->args->src;
-      TM2x·Tape*dst = lnk->args->dst;
+      TM2x·Tape *src = lnk->args->src;
+      TM2x·Tape *dst = lnk->args->dst;
       address_t src_byte_0 = *lnk->args->src_byte_0;
       address_t dst_byte_0 = *lnk->args->dst_byte_0;
       address_t byte_n = *lnk->args->byte_n;
@@ -263,8 +263,8 @@ address_t TM2x·alloc_array_count = 0;
     // some aliases
     //
       TM2x·CopyContiguousBytes·Lnk *lnk = (TM2x·CopyContiguousBytes·Lnk *)SQ·lnk;
-      TM2x·Tape*src = lnk->args->src;
-      TM2x·Tape*dst = lnk->args->dst;
+      TM2x·Tape *src = lnk->args->src;
+      TM2x·Tape *dst = lnk->args->dst;
       address_t src_byte_0 = *lnk->args->src_byte_0;
       address_t dst_byte_0 = *lnk->args->dst_byte_0;
       address_t byte_n = *lnk->args->byte_n;
@@ -295,7 +295,7 @@ address_t TM2x·alloc_array_count = 0;
 
 SQ·def(resize_bytes){
   // shorten the arg names, give the optimizer something more to do
-  TM2x·Tape*tm2x = Args.TM2x·resize_bytes.tm2x;
+  TM2x·Tape *tm2x = Args.TM2x·resize_bytes.tm2x;
   address_t after_byte_n = Args.TM2x·resize_bytes.after_byte_n;
   SequencePtr nominal = Args.TM2x·resize_bytes.nominal;
   SequencePtr alloc_fail = Args.TM2x·resize_bytes.alloc_fail;
@@ -345,7 +345,7 @@ SQ·def(resize_bytes){
 
 
 INLINE_PREFIX ContinuationPtr index·to_pt{
-  TM2x·Tape*tm2x               = Args.TM2x·index·to_pt.tm2x;
+  TM2x·Tape *tm2x               = Args.TM2x·index·to_pt.tm2x;
   address_t index          = Args.TM2x·index·to_pt.index;
   address_t element_byte_n = Args.TM2x·index·to_pt.element_byte_n;
   void **pt                = Args.TM2x·index·to_pt.pt;
@@ -372,7 +372,7 @@ INLINE_PREFIX ContinuationPtr index·to_pt{
 
 
 SQ·def(pop){
-   TM2x·Tape*tm2x                = Args.TM2x·pop.tm2x;           
+   TM2x·Tape *tm2x                = Args.TM2x·pop.tm2x;           
    address_t element_byte_n  = Args.TM2x·pop.element_byte_n; 
    SequencePtr nominal      = Args.TM2x·pop.nominal;        
    SequencePtr pop_last     = Args.TM2x·pop.pop_last;       
@@ -386,7 +386,7 @@ SQ·def(pop){
 
 
 SQ·def(push_bytes){
-  TM2x·Tape*tm2x              = TM2x·push_bytes.args.tm2x;           
+  TM2x·Tape *tm2x              = TM2x·push_bytes.args.tm2x;           
   void *source_pt         = TM2x·push_bytes.args.source_pt;      
   address_t source_byte_n = TM2x·push_bytes.args.source_byte_n;  
   SequencePtr nominal    = TM2x·push_bytes.args.nominal;        
@@ -401,7 +401,7 @@ SQ·def(push_bytes){
 
 
 Args.TM2x·push_elements.{
-  TM2x·Tape*tm2x                = Args.TM2x·push_elements.tm2x;
+  TM2x·Tape *tm2x                = Args.TM2x·push_elements.tm2x;
   void *base_pt             = Args.TM2x·push_elements.base_pt;
   address_t element_n       = Args.TM2x·push_elements.element_n;
   address_t element_byte_n  = Args.TM2x·push_elements.element_byte_n;
@@ -411,7 +411,7 @@ Args.TM2x·push_elements.{
  }
 
   SQ·def(TM2x·push){
-    TM2x·Tape*tm2x                 = Args.TM2x·push.tm2x;
+    TM2x·Tape *tm2x                 = Args.TM2x·push.tm2x;
     void *element_base_pt      = Args.TM2x·push.element_base_pt;
     address_t element_byte_n   = Args.TM2x·push.element_byte_n;
     SequencePtr nominal       = Args.TM2x·push.nominal;
@@ -420,14 +420,14 @@ Args.TM2x·push_elements.{
   }
 
 Args.TM2x·push_TM2x.{
-  TM2x·Tape*tm2x                = Args.TM2x·push_TM2x.tm2x;
-  TM2x·Tape*tm2x_source         = Args.TM2x·push_TM2x.tm2x_source;
+  TM2x·Tape *tm2x                = Args.TM2x·push_TM2x.tm2x;
+  TM2x·Tape *tm2x_source         = Args.TM2x·push_TM2x.tm2x_source;
   SequencePtr nominal      = Args.TM2x·push_TM2x.nominal;
   SequencePtr alloc_fail   = Args.TM2x·push_TM2x.alloc_fail;
 }
 
 SQ·def(read_pop){
-  TM2x·Tape*tm2x                 = Args.TM2x·read_pop.TM2x·Tape*tm2x;            
+  TM2x·Tape *tm2x                 = Args.TM2x·read_pop.TM2x·Tape *tm2x;            
   void *dst_element_pt       = Args.TM2x·read_pop.void *dst_element_pt;  
   address_t element_byte_n   = Args.TM2x·read_pop.address_t element_byte_n;
   SequencePtr nominal       = Args.TM2x·read_pop.SequencePtr nominal;   
@@ -439,7 +439,7 @@ SQ·def(read_pop){
 
 
 /*
-  Dynamic allocation of the TM2x·Tapeheader.  For static allocation use the AllocStatic() macro.
+  Dynamic allocation of the TM2x·Tape header.  For static allocation use the AllocStatic() macro.
   This does not allocate data for the array itself.
 */
 
@@ -451,7 +451,7 @@ extern address_t TM2x·alloc_array_count;
 
 SQ·def(resize_bytes){
   // shorten the arg names, give the optimizer something more to do
-  TM2x·Tape*tm2x = Args.TM2x·resize_bytes.tm2x;
+  TM2x·Tape *tm2x = Args.TM2x·resize_bytes.tm2x;
   address_t after_byte_n = Args.TM2x·resize_bytes.after_byte_n;
   SequencePtr nominal = Args.TM2x·resize_bytes.nominal;
   SequencePtr alloc_fail = Args.TM2x·resize_bytes.alloc_fail;
@@ -495,13 +495,13 @@ SQ·def(resize_bytes){
   SQ·end
 }
 /*
-  Dynamic allocation of the TM2x·Tapeheader.  For static allocation use the AllocStatic() macro.
+  Dynamic allocation of the TM2x·Tape header.  For static allocation use the AllocStatic() macro.
   This does not allocate data for the array itself.
 */
 
 
 SQ·def(F_PREFIX SequencePtr TM2x·resize_elements){
-  TM2x·Tape*tm2x                = Args.TM2x·resize_elements.tm2x;
+  TM2x·Tape *tm2x                = Args.TM2x·resize_elements.tm2x;
   address_t after_element_n = Args.TM2x·resize_elements.after_element_n;
   address_t element_byte_n  = Args.TM2x·resize_elements.element_byte_n;
   SequencePtr nominal      = Args.TM2x·resize_elements.nominal;
@@ -539,7 +539,7 @@ we are writing the dst tm2x.
 
 */
 SQ·def(write_bytes){
-          TM2x·Tape*dst               = Args.TM2x·write_bytes.dst          
+          TM2x·Tape *dst               = Args.TM2x·write_bytes.dst          
      address_t  dst_byte_i        = Args.TM2x·write_bytes.dst_byte_i   
           void *src_pt            = Args.TM2x·write_bytes.src_pt       
      address_t  byte_n            = Args.TM2x·write_bytes.byte_n       

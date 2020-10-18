@@ -1,5 +1,5 @@
 /*
-  Dynamic allocation of the TM2x·Tapeheader.  For static allocation use the AllocStatic() macro.
+  Dynamic allocation of the TM2x·Tape header.  For static allocation use the AllocStatic() macro.
   This does not allocate data for the array itself.
 */
 
@@ -11,7 +11,7 @@ extern address_t TM2x·alloc_array_count;
 
 TM2x·resize_bytes:{
   // shorten the arg names, give the optimizer something more to do
-  TM2x·Tape*tape = TM2x·resize_bytes·args.tape;
+  TM2x·Tape *tape = TM2x·resize_bytes·args.tape;
   address_t after_byte_n = TM2x·resize_bytes·args.after_byte_n;
   continuation nominal = TM2x·resize_bytes·args.nominal;
   continuation alloc_fail = TM2x·resize_bytes·args.alloc_fail;

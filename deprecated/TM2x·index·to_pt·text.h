@@ -1,6 +1,6 @@
 
 TM2x·index·to_pt{
-  TM2x·Tape*tape               = TM2x·index·to_pt·args.tape;
+  TM2x·Tape *tape               = TM2x·index·to_pt·args.tape;
   address_t index          = TM2x·index·to_pt·args.index;
   address_t element_byte_n = TM2x·index·to_pt·args.element_byte_n;
   void **pt                = TM2x·index·to_pt·args.pt;

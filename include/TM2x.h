@@ -9,17 +9,14 @@
 #include "Sequence.h"
 
 //--------------------------------------------------------------------------------
-// The TM2x·Tapedynamic array header struct
+// The TM2x·Tape dynamic array header struct
 //   .. does the mutex lock variable belongs here, or at L2? Perhaps here,
 //   because look at all the trouble we have already gone through to make
 //   this thread safe.
   typedef struct {
     char *base_pt;
     address_t byte_n;
-  } TM2x·Tape;
-
-INLINE_PREFIX TM2x·TapeCopy(
-
+  } TM2x·Tape ;
 
 //--------------------------------------------------------------------------------
 // adjectives

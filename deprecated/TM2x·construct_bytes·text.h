@@ -3,7 +3,7 @@
 
 // byte_n is the maximum byte index for the initial data array
 TM2x·alloc_array_bytes:{
-  TM2x·Tape*tape              = TM2x·alloc_array_bytes·args.tape;
+  TM2x·Tape *tape              = TM2x·alloc_array_bytes·args.tape;
   address_t byte_n        = TM2x·alloc_array_bytes·args.byte_n;
   continuation nominal    = TM2x·alloc_array_bytes·args.nominal;
   continuation alloc_fail = TM2x·alloc_array_bytes·args.alloc_fail;

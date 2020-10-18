@@ -1,6 +1,6 @@
 
 struct{
-  TM2x·Tape*tape;
+  TM2x·Tape *tape;
   address_t element_n;  // number of elements
   address_t element_byte_n; // index of last byte in element
   continuation nominal;

@@ -1,7 +1,7 @@
 
 
 TM2x·alloc_array_elements:{
-  TM2x·Tape*tape               = TM2x·alloc_array_elements·args.tape;      
+  TM2x·Tape *tape               = TM2x·alloc_array_elements·args.tape;      
   address_t element_n      = TM2x·alloc_array_elements·args.element_n;    
   address_t element_byte_n = TM2x·alloc_array_elements·args.element_byte_n;    
   continuation nominal     = TM2x·alloc_array_elements·args.nominal;

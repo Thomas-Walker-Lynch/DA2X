@@ -1,5 +1,5 @@
 /*
-Allocates a TM2x·Tapeheader struct on the heap.  Constructs an array.  Destructs the array.
+Allocates a TM2x·Tape header struct on the heap.  Constructs an array.  Destructs the array.
 Deallocates the header.
 
 
@@ -22,7 +22,7 @@ Deallocates the header.
     // result tableau
     //
       address_t byte_n = 9;
-      TM2x·Tape*tm2x; // set by alloc_Tape_heap, then distributed
+      TM2x·Tape *tm2x; // set by alloc_Tape_heap, then distributed
 
     // ----------------------------------------
     // Links

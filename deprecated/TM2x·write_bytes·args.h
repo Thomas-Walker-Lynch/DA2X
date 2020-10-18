@@ -1,7 +1,7 @@
 
 struct{
   void *src_pt;
-  TM2x·Tape*dst;
+  TM2x·Tape *dst;
   address_t dst_byte_i;
   address_t byte_n;
   continuation nominal;

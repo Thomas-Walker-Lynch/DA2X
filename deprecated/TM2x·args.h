@@ -23,20 +23,20 @@
   union{
 
     struct AllocHeap{
-      TM2x·Tape*tape;
+      TM2x·Tape *tape;
       continuation nominal;
       continuation fail;
     } alloc_Tape_heap;
 
     struct ConstructBytes{
-      TM2x·Tape*tape;
+      TM2x·Tape *tape;
       address_t byte_n;
       continuation nominal;
       continuation alloc_fail;
     } alloc_array_bytes;
 
     struct ConstructBytes{
-      TM2x·Tape*tape;
+      TM2x·Tape *tape;
       address_t element_n;  // number of elements
       address_t element_byte_n; // index of last byte in element
       continuation nominal;
@@ -45,14 +45,14 @@
     } alloc_array_bytes;
 
     struct ConstructWrite{
-      TM2x·Tape*tape;
-      TM2x·Tape*tape_source;
+      TM2x·Tape *tape;
+      TM2x·Tape *tape_source;
       continuation nominal;
       continuation fail;
     } construct_write;
 
     struct ConstructWriteBytes{
-      TM2x·Tape*tape;
+      TM2x·Tape *tape;
       void *source_pt;
       address_t byte_n;
       continuation nominal;
@@ -60,7 +60,7 @@
     } construct_write_bytes;
 
     struct ConstructWriteElements{
-      TM2x·Tape*tape;
+      TM2x·Tape *tape;
       void *source_pt;
       address_t element_n;
       address_t element_byte_n;
@@ -70,16 +70,16 @@
     } construct_write_elements;
 
     struct ConstructWriteTM2x{
-      TM2x·Tape*tape;
-      TM2x·Tape*tape_source;
+      TM2x·Tape *tape;
+      TM2x·Tape *tape_source;
       continuation nominal;
       continuation fail;
     } construct_write_TM2x;
 
     struct CopyContiguousBytes{
-      TM2x·Tape*src;
+      TM2x·Tape *src;
       address_t src_byte_i;
-      TM2x·Tape*dst;
+      TM2x·Tape *dst;
       address_t dst_byte_i;
       address_t byte_n;
       continuation nominal;
@@ -89,9 +89,9 @@
     } copy_contiguous_bytes;
 
     struct CopyContiguousElements{
-      TM2x·Tape*src;
+      TM2x·Tape *src;
       address_t src_element_i;
-      TM2x·Tape*dst;
+      TM2x·Tape *dst;
       address_t dst_element_i;
       address_t element_n;  // index of nth element of the copy region
       address_t element_byte_n;
@@ -102,17 +102,17 @@
     } copy_contiguous_elements;
 
     struct DeallocHeap{
-      TM2x·Tape**tape;
+      TM2x·Tape **tape;
       continuation nominal;
     } dealloc_Tape_heap;
 
     struct Destruct{
-      TM2x·Tape*tape;
+      TM2x·Tape *tape;
       continuation nominal;
     } destruct;
 
     struct Index·Read{
-      TM2x·Tape*tape;
+      TM2x·Tape *tape;
       address_t index;
       address_t element_n;
       address_t element_byte_n;
@@ -122,7 +122,7 @@
     } index·read;
 
     struct Index·ToPt{
-       TM2x·Tape*tape ;
+       TM2x·Tape *tape ;
        address_t index;
        address_t element_byte_n;
        void **pt;
@@ -131,7 +131,7 @@
     } index·to_pt;
 
     struct{
-       TM2x·Tape*tape;
+       TM2x·Tape *tape;
        address_t element_byte_n;
        continuation nominal;
        continuation pop_last;
@@ -139,7 +139,7 @@
     } pop;
 
     struct Push{
-      TM2x·Tape*tape;
+      TM2x·Tape *tape;
       void *element_base_pt;
       address_t element_byte_n;
       continuation nominal;
@@ -147,7 +147,7 @@
     } push;
 
     struct PushBytes{
-      TM2x·Tape*tape;
+      TM2x·Tape *tape;
       void *source_pt;
       address_t source_byte_n;
       continuation nominal;
@@ -155,7 +155,7 @@
     } push_bytes;
 
     struct PushElements{
-      TM2x·Tape*tape ;
+      TM2x·Tape *tape ;
       void *base_pt;
       address_t element_n ;
       address_t element_byte_n ;
@@ -165,14 +165,14 @@
      } push_elements;
 
     struct PushTM2x{
-      TM2x·Tape*tape ;
-      TM2x·Tape*tape_source;
+      TM2x·Tape *tape ;
+      TM2x·Tape *tape_source;
       continuation nominal;
       continuation alloc_fail;
     } push_TM2x;
 
     struct ReadPop{
-       TM2x·Tape*tape ;
+       TM2x·Tape *tape ;
        void *dst_element_pt ;
        address_t element_byte_n;
        continuation nominal;
@@ -181,14 +181,14 @@
     } read_pop;
 
     struct ResizeBytes{
-      TM2x·Tape*tape;
+      TM2x·Tape *tape;
       address_t after_byte_n;
       continuation nominal;
       continuation alloc_fail;
     } resize_bytes;
 
     struct ResizeElements{
-      TM2x·Tape*tape;
+      TM2x·Tape *tape;
       address_t after_element_n;
       address_t element_byte_n;
       continuation nominal;
@@ -198,7 +198,7 @@
 
     struct WriteBytes{
       void *src_pt;
-      TM2x·Tape*dst;
+      TM2x·Tape *dst;
       address_t dst_byte_i;
       address_t byte_n;
       continuation nominal;

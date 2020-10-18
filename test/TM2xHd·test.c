@@ -28,7 +28,7 @@ Result·Tallies test_0(){
 
   Result·Tallies r ,*rp; rp = &r;
   Result·Tallies·init(rp);
-  TM2x·Tape*a0;
+  TM2x·Tape *a0;
   continue_into TM2x·alloc_Tape_heap_construct(&a0 ,0 ,byte_n_of(uint32_t) ,&&nominal_0 ,&&fail_0 ,&&fail_0);
   nominal_0:{
     f[i] = true;
@@ -147,7 +147,7 @@ Result·Tallies test_1(){
 
   Result·Tallies r ,*rp; rp = &r;
   Result·Tallies·init(rp);
-  TM2x·Tape*a0;
+  TM2x·Tape *a0;
   continue_into TM2x·alloc_Tape_heap_construct(&a0 ,0 ,byte_n_of(uint32_t) ,&&nominal_0 ,&&fail_0 ,&&fail_0);
   nominal_0:{
     f[i] = true;
@@ -271,7 +271,7 @@ Result·Tallies test_2(){
   bool f[256];
   uint32_t i = 0;
 
-  TM2x·Tape*a0;
+  TM2x·Tape *a0;
   continue_into TM2x·alloc_Tape_heap_construct(&a0 ,0 ,byte_n_of(uint32_t) ,&&nominal_0 ,&&fail_0 ,&&fail_0);
   nominal_0:{
     f[i] = true;

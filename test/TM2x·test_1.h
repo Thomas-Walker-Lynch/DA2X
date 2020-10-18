@@ -22,7 +22,7 @@ the array.
     //
       address_t element_n = 9;
       address_t element_byte_n = 3; // extent of 32 bit int in elements
-      TM2x·Tape*tm2x; // set by alloc_Tape_heap, then distributed
+      TM2x·Tape *tm2x; // set by alloc_Tape_heap, then distributed
 
     // ----------------------------------------
     // Links

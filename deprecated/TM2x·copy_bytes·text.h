@@ -1,8 +1,8 @@
 
 TM2x·copy_contiguous_bytes:{
-         TM2x·Tape*src             = TM2x·copy_contiguous_bytes·args.src;          
+         TM2x·Tape *src             = TM2x·copy_contiguous_bytes·args.src;          
      address_t src_byte_i      = TM2x·copy_contiguous_bytes·args.src_byte_i;   
-         TM2x·Tape*dst             = TM2x·copy_contiguous_bytes·args.dst;          
+         TM2x·Tape *dst             = TM2x·copy_contiguous_bytes·args.dst;          
      address_t dst_byte_i      = TM2x·copy_contiguous_bytes·args.dst_byte_i;   
      address_t byte_n          = TM2x·copy_contiguous_bytes·args.byte_n;       
   continuation nominal         = TM2x·copy_contiguous_bytes·args.nominal;      

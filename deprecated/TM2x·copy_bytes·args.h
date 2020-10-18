@@ -1,8 +1,8 @@
 
 struct{
-  TM2x·Tape*src;
+  TM2x·Tape *src;
   address_t src_byte_i;
-  TM2x·Tape*dst;
+  TM2x·Tape *dst;
   address_t dst_byte_i;
   address_t byte_n;
   continuation nominal;

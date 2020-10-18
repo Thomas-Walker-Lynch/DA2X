@@ -1,6 +1,6 @@
 
 struct{
-  TM2x·Tape*tape;
+  TM2x·Tape *tape;
   void *element_base_pt;
   address_t element_byte_n;
   continuation nominal;

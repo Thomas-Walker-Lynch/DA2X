@@ -1,6 +1,6 @@
 
 struct{
-  TM2x·Tape*tape;
+  TM2x·Tape *tape;
   void *source_pt;
   address_t element_n;
   address_t element_byte_n;

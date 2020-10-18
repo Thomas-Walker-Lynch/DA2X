@@ -1,5 +1,5 @@
 TM2x·construct_write_elements:{
-         TM2x·Tape*tape            = TM2x·construct_write_elements·args.tape;           
+         TM2x·Tape *tape            = TM2x·construct_write_elements·args.tape;           
          void *source_pt       = TM2x·construct_write_elements·args.source_pt;        
      address_t element_n       = TM2x·construct_write_elements·args.element_n;      
      address_t element_byte_n  = TM2x·construct_write_elements·args.element_byte_n; 
