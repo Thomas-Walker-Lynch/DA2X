@@ -9,6 +9,7 @@ exec/
 *.i
 *.s
 a.out
+test/Inclusive·test
 test/TM2x·test
 test/TM2xHd·test
 
