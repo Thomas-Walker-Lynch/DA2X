@@ -16,7 +16,7 @@
       Sequence fail;
     } TM2x·alloc_Tape_heap;
 
-    struct TM2x·Args·ConstructBytes{
+    struct TM2x·Args·Construct{
       TM2x·Tape *tape;
       address_t byte_n;   // extent of the array, in bytes
       Sequence nominal;
@@ -39,7 +39,7 @@
       Sequence fail;
     } TM2x·construct_write;
 
-    struct TM2x·Args·ConstructWriteBytes{
+    struct TM2x·Args·ConstructWrite{
       TM2x·Tape *tape;
       void *source_pt;
       address_t byte_n;
@@ -64,7 +64,7 @@
       Sequence fail;
     } TM2x·construct_write_TM2x;
 
-    struct TM2x·Args·CopyContiguousBytes{
+    struct TM2x·Args·CopyContiguous{
       TM2x·Tape *src;
       address_t src_byte_i;
       TM2x·Tape *dst;
@@ -133,7 +133,7 @@
       Sequence alloc_fail;
     } TM2x·push;
 
-    struct TM2x·Args·PushBytes{
+    struct TM2x·Args·Push{
       TM2x·Tape *tape;
       void *source_pt;
       address_t source_byte_n;
@@ -167,7 +167,7 @@
        Sequence alloc_fail;
     } TM2x·read_pop;
 
-    struct TM2x·Args·ResizeBytes{
+    struct TM2x·Args·Resize{
       TM2x·Tape *tape;
       address_t after_byte_n;
       Sequence nominal;
@@ -183,7 +183,7 @@
       Sequence index_gt_n;
     } TM2x·resize_elements;
 
-    struct TM2x·Args·WriteBytes{
+    struct TM2x·Args·Write{
       void *src_pt;
       TM2x·Tape *dst;
       address_t dst_byte_i;

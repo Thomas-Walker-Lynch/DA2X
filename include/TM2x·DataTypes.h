@@ -19,19 +19,19 @@
   typedef struct{
     TM2x·Tape *tm2x;
     address_t *byte_n;   // extent of the array, in bytes
-  } TM2x·AllocArrayBytes·Args;
+  } TM2x·AllocArray·Args;
   typedef struct{
-  } TM2x·AllocArrayBytes·Ress;
+  } TM2x·AllocArray·Ress;
   typedef struct{
     SQ·Lnk nominal;
     SQ·Lnk alloc_fail;
-  } TM2x·AllocArrayBytes·Lnks;
+  } TM2x·AllocArray·Lnks;
   typedef struct{
     SQ·Ptr sequence;
-    TM2x·AllocArrayBytes·Args *args;
-    TM2x·AllocArrayBytes·Ress *ress;
-    TM2x·AllocArrayBytes·Lnks *lnks;
-  } TM2x·AllocArrayBytes·Lnk;
+    TM2x·AllocArray·Args *args;
+    TM2x·AllocArray·Ress *ress;
+    TM2x·AllocArray·Lnks *lnks;
+  } TM2x·AllocArray·Lnk;
 
 
   typedef struct{
@@ -107,20 +107,20 @@
          TM2x·Tape *dst;
     address_t *dst_byte_0;
     address_t *byte_n;
-  } TM2x·CopyContiguousBytes·Args;
+  } TM2x·CopyContiguous·Args;
   typedef struct{
-  } TM2x·CopyContiguousBytes·Ress;
+  } TM2x·CopyContiguous·Ress;
   typedef struct{
     SQ·Lnk nominal;
     SQ·Lnk src_index_gt_n;
     SQ·Lnk dst_index_gt_n;
-  } TM2x·CopyContiguousBytes·Lnks;
+  } TM2x·CopyContiguous·Lnks;
   typedef struct{
     SQ·Ptr sequence;
-    TM2x·CopyContiguousBytes·Args *args;
-    TM2x·CopyContiguousBytes·Ress *ress;
-    TM2x·CopyContiguousBytes·Lnks *lnks;
-  } TM2x·CopyContiguousBytes·Lnk;
+    TM2x·CopyContiguous·Args *args;
+    TM2x·CopyContiguous·Ress *ress;
+    TM2x·CopyContiguous·Lnks *lnks;
+  } TM2x·CopyContiguous·Lnk;
 
 
   typedef struct{

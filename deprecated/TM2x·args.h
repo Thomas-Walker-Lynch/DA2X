@@ -28,14 +28,14 @@
       continuation fail;
     } alloc_Tape_heap;
 
-    struct ConstructBytes{
+    struct Construct{
       TM2x·Tape *tape;
       address_t byte_n;
       continuation nominal;
       continuation alloc_fail;
     } alloc_array_bytes;
 
-    struct ConstructBytes{
+    struct Construct{
       TM2x·Tape *tape;
       address_t element_n;  // number of elements
       address_t element_byte_n; // index of last byte in element
@@ -51,7 +51,7 @@
       continuation fail;
     } construct_write;
 
-    struct ConstructWriteBytes{
+    struct ConstructWrite{
       TM2x·Tape *tape;
       void *source_pt;
       address_t byte_n;
@@ -76,7 +76,7 @@
       continuation fail;
     } construct_write_TM2x;
 
-    struct CopyContiguousBytes{
+    struct CopyContiguous{
       TM2x·Tape *src;
       address_t src_byte_i;
       TM2x·Tape *dst;
@@ -146,7 +146,7 @@
       continuation alloc_fail;
     } push;
 
-    struct PushBytes{
+    struct Push{
       TM2x·Tape *tape;
       void *source_pt;
       address_t source_byte_n;
@@ -180,7 +180,7 @@
        continuation alloc_fail;
     } read_pop;
 
-    struct ResizeBytes{
+    struct Resize{
       TM2x·Tape *tape;
       address_t after_byte_n;
       continuation nominal;
@@ -196,7 +196,7 @@
       continuation index_gt_n;
     } resize_elements;
 
-    struct WriteBytes{
+    struct Write{
       void *src_pt;
       TM2x·Tape *dst;
       address_t dst_byte_i;

@@ -113,7 +113,7 @@ the 2x in the name.
 
   The recursive nature of memory type leads to a bit of a confusing situation. For
   example, we have three lengths measures for an array of the type we declare in our
-  program.  One for its length in elements, another for its length in bytes. Bytes in the
+  program.  One for its length in elements, another for its length in bytes.  in the
   array can be indexes from 0 to n within the array, but those same bytes will have
   indexes ranging from 0 being the first byte in memory to n being the last byte in
   memory.

@@ -34,7 +34,7 @@ address_t TM2x·alloc_array_count = 0;
   // allocates data on the heap
   SQ·def(TM2x·alloc_array_bytes){
     TM2x·alloc_array_count++; // to assist with debugging
-    TM2x·AllocArrayBytes·Lnk *lnk = (TM2x·AllocArrayBytes·Lnk *)SQ·lnk;
+    TM2x·AllocArray·Lnk *lnk = (TM2x·AllocArray·Lnk *)SQ·lnk;
 
     lnk->args->tm2x->byte_n = *lnk->args->byte_n;
 
@@ -72,14 +72,14 @@ address_t TM2x·alloc_array_count = 0;
     // Links
     //
       SQ·make_Lnk(scale_ext ,Inclusive·3opLL ,&&Inclusive·mul_idx);
-      SQ·make_Lnk(alloc_array_bytes ,TM2x·AllocArrayBytes ,&&TM2x·alloc_array_bytes);
+      SQ·make_Lnk(alloc_array_bytes ,TM2x·AllocArray ,&&TM2x·alloc_array_bytes);
 
       scale_ext_lnks = (Inclusive·3opLL·Lnks)
         { .nominal = AS(alloc_array_bytes_lnk ,SQ·Lnk)
           ,.gt_address_t_n = lnk->lnks->index_gt_n
         };
 
-      alloc_array_bytes_lnks = (TM2x·AllocArrayBytes·Lnks)
+      alloc_array_bytes_lnks = (TM2x·AllocArray·Lnks)
         { .nominal = lnk->lnks->nominal
           ,.alloc_fail = lnk->lnks->alloc_fail
         };
@@ -155,7 +155,7 @@ address_t TM2x·alloc_array_count = 0;
   SQ·def(TM2x·copy_contiguous_bytes){
     // some aliases
     //
-      TM2x·CopyContiguousBytes·Lnk *lnk = (TM2x·CopyContiguousBytes·Lnk *)SQ·lnk;
+      TM2x·CopyContiguous·Lnk *lnk = (TM2x·CopyContiguous·Lnk *)SQ·lnk;
       TM2x·Tape *src = lnk->args->src;
       TM2x·Tape *dst = lnk->args->dst;
       address_t src_byte_0 = *lnk->args->src_byte_0;
@@ -196,7 +196,7 @@ address_t TM2x·alloc_array_count = 0;
       SQ·make_Lnk(scale_src ,Inclusive·3opLL ,&&Inclusive·mul_idx);
       SQ·make_Lnk(scale_dst ,Inclusive·3opLL ,&&Inclusive·mul_idx);
       SQ·make_Lnk(scale_ext ,Inclusive·3opLL ,&&Inclusive·mul_ext);
-      SQ·make_Lnk(copy_contiguous_bytes ,TM2x·CopyContiguousBytes ,&&TM2x·copy_contiguous_bytes);
+      SQ·make_Lnk(copy_contiguous_bytes ,TM2x·CopyContiguous ,&&TM2x·copy_contiguous_bytes);
 
       scale_src_lnks = (Inclusive·3opLL·Lnks)
         {  .nominal = AS(scale_dst_lnk ,SQ·Lnk)
@@ -213,7 +213,7 @@ address_t TM2x·alloc_array_count = 0;
           ,.gt_address_t_n = lnk->lnks->src_index_gt_n
         };
 
-      copy_contiguous_bytes_lnks = (TM2x·CopyContiguousBytes·Lnks)
+      copy_contiguous_bytes_lnks = (TM2x·CopyContiguous·Lnks)
         {  .nominal = lnk->lnks->nominal
           ,.src_index_gt_n = lnk->lnks->src_index_gt_n
           ,.dst_index_gt_n = lnk->lnks->dst_index_gt_n
@@ -244,7 +244,7 @@ address_t TM2x·alloc_array_count = 0;
           ,.a_1 = lnk->args->element_byte_n
         };
 
-      copy_contiguous_bytes_args  = (TM2x·CopyContiguousBytes·Args)
+      copy_contiguous_bytes_args  = (TM2x·CopyContiguous·Args)
         {  .src        = lnk->args->src
           ,.src_byte_0 = &src_byte_0
           ,.dst        = lnk->args->dst
@@ -262,7 +262,7 @@ address_t TM2x·alloc_array_count = 0;
   SQ·def(TM2x·resize){
     // some aliases
     //
-      TM2x·CopyContiguousBytes·Lnk *lnk = (TM2x·CopyContiguousBytes·Lnk *)SQ·lnk;
+      TM2x·CopyContiguous·Lnk *lnk = (TM2x·CopyContiguous·Lnk *)SQ·lnk;
       TM2x·Tape *src = lnk->args->src;
       TM2x·Tape *dst = lnk->args->dst;
       address_t src_byte_0 = *lnk->args->src_byte_0;

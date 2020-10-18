@@ -36,9 +36,9 @@ Deallocates the header.
       ah_lnk.lnks = &ah_lnks;
       ah_lnk.sequence = &&TM2x·alloc_Tape_heap;
 
-      TM2x·AllocArrayBytes·Args cb_args;
-      TM2x·AllocArrayBytes·Lnks cb_lnks;
-      TM2x·AllocArrayBytes·Lnk  cb_lnk;
+      TM2x·AllocArray·Args cb_args;
+      TM2x·AllocArray·Lnks cb_lnks;
+      TM2x·AllocArray·Lnk  cb_lnk;
       cb_lnk.args = &cb_args;
       cb_lnk.lnks = &cb_lnks;
       cb_lnk.sequence = &&TM2x·alloc_array_bytes;

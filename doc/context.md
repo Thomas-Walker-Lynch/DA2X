@@ -1222,7 +1222,7 @@ own context. The parent's context will be in the grandparent's tableau.
       struct Inclusive·Cons·3opLL cons;
     } mul_ei_bi_1;
 
-    struct CopyContiguousBytes0·Context{
+    struct CopyContiguous0·Context{
       struct TM2x·Args·copy_contiguous_bytes0 args;
       struct TM2x·Cons·copy_contiguous_bytes cons;
     } copy_contiguous_bytes_0;
