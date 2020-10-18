@@ -25,7 +25,7 @@
 //
 
   // base pointers
-  INLINE_PREFIX char *TM2x·byte_0_pt(TM2x·Tape *tm2x){
+  INLINE_PREFIX char *TM2x·0_pt(TM2x·Tape *tm2x){
     return tm2x->base_pt;
   }
   INLINE_PREFIX void *TM2x·element_0_pt(TM2x·Tape *tm2x){

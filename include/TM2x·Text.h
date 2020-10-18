@@ -158,24 +158,24 @@ address_t TM2x·alloc_array_count = 0;
       TM2x·CopyContiguous·Lnk *lnk = (TM2x·CopyContiguous·Lnk *)SQ·lnk;
       TM2x·Tape *src = lnk->args->src;
       TM2x·Tape *dst = lnk->args->dst;
-      address_t src_byte_0 = *lnk->args->src_byte_0;
-      address_t dst_byte_0 = *lnk->args->dst_byte_0;
+      address_t src_0 = *lnk->args->src_0;
+      address_t dst_0 = *lnk->args->dst_0;
       address_t byte_n = *lnk->args->byte_n;
     if( 
        TM2x·byte_n(src) < byte_n
        ||
-       TM2x·byte_n(src) - byte_n < src_byte_0
+       TM2x·byte_n(src) - byte_n < src_0
         ){
       SQ·continue_indirect(lnk->lnks->src_index_gt_n);
     }
     if( 
        TM2x·byte_n(dst) < byte_n
        ||
-       TM2x·byte_n(dst) - byte_n < dst_byte_0
+       TM2x·byte_n(dst) - byte_n < dst_0
         ){
       SQ·continue_indirect(lnk->lnks->dst_index_gt_n);
     }
-    memcpyn(TM2x·byte_0_pt(dst) + dst_byte_0, TM2x·byte_0_pt(src) + src_byte_0, byte_n);
+    memcpyn(TM2x·0_pt(dst) + dst_0, TM2x·0_pt(src) + src_0, byte_n);
     SQ·continue_indirect(lnk->lnks->nominal);
   } SQ·end(TM2x·copy_contiguous_bytes);
 
@@ -186,8 +186,8 @@ address_t TM2x·alloc_array_count = 0;
     // ----------------------------------------
     // local result tableau
     //
-      address_t src_byte_0;  
-      address_t dst_byte_0;  
+      address_t src_0;  
+      address_t dst_0;  
       address_t ext_byte_n;  
 
     // ----------------------------------------
@@ -222,8 +222,8 @@ address_t TM2x·alloc_array_count = 0;
     // ----------------------------------------
     // sequence results point into the tableau
     //
-      scale_src_ress.r = &src_byte_0;
-      scale_dst_ress.r = &dst_byte_0;
+      scale_src_ress.r = &src_0;
+      scale_dst_ress.r = &dst_0;
       scale_ext_ress.r = &ext_byte_n;
 
     // ----------------------------------------
@@ -246,9 +246,9 @@ address_t TM2x·alloc_array_count = 0;
 
       copy_contiguous_bytes_args  = (TM2x·CopyContiguous·Args)
         {  .src        = lnk->args->src
-          ,.src_byte_0 = &src_byte_0
+          ,.src_0 = &src_0
           ,.dst        = lnk->args->dst
-          ,.dst_byte_0 = &dst_byte_0
+          ,.dst_0 = &dst_0
           ,.byte_n     = &ext_byte_n
         };
 
@@ -267,7 +267,7 @@ address_t TM2x·alloc_array_count = 0;
 
 
 
-    memcpyn(TM2x·byte_0_pt(dst) + dst_byte_0, TM2x·byte_0_pt(src) + src_byte_0, byte_n);
+    memcpyn(TM2x·0_pt(dst) + dst_0, TM2x·0_pt(src) + src_0, byte_n);
     SQ·continue_indirect(lnk->lnks->nominal);
   } SQ·end(TM2x·resize);
 
@@ -336,17 +336,17 @@ INLINE_PREFIX ContinuationPtr index·to_pt{
   SequencePtr nominal     = Args.TM2x·index·to_pt.nominal;
   SequencePtr index_gt_n = Args.TM2x·index·to_pt.index_gt_n;
 
-  address_t byte_i;
+  address_t i;
   inclusive·mul_ext·args.an = index;
   inclusive·mul_ext·args.bn = element_n_Byte;
-  inclusive·mul_ext·args.cn = &byte_i;
+  inclusive·mul_ext·args.cn = &i;
   inclusive·mul_ext·args.nominal = &&mul_ext·nominal;
   inclusive·mul_ext·args.gt_address_n = index_gt_n;
   continue inclusive·mul_ext;
 
   SQ·def(mul_ext·nominal){
-    if( byte_i > TM2x·byte_n(tm2x) ) continue index_gt_n;
-    *pt = (void *)(TM2x·byte_0_pt(tm2x) + byte_i);
+    if( i > TM2x·byte_n(tm2x) ) continue index_gt_n;
+    *pt = (void *)(TM2x·0_pt(tm2x) + i);
     SQ·end;
   }
 
@@ -516,7 +516,7 @@ SQ·def(F_PREFIX SequencePtr TM2x·resize_elements){
 /*
 
 Copies a region stemming from src_pt to src_pt + byte_n on to the 
-dst tm2x starting from byte offset dst_byte_i.
+dst tm2x starting from byte offset dst_i.
 
 The only tm2x explicitly identified is the dst tm2x, so we say that
 we are writing the dst tm2x.
@@ -524,7 +524,7 @@ we are writing the dst tm2x.
 */
 SQ·def(write_bytes){
           TM2x·Tape *dst               = Args.TM2x·write_bytes.dst          
-     address_t  dst_byte_i        = Args.TM2x·write_bytes.dst_byte_i   
+     address_t  dst_i        = Args.TM2x·write_bytes.dst_i   
           void *src_pt            = Args.TM2x·write_bytes.src_pt       
      address_t  byte_n            = Args.TM2x·write_bytes.byte_n       
   SequencePtr  nominal          = Args.TM2x·write_bytes.nominal      

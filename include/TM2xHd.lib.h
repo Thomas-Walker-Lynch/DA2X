@@ -39,7 +39,7 @@
     ,SequencePtr is_true  
     ,SequencePtr is_false
     ){
-    if( hd->element_pt <= TM2x·byte_n_pt(tape) && hd->element_pt >= TM2x·byte_0_pt(tape) ) continue_via_trampoline is_true;
+    if( hd->element_pt <= TM2x·byte_n_pt(tape) && hd->element_pt >= TM2x·0_pt(tape) ) continue_via_trampoline is_true;
     continue_via_trampoline is_false;
   }
   TM2xHd·F_PREFIX SequencePtr TM2xHd·at_n_Element
@@ -58,7 +58,7 @@
 //
   // this also initializes an hd
   TM2xHd·F_PREFIX void TM2xHd·rewind(TM2x·Tape *tape ,TM2xHd *hd){
-    hd->element_pt = TM2x·byte_0_pt(tape);
+    hd->element_pt = TM2x·0_pt(tape);
   }
 
   TM2xHd·F_PREFIX void TM2xHd·unguarded_step(TM2xHd *hd ,address_t element_n_Byte){

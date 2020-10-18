@@ -913,29 +913,29 @@
         p0->a0             = p1->n_Element;
         p0->a1             = p1->element_n_Byte;
         p0->rpt            = &cx->byte_n;
-        p0->nominal        = &&src_byte_i;
+        p0->nominal        = &&src_i;
         p0->gt_address_t_n = pop(byte_n_of(struct c0 ,cx->src_index_gt_n);    // goes elsewhere
         continue Inclusive·mul_ext;
       }
 
       // c2
-      cdef(src_byte_i){
+      cdef(src_i){
         P0(p0 ,Inclusive·3opLL ,0);
         p0->a0             = cx->src_element_i;
         p0->a1             = cx->element_n_Byte;
-        p0->rpt            = &cx->src_byte_i;
-        p0->nominal        = &&dst_byte_i;
+        p0->rpt            = &cx->src_i;
+        p0->nominal        = &&dst_i;
         p0->gt_address_t_n = pop(byte_n_of(struct c0 ,cx->src_index_gt_n);  // goes elsewhere
         continue Inclusive·mul_idx;
         cend;
       }
 
       // c3
-      cdef(dst_byte_i){
+      cdef(dst_i){
         P0(p0 ,Inclusive·3opLL ,0);
         p0->a0             = cx->dst_element_i;
         p0->a1             = cx->element_n_Byte;
-        p0->rpt            = &cx->dst_byte_i;
+        p0->rpt            = &cx->dst_i;
         p0->nominal        = &&copy_contiguous_bytes;
         p0->gt_address_t_n = pop(byte_n_of(struct c0 ,cx->dst_index_gt_n);   // goes elsewhere
         continue Inclusive·mul_idx;
@@ -946,9 +946,9 @@
       cdef(copy_contiguous_bytes){
         P0(p0 ,TM2x·construct_copy_contiguous_bytes ,0);
         p0->src             = cx->src;
-        p0->src_byte_i      = cx->src_byte_i;
+        p0->src_i      = cx->src_i;
         p0->dst             = cx->dst;
-        p0->dst_byte_i      = cx->dst_byte_i;
+        p0->dst_i      = cx->dst_i;
         p0->byte_n          = cx->byte_n;
         p0->nominal         = pop(byte_n_of(struct c0 ,cx->nominal);         // goes elsewhere
         p0->src_index_gt_n  = pop(byte_n_of(struct c0 ,cx->src_index_gt_n);  // goes elsewhere
@@ -994,7 +994,7 @@ stack push and pop.
         p0->a0             = p1->n_Element;
         p0->a1             = p1->element_n_Byte;
         p0->rpt            = &cx->byte_n;
-        p0->nominal        = &&src_byte_i;
+        p0->nominal        = &&src_i;
         p0->gt_address_t_n = cx_dealloc(byte_n_of(struct c0) ,cx->src_index_gt_n);    // goes elsewhere
         continue Inclusive·mul_ext;
       }
@@ -1005,7 +1005,7 @@ stack push and pop.
         p0->a0             = p1->n_Element;
         p0->a1             = p1->element_n_Byte;
         p0->rpt            = &cx->byte_n;
-        p0->nominal        = &&src_byte_i;
+        p0->nominal        = &&src_i;
         p0->gt_address_t_n = &&leave
         p1->n              = byte_n_of(struct c0);
         p1->sequence     = cx->src_index_gt_n
@@ -1020,23 +1020,23 @@ stack push and pop.
 
 
       // c2
-      cdef(src_byte_i){
+      cdef(src_i){
         P0(p0 ,Inclusive·3opLL ,0);
         p0->a0             = cx->src_element_i;
         p0->a1             = cx->element_n_Byte;
-        p0->rpt            = &cx->src_byte_i;
-        p0->nominal        = &&dst_byte_i;
+        p0->rpt            = &cx->src_i;
+        p0->nominal        = &&dst_i;
         p0->gt_address_t_n = cx_dealloc(byte_n_of(struct c0) ,cx->src_index_gt_n);  // goes elsewhere
         continue Inclusive·mul_idx;
         cend;
       }
 
       // c3
-      cdef(dst_byte_i){
+      cdef(dst_i){
         P0(p0 ,Inclusive·3opLL ,0);
         p0->a0             = cx->dst_element_i;
         p0->a1             = cx->element_n_Byte;
-        p0->rpt            = &cx->dst_byte_i;
+        p0->rpt            = &cx->dst_i;
         p0->nominal        = &&copy_contiguous_bytes;
         p0->gt_address_t_n = cx_dealloc(byte_n_of(struct c0) ,cx->dst_index_gt_n);   // goes elsewhere
         continue Inclusive·mul_idx;
@@ -1047,9 +1047,9 @@ stack push and pop.
       cdef(copy_contiguous_bytes){
         P0(p0 ,TM2x·construct_copy_contiguous_bytes ,0);
         p0->src             = cx->src;
-        p0->src_byte_i      = cx->src_byte_i;
+        p0->src_i      = cx->src_i;
         p0->dst             = cx->dst;
-        p0->dst_byte_i      = cx->dst_byte_i;
+        p0->dst_i      = cx->dst_i;
         p0->byte_n          = cx->byte_n;
         p0->nominal         = cx_dealloc(byte_n_of(struct c0) ,cx->nominal);         // goes elsewhere
         p0->src_index_gt_n  = cx_dealloc(byte_n_of(struct c0) ,cx->src_index_gt_n);  // goes elsewhere
@@ -1167,8 +1167,8 @@ be done even before the program runs.
 void copy_element_init(){ 
   // results
   t.mul_ib_0.args.rpt    = &t.copy_contiguous_bytes_0.args.byte_n;
-  t.mul_ei_bi_0.args.rpt = &t.copy_contiguous_bytes_0.args.src_byte_i;
-  t.mul_ei_bi_1.args.rpt = &t.copy_contiguous_bytes_0.args.copy_contiguous_bytes_0.dst_byte_i;
+  t.mul_ei_bi_0.args.rpt = &t.copy_contiguous_bytes_0.args.src_i;
+  t.mul_ei_bi_1.args.rpt = &t.copy_contiguous_bytes_0.args.copy_contiguous_bytes_0.dst_i;
 
   // connectors
   t.mul_ib_0.cons.nominal= (Connector) 

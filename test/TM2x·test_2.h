@@ -95,8 +95,8 @@ we may create a tape machine header that points to the C array, and then do the 
       cb_args.byte_n = &byte_n;
      
       cpb_args.src = &src;
-      cpb_args.src_byte_0 = &offset;
-      cpb_args.dst_byte_0 = &offset;
+      cpb_args.src_0 = &offset;
+      cpb_args.dst_0 = &offset;
       cpb_args.byte_n = &byte_n;
 
       // .dst arguments are assigned in the ah_dist sequence

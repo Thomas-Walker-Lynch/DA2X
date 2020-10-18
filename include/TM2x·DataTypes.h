@@ -103,9 +103,9 @@
 
   typedef struct{
          TM2x·Tape *src;
-    address_t *src_byte_0;
+    address_t *src_0;
          TM2x·Tape *dst;
-    address_t *dst_byte_0;
+    address_t *dst_0;
     address_t *byte_n;
   } TM2x·CopyContiguous·Args;
   typedef struct{
@@ -254,7 +254,7 @@ struct TM2x·resize_elements_0{
 struct TM2x·write_bytes_0{
   void *src_pt;
   TM2x·Tape *dst;
-  address_t dst_byte_i;
+  address_t dst_i;
   address_t byte_n;
   SQ·Lnk nominal;
   SQ·Lnk alloc_fail;

@@ -143,12 +143,12 @@ the 2x in the name.
 
   Consider another example,
     ```
-          array_byte_0
-          array_byte_0_pt
+          array_0
+          array_0_pt
     ```
 
-   We might expect that the value of a variable called `array_byte_0` would be zero.
-   A variable called `array_byte_0_pt` would be the address of the first byte of the array
+   We might expect that the value of a variable called `array_0` would be zero.
+   A variable called `array_0_pt` would be the address of the first byte of the array
    relative to the start of memory.  This is also called: 'the array's location in memory',
    'a pointer to the first byte in the array', 'a pointer to the first element in the array',
    and 'the array base'.
@@ -158,19 +158,19 @@ the 2x in the name.
    To access the nth byte in the array, the last byte, we write:
 
    ```
-       byte_0_pt[byte_n]
+       0_pt[byte_n]
    ```
 
    And to access the ith element when that element is an 'int':
 
    ```
-       ((int *)byte_0_pt)[element_i]
+       ((int *)0_pt)[element_i]
    ```
 
    Or even:
 
    ```
-       *((int *)byte_0_pt + element_i)
+       *((int *)0_pt + element_i)
    ```
 
 
