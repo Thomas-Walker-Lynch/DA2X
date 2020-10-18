@@ -29,7 +29,7 @@ Result·Tallies test_0(){
   Result·Tallies r ,*rp; rp = &r;
   Result·Tallies·init(rp);
   TM2x·Tape*a0;
-  continue_into TM2x·alloc_header_heap_construct(&a0 ,0 ,byte_n_of(uint32_t) ,&&nominal_0 ,&&fail_0 ,&&fail_0);
+  continue_into TM2x·alloc_Tape_heap_construct(&a0 ,0 ,byte_n_of(uint32_t) ,&&nominal_0 ,&&fail_0 ,&&fail_0);
   nominal_0:{
     f[i] = true;
     continue_from end_0;
@@ -66,7 +66,7 @@ Result·Tallies test_0(){
   f[i++] = c->result;
   f[i++] = c->ref == 100;
 
-  TM2x·dealloc_header_heap(a0);
+  TM2x·dealloc_Tape_heap(a0);
   f[i++] = malloc_cnt == MallocCounter·count;
   f[i++] = constructed_cnt == TM2x·alloc_array_count;
   Result·Tallies·tally("test_0" ,rp ,f ,i);
@@ -148,7 +148,7 @@ Result·Tallies test_1(){
   Result·Tallies r ,*rp; rp = &r;
   Result·Tallies·init(rp);
   TM2x·Tape*a0;
-  continue_into TM2x·alloc_header_heap_construct(&a0 ,0 ,byte_n_of(uint32_t) ,&&nominal_0 ,&&fail_0 ,&&fail_0);
+  continue_into TM2x·alloc_Tape_heap_construct(&a0 ,0 ,byte_n_of(uint32_t) ,&&nominal_0 ,&&fail_0 ,&&fail_0);
   nominal_0:{
     f[i] = true;
     continue_from end_0;
@@ -256,7 +256,7 @@ Result·Tallies test_1(){
     i++;
   }
   
-  TM2x·dealloc_header_heap(a0);
+  TM2x·dealloc_Tape_heap(a0);
   f[i++] = malloc_cnt == MallocCounter·count;
   f[i++] = constructed_cnt == TM2x·alloc_array_count;
   Result·Tallies·tally("test_1" ,rp ,f ,i);
@@ -272,7 +272,7 @@ Result·Tallies test_2(){
   uint32_t i = 0;
 
   TM2x·Tape*a0;
-  continue_into TM2x·alloc_header_heap_construct(&a0 ,0 ,byte_n_of(uint32_t) ,&&nominal_0 ,&&fail_0 ,&&fail_0);
+  continue_into TM2x·alloc_Tape_heap_construct(&a0 ,0 ,byte_n_of(uint32_t) ,&&nominal_0 ,&&fail_0 ,&&fail_0);
   nominal_0:{
     f[i] = true;
     continue_from end_0;
@@ -305,7 +305,7 @@ Result·Tallies test_2(){
   TM2xHd·apply_to_each(a0 ,hd ,byte_n_of(uint32_t) ," " ,TM2xHd·f_print_int);
   fputc('\n' ,stderr);
 
-  TM2x·dealloc_header_heap(a0);
+  TM2x·dealloc_Tape_heap(a0);
   f[i++] = malloc_cnt == MallocCounter·count;
   f[i++] = constructed_cnt == TM2x·alloc_array_count;
   Result·Tallies·tally("test_2" ,rp ,f ,i);

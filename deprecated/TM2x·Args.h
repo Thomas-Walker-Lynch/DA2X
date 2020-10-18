@@ -14,7 +14,7 @@
       TM2x·Tape**tape;
       Sequence nominal;
       Sequence fail;
-    } TM2x·alloc_header_heap;
+    } TM2x·alloc_Tape_heap;
 
     struct TM2x·Args·ConstructBytes{
       TM2x·Tape*tape;
@@ -91,7 +91,7 @@
     struct TM2x·Args·DeallocHeap{
       TM2x·Tape**tape;
       Sequence nominal;
-    } TM2x·dealloc_header_heap;
+    } TM2x·dealloc_Tape_heap;
 
     struct TM2x·Args·Destruct{
       TM2x·Tape*tape;

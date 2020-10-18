@@ -22,7 +22,7 @@ the array.
     //
       address_t element_n = 9;
       address_t element_byte_n = 3; // extent of 32 bit int in elements
-      TM2x·Tape*tm2x; // set by alloc_header_heap, then distributed
+      TM2x·Tape*tm2x; // set by alloc_Tape_heap, then distributed
 
     // ----------------------------------------
     // Links
@@ -34,7 +34,7 @@ the array.
       ah_lnk.args = &ah_args;
       ah_lnk.ress = &ah_ress;
       ah_lnk.lnks = &ah_lnks;
-      ah_lnk.sequence = &&TM2x·alloc_header_heap;
+      ah_lnk.sequence = &&TM2x·alloc_Tape_heap;
 
       TM2x·AllocArrayElements·Args ce_args;
       TM2x·AllocArrayElements·Lnks ce_lnks;
@@ -55,7 +55,7 @@ the array.
       TM2x·DeallocHeaderHeap·Lnk     dh_lnk;
       dh_lnk.args = &dh_args;
       dh_lnk.lnks = &dh_lnks;
-      dh_lnk.sequence = &&TM2x·dealloc_header_heap;
+      dh_lnk.sequence = &&TM2x·dealloc_Tape_heap;
 
       ah_lnks.nominal.sequence = &&ah_dist;
       ah_lnks.fail.sequence = &&fail;
@@ -78,7 +78,7 @@ the array.
       ce_args.element_n = &element_n;
       ce_args.element_byte_n = &element_byte_n;
 
-      // The alloc_header_heap result is a pointer to the allocation.  The distribution sequence that
+      // The alloc_Tape_heap result is a pointer to the allocation.  The distribution sequence that
       // follows it distributes this pointer to the parameters of other rourtines. Consequently
       // those parameters are not set here.
 

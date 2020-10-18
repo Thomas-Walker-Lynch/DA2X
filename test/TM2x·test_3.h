@@ -27,7 +27,7 @@ Currnenly this is just a copy of the copy_contiguous_bytes test.
     // result tableau
     //
       address_t byte_n = 4;  // input constant
-      TM2x·Tape *dst;             // result of alloc_header_heap, it gets distributed
+      TM2x·Tape *dst;             // result of alloc_Tape_heap, it gets distributed
       address_t offset = 0;  // input constant
 
     // ----------------------------------------
@@ -40,7 +40,7 @@ Currnenly this is just a copy of the copy_contiguous_bytes test.
       ah_lnk.args = &ah_args;
       ah_lnk.ress = &ah_ress;
       ah_lnk.lnks = &ah_lnks;
-      ah_lnk.sequence = &&TM2x·alloc_header_heap;
+      ah_lnk.sequence = &&TM2x·alloc_Tape_heap;
 
       TM2x·AllocArrayBytes·Args cb_args;
       TM2x·AllocArrayBytes·Lnks cb_lnks;
@@ -68,7 +68,7 @@ Currnenly this is just a copy of the copy_contiguous_bytes test.
       TM2x·DeallocHeaderHeap·Lnk     dh_lnk;
       dh_lnk.args = &dh_args;
       dh_lnk.lnks = &dh_lnks;
-      dh_lnk.sequence = &&TM2x·dealloc_header_heap;
+      dh_lnk.sequence = &&TM2x·dealloc_Tape_heap;
 
       ah_lnks.nominal.sequence = &&ah_dist;
       ah_lnks.fail.sequence = &&fail;

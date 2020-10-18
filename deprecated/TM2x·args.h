@@ -26,7 +26,7 @@
       TM2x·Tape*tape;
       continuation nominal;
       continuation fail;
-    } alloc_header_heap;
+    } alloc_Tape_heap;
 
     struct ConstructBytes{
       TM2x·Tape*tape;
@@ -104,7 +104,7 @@
     struct DeallocHeap{
       TM2x·Tape**tape;
       continuation nominal;
-    } dealloc_header_heap;
+    } dealloc_Tape_heap;
 
     struct Destruct{
       TM2x·Tape*tape;

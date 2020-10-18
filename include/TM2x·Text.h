@@ -8,8 +8,8 @@ address_t TM2x·alloc_array_count = 0;
 */
 
   // allocate a TM2x·Tapeheader on the heap
-  // See also the TM2x·alloc_header_static macro in TM2x.h 
-  SQ·def(TM2x·alloc_header_heap){
+  // See also the TM2x·alloc_Tape_static macro in TM2x.h 
+  SQ·def(TM2x·alloc_Tape_heap){
     TM2x·AllocHeaderHeap·Lnk *lnk = (TM2x·AllocHeaderHeap·Lnk *)SQ·lnk;
 
     CLib·Mallocn·Args m_args;
@@ -29,7 +29,7 @@ address_t TM2x·alloc_array_count = 0;
 
     SQ·continue_indirect(m_lnk);
 
-  } SQ·end(TM2x·alloc_header_heap);
+  } SQ·end(TM2x·alloc_Tape_heap);
 
   // allocates data on the heap
   SQ·def(TM2x·alloc_array_bytes){
@@ -111,11 +111,11 @@ address_t TM2x·alloc_array_count = 0;
   } SQ·end(TM2x·dealloc_array);
 
   // we are to deallocate the header from the heap
-  SQ·def(TM2x·dealloc_header_heap){
+  SQ·def(TM2x·dealloc_Tape_heap){
     TM2x·DeallocHeaderHeap·Lnk *lnk = (TM2x·DeallocHeaderHeap·Lnk *)SQ·lnk;
     free(lnk->args->tm2x);
     SQ·continue_indirect(lnk->lnks->nominal);
-  } SQ·end(TM2x·dealloc_header_heap);
+  } SQ·end(TM2x·dealloc_Tape_heap);
 
 
 /*--------------------------------------------------------------------------------
@@ -138,14 +138,15 @@ address_t TM2x·alloc_array_count = 0;
     contiguous copies as for delete.
 
 */
-
-  // copy_header will often be followed by the deallocation of the src tape header
+  // copy_header will often be followed by the deallocation of the src tape header.  The
+  // source destination nomenclature here is local, in the bigger picture the roles are
+  // often the opposite.
   SQ·def(TM2x·copy_header){
     // some aliases
-    //
-      TM2x·CopyHeader·Lnk *lnk = (TM2x·CopyHeader·Lnk *)SQ·lnk;
-      TM2x·Tape*src = lnk->args->src;
-      TM2x·Tape*dst = lnk->args->dst;
+    TM2x·CopyHeader·Lnk *lnk = (TM2x·CopyHeader·Lnk *)SQ·lnk;
+    TM2x·Tape*src = lnk->args->src;
+    TM2x·Tape*dst = lnk->args->dst;
+
     dst->base_pt = src->base_pt;
     dst->byte_n = src->byte_n;
     SQ·continue_indirect(lnk->lnks->nominal);
@@ -255,10 +256,42 @@ address_t TM2x·alloc_array_count = 0;
 
   } SQ·end(TM2x·copy_contiguous_elements);
 
+/*--------------------------------------------------------------------------------
+ */
+
+  SQ·def(TM2x·resize){
+    // some aliases
+    //
+      TM2x·CopyContiguousBytes·Lnk *lnk = (TM2x·CopyContiguousBytes·Lnk *)SQ·lnk;
+      TM2x·Tape*src = lnk->args->src;
+      TM2x·Tape*dst = lnk->args->dst;
+      address_t src_byte_0 = *lnk->args->src_byte_0;
+      address_t dst_byte_0 = *lnk->args->dst_byte_0;
+      address_t byte_n = *lnk->args->byte_n;
+    if( 
+       TM2x·byte_n(src) < byte_n
+       ||
+       TM2x·byte_n(src) - byte_n < src_byte_0
+        ){
+      SQ·continue_indirect(lnk->lnks->src_index_gt_n);
+    }
+    if( 
+       TM2x·byte_n(dst) < byte_n
+       ||
+       TM2x·byte_n(dst) - byte_n < dst_byte_0
+        ){
+      SQ·continue_indirect(lnk->lnks->dst_index_gt_n);
+    }
+    memcpyn(TM2x·byte_0_pt(dst) + dst_byte_0, TM2x·byte_0_pt(src) + src_byte_0, byte_n);
+    SQ·continue_indirect(lnk->lnks->nominal);
+  } SQ·end(TM2x·resize);
 
 
 
 #if 0
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
 
 SQ·def(resize_bytes){
   // shorten the arg names, give the optimizer something more to do

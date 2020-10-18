@@ -6,7 +6,7 @@
 struct{
   TM2x·Tape**tape;
   continuation nominal;
-} TM2x·dealloc_header_heap;
+} TM2x·dealloc_Tape_heap;
 
 
 
