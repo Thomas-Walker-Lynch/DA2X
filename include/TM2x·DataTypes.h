@@ -146,19 +146,14 @@
   } TM2x·CopyContiguousElements·Lnk;
 
   typedef struct{
-         TM2x·Tape *src;
-    address_t *src_element_0;
-         TM2x·Tape *dst;
-    address_t *dst_element_0;
-    address_t *n_Element;
-    address_t *element_n_Byte;
+         TM2x·Tape *tape;
+         address_t *n;
   } TM2x·Resize·Args;
   typedef struct{
   } TM2x·Resize·Ress;
   typedef struct{
     SQ·Lnk nominal;
-    SQ·Lnk src_index_gt_n;
-    SQ·Lnk dst_index_gt_n;
+    SQ·Lnk alloc_fail;
   } TM2x·Resize·Lnks;
   typedef struct{
     SQ·Ptr sequence;
