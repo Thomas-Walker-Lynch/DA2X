@@ -56,10 +56,10 @@
 //--------------------------------------------------------------------------------
 // allocation
 //
-  #define MINIMUM_ALLOC_N power_2_extent(15)
+  #define TM2x·MINIMUM_ALLOC_N power_2_extent(15)
 
-  INLINE_PREFIX address_t alloc_n(address_t byte_n){
-    if( byte_n <= MINIMUM_ALLOC_N) return MINIMUM_ALLOC_N;
+  INLINE_PREFIX address_t TM2x·alloc_n(address_t byte_n){
+    if( byte_n <= TM2x·MINIMUM_ALLOC_N) return TM2x·MINIMUM_ALLOC_N;
     return power_2_extent(byte_n);
   }
 
