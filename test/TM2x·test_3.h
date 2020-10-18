@@ -1,7 +1,7 @@
 /*
 Copies elements from one machine to another.
 
-Currnenly this is just a copy of the copy_contiguous_bytes test.
+Currnenly this is just a copy of the copy_contiguous test.
 
 */
 
@@ -47,14 +47,14 @@ Currnenly this is just a copy of the copy_contiguous_bytes test.
       TM2x·AllocArray·Lnk  cb_lnk;
       cb_lnk.args = &cb_args;
       cb_lnk.lnks = &cb_lnks;
-      cb_lnk.sequence = &&TM2x·alloc_array_bytes;
+      cb_lnk.sequence = &&TM2x·alloc_array;
 
       TM2x·CopyContiguous·Args cpb_args;
       TM2x·CopyContiguous·Lnks cpb_lnks;
       TM2x·CopyContiguous·Lnk  cpb_lnk;
       cpb_lnk.args = &cpb_args;
       cpb_lnk.lnks = &cpb_lnks;
-      cpb_lnk.sequence = &&TM2x·copy_contiguous_bytes;
+      cpb_lnk.sequence = &&TM2x·copy_contiguous;
 
       TM2x·DeallocArray·Args       da_args;
       TM2x·DeallocArray·Lnks       da_lnks;

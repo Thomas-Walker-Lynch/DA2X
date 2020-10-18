@@ -16,12 +16,12 @@ TM2x·construct_write_elements:{
   continue_from inclusive·mul_ext;
 
   mul_ext·nominal:{
-    TM2x·construct_write_bytes·args.tape      = tape;
-    TM2x·construct_write_bytes·args.source_pt = source_pt;
-    TM2x·construct_write_bytes·args.byte_n    = byte_n;
-    TM2x·construct_write_bytes·args.nominal   = nominal;
-    TM2x·construct_write_bytes·args.fail      = fail;
-    continue_from TM2x·construct_write_bytes;
+    TM2x·construct_write·args.tape      = tape;
+    TM2x·construct_write·args.source_pt = source_pt;
+    TM2x·construct_write·args.byte_n    = byte_n;
+    TM2x·construct_write·args.nominal   = nominal;
+    TM2x·construct_write·args.fail      = fail;
+    continue_from TM2x·construct_write;
     cend;
   }
 

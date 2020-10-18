@@ -8,7 +8,7 @@ struct{
   address_t after_byte_n;
   continuation nominal;
   continuation alloc_fail;
-} TM2x·resize_bytes;
+} TM2x·resize;
 
 
 

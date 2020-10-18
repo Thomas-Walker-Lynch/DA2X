@@ -407,7 +407,7 @@
     continue_via_trampoline pred_false;
   }
 
-  TM2xHd·F_PREFIX SequencePtr TM2xHd·pred_bytes_eq
+  TM2xHd·F_PREFIX SequencePtr TM2xHd·pred_eq
   ( void *context 
     ,void *a_e0 
     ,address_t element_byte_n

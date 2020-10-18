@@ -27,11 +27,11 @@ TM2x·F_PREFIX continuation TM2x·resize_elements:{
   continue_from inclusive·mul_ext;
 
   mul_ext·nominal:{
-   resize_bytes·args.tape = tape;
-   resize_bytes·args.after_byte_n = after_byte_n;
-   resize_bytes·args.nominal = nominal;
-   resize_bytes·args.alloc_fail = alloc_fail;
-   contine_from TM2x·resize_bytes;
+   resize·args.tape = tape;
+   resize·args.after_byte_n = after_byte_n;
+   resize·args.nominal = nominal;
+   resize·args.alloc_fail = alloc_fail;
+   contine_from TM2x·resize;
    cend;
   }
 

@@ -97,9 +97,9 @@
 //   consider using the iterator TM2xHd.h instead of indexes
 //
 
-TM2x·write_bytes·args
+TM2x·write·args
 
-  TM2x·F_PREFIX SequencePtr TM2x·write_bytes
+  TM2x·F_PREFIX SequencePtr TM2x·write
     ,TM2x·Tape *dst
     ,address_t dst_byte_i
     ,void *src_pt
@@ -121,8 +121,8 @@ TM2x·write_bytes·args
   #define TM2x·Write(tape ,index ,x) TM2x·write(tape ,index ,&(x) ,byte_n_of(typeof(x)))
 
 
-TM2x·copy_contiguous_bytes·args
-  TM2x·F_PREFIX SequencePtr TM2x·copy_contiguous_bytes
+TM2x·copy_contiguous·args
+  TM2x·F_PREFIX SequencePtr TM2x·copy_contiguous
   ( TM2x·Tape *src
     ,address_t src_byte_i
     ,TM2x·Tape *dst
@@ -167,7 +167,7 @@ TM2x·copy_contiguous_elements·args
         address_t byte_n;
         continue_into mul_ext(element_n ,element_byte_n ,&byte_n ,&&nominal ,&&gt_address_n);
         nominal:{
-          continue_via_trampoline TM2x·copy_contiguous_bytes
+          continue_via_trampoline TM2x·copy_contiguous
             ( src
               ,src_byte_i
               ,dst
@@ -191,8 +191,8 @@ TM2x·copy_contiguous_elements·args
 //--------------------------------------------------------------------------------
 // stack behavior
 //
-TM2x·push_bytes.args
-  TM2x·F_PREFIX SequencePtr TM2x·push_bytes
+TM2x·push.args
+  TM2x·F_PREFIX SequencePtr TM2x·push
    ( TM2x·Tape *tape 
     ,void *source_pt 
     ,address_t source_byte_n
@@ -201,7 +201,7 @@ TM2x·push_bytes.args
     ){
     address_t push_pt = TM2x·byte_n(tape) + 1;
     address_t after_byte_n = push_pt + source_byte_n;
-    continue_into TM2x·resize_bytes(tape ,after_byte_n ,&&resize_nominal ,&&resize_fail);
+    continue_into TM2x·resize(tape ,after_byte_n ,&&resize_nominal ,&&resize_fail);
 
     resize_nominal:{
       memcpyn(TM2x·byte_0_pt(tape) + push_pt ,source_pt ,source_byte_n);
@@ -222,7 +222,7 @@ SequencePtr TM2x·push·args
     ,SequencePtr nominal
     ,SequencePtr alloc_fail
     ){
-    continue_via_trampoline TM2x·push_bytes(tape ,element_base_pt ,element_byte_n ,nominal  ,alloc_fail);
+    continue_via_trampoline TM2x·push(tape ,element_base_pt ,element_byte_n ,nominal  ,alloc_fail);
   }
 
   // use this to block push an entire array of elements
@@ -272,7 +272,7 @@ TM2x·push_TM2x·args
     address_t before_byte_n = TM2x·byte_n(tape);
     if( before_byte_n <= element_byte_n ) continue_via_trampoline pop_last;
     address_t after_byte_n = before_byte_n - element_byte_n - 1;
-    TM2x·resize_bytes(tape ,after_byte_n ,&&resize_nominal ,&&alloc_fail);
+    TM2x·resize(tape ,after_byte_n ,&&resize_nominal ,&&alloc_fail);
     resize_nominal:{
       continue_via_trampoline nominal;
     }

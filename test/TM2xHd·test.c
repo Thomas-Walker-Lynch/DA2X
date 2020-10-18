@@ -476,7 +476,7 @@ Result·Tallies test_3(){
         ,a0 
         ,a1
         ,byte_n_of(uint) 
-        ,TM2xHd·pred_bytes_eq
+        ,TM2xHd·pred_eq
         ,&&nominal 
         ,&&empty
         ,&&fail
@@ -497,7 +497,7 @@ Result·Tallies test_3(){
             ,a2 
             ,a2_hd
             ,byte_n_of(uint) 
-            ,TM2xHd·pred_bytes_eq 
+            ,TM2xHd·pred_eq 
             ,&subset
             ,&&nominal 
             ,&&fail

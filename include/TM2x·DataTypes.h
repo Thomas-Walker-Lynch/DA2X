@@ -147,10 +147,6 @@
 
   typedef struct{
          TM2x·Tape *src;
-    address_t *src_element_0;
-         TM2x·Tape *dst;
-    address_t *dst_element_0;
-    address_t *element_n;
     address_t *element_byte_n;
   } TM2x·Resize·Args;
   typedef struct{
@@ -206,7 +202,7 @@ struct TM2x·push_0{
   SQ·Lnk alloc_fail;
 };
 
-struct TM2x·push_bytes_0{
+struct TM2x·push_0{
   TM2x·Tape *tape;
   void *source_pt;
   address_t source_byte_n;
@@ -240,7 +236,7 @@ struct TM2x·read_pop_0{
   SQ·Lnk alloc_fail;
 };
 
-struct TM2x·resize_bytes_0{
+struct TM2x·resize_0{
   TM2x·Tape *tape;
   address_t after_byte_n;
   SQ·Lnk nominal;
@@ -256,7 +252,7 @@ struct TM2x·resize_elements_0{
   SQ·Lnk index_gt_n;
 };
 
-struct TM2x·write_bytes_0{
+struct TM2x·write_0{
   void *src_pt;
   TM2x·Tape *dst;
   address_t dst_byte_i;

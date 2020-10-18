@@ -17,11 +17,11 @@ TM2x·alloc_array_elements:{
   continue_from inclusive·mul_ext;
 
   mul_ext·nominal:{
-    TM2x·alloc_array_bytes·args.tape       = tape;
-    TM2x·alloc_array_bytes·args.byte_n     = byte_n;
-    TM2x·alloc_array_bytes·args.nominal    = nominal;
-    TM2x·alloc_array_bytes·args.alloc_fail = alloc_fail;
-    continue_from TM2x·alloc_array_bytes;
+    TM2x·alloc_array·args.tape       = tape;
+    TM2x·alloc_array·args.byte_n     = byte_n;
+    TM2x·alloc_array·args.nominal    = nominal;
+    TM2x·alloc_array·args.alloc_fail = alloc_fail;
+    continue_from TM2x·alloc_array;
     cend;
   }
 

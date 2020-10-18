@@ -21,7 +21,7 @@
       address_t byte_n;   // extent of the array, in bytes
       Sequence nominal;
       Sequence alloc_fail;
-    } TM2x·alloc_array_bytes;
+    } TM2x·alloc_array;
 
     struct TM2x·Args·AllocArrayElements{
       TM2x·Tape *tape;
@@ -45,7 +45,7 @@
       address_t byte_n;
       Sequence nominal;
       Sequence fail;
-    } TM2x·construct_write_bytes;
+    } TM2x·construct_write;
 
     struct TM2x·Args·ConstructWriteElements{
       TM2x·Tape *tape;
@@ -73,7 +73,7 @@
       Sequence nominal;
       Sequence src_index_gt_n;
       Sequence dst_index_gt_n;
-    } TM2x·copy_contiguous_bytes;
+    } TM2x·copy_contiguous;
 
     struct TM2x·Args·CopyContiguousElements{
       TM2x·Tape *src;
@@ -139,7 +139,7 @@
       address_t source_byte_n;
       Sequence nominal;
       Sequence alloc_fail;
-    } TM2x·push_bytes;
+    } TM2x·push;
 
     struct TM2x·Args·PushElements{
       TM2x·Tape *tape ;
@@ -172,7 +172,7 @@
       address_t after_byte_n;
       Sequence nominal;
       Sequence alloc_fail;
-    } TM2x·resize_bytes;
+    } TM2x·resize;
 
     struct TM2x·Args·ResizeElements{
       TM2x·Tape *tape;
@@ -192,5 +192,5 @@
       Sequence alloc_fail;
       Sequence src_index_gt_n;
       Sequence dst_index_gt_n;
-    } TM2x·write_bytes;
+    } TM2x·write;
 

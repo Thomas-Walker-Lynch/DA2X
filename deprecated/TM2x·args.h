@@ -33,7 +33,7 @@
       address_t byte_n;
       continuation nominal;
       continuation alloc_fail;
-    } alloc_array_bytes;
+    } alloc_array;
 
     struct Construct{
       TM2x·Tape *tape;
@@ -42,7 +42,7 @@
       continuation nominal;
       continuation alloc_fail;
       continuation index_gt_n;
-    } alloc_array_bytes;
+    } alloc_array;
 
     struct ConstructWrite{
       TM2x·Tape *tape;
@@ -57,7 +57,7 @@
       address_t byte_n;
       continuation nominal;
       continuation fail;
-    } construct_write_bytes;
+    } construct_write;
 
     struct ConstructWriteElements{
       TM2x·Tape *tape;
@@ -86,7 +86,7 @@
       continuation alloc_fail;
       continuation bad_src_index;
       continuation bad_dst_index;
-    } copy_contiguous_bytes;
+    } copy_contiguous;
 
     struct CopyContiguousElements{
       TM2x·Tape *src;
@@ -152,7 +152,7 @@
       address_t source_byte_n;
       continuation nominal;
       continuation alloc_fail;
-    } push_bytes;
+    } push;
 
     struct PushElements{
       TM2x·Tape *tape ;
@@ -185,7 +185,7 @@
       address_t after_byte_n;
       continuation nominal;
       continuation alloc_fail;
-    } resize_bytes;
+    } resize;
 
     struct ResizeElements{
       TM2x·Tape *tape;
@@ -205,7 +205,7 @@
       continuation alloc_fail;
       continuation bad_src_index;
       continuation bad_dst_index;
-    } write_bytes;
+    } write;
 
   } TM2x·args;
 
