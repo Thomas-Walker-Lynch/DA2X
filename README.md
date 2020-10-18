@@ -130,7 +130,7 @@ the 2x in the name.
   Here are two examples:
     ```
           array_byte_n
-          array_element_n_pt
+          array_n_Element_pt
     ```
 
   Here the variable `array_byte_n` will hold a natural number that is the subscript of the
@@ -138,8 +138,8 @@ the 2x in the name.
   this value the 'extent' of the array, here measured in bytes.  Generally the extent of
   an array measured in bytes, plus 1, will be the 'size' or the 'length' of the array.
 
-  In contrast, the variable `array_element_n_pt` will hold the address of the element at
-  index `array_element_n`.
+  In contrast, the variable `array_n_Element_pt` will hold the address of the element at
+  index `array_n_Element`.
 
   Consider another example,
     ```

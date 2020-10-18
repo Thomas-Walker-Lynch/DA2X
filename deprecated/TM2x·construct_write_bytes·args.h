@@ -5,4 +5,4 @@ struct{
   address_t byte_n;
   continuation nominal;
   continuation fail;
-} TM2x·construct_write;
+} TM2x·construct_write_bytes;

@@ -4,8 +4,8 @@ struct{
   address_t src_element_i;
   TM2x·Tape *dst;
   address_t dst_element_i;
-  address_t element_n;  // index of nth element of the copy region
-  address_t element_byte_n;
+  address_t n_Element;  // index of nth element of the copy region
+  address_t element_n_Byte;
   continuation nominal;
   continuation alloc_fail;
   continuation bad_src_index;

@@ -2,14 +2,14 @@
 TM2x·index·to_pt{
   TM2x·Tape *tape               = TM2x·index·to_pt·args.tape;
   address_t index          = TM2x·index·to_pt·args.index;
-  address_t element_byte_n = TM2x·index·to_pt·args.element_byte_n;
+  address_t element_n_Byte = TM2x·index·to_pt·args.element_n_Byte;
   void **pt                = TM2x·index·to_pt·args.pt;
   continuation nominal     = TM2x·index·to_pt·args.nominal;
   continuation index_gt_n = TM2x·index·to_pt·args.index_gt_n;
 
   address_t byte_i;
   inclusive·mul_ext·args.an = index;
-  inclusive·mul_ext·args.bn = element_byte_n;
+  inclusive·mul_ext·args.bn = element_n_Byte;
   inclusive·mul_ext·args.cn = &byte_i;
   inclusive·mul_ext·args.nominal = &&mul_ext·nominal;
   inclusive·mul_ext·args.gt_address_n = index_gt_n;

@@ -9,12 +9,12 @@
 
 extern address_t TM2x·alloc_array_count;
 
-TM2x·resize:{
+TM2x·resize_bytes:{
   // shorten the arg names, give the optimizer something more to do
-  TM2x·Tape *tape = TM2x·resize·args.tape;
-  address_t after_byte_n = TM2x·resize·args.after_byte_n;
-  continuation nominal = TM2x·resize·args.nominal;
-  continuation alloc_fail = TM2x·resize·args.alloc_fail;
+  TM2x·Tape *tape = TM2x·resize_bytes·args.tape;
+  address_t after_byte_n = TM2x·resize_bytes·args.after_byte_n;
+  continuation nominal = TM2x·resize_bytes·args.nominal;
+  continuation alloc_fail = TM2x·resize_bytes·args.alloc_fail;
 
   address_t before_alloc_n = binary_interval_inclusive_upper_bound(tape->byte_n);
   address_t after_alloc_n = binary_interval_inclusive_upper_bound(after_byte_n);

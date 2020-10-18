@@ -8,4 +8,4 @@ struct{
   continuation alloc_fail;
   continuation bad_src_index;
   continuation bad_dst_index;
-}TM2x·write;
+}TM2x·write_bytes;

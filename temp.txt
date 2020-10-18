@@ -1,259 +1,120 @@
-Binary file ./.git/index matches
-./temp.sh:sed_tree . -e 's/copy_contiguous/copy_contiguous/g'
-./test/TM2x·test_3.h:Currnenly this is just a copy of the copy_contiguous test.
-./test/TM2x·test_3.h:      cb_lnk.sequence = &&TM2x·alloc_array;
-./test/TM2x·test_3.h:      cpb_lnk.sequence = &&TM2x·copy_contiguous;
-./test/TM2x·test_2.h:      cb_lnk.sequence = &&TM2x·alloc_array;
-./test/TM2x·test_2.h:      cpb_lnk.sequence = &&TM2x·copy_contiguous;
-./test/TM2x·test_4.h:      cb_lnk.sequence = &&TM2x·alloc_array;
-./test/TM2x·test_4.h:      cpb_lnk.sequence = &&TM2x·copy_contiguous;
-./test/TM2x·test_0.h:      cb_lnk.sequence = &&TM2x·alloc_array;
-./test/TM2xHd·test.c:        ,TM2xHd·pred_eq
-./test/TM2xHd·test.c:            ,TM2xHd·pred_eq 
-./deprecated/TM2x.lib.h:TM2x·write·args
-./deprecated/TM2x.lib.h:  TM2x·F_PREFIX SequencePtr TM2x·write
-./deprecated/TM2x.lib.h:TM2x·copy_contiguous·args
-./deprecated/TM2x.lib.h:  TM2x·F_PREFIX SequencePtr TM2x·copy_contiguous
-./deprecated/TM2x.lib.h:          continue_via_trampoline TM2x·copy_contiguous
-./deprecated/TM2x.lib.h:TM2x·push.args
-./deprecated/TM2x.lib.h:  TM2x·F_PREFIX SequencePtr TM2x·push
-./deprecated/TM2x.lib.h:    continue_into TM2x·resize(tape ,after_byte_n ,&&resize_nominal ,&&resize_fail);
-./deprecated/TM2x.lib.h:    continue_via_trampoline TM2x·push(tape ,element_base_pt ,element_byte_n ,nominal  ,alloc_fail);
-./deprecated/TM2x.lib.h:    TM2x·resize(tape ,after_byte_n ,&&resize_nominal ,&&alloc_fail);
-./deprecated/TM2x·construct_write_TM2x·text.h:  TM2x·construct_write·args.tape = tape;      
-./deprecated/TM2x·construct_write_TM2x·text.h:  TM2x·construct_write·args.tape_source = tape_source->base_pt;  
-./deprecated/TM2x·construct_write_TM2x·text.h:  TM2x·construct_write·args.source_byte_n = tape_source->byte_n;
-./deprecated/TM2x·construct_write_TM2x·text.h:  TM2x·construct_write·args.continuation nominal = nominal;
-./deprecated/TM2x·construct_write_TM2x·text.h:  TM2x·construct_write·args.continuation fail = fail;
-./deprecated/TM2x·construct_write_TM2x·text.h:  continue_from TM2x·construct_write;
-./deprecated/TM2x·construct_elements·args.h:} TM2x·alloc_array;
-./deprecated/TM2x·resize·args.h:} TM2x·resize;
-./deprecated/TM2x·push·text.h:TM2x·push:{
-./deprecated/TM2x·push·text.h:  TM2x·Tape *tape              = TM2x·push.args.tape;           
-./deprecated/TM2x·push·text.h:  void *source_pt         = TM2x·push.args.source_pt;      
-./deprecated/TM2x·push·text.h:  address_t source_byte_n = TM2x·push.args.source_byte_n;  
-./deprecated/TM2x·push·text.h:  continuation nominal    = TM2x·push.args.nominal;        
-./deprecated/TM2x·push·text.h:  continuation alloc_fail = TM2x·push.args.alloc_fail;     
-./deprecated/TM2x·construct_write_elements·text.h:    TM2x·construct_write·args.tape      = tape;
-./deprecated/TM2x·construct_write_elements·text.h:    TM2x·construct_write·args.source_pt = source_pt;
-./deprecated/TM2x·construct_write_elements·text.h:    TM2x·construct_write·args.byte_n    = byte_n;
-./deprecated/TM2x·construct_write_elements·text.h:    TM2x·construct_write·args.nominal   = nominal;
-./deprecated/TM2x·construct_write_elements·text.h:    TM2x·construct_write·args.fail      = fail;
-./deprecated/TM2x·construct_write_elements·text.h:    continue_from TM2x·construct_write;
-./deprecated/TM2x·push.args.h:} TM2x·push;
-./deprecated/TM2x·copy·text.h:TM2x·copy_contiguous:{
-./deprecated/TM2x·copy·text.h:         TM2x·Tape *src             = TM2x·copy_contiguous·args.src;          
-./deprecated/TM2x·copy·text.h:     address_t src_byte_i      = TM2x·copy_contiguous·args.src_byte_i;   
-./deprecated/TM2x·copy·text.h:         TM2x·Tape *dst             = TM2x·copy_contiguous·args.dst;          
-./deprecated/TM2x·copy·text.h:     address_t dst_byte_i      = TM2x·copy_contiguous·args.dst_byte_i;   
-./deprecated/TM2x·copy·text.h:     address_t byte_n          = TM2x·copy_contiguous·args.byte_n;       
-./deprecated/TM2x·copy·text.h:  continuation nominal         = TM2x·copy_contiguous·args.nominal;      
-./deprecated/TM2x·copy·text.h:  continuation alloc_fail      = TM2x·copy_contiguous·args.alloc_fail;   
-./deprecated/TM2x·copy·text.h:  continuation bad_src_index   = TM2x·copy_contiguous·args.bad_src_index;
-./deprecated/TM2x·copy·text.h:  continuation bad_dst_index   = TM2x·copy_contiguous·args.bad_dst_index;
-./deprecated/TM2x·construct_write·text.h:construct_write:{
-./deprecated/TM2x·construct_write·text.h:         TM2x·Tape *tape      = TM2x·construct_write·args.tape;
-./deprecated/TM2x·construct_write·text.h:         void *source_pt = TM2x·construct_write·args.source_pt;
-./deprecated/TM2x·construct_write·text.h:     address_t byte_n    = TM2x·construct_write·args.byte_n;
-./deprecated/TM2x·construct_write·text.h:  continuation nominal   = TM2x·construct_write·args.nominal;
-./deprecated/TM2x·construct_write·text.h:  continuation fail      = TM2x·construct_write·args.fail;
-./deprecated/TM2x·construct_write·text.h:  TM2x·alloc_array·args.tape = tape;      
-./deprecated/TM2x·construct_write·text.h:  TM2x·alloc_array·args.tape_source = tape_source->base_pt;  
-./deprecated/TM2x·construct_write·text.h:  TM2x·alloc_array·args.byte_n = tape_source->byte_n;
-./deprecated/TM2x·construct_write·text.h:  TM2x·alloc_array·args.continuation nominal = &&construct_nominal;
-./deprecated/TM2x·construct_write·text.h:  TM2x·alloc_array·args.continuation fail = fail;
-./deprecated/TM2x·construct_write·text.h:  continue_from TM2x·alloc_array;
-./deprecated/TM2x·write·args.h:}TM2x·write;
-./deprecated/TM2x·Args.h:    } TM2x·alloc_array;
-./deprecated/TM2x·Args.h:    } TM2x·construct_write;
-./deprecated/TM2x·Args.h:    } TM2x·copy_contiguous;
-./deprecated/TM2x·Args.h:    } TM2x·push;
-./deprecated/TM2x·Args.h:    } TM2x·resize;
-./deprecated/TM2x·Args.h:    } TM2x·write;
-./deprecated/TM2x·construct_elements·text.h:    TM2x·alloc_array·args.tape       = tape;
-./deprecated/TM2x·construct_elements·text.h:    TM2x·alloc_array·args.byte_n     = byte_n;
-./deprecated/TM2x·construct_elements·text.h:    TM2x·alloc_array·args.nominal    = nominal;
-./deprecated/TM2x·construct_elements·text.h:    TM2x·alloc_array·args.alloc_fail = alloc_fail;
-./deprecated/TM2x·construct_elements·text.h:    continue_from TM2x·alloc_array;
-./deprecated/TM2x·text.h:#include "TM2x·alloc_array·text.h"
-./deprecated/TM2x·text.h:#include "TM2x·construct_write·text.h"
-./deprecated/TM2x·text.h:#include "TM2x·copy_contiguous·text.h"
-./deprecated/TM2x·text.h:#include "TM2x·push·text.h"
-./deprecated/TM2x·text.h:#include "TM2x·resize·text.h"
-./deprecated/TM2x·text.h:#include "TM2x·write·text.h"
-./deprecated/TM2x·construct_write·text.h:  TM2x·construct_write·args.tape      = tape;
-./deprecated/TM2x·construct_write·text.h:  TM2x·construct_write·args.source_pt = element_base_pt;
-./deprecated/TM2x·construct_write·text.h:  TM2x·construct_write·args.byte_n    = element_byte_n;
-./deprecated/TM2x·construct_write·text.h:  TM2x·construct_write·args.nominal   = nominal;
-./deprecated/TM2x·construct_write·text.h:  TM2x·construct_write·args.fail      = fail;
-./deprecated/TM2x·construct_write·text.h:  continue_from TM2x·construct_write;
-./deprecated/TM2x·resize·text.h:TM2x·resize:{
-./deprecated/TM2x·resize·text.h:  TM2x·Tape *tape = TM2x·resize·args.tape;
-./deprecated/TM2x·resize·text.h:  address_t after_byte_n = TM2x·resize·args.after_byte_n;
-./deprecated/TM2x·resize·text.h:  continuation nominal = TM2x·resize·args.nominal;
-./deprecated/TM2x·resize·text.h:  continuation alloc_fail = TM2x·resize·args.alloc_fail;
-./deprecated/TM2x·construct·text.h:TM2x·alloc_array:{
-./deprecated/TM2x·construct·text.h:  TM2x·Tape *tape              = TM2x·alloc_array·args.tape;
-./deprecated/TM2x·construct·text.h:  address_t byte_n        = TM2x·alloc_array·args.byte_n;
-./deprecated/TM2x·construct·text.h:  continuation nominal    = TM2x·alloc_array·args.nominal;
-./deprecated/TM2x·construct·text.h:  continuation alloc_fail = TM2x·alloc_array·args.alloc_fail;
-./deprecated/TM2x·construct_write·args.h:} TM2x·construct_write;
-./deprecated/TM2x·resize_elements·text.h:   resize·args.tape = tape;
-./deprecated/TM2x·resize_elements·text.h:   resize·args.after_byte_n = after_byte_n;
-./deprecated/TM2x·resize_elements·text.h:   resize·args.nominal = nominal;
-./deprecated/TM2x·resize_elements·text.h:   resize·args.alloc_fail = alloc_fail;
-./deprecated/TM2x·resize_elements·text.h:   contine_from TM2x·resize;
-./deprecated/TM2x·write·text.h:TM2x·write:{
-./deprecated/TM2x·write·text.h:          TM2x·Tape *dst             = TM2x·write·args.dst          
-./deprecated/TM2x·write·text.h:     address_t  dst_byte_i      = TM2x·write·args.dst_byte_i   
-./deprecated/TM2x·write·text.h:          void *src_pt          = TM2x·write·args.src_pt       
-./deprecated/TM2x·write·text.h:     address_t  byte_n          = TM2x·write·args.byte_n       
-./deprecated/TM2x·write·text.h:  continuation  nominal         = TM2x·write·args.nominal      
-./deprecated/TM2x·write·text.h:  continuation  alloc_fail      = TM2x·write·args.alloc_fail   
-./deprecated/TM2x·write·text.h:  continuation  bad_src_index   = TM2x·write·args.bad_src_index
-./deprecated/TM2x·write·text.h:  continuation  bad_dst_index   = TM2x·write·args.bad_dst_index
-./deprecated/TM2x·args.h:    } alloc_array;
-./deprecated/TM2x·args.h:    } alloc_array;
-./deprecated/TM2x·args.h:    } construct_write;
-./deprecated/TM2x·args.h:    } copy_contiguous;
-./deprecated/TM2x·args.h:    } push;
-./deprecated/TM2x·args.h:    } resize;
-./deprecated/TM2x·args.h:    } write;
-./deprecated/TM2x·copy·args.h:} TM2x·copy_contiguous;
-./deprecated/TM2x·construct·args.h:} TM2x·alloc_array;
-./include/TM2x·DataTypes.h:struct TM2x·push_0{
-./include/TM2x·DataTypes.h:struct TM2x·resize_0{
-./include/TM2x·DataTypes.h:struct TM2x·write_0{
-./include/TM2xHd.lib.h:  TM2xHd·F_PREFIX SequencePtr TM2xHd·pred_eq
-./include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:  SQ·def(TM2x·alloc_array){
-./include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:  } SQ·end(TM2x·alloc_array);
-./include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:      SQ·make_Lnk(alloc_array ,TM2x·AllocArray ,&&TM2x·alloc_array);
-./include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:        { .nominal = AS(alloc_array_lnk ,SQ·Lnk)
-./include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:      alloc_array_lnks = (TM2x·AllocArray·Lnks)
-./include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:      alloc_array_args.tm2x = lnk->args->tm2x;
-./include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:      alloc_array_args.byte_n = &byte_n;
-./include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:  SQ·def(TM2x·copy_contiguous){
-./include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:  } SQ·end(TM2x·copy_contiguous);
-./include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:      SQ·make_Lnk(copy_contiguous ,TM2x·CopyContiguous ,&&TM2x·copy_contiguous);
-./include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:        {  .nominal = AS(copy_contiguous_lnk ,SQ·Lnk)
-./include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:      copy_contiguous_lnks = (TM2x·CopyContiguous·Lnks)
-./include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:      copy_contiguous_args  = (TM2x·CopyContiguous·Args)
-./include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:SQ·def(resize){
-./include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:  TM2x·Tape *tm2x = Args.TM2x·resize.tm2x;
-./include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:  address_t after_byte_n = Args.TM2x·resize.after_byte_n;
-./include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:  SequencePtr nominal = Args.TM2x·resize.nominal;
-./include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:  SequencePtr alloc_fail = Args.TM2x·resize.alloc_fail;
-./include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:} SQ·end(resize);
-./include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:SQ·def(push){
-./include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:  TM2x·Tape *tm2x              = TM2x·push.args.tm2x;           
-./include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:  void *source_pt         = TM2x·push.args.source_pt;      
-./include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:  address_t source_byte_n = TM2x·push.args.source_byte_n;  
-./include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:  SequencePtr nominal    = TM2x·push.args.nominal;        
-./include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:  SequencePtr alloc_fail = TM2x·push.args.alloc_fail;     
-./include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:SQ·def(resize){
-./include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:  TM2x·Tape *tm2x = Args.TM2x·resize.tm2x;
-./include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:  address_t after_byte_n = Args.TM2x·resize.after_byte_n;
-./include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:  SequencePtr nominal = Args.TM2x·resize.nominal;
-./include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:  SequencePtr alloc_fail = Args.TM2x·resize.alloc_fail;
-./include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:    resize·args.tm2x = tm2x;
-./include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:    resize·args.after_byte_n = after_byte_n;
-./include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:    resize·args.nominal = nominal;
-./include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:    resize·args.alloc_fail = alloc_fail;
-./include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:    contine_from TM2x·resize;
-./include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:SQ·def(write){
-./include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:          TM2x·Tape *dst               = Args.TM2x·write.dst          
-./include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:     address_t  dst_byte_i        = Args.TM2x·write.dst_byte_i   
-./include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:          void *src_pt            = Args.TM2x·write.src_pt       
-./include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:     address_t  byte_n            = Args.TM2x·write.byte_n       
-./include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:  SequencePtr  nominal          = Args.TM2x·write.nominal      
-./include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:  SequencePtr  alloc_fail       = Args.TM2x·write.alloc_fail   
-./include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:  SequencePtr  src_index_gt_n   = Args.TM2x·write.src_index_gt_n
-./include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:  SequencePtr  dst_index_gt_n   = Args.TM2x·write.dst_index_gt_n
-./include/TM2x·Text.h:  SQ·def(TM2x·alloc_array){
-./include/TM2x·Text.h:  } SQ·end(TM2x·alloc_array);
-./include/TM2x·Text.h:      SQ·make_Lnk(alloc_array ,TM2x·AllocArray ,&&TM2x·alloc_array);
-./include/TM2x·Text.h:        { .nominal = AS(alloc_array_lnk ,SQ·Lnk)
-./include/TM2x·Text.h:      alloc_array_lnks = (TM2x·AllocArray·Lnks)
-./include/TM2x·Text.h:      alloc_array_args.tm2x = lnk->args->tm2x;
-./include/TM2x·Text.h:      alloc_array_args.byte_n = &byte_n;
-./include/TM2x·Text.h:  SQ·def(TM2x·copy_contiguous){
-./include/TM2x·Text.h:  } SQ·end(TM2x·copy_contiguous);
-./include/TM2x·Text.h:      SQ·make_Lnk(copy_contiguous ,TM2x·CopyContiguous ,&&TM2x·copy_contiguous);
-./include/TM2x·Text.h:        {  .nominal = AS(copy_contiguous_lnk ,SQ·Lnk)
-./include/TM2x·Text.h:      copy_contiguous_lnks = (TM2x·CopyContiguous·Lnks)
-./include/TM2x·Text.h:      copy_contiguous_args  = (TM2x·CopyContiguous·Args)
-./include/TM2x·Text.h:SQ·def(resize){
-./include/TM2x·Text.h:  TM2x·Tape *tm2x = Args.TM2x·resize.tm2x;
-./include/TM2x·Text.h:  address_t after_byte_n = Args.TM2x·resize.after_byte_n;
-./include/TM2x·Text.h:  SequencePtr nominal = Args.TM2x·resize.nominal;
-./include/TM2x·Text.h:  SequencePtr alloc_fail = Args.TM2x·resize.alloc_fail;
-./include/TM2x·Text.h:} SQ·end(resize);
-./include/TM2x·Text.h:SQ·def(push){
-./include/TM2x·Text.h:  TM2x·Tape *tm2x              = TM2x·push.args.tm2x;           
-./include/TM2x·Text.h:  void *source_pt         = TM2x·push.args.source_pt;      
-./include/TM2x·Text.h:  address_t source_byte_n = TM2x·push.args.source_byte_n;  
-./include/TM2x·Text.h:  SequencePtr nominal    = TM2x·push.args.nominal;        
-./include/TM2x·Text.h:  SequencePtr alloc_fail = TM2x·push.args.alloc_fail;     
-./include/TM2x·Text.h:SQ·def(resize){
-./include/TM2x·Text.h:  TM2x·Tape *tm2x = Args.TM2x·resize.tm2x;
-./include/TM2x·Text.h:  address_t after_byte_n = Args.TM2x·resize.after_byte_n;
-./include/TM2x·Text.h:  SequencePtr nominal = Args.TM2x·resize.nominal;
-./include/TM2x·Text.h:  SequencePtr alloc_fail = Args.TM2x·resize.alloc_fail;
-./include/TM2x·Text.h:    resize·args.tm2x = tm2x;
-./include/TM2x·Text.h:    resize·args.after_byte_n = after_byte_n;
-./include/TM2x·Text.h:    resize·args.nominal = nominal;
-./include/TM2x·Text.h:    resize·args.alloc_fail = alloc_fail;
-./include/TM2x·Text.h:    contine_from TM2x·resize;
-./include/TM2x·Text.h:SQ·def(write){
-./include/TM2x·Text.h:          TM2x·Tape *dst               = Args.TM2x·write.dst          
-./include/TM2x·Text.h:     address_t  dst_byte_i        = Args.TM2x·write.dst_byte_i   
-./include/TM2x·Text.h:          void *src_pt            = Args.TM2x·write.src_pt       
-./include/TM2x·Text.h:     address_t  byte_n            = Args.TM2x·write.byte_n       
-./include/TM2x·Text.h:  SequencePtr  nominal          = Args.TM2x·write.nominal      
-./include/TM2x·Text.h:  SequencePtr  alloc_fail       = Args.TM2x·write.alloc_fail   
-./include/TM2x·Text.h:  SequencePtr  src_index_gt_n   = Args.TM2x·write.src_index_gt_n
-./include/TM2x·Text.h:  SequencePtr  dst_index_gt_n   = Args.TM2x·write.dst_index_gt_n
-./doc/context.md:    Sequence scale ,alloc_array ,local_index_gt_n ,local_nominal ,local_alloc_fail;
-./doc/context.md:      continue Inclusive·mul_ext(&&alloc_array ,&&local_index_gt_n);
-./doc/context.md:    cdef(alloc_array){
-./doc/context.md:      P0(p0 ,TM2x·alloc_array ,0);
-./doc/context.md:      continue TM2x·alloc_array(&&local_nominal ,&&local_alloc_fail);
-./doc/context.md:  encapsulation.  By having `TM2x·alloc_array` and `Inclusive·mul_ext` first
-./doc/context.md:  the stack frame, `TM2x·alloc_array` and `Inclusive·mul_ext` could continue directly to
-./doc/context.md:      p0->nominal = &&alloc_array;
-./doc/context.md:      cdef(alloc_array){
-./doc/context.md:  `alloc_array` or to `p1->index_gt_n`.
-./doc/context.md:  The sequence `alloc_array` was defined in the lexical scope for `f`.  Hence
-./doc/context.md:  continueing to it will restore order to the universe.  `alloc_array` then returns
-./doc/context.md:  `Inclusive·mul_ext` corresponds to c2, and `alloc_array` corresponds to c3.
-./doc/context.md:  `TM2x·alloc_array_elements` is an encapsulating sequence. `alloc_array` is local
-./doc/context.md:  `alloc_array`, rather we reach the end of dynamic scope for
-./doc/context.md:  continues to the closing bracket, so `alloc_array` is defined within the lexical
-./doc/context.md:  `alloc_array` entry point viewable to only `TM2x·alloc_array_elements`.
-./doc/context.md:      Sequence alloc_array;
-./doc/context.md:      p0->nominal = &&alloc_array;
-./doc/context.md:      cdef(alloc_array){
-./doc/context.md:        P0(p0 ,TM2x·alloc_array ,0);
-./doc/context.md:        continue TM2x·alloc_array;
-./doc/context.md:  `alloc_array`.  Note that its `gt_address_t_n` sequence argument has been set to
-./doc/context.md:        p0->nominal        = &&copy_contiguous;
-./doc/context.md:      cdef(copy_contiguous){
-./doc/context.md:        P0(p0 ,TM2x·construct_copy_contiguous ,0);
-./doc/context.md:        continue TM2x·copy_contiguous;
-./doc/context.md:        p0->nominal        = &&copy_contiguous;
-./doc/context.md:      cdef(copy_contiguous){
-./doc/context.md:        P0(p0 ,TM2x·construct_copy_contiguous ,0);
-./doc/context.md:        continue TM2x·copy_contiguous;
-./doc/context.md:      struct TM2x·Args·copy_contiguous0 args;
-./doc/context.md:      struct TM2x·Cons·copy_contiguous cons;
-./doc/context.md:    } copy_contiguous_0;
-./doc/context.md:  t.mul_ib_0.args.rpt    = &t.copy_contiguous_0.args.byte_n;
-./doc/context.md:  t.mul_ei_bi_0.args.rpt = &t.copy_contiguous_0.args.src_byte_i;
-./doc/context.md:  t.mul_ei_bi_1.args.rpt = &t.copy_contiguous_0.args.copy_contiguous_0.dst_byte_i;
-./doc/context.md:  t.copy_contiguous_0.cons.mominal = current.connections.nominal;
-./doc/context.md:  t.copy_contiguous_0.cons.src_index_gt_n = current.connections->src_index_gt_n;
-./doc/context.md:  t.copy_contiguous_0.cons.src_index_gt_n = current.connections->src_index_gt_n;
-./doc/context.md:      struct TM2x·Args·copy_contiguous0 args;
-./doc/context.md:      struct TM2x·Cons·copy_contiguous cons;
-./doc/context.md:    } copy_contiguous_0;
-./doc/basic_operations.txt:  the more general append rather than just push.
+include/TM2x.h:  // (n_Element + 1) in the denominator must be representable:
+include/TM2x.h:  INLINE_PREFIX address_t TM2x·n_Element(TM2x·Tape *tm2x ,address_t n_Element){
+include/TM2x.h:    return tm2x->byte_n/(n_Element + 1);
+include/TM2x.h:  INLINE_PREFIX void *TM2x·n_Element_pt(TM2x·Tape *tm2x ,address_t n_Element){
+include/TM2x.h:    return TM2x·byte_n_pt(tm2x) - n_Element;
+include/TM2x.h:  #define TM2x·Element_N_Pt(tm2x ,type) TM2x·n_Element_pt(tm2x ,byte_n_of(type))
+include/TM2x·DataTypes.h:    address_t *n_Element;  // extent of the array, in elements
+include/TM2x·DataTypes.h:    address_t *n_Element; // extent of the element, in bytes
+include/TM2x·DataTypes.h:    address_t *n_Element;
+include/TM2x·DataTypes.h:    address_t *n_Element;
+include/TM2x·DataTypes.h:    address_t *n_Element;
+include/TM2x·DataTypes.h:  address_t n_Element;
+include/TM2x·DataTypes.h:  address_t n_Element;
+include/TM2x·DataTypes.h:  address_t n_Element;
+include/TM2x·DataTypes.h:  address_t n_Element;
+include/TM2x·DataTypes.h:  address_t n_Element;
+include/TM2x·DataTypes.h:  address_t n_Element ;
+include/TM2x·DataTypes.h:  address_t n_Element ;
+include/TM2x·DataTypes.h:  address_t n_Element;
+include/TM2x·DataTypes.h:  address_t after_n_Element;
+include/TM2x·DataTypes.h:  address_t n_Element;
+include/TM2xHd.lib.h:    n_Element  just after hd, and if not hd, just after tape
+include/TM2xHd.lib.h:  TM2xHd·F_PREFIX SequencePtr TM2xHd·at_n_Element
+include/TM2xHd.lib.h:    ,address_t n_Element
+include/TM2xHd.lib.h:    if( hd->element_pt == TM2x·n_Element_pt(tape ,n_Element) ) continue_via_trampoline is_true;
+include/TM2xHd.lib.h:  TM2xHd·F_PREFIX void TM2xHd·unguarded_step(TM2xHd *hd ,address_t n_Element){
+include/TM2xHd.lib.h:    hd->element_pt += n_Element + 1;
+include/TM2xHd.lib.h:    ,address_t n_Element
+include/TM2xHd.lib.h:    continue_into TM2xHd·at_n_Element(tape ,hd ,n_Element ,&&at_n ,&&not_at_n);
+include/TM2xHd.lib.h:      TM2xHd·unguarded_step(hd ,n_Element);
+include/TM2xHd.lib.h:  TM2xHd·F_PREFIX void TM2xHd·read(TM2xHd *hd ,address_t n_Element ,void *dst_pt){
+include/TM2xHd.lib.h:    memcpyn(dst_pt, hd->element_pt, n_Element);
+include/TM2xHd.lib.h:  TM2xHd·F_PREFIX void TM2xHd·write(TM2xHd *hd ,address_t n_Element ,void *src_element_pt){
+include/TM2xHd.lib.h:    memcpyn(hd->element_pt ,src_element_pt ,n_Element);
+include/TM2xHd.lib.h:    ,address_t n_Element
+include/TM2xHd.lib.h:      continue_into TM2x·push(tape_acc ,TM2xHd·pt(hd_src) ,n_Element ,&&pw_nominal ,&&pw_allocation_failed);
+include/TM2xHd.lib.h:        continue_into TM2xHd·step(tape_src ,hd_src ,n_Element ,&&loop ,&&at_n);
+include/TM2xHd.lib.h:    ,address_t n_Element
+include/TM2xHd.lib.h:    ,void f(void *context ,void *el ,address_t n_Element)
+include/TM2xHd.lib.h:      f(context ,element_pt ,n_Element);
+include/TM2xHd.lib.h:      continue_into TM2xHd·at_n_Element(tape ,hd ,n_Element ,&&hd_at_n ,&&hd_not_at_n);
+include/TM2xHd.lib.h:        TM2xHd·unguarded_step(hd ,n_Element);
+include/TM2xHd.lib.h:    ,address_t n_Element
+include/TM2xHd.lib.h:    ,SequencePtr pred(void *context ,void *el ,address_t n_Element ,SequencePtr pred_true ,SequencePtr pred_false)
+include/TM2xHd.lib.h:      continue_into pred(context ,TM2xHd·pt(hd) ,n_Element ,&&pred_true ,&&pred_false);
+include/TM2xHd.lib.h:        continue_into TM2xHd·at_n_Element(tape ,hd ,n_Element ,&&at_n , &&not_at_n);
+include/TM2xHd.lib.h:          TM2xHd·unguarded_step(hd ,n_Element);
+include/TM2xHd.lib.h:    ,address_t n_Element
+include/TM2xHd.lib.h:    ,SequencePtr pred(void *context ,void *el ,address_t n_Element ,SequencePtr pred_true ,SequencePtr pred_false)
+include/TM2xHd.lib.h:      continue_into pred(context ,TM2xHd·pt(hd) ,n_Element ,&&pred_true ,&&pred_false );
+include/TM2xHd.lib.h:        continue_into TM2xHd·at_n_Element(tape ,hd ,n_Element ,&&hd_at_n , &&hd_not_at_n);
+include/TM2xHd.lib.h:          TM2xHd·unguarded_step(hd ,n_Element);
+include/TM2xHd.lib.h:    ,address_t n_Element
+include/TM2xHd.lib.h:    ,SequencePtr pred(void *context ,void *el ,address_t n_Element ,SequencePtr pred_true ,SequencePtr pred_false)
+include/TM2xHd.lib.h:        ,n_Element 
+include/TM2xHd.lib.h:      continue_into TM2x·push(tape_dst ,src_element_pt ,n_Element ,&&pw_wrote_it ,&&pw_alloc_failed);
+include/TM2xHd.lib.h:    ,address_t n_Element
+include/TM2xHd.lib.h:    ,SequencePtr pred(void *context ,void *el ,address_t n_Element ,SequencePtr pred_true ,SequencePtr pred_false)
+include/TM2xHd.lib.h:          ,n_Element 
+include/TM2xHd.lib.h:        continue_into TM2xHd·at_n_Element(set_src ,hd_src ,n_Element ,&&at_n , &&not_at_n);
+include/TM2xHd.lib.h:          TM2xHd·unguarded_step(hd_src ,n_Element);
+include/TM2xHd.lib.h:    ,address_t n_Element
+include/TM2xHd.lib.h:    ,SequencePtr pred(void *context ,void *el ,address_t n_Element ,SequencePtr pred_true ,SequencePtr pred_false)
+include/TM2xHd.lib.h:          ,n_Element 
+include/TM2xHd.lib.h:          ,n_Element 
+include/TM2xHd.lib.h:          ,n_Element 
+include/TM2xHd.lib.h:          ,n_Element
+include/TM2xHd.lib.h:    ,address_t n_Element
+include/TM2xHd.lib.h:    ,address_t n_Element
+include/TM2xHd.lib.h:    ,address_t n_Element
+include/TM2xHd.lib.h:    if( memcmpn(e0 ,e1 ,n_Element) == 0 )
+include/TM2xHd.lib.h:    ,address_t n_Element
+include/TM2xHd.lib.h:    if( strncmpn(e0 ,e1 ,n_Element) == 0 )
+include/TM2xHd.lib.h:  TM2xHd·F_PREFIX void TM2xHd·f_free(void *context ,void *element_pt ,address_t n_Element){
+include/TM2xHd.lib.h:  // could improve this by getting the integer size from n_Element
+include/TM2xHd.lib.h:  TM2xHd·F_PREFIX void TM2xHd·f_print_int(void *context ,void *element_pt ,address_t n_Element){
+include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:      scale_ext_args.a_0 = lnk->args->n_Element;
+include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:      scale_ext_args.a_1 = lnk->args->n_Element;
+include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:          ,.a_1 = lnk->args->n_Element
+include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:          ,.a_1 = lnk->args->n_Element
+include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:        {  .a_0 = lnk->args->n_Element
+include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:          ,.a_1 = lnk->args->n_Element
+include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:  address_t n_Element = Args.TM2x·index·to_pt.n_Element;
+include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:  inclusive·mul_ext·args.bn = n_Element;
+include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:   address_t n_Element  = Args.TM2x·pop.n_Element; 
+include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:  address_t n_Element       = Args.TM2x·push_elements.n_Element;
+include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:  address_t n_Element  = Args.TM2x·push_elements.n_Element;
+include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:    address_t n_Element   = Args.TM2x·push.n_Element;
+include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:  address_t n_Element   = Args.TM2x·read_pop.address_t n_Element;
+include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:  address_t after_n_Element = Args.TM2x·resize_elements.after_n_Element;
+include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:  address_t n_Element  = Args.TM2x·resize_elements.n_Element;
+include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:  inclusive·mul_ext·args.an = after_n_Element;
+include/TM2x·Text.h.~2a3bbfe889c5c008a5bc421409ee473d4b525609~:  inclusive·mul_ext·args.bn = n_Element;
+include/TM2x·Text.h:      scale_ext_args.a_0 = lnk->args->n_Element;
+include/TM2x·Text.h:      scale_ext_args.a_1 = lnk->args->n_Element;
+include/TM2x·Text.h:          ,.a_1 = lnk->args->n_Element
+include/TM2x·Text.h:          ,.a_1 = lnk->args->n_Element
+include/TM2x·Text.h:        {  .a_0 = lnk->args->n_Element
+include/TM2x·Text.h:          ,.a_1 = lnk->args->n_Element
+include/TM2x·Text.h:  address_t n_Element = Args.TM2x·index·to_pt.n_Element;
+include/TM2x·Text.h:  inclusive·mul_ext·args.bn = n_Element;
+include/TM2x·Text.h:   address_t n_Element  = Args.TM2x·pop.n_Element; 
+include/TM2x·Text.h:  address_t n_Element       = Args.TM2x·push_elements.n_Element;
+include/TM2x·Text.h:  address_t n_Element  = Args.TM2x·push_elements.n_Element;
+include/TM2x·Text.h:    address_t n_Element   = Args.TM2x·push.n_Element;
+include/TM2x·Text.h:  address_t n_Element   = Args.TM2x·read_pop.address_t n_Element;
+include/TM2x·Text.h:  address_t after_n_Element = Args.TM2x·resize_elements.after_n_Element;
+include/TM2x·Text.h:  address_t n_Element  = Args.TM2x·resize_elements.n_Element;
+include/TM2x·Text.h:  inclusive·mul_ext·args.an = after_n_Element;
+include/TM2x·Text.h:  inclusive·mul_ext·args.bn = n_Element;
+test/TM2x·test_1.h:      address_t n_Element = 9;
+test/TM2x·test_1.h:      address_t n_Element = 3; // extent of 32 bit int in elements
+test/TM2x·test_1.h:      ce_args.n_Element = &n_Element;
+test/TM2x·test_1.h:      ce_args.n_Element = &n_Element;
+test/TM2xHd·test.c:void TM2xHd·f0(void *context ,void *item_pt ,address_t n_Element){
+test/TM2xHd·test.c:  ,address_t n_Element 
+test/TM2xHd·test.c:  ,address_t n_Element 
+test/TM2xHd·test.c:  ,address_t n_Element 
+test/TM2xHd·test.c:  ,address_t n_Element 
+test/TM2xHd·test.c:  ,address_t n_Element 

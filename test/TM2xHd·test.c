@@ -14,7 +14,7 @@ typedef struct {
 } TM2xHdTestContext1;
 
 // checks for equivalence between item and reference value, then increments the referece value.
-void TM2xHd·f0(void *context ,void *item_pt ,address_t element_byte_n){
+void TM2xHd·f0(void *context ,void *item_pt ,address_t element_n_Byte){
   uint item = *(uint *)item_pt;
   TM2xHdTestContext1 *cpt = context; 
   cpt->result = cpt->result && (item == cpt->ref++);
@@ -76,7 +76,7 @@ Result·Tallies test_0(){
 continuation TM2xHd·p0
 ( void *context 
   ,void *item_pt 
-  ,address_t element_byte_n 
+  ,address_t element_n_Byte 
   ,continuation pred_true 
   ,continuation pred_false
   ){
@@ -89,7 +89,7 @@ continuation TM2xHd·p0
 continuation TM2xHd·p1
 ( void *context 
   ,void *item_pt 
-  ,address_t element_byte_n 
+  ,address_t element_n_Byte 
   ,continuation pred_true 
   ,continuation pred_false
   ){
@@ -102,7 +102,7 @@ continuation TM2xHd·p1
 continuation TM2xHd·p2
 ( void *context 
   ,void *item_pt 
-  ,address_t element_byte_n 
+  ,address_t element_n_Byte 
   ,continuation pred_true 
   ,continuation pred_false
   ){
@@ -115,7 +115,7 @@ continuation TM2xHd·p2
 continuation TM2xHd·p3
 ( void *context 
   ,void *item_pt 
-  ,address_t element_byte_n 
+  ,address_t element_n_Byte 
   ,continuation pred_true 
   ,continuation pred_false
   ){
@@ -128,7 +128,7 @@ continuation TM2xHd·p3
 continuation TM2xHd·p4
 ( void *context 
   ,void *item_pt 
-  ,address_t element_byte_n 
+  ,address_t element_n_Byte 
   ,continuation pred_true 
   ,continuation pred_false
   ){
@@ -476,7 +476,7 @@ Result·Tallies test_3(){
         ,a0 
         ,a1
         ,byte_n_of(uint) 
-        ,TM2xHd·pred_eq
+        ,TM2xHd·pred_bytes_eq
         ,&&nominal 
         ,&&empty
         ,&&fail
@@ -497,7 +497,7 @@ Result·Tallies test_3(){
             ,a2 
             ,a2_hd
             ,byte_n_of(uint) 
-            ,TM2xHd·pred_eq 
+            ,TM2xHd·pred_bytes_eq 
             ,&subset
             ,&&nominal 
             ,&&fail

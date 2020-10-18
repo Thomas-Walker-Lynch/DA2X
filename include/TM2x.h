@@ -37,20 +37,20 @@
     return tm2x->byte_n;
   }
   // The index of the last element in the array.  Note that the
-  // (element_byte_n + 1) in the denominator must be representable:
-  INLINE_PREFIX address_t TM2x·element_n(TM2x·Tape *tm2x ,address_t element_byte_n){
-    return tm2x->byte_n/(element_byte_n + 1);
+  // (element_n_Byte + 1) in the denominator must be representable:
+  INLINE_PREFIX address_t TM2x·n_Element(TM2x·Tape *tm2x ,address_t element_n_Byte){
+    return tm2x->byte_n/(element_n_Byte + 1);
   }
 
   // nth pointers
   INLINE_PREFIX char *TM2x·byte_n_pt(TM2x·Tape *tm2x){
     return tm2x->base_pt + tm2x->byte_n;
   }
-  INLINE_PREFIX void *TM2x·element_n_pt(TM2x·Tape *tm2x ,address_t element_byte_n){
-    return TM2x·byte_n_pt(tm2x) - element_byte_n;
+  INLINE_PREFIX void *TM2x·n_Element_pt(TM2x·Tape *tm2x ,address_t element_n_Byte){
+    return TM2x·byte_n_pt(tm2x) - element_n_Byte;
   }
 
-  #define TM2x·Element_N_Pt(tm2x ,type) TM2x·element_n_pt(tm2x ,byte_n_of(type))
+  #define TM2x·Element_N_Pt(tm2x ,type) TM2x·n_Element_pt(tm2x ,byte_n_of(type))
 
 
 //--------------------------------------------------------------------------------

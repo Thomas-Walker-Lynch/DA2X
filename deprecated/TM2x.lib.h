@@ -63,19 +63,19 @@
     return tape->byte_n;
   }
   // The index of the last element in the array.  Note that the
-  // (element_byte_n + 1) in the denominator must be representable:
-  TM2x·F_PREFIX address_t TM2x·element_n(TM2x·Tape *tape ,address_t element_byte_n){
-    return tape->byte_n/(element_byte_n + 1);
+  // (element_n_Byte + 1) in the denominator must be representable:
+  TM2x·F_PREFIX address_t TM2x·n_Element(TM2x·Tape *tape ,address_t element_n_Byte){
+    return tape->byte_n/(element_n_Byte + 1);
   }
 
   // nth pointers
   TM2x·F_PREFIX char *TM2x·byte_n_pt(TM2x·Tape *tape){
     return tape->base_pt + tape->byte_n;
   }
-  TM2x·F_PREFIX void *TM2x·element_n_pt(TM2x·Tape *tape ,address_t element_byte_n){
-    return TM2x·byte_n_pt(tape) - element_byte_n;
+  TM2x·F_PREFIX void *TM2x·n_Element_pt(TM2x·Tape *tape ,address_t element_n_Byte){
+    return TM2x·byte_n_pt(tape) - element_n_Byte;
   }
-  #define TM2x·Element_N_Pt(tape ,type) TM2x·element_n_pt(tape ,byte_n_of(type))
+  #define TM2x·Element_N_Pt(tape ,type) TM2x·n_Element_pt(tape ,byte_n_of(type))
 
 
 //--------------------------------------------------------------------------------
@@ -97,9 +97,9 @@
 //   consider using the iterator TM2xHd.h instead of indexes
 //
 
-TM2x·write·args
+TM2x·write_bytes·args
 
-  TM2x·F_PREFIX SequencePtr TM2x·write
+  TM2x·F_PREFIX SequencePtr TM2x·write_bytes
     ,TM2x·Tape *dst
     ,address_t dst_byte_i
     ,void *src_pt
@@ -114,15 +114,15 @@ TM2x·write·args
     memcpyn(TM2x·byte_0_pt(dst) + dst_byte_i ,src_pt ,byte_n);
   }
 
-  TM2x·F_PREFIX void TM2x·write(TM2x·Tape *tape ,address_t index ,void *src_element_pt ,address_t element_byte_n){
-    void *dst_element_pt = TM2x·index·to_pt(tape ,index ,element_byte_n);
-    memcpyn(dst_element_pt, src_element_pt, element_byte_n);
+  TM2x·F_PREFIX void TM2x·write(TM2x·Tape *tape ,address_t index ,void *src_element_pt ,address_t element_n_Byte){
+    void *dst_element_pt = TM2x·index·to_pt(tape ,index ,element_n_Byte);
+    memcpyn(dst_element_pt, src_element_pt, element_n_Byte);
   }
   #define TM2x·Write(tape ,index ,x) TM2x·write(tape ,index ,&(x) ,byte_n_of(typeof(x)))
 
 
-TM2x·copy_contiguous·args
-  TM2x·F_PREFIX SequencePtr TM2x·copy_contiguous
+TM2x·copy_contiguous_bytes·args
+  TM2x·F_PREFIX SequencePtr TM2x·copy_contiguous_bytes
   ( TM2x·Tape *src
     ,address_t src_byte_i
     ,TM2x·Tape *dst
@@ -146,8 +146,8 @@ TM2x·copy_contiguous_elements·args
     ,address_t src_element_i
     ,TM2x·Tape *dst
     ,address_t dst_element_i
-    ,address_t element_n  // index of nth element of the copy region
-    ,address_t element_byte_n
+    ,address_t n_Element  // index of nth element of the copy region
+    ,address_t element_n_Byte
     ,SequencePtr nominal
     ,SequencePtr alloc_fail
     ,SequencePtr bad_src_index
@@ -156,18 +156,18 @@ TM2x·copy_contiguous_elements·args
 
     Sequence nominal ,gt_address_n;
     address_t src_byte_i;
-    continue_into mul_ext(src_element_i ,element_byte_n ,&src_byte_i ,&&nominal ,&&gt_address_n);
+    continue_into mul_ext(src_element_i ,element_n_Byte ,&src_byte_i ,&&nominal ,&&gt_address_n);
 
     nominal:{ 
       Sequence nominal;
       address_t dst_byte_i;
-      continue_into mul_ext(dst_element_i ,element_byte_n ,&dst_byte_i ,&&nominal ,&&gt_address_n);
+      continue_into mul_ext(dst_element_i ,element_n_Byte ,&dst_byte_i ,&&nominal ,&&gt_address_n);
       nominal:{
         Sequence nominal;
         address_t byte_n;
-        continue_into mul_ext(element_n ,element_byte_n ,&byte_n ,&&nominal ,&&gt_address_n);
+        continue_into mul_ext(n_Element ,element_n_Byte ,&byte_n ,&&nominal ,&&gt_address_n);
         nominal:{
-          continue_via_trampoline TM2x·copy_contiguous
+          continue_via_trampoline TM2x·copy_contiguous_bytes
             ( src
               ,src_byte_i
               ,dst
@@ -191,8 +191,8 @@ TM2x·copy_contiguous_elements·args
 //--------------------------------------------------------------------------------
 // stack behavior
 //
-TM2x·push.args
-  TM2x·F_PREFIX SequencePtr TM2x·push
+TM2x·push_bytes.args
+  TM2x·F_PREFIX SequencePtr TM2x·push_bytes
    ( TM2x·Tape *tape 
     ,void *source_pt 
     ,address_t source_byte_n
@@ -201,7 +201,7 @@ TM2x·push.args
     ){
     address_t push_pt = TM2x·byte_n(tape) + 1;
     address_t after_byte_n = push_pt + source_byte_n;
-    continue_into TM2x·resize(tape ,after_byte_n ,&&resize_nominal ,&&resize_fail);
+    continue_into TM2x·resize_bytes(tape ,after_byte_n ,&&resize_nominal ,&&resize_fail);
 
     resize_nominal:{
       memcpyn(TM2x·byte_0_pt(tape) + push_pt ,source_pt ,source_byte_n);
@@ -218,11 +218,11 @@ SequencePtr TM2x·push·args
   TM2x·F_PREFIX SequencePtr TM2x·push
    ( TM2x·Tape *tape 
     ,void *element_base_pt
-    ,address_t element_byte_n
+    ,address_t element_n_Byte
     ,SequencePtr nominal
     ,SequencePtr alloc_fail
     ){
-    continue_via_trampoline TM2x·push(tape ,element_base_pt ,element_byte_n ,nominal  ,alloc_fail);
+    continue_via_trampoline TM2x·push_bytes(tape ,element_base_pt ,element_n_Byte ,nominal  ,alloc_fail);
   }
 
   // use this to block push an entire array of elements
@@ -230,14 +230,14 @@ TM2x·push_elements·args
   TM2x·F_PREFIX SequencePtr TM2x·push_elements
    ( TM2x·Tape *tape 
     ,void *base_pt
-    ,address_t element_n 
-    ,address_t element_byte_n 
+    ,address_t n_Element 
+    ,address_t element_n_Byte 
     ,SequencePtr nominal
     ,SequencePtr alloc_fail
     ,SequencePtr bad_index
     ){
     address_t byte_n;
-    continue_into mul_ext(element_n ,element_byte_n ,&byte_n ,&&mul_ext·nominal ,&&mul_ext·gt_address_n);
+    continue_into mul_ext(n_Element ,element_n_Byte ,&byte_n ,&&mul_ext·nominal ,&&mul_ext·gt_address_n);
     mul_ext·nominal:{
       continue_via_trampoline TM2x·push(tape ,base_pt ,byte_n ,nominal  ,alloc_fail);
     }
@@ -263,16 +263,16 @@ TM2x·push_TM2x·args
 
   TM2x·F_PREFIX SequencePtr TM2x·pop·args
   ( TM2x·Tape *tape
-    ,address_t element_byte_n
+    ,address_t element_n_Byte
     ,SequencePtr nominal
     ,SequencePtr pop_last
     ,SequencePtr alloc_fail
     ){
 
     address_t before_byte_n = TM2x·byte_n(tape);
-    if( before_byte_n <= element_byte_n ) continue_via_trampoline pop_last;
-    address_t after_byte_n = before_byte_n - element_byte_n - 1;
-    TM2x·resize(tape ,after_byte_n ,&&resize_nominal ,&&alloc_fail);
+    if( before_byte_n <= element_n_Byte ) continue_via_trampoline pop_last;
+    address_t after_byte_n = before_byte_n - element_n_Byte - 1;
+    TM2x·resize_bytes(tape ,after_byte_n ,&&resize_nominal ,&&alloc_fail);
     resize_nominal:{
       continue_via_trampoline nominal;
     }
@@ -287,13 +287,13 @@ TM2x·push_TM2x·args
 TM2x·read_pop·args
   ( TM2x·Tape *tape 
     ,void *dst_element_pt 
-    ,address_t element_byte_n
+    ,address_t element_n_Byte
     ,SequencePtr nominal
     ,SequencePtr pop_last
     ,SequencePtr alloc_fail
     ){
-    memcpyn(dst_element_pt, TM2x·element_n_pt(tape ,element_byte_n) ,element_byte_n);
-    continue_into TM2x·pop(tape ,element_byte_n ,&&pop_nominal ,&&pop_pop_last ,&&pop_alloc_fail);
+    memcpyn(dst_element_pt, TM2x·n_Element_pt(tape ,element_n_Byte) ,element_n_Byte);
+    continue_into TM2x·pop(tape ,element_n_Byte ,&&pop_nominal ,&&pop_pop_last ,&&pop_alloc_fail);
     pop_nominal:{ continue_via_trampoline nominal;}
     pop_pop_last:{ continue_via_trampoline pop_last;}
     pop_alloc_fail:{ continue_via_trampoline alloc_fail;}

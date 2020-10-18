@@ -5,8 +5,8 @@
 
 struct{
   TM2x·Tape *tape;
-  address_t after_element_n;
-  address_t element_byte_n;
+  address_t after_n_Element;
+  address_t element_n_Byte;
   continuation nominal;
   continuation alloc_fail;
   continuation index_gt_n;

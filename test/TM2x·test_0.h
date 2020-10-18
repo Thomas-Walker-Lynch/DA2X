@@ -41,7 +41,7 @@ Deallocates the header.
       TM2x·AllocArray·Lnk  cb_lnk;
       cb_lnk.args = &cb_args;
       cb_lnk.lnks = &cb_lnks;
-      cb_lnk.sequence = &&TM2x·alloc_array;
+      cb_lnk.sequence = &&TM2x·alloc_array_bytes;
 
       TM2x·DeallocArray·Args       da_args;
       TM2x·DeallocArray·Lnks       da_lnks;

@@ -21,12 +21,12 @@
       address_t byte_n;   // extent of the array, in bytes
       Sequence nominal;
       Sequence alloc_fail;
-    } TM2x·alloc_array;
+    } TM2x·alloc_array_bytes;
 
     struct TM2x·Args·AllocArrayElements{
       TM2x·Tape *tape;
-      address_t element_n;  // extent of the array, in elements
-      address_t element_byte_n; // extent of the element, in bytes
+      address_t n_Element;  // extent of the array, in elements
+      address_t element_n_Byte; // extent of the element, in bytes
       Sequence nominal;
       Sequence index_gt_n;
       Sequence alloc_fail;
@@ -45,13 +45,13 @@
       address_t byte_n;
       Sequence nominal;
       Sequence fail;
-    } TM2x·construct_write;
+    } TM2x·construct_write_bytes;
 
     struct TM2x·Args·ConstructWriteElements{
       TM2x·Tape *tape;
       void *source_pt;
-      address_t element_n;
-      address_t element_byte_n;
+      address_t n_Element;
+      address_t element_n_Byte;
       Sequence nominal;
       Sequence index_gt_n;
       Sequence fail;
@@ -73,15 +73,15 @@
       Sequence nominal;
       Sequence src_index_gt_n;
       Sequence dst_index_gt_n;
-    } TM2x·copy_contiguous;
+    } TM2x·copy_contiguous_bytes;
 
     struct TM2x·Args·CopyContiguousElements{
       TM2x·Tape *src;
       address_t src_element_i;
       TM2x·Tape *dst;
       address_t dst_element_i;
-      address_t element_n;  // index of nth element of the copy region
-      address_t element_byte_n;
+      address_t n_Element;  // index of nth element of the copy region
+      address_t element_n_Byte;
       Sequence nominal;
       Sequence alloc_fail;
       Sequence src_index_gt_n;
@@ -101,8 +101,8 @@
     struct TM2x·Args·Index·Read{
       TM2x·Tape *tape;
       address_t index;
-      address_t element_n;
-      address_t element_byte_n;
+      address_t n_Element;
+      address_t element_n_Byte;
       void *dst_element_pt;
       Sequence nominal;
       Sequence index_gt_n;
@@ -111,7 +111,7 @@
     struct TM2x·Args·Index·ToPt{
        TM2x·Tape *tape ;
        address_t index;
-       address_t element_byte_n;
+       address_t element_n_Byte;
        void **pt;
        Sequence nominal;
        Sequence index_gt_n;
@@ -119,7 +119,7 @@
 
     struct TM2x·Args·Pop{
        TM2x·Tape *tape;
-       address_t element_byte_n;
+       address_t element_n_Byte;
        Sequence nominal;
        Sequence pop_last;
        Sequence alloc_fail;
@@ -128,7 +128,7 @@
     struct TM2x·Args·Push{
       TM2x·Tape *tape;
       void *element_base_pt;
-      address_t element_byte_n;
+      address_t element_n_Byte;
       Sequence nominal;
       Sequence alloc_fail;
     } TM2x·push;
@@ -139,13 +139,13 @@
       address_t source_byte_n;
       Sequence nominal;
       Sequence alloc_fail;
-    } TM2x·push;
+    } TM2x·push_bytes;
 
     struct TM2x·Args·PushElements{
       TM2x·Tape *tape ;
       void *base_pt;
-      address_t element_n ;
-      address_t element_byte_n ;
+      address_t n_Element ;
+      address_t element_n_Byte ;
       Sequence nominal;
       Sequence alloc_fail;
       Sequence index_gt_n;
@@ -161,7 +161,7 @@
     struct TM2x·Args·ReadPop{
        TM2x·Tape *tape ;
        void *dst_element_pt ;
-       address_t element_byte_n;
+       address_t element_n_Byte;
        Sequence nominal;
        Sequence pop_last;
        Sequence alloc_fail;
@@ -172,12 +172,12 @@
       address_t after_byte_n;
       Sequence nominal;
       Sequence alloc_fail;
-    } TM2x·resize;
+    } TM2x·resize_bytes;
 
     struct TM2x·Args·ResizeElements{
       TM2x·Tape *tape;
-      address_t after_element_n;
-      address_t element_byte_n;
+      address_t after_n_Element;
+      address_t element_n_Byte;
       Sequence nominal;
       Sequence alloc_fail;
       Sequence index_gt_n;
@@ -192,5 +192,5 @@
       Sequence alloc_fail;
       Sequence src_index_gt_n;
       Sequence dst_index_gt_n;
-    } TM2x·write;
+    } TM2x·write_bytes;
 

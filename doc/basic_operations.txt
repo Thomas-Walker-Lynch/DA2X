@@ -84,7 +84,7 @@ III. Functions that should be on the TM library interface
   interface provides push and pop.
 
   Pushing an element is the same as appending a sequence of bytes, so we we will need
-  the more general append rather than just push.
+  the more general append_bytes rather than just push.
 
   Queuing is more complex because the array base is at a fixed location. Something special
   needs to be done to push on the left.  Chances are we need a new header struct, and to

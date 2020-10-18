@@ -28,23 +28,23 @@ output tape (here 'set_c') was written.
     bool found_first = false;
     do{
       void *a_element_pt = TM2xHd_pt(hd_a);
-      found_first = TM2xHd_exists(set_b ,hd_b ,element_byte_n ,a_element_pt ,pred);
+      found_first = TM2xHd_exists(set_b ,hd_b ,element_n_Byte ,a_element_pt ,pred);
       if( found_first ){
-        TM2x_write_init(set_c ,a_element_pt ,element_byte_n);
+        TM2x_write_init(set_c ,a_element_pt ,element_n_Byte);
         break;
       }
-      if( !TM2xHd_unguarded_step(set_a ,hd_a ,element_byte_n) )
+      if( !TM2xHd_unguarded_step(set_a ,hd_a ,element_n_Byte) )
         break;
       TM2xHd_rewind(set_b ,hd_b);
     }while(true);
     if( !found_first ) return false;
 
     // extend
-    while(TM2xHd_unguarded_step(set_a ,hd_a ,element_byte_n)){
+    while(TM2xHd_unguarded_step(set_a ,hd_a ,element_n_Byte)){
       a_element_pt = TM2xHd_pt(hd_a);
       TM2xHd_rewind(set_b ,hd_b);
-      if(TM2xHd_exists(set_b ,hd_b ,element_byte_n ,a_element_pt ,pred)){
-        TM2x_push_write(set_c ,a_element_pt ,element_byte_n);
+      if(TM2xHd_exists(set_b ,hd_b ,element_n_Byte ,a_element_pt ,pred)){
+        TM2x_push_write(set_c ,a_element_pt ,element_n_Byte);
       }
     }
     return true;
@@ -54,20 +54,20 @@ We could have instead nested the extension code.
     // search for first, nested extension
     do{
       void *a_element_pt = TM2xHd_pt(hd_a);
-      found_first = TM2xHd_exists(set_b ,hd_b ,element_byte_n ,a_element_pt ,pred);
+      found_first = TM2xHd_exists(set_b ,hd_b ,element_n_Byte ,a_element_pt ,pred);
       if( found_first ){
-        TM2x_write_init(set_c ,a_element_pt ,element_byte_n);
+        TM2x_write_init(set_c ,a_element_pt ,element_n_Byte);
         // extend
-        while(TM2xHd_unguarded_step(set_a ,hd_a ,element_byte_n)){
+        while(TM2xHd_unguarded_step(set_a ,hd_a ,element_n_Byte)){
           a_element_pt = TM2xHd_pt(hd_a);
           TM2xHd_rewind(set_b ,hd_b);
-          if(TM2xHd_exists(set_b ,hd_b ,element_byte_n ,a_element_pt ,pred)){
-            TM2x_push_write(set_c ,a_element_pt ,element_byte_n);
+          if(TM2xHd_exists(set_b ,hd_b ,element_n_Byte ,a_element_pt ,pred)){
+            TM2x_push_write(set_c ,a_element_pt ,element_n_Byte);
           }
         }
         break;
       }
-      if( !TM2xHd_unguarded_step(set_a ,hd_a ,element_byte_n) )
+      if( !TM2xHd_unguarded_step(set_a ,hd_a ,element_n_Byte) )
         break;
       TM2xHd_rewind(set_b ,hd_b);
     }while(true);
@@ -150,19 +150,19 @@ In both cases the source iterator is left at the end of the tape.
     // first block
     do{
        if( is_one(hd) ) init(destination ,hd); break;
-       if( at_element_n(hd) ) goto never_is_one;
+       if( at_n_Element(hd) ) goto never_is_one;
        unguarded_step(hd)
     }while(true);
 
     // extend block
-    while(!at_element_n(hd)){
+    while(!at_n_Element(hd)){
        unguarded_step(hd)
        if( is_one(hd) ) extend(hd);
     }
     end:;
     never_is_one:;
 
-The functions: is_one(), unguarded_step(), and at_element_n() are used both by the first and extend blocks.
+The functions: is_one(), unguarded_step(), and at_n_Element() are used both by the first and extend blocks.
 
 The function init(destination ,hd) is unique to the first block.
 
@@ -224,7 +224,7 @@ The first-extend loop now looks like:
         write_init(output ,hd);
         continue_from_local extend;
       not_one:;
-        continue_into at_element_n(hd ,&&at_n  ,&&not_at_n);
+        continue_into at_n_Element(hd ,&&at_n  ,&&not_at_n);
           at_n:;
             continue_from <not_found>
           not_at_n:;
@@ -232,7 +232,7 @@ The first-extend loop now looks like:
             continue_from_local first;
 
   extend:;
-    continue_into at_element_n(hd ,&&at_n ,&&not_at_n);
+    continue_into at_n_Element(hd ,&&at_n ,&&not_at_n);
       at_n:;
         continue_from <done>
       not_at_n:;
@@ -262,19 +262,19 @@ If we could have a language statement for this form, perhaps it would be somethi
 
    hd -> <not_found> ,<done>
      if( is_one ) init ,extend;
-     if( !at_element_n ) step;
+     if( !at_n_Element ) step;
 
 or perhaps
 
    LP {
      if( is_one() ) init(); extend();
-     if( at_element_n ) <done> else unguarded_step();
+     if( at_n_Element ) <done> else unguarded_step();
      <not_found>
      }
 
 as a macro:
 
-   #define LP( is_one ,init ,extend ,at_element_n ,step, done ,not_found )
+   #define LP( is_one ,init ,extend ,at_n_Element ,step, done ,not_found )
 
 It would be awful to pass that much code as macro arguments. Perhaps I can add a this loop
 to the tranche macro pre-processor, but then we quickly get into the preprocessor having
@@ -284,7 +284,7 @@ to be aware of contexts so as to make up namespaced labels that do not collide .
 
   first: if( is_one(hd) ) write_init(output ,hd); else <not_found>
   extend: if( is_one(hd) ) push_write(output ,hd);
-  iterator: if( at_element_n(input ,hd) ) <done> else unguarded_step(hd);
+  iterator: if( at_n_Element(input ,hd) ) <done> else unguarded_step(hd);
 
 This is not a very good language statement because is_one appears twice, so we can not just have
 anonymous code in braces for it.
@@ -293,12 +293,12 @@ anonymous code in braces for it.
   write_if: is_one(hd) | <not_found>
   first: write_init(output ,hd)
   extend: push_write(output ,hd)
-  iterator: if( at_element_n(input ,hd) ) <done> else unguarded_step(hd);
+  iterator: if( at_n_Element(input ,hd) ) <done> else unguarded_step(hd);
 
   write: is_one(hd) | <not_found>
   first: write_init(output ,hd)
   extend: push_write(output ,hd)
-  iterator: at_element_n(input ,hd) && <done> | unguarded_step(hd)
+  iterator: at_n_Element(input ,hd) && <done> | unguarded_step(hd)
 
 
 --------------------------------------------------------------------------------
@@ -309,7 +309,7 @@ anonymous code in braces for it.
 
       is_one:;
         write_init(output ,hd);
-        continue_into at_element_n(hd ,&&at_n ,&&not_at_n);
+        continue_into at_n_Element(hd ,&&at_n ,&&not_at_n);
           at_n:;
             continue_from <done>
           not_at_n:;
@@ -321,7 +321,7 @@ anonymous code in braces for it.
                 continue_from_local extend;
 
       not_one:;
-        continue_into at_element_n(hd ,&&at_n  ,&&not_at_n);
+        continue_into at_n_Element(hd ,&&at_n  ,&&not_at_n);
           at_n:;
             continue_from <not_found>
           not_at_n:;
@@ -343,7 +343,7 @@ anonymous code in braces for it.
         (*write)(output ,hd);
         write = write_extend; // this assignment will be repeated redundantly
       not_one:;
-        continue_into at_element_n(hd ,&&done  ,&&not_at_n);
+        continue_into at_n_Element(hd ,&&done  ,&&not_at_n);
           not_at_n:;
             unguarded_step(hd);
             continue_from_local loop;
@@ -373,7 +373,7 @@ use of the function pointer will assure that the compiler does not inline it.
         continue_from_local step;
 
   step:;
-    continue_into at_element_n(hd ,&&done  ,&&not_at_n);
+    continue_into at_n_Element(hd ,&&done  ,&&not_at_n);
       not_at_n:;
         unguarded_step(hd);
         continue_from_local work;

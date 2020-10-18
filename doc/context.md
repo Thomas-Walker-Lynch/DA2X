@@ -400,8 +400,8 @@
 
   ````
     P0(p0 ,Inclusive·3opLL ,0);
-    p0->a0 = p1->element_n;
-    p0->a1 = p1->element_byte_n;
+    p0->a0 = p1->n_Element;
+    p0->a1 = p1->element_n_Byte;
     p0->rpt = &cx->byte_n;
     continue *Inclusive·mul_ext(nominal ,gt_address_t_n);
 
@@ -426,7 +426,7 @@
      ,ContinuationPtr index_gt_n
      ,ContinuationPtr alloc_fail
      ){
-    Sequence scale ,alloc_array ,local_index_gt_n ,local_nominal ,local_alloc_fail;
+    Sequence scale ,alloc_array_bytes ,local_index_gt_n ,local_nominal ,local_alloc_fail;
     Sequence·swap();
     P1(p1 ,TM2x·alloc_array_elements ,1);
 
@@ -437,18 +437,18 @@
 
     cdef(scale){
       P0(p0 ,Inclusive·3opLL ,0);
-      p0->a0 = p1->element_n;
-      p0->a1 = p1->element_byte_n;
+      p0->a0 = p1->n_Element;
+      p0->a1 = p1->element_n_Byte;
       p0->rpt = &byte_n;
-      continue Inclusive·mul_ext(&&alloc_array ,&&local_index_gt_n);
+      continue Inclusive·mul_ext(&&alloc_array_bytes ,&&local_index_gt_n);
       cend;
     };
 
-    cdef(alloc_array){
-      P0(p0 ,TM2x·alloc_array ,0);
+    cdef(alloc_array_bytes){
+      P0(p0 ,TM2x·alloc_array_bytes ,0);
       p0->tape       = tape;
       p0->byte_n     = byte_n;
-      continue TM2x·alloc_array(&&local_nominal ,&&local_alloc_fail);
+      continue TM2x·alloc_array_bytes(&&local_nominal ,&&local_alloc_fail);
       cend;
     };
 
@@ -474,9 +474,9 @@
 
   It is too bad we need the local sequences, `local_index_gt_n`, `local_nominal`, and
   `local_alloc_fail`.  Their sole purpose is to maintain the integrity of the
-  encapsulation.  By having `TM2x·alloc_array` and `Inclusive·mul_ext` first
+  encapsulation.  By having `TM2x·alloc_array_bytes` and `Inclusive·mul_ext` first
   continue locally we assure that the stack frame gets popped.  If we did not need to pop
-  the stack frame, `TM2x·alloc_array` and `Inclusive·mul_ext` could continue directly to
+  the stack frame, `TM2x·alloc_array_bytes` and `Inclusive·mul_ext` could continue directly to
   `index_gt_n`, `nominal`, and `alloc_fail`.
 
 
@@ -495,14 +495,14 @@
       struct p1 *p1 = &p1dat;
 
       P0(p0 ,Inclusive·3opLL ,0);
-      p0->a0 = p1->element_n;
-      p0->a1 = p1->element_byte_n;
+      p0->a0 = p1->n_Element;
+      p0->a1 = p1->element_n_Byte;
       p0->rpt = &cx->byte_n;
-      p0->nominal = &&alloc_array;
+      p0->nominal = &&alloc_array_bytes;
       p0->gt_address_t_n = p1->index_gt_n;
       continue Inclusive·mul_ext;
 
-      cdef(alloc_array){
+      cdef(alloc_array_bytes){
         leave_to nominal;
         cend;
       };
@@ -539,10 +539,10 @@
   class variable despite our request to make it a register.
 
   Assuming that by some miracle things went well `Inclusive·mul_ext` then continues to either
-  `alloc_array` or to `p1->index_gt_n`.
+  `alloc_array_bytes` or to `p1->index_gt_n`.
 
-  The sequence `alloc_array` was defined in the lexical scope for `f`.  Hence
-  continueing to it will restore order to the universe.  `alloc_array` then returns
+  The sequence `alloc_array_bytes` was defined in the lexical scope for `f`.  Hence
+  continueing to it will restore order to the universe.  `alloc_array_bytes` then returns
   from the function via `leave_to nominal`.
 
   Had we instead continueed `p1->index_gt_n`, the stack to code correspondence would
@@ -621,22 +621,22 @@
   context gets deallocated.
 
   Here is a concrete example of this pattern. Here `TM2x·alloc_array_elements` corresponds to c1.
-  `Inclusive·mul_ext` corresponds to c2, and `alloc_array` corresponds to c3.
-  `TM2x·alloc_array_elements` is an encapsulating sequence. `alloc_array` is local
+  `Inclusive·mul_ext` corresponds to c2, and `alloc_array_bytes` corresponds to c3.
+  `TM2x·alloc_array_elements` is an encapsulating sequence. `alloc_array_bytes` is local
   sequence, and `Inclusive·mul_ext` is a general purpose sequence.  
 
   Note that execution flow from in `TM2x·alloc_array_elements` never reaches
-  `alloc_array`, rather we reach the end of dynamic scope for
+  `alloc_array_bytes`, rather we reach the end of dynamic scope for
   `TM2x·alloc_array_elements` when it continues to `Inclusive·mul_ext`, yet the static scope
-  continues to the closing bracket, so `alloc_array` is defined within the lexical
+  continues to the closing bracket, so `alloc_array_bytes` is defined within the lexical
   scope of of `TM2x·alloc_array_elements`.  What this accomplishes for us is to make the
-  `alloc_array` entry point viewable to only `TM2x·alloc_array_elements`.
+  `alloc_array_bytes` entry point viewable to only `TM2x·alloc_array_elements`.
   `TM2x·alloc_array_elements` then uses its ability to see this entry point to give a value
   to the `Inclusive·mul_ext`'s `nominal` sequence argument.
 
 ````
     cdef(TM2x·alloc_array_elements){
-      Sequence alloc_array;
+      Sequence alloc_array_bytes;
       Sequence·swap();
       P1(p1 ,TM2x·alloc_array_elements ,1);
 
@@ -648,20 +648,20 @@
 
       // P0 is a macro that points `p0` to the arguments pad and gives it type.
       P0(p0 ,Inclusive·3opLL ,0);
-      p0->a0 = p1->element_n;
-      p0->a1 = p1->element_byte_n;
+      p0->a0 = p1->n_Element;
+      p0->a1 = p1->element_n_Byte;
       p0->rpt = &cx->byte_n;
-      p0->nominal = &&alloc_array;
+      p0->nominal = &&alloc_array_bytes;
       p0->gt_address_t_n = p1->index_gt_n;
       continue Inclusive·mul_ext;
 
-      cdef(alloc_array){
-        P0(p0 ,TM2x·alloc_array ,0);
+      cdef(alloc_array_bytes){
+        P0(p0 ,TM2x·alloc_array_bytes ,0);
         p0->tape       = cx->tape;
         p0->byte_n     = cx->byte_n;
         p0->nominal    = cx->nominal;
         p0->alloc_fail = cx->alloc_fail;
-        continue TM2x·alloc_array;
+        continue TM2x·alloc_array_bytes;
         cend;
       };
 
@@ -682,7 +682,7 @@
 
   After setting up the `p0` pad, this code continues to general purpose sequence
   `Inclusive·mul_ext`, which has its `nominal` sequence argument set to
-  `alloc_array`.  Note that its `gt_address_t_n` sequence argument has been set to
+  `alloc_array_bytes`.  Note that its `gt_address_t_n` sequence argument has been set to
   go elsewhere.
 
   So we have an open question. How does the context get deallocated?
@@ -910,8 +910,8 @@
       // c1
       cdef(byte_n){
         P0(p0 ,Inclusive·3opLL ,0);
-        p0->a0             = p1->element_n;
-        p0->a1             = p1->element_byte_n;
+        p0->a0             = p1->n_Element;
+        p0->a1             = p1->element_n_Byte;
         p0->rpt            = &cx->byte_n;
         p0->nominal        = &&src_byte_i;
         p0->gt_address_t_n = pop(byte_n_of(struct c0 ,cx->src_index_gt_n);    // goes elsewhere
@@ -922,7 +922,7 @@
       cdef(src_byte_i){
         P0(p0 ,Inclusive·3opLL ,0);
         p0->a0             = cx->src_element_i;
-        p0->a1             = cx->element_byte_n;
+        p0->a1             = cx->element_n_Byte;
         p0->rpt            = &cx->src_byte_i;
         p0->nominal        = &&dst_byte_i;
         p0->gt_address_t_n = pop(byte_n_of(struct c0 ,cx->src_index_gt_n);  // goes elsewhere
@@ -934,17 +934,17 @@
       cdef(dst_byte_i){
         P0(p0 ,Inclusive·3opLL ,0);
         p0->a0             = cx->dst_element_i;
-        p0->a1             = cx->element_byte_n;
+        p0->a1             = cx->element_n_Byte;
         p0->rpt            = &cx->dst_byte_i;
-        p0->nominal        = &&copy_contiguous;
+        p0->nominal        = &&copy_contiguous_bytes;
         p0->gt_address_t_n = pop(byte_n_of(struct c0 ,cx->dst_index_gt_n);   // goes elsewhere
         continue Inclusive·mul_idx;
         cend;
       }
 
       // c4
-      cdef(copy_contiguous){
-        P0(p0 ,TM2x·construct_copy_contiguous ,0);
+      cdef(copy_contiguous_bytes){
+        P0(p0 ,TM2x·construct_copy_contiguous_bytes ,0);
         p0->src             = cx->src;
         p0->src_byte_i      = cx->src_byte_i;
         p0->dst             = cx->dst;
@@ -953,7 +953,7 @@
         p0->nominal         = pop(byte_n_of(struct c0 ,cx->nominal);         // goes elsewhere
         p0->src_index_gt_n  = pop(byte_n_of(struct c0 ,cx->src_index_gt_n);  // goes elsewhere
         p0->dst_index_gt_n  = pop(byte_n_of(struct c0 ,cx->dst_index_gt_n);  // goes elsewhere
-        continue TM2x·copy_contiguous;
+        continue TM2x·copy_contiguous_bytes;
         cend;
       }
 
@@ -991,8 +991,8 @@ stack push and pop.
       // c1
       cdef(byte_n){
         P0(p0 ,Inclusive·3opLL ,0);
-        p0->a0             = p1->element_n;
-        p0->a1             = p1->element_byte_n;
+        p0->a0             = p1->n_Element;
+        p0->a1             = p1->element_n_Byte;
         p0->rpt            = &cx->byte_n;
         p0->nominal        = &&src_byte_i;
         p0->gt_address_t_n = cx_dealloc(byte_n_of(struct c0) ,cx->src_index_gt_n);    // goes elsewhere
@@ -1002,8 +1002,8 @@ stack push and pop.
       // c1
       cdef(byte_n){
         P0(p0 ,Inclusive·3opLL ,0);
-        p0->a0             = p1->element_n;
-        p0->a1             = p1->element_byte_n;
+        p0->a0             = p1->n_Element;
+        p0->a1             = p1->element_n_Byte;
         p0->rpt            = &cx->byte_n;
         p0->nominal        = &&src_byte_i;
         p0->gt_address_t_n = &&leave
@@ -1023,7 +1023,7 @@ stack push and pop.
       cdef(src_byte_i){
         P0(p0 ,Inclusive·3opLL ,0);
         p0->a0             = cx->src_element_i;
-        p0->a1             = cx->element_byte_n;
+        p0->a1             = cx->element_n_Byte;
         p0->rpt            = &cx->src_byte_i;
         p0->nominal        = &&dst_byte_i;
         p0->gt_address_t_n = cx_dealloc(byte_n_of(struct c0) ,cx->src_index_gt_n);  // goes elsewhere
@@ -1035,17 +1035,17 @@ stack push and pop.
       cdef(dst_byte_i){
         P0(p0 ,Inclusive·3opLL ,0);
         p0->a0             = cx->dst_element_i;
-        p0->a1             = cx->element_byte_n;
+        p0->a1             = cx->element_n_Byte;
         p0->rpt            = &cx->dst_byte_i;
-        p0->nominal        = &&copy_contiguous;
+        p0->nominal        = &&copy_contiguous_bytes;
         p0->gt_address_t_n = cx_dealloc(byte_n_of(struct c0) ,cx->dst_index_gt_n);   // goes elsewhere
         continue Inclusive·mul_idx;
         cend;
       }
 
       // c4
-      cdef(copy_contiguous){
-        P0(p0 ,TM2x·construct_copy_contiguous ,0);
+      cdef(copy_contiguous_bytes){
+        P0(p0 ,TM2x·construct_copy_contiguous_bytes ,0);
         p0->src             = cx->src;
         p0->src_byte_i      = cx->src_byte_i;
         p0->dst             = cx->dst;
@@ -1054,7 +1054,7 @@ stack push and pop.
         p0->nominal         = cx_dealloc(byte_n_of(struct c0) ,cx->nominal);         // goes elsewhere
         p0->src_index_gt_n  = cx_dealloc(byte_n_of(struct c0) ,cx->src_index_gt_n);  // goes elsewhere
         p0->dst_index_gt_n  = cx_dealloc(byte_n_of(struct c0) ,cx->dst_index_gt_n);  // goes elsewhere
-        continue TM2x·copy_contiguous;
+        continue TM2x·copy_contiguous_bytes;
         cend;
       }
 
@@ -1138,9 +1138,9 @@ be stack base allocated.
     } mul_ei_bi_1;
 
     struct{
-      struct TM2x·Args·copy_contiguous0 args;
-      struct TM2x·Cons·copy_contiguous cons;
-    } copy_contiguous_0;
+      struct TM2x·Args·copy_contiguous_bytes0 args;
+      struct TM2x·Cons·copy_contiguous_bytes cons;
+    } copy_contiguous_bytes_0;
 
   } CopyContiguousElements·tableau;
 ````
@@ -1166,9 +1166,9 @@ be done even before the program runs.
 #define CopyContiguousElements·tableau
 void copy_element_init(){ 
   // results
-  t.mul_ib_0.args.rpt    = &t.copy_contiguous_0.args.byte_n;
-  t.mul_ei_bi_0.args.rpt = &t.copy_contiguous_0.args.src_byte_i;
-  t.mul_ei_bi_1.args.rpt = &t.copy_contiguous_0.args.copy_contiguous_0.dst_byte_i;
+  t.mul_ib_0.args.rpt    = &t.copy_contiguous_bytes_0.args.byte_n;
+  t.mul_ei_bi_0.args.rpt = &t.copy_contiguous_bytes_0.args.src_byte_i;
+  t.mul_ei_bi_1.args.rpt = &t.copy_contiguous_bytes_0.args.copy_contiguous_bytes_0.dst_byte_i;
 
   // connectors
   t.mul_ib_0.cons.nominal= (Connector) 
@@ -1185,9 +1185,9 @@ void copy_element_init(){
     }
   t.mul_ib_1.cons.gt_address_t_n = (struct TM2x·Cons·copy_contiguous_elements)(current->cons)->gt_address_t_n;
 
-  t.copy_contiguous_0.cons.mominal = current.connections.nominal;
-  t.copy_contiguous_0.cons.src_index_gt_n = current.connections->src_index_gt_n;
-  t.copy_contiguous_0.cons.src_index_gt_n = current.connections->src_index_gt_n;
+  t.copy_contiguous_bytes_0.cons.mominal = current.connections.nominal;
+  t.copy_contiguous_bytes_0.cons.src_index_gt_n = current.connections->src_index_gt_n;
+  t.copy_contiguous_bytes_0.cons.src_index_gt_n = current.connections->src_index_gt_n;
 }
 ````
 
@@ -1223,9 +1223,9 @@ own context. The parent's context will be in the grandparent's tableau.
     } mul_ei_bi_1;
 
     struct CopyContiguous0·Context{
-      struct TM2x·Args·copy_contiguous0 args;
-      struct TM2x·Cons·copy_contiguous cons;
-    } copy_contiguous_0;
+      struct TM2x·Args·copy_contiguous_bytes0 args;
+      struct TM2x·Cons·copy_contiguous_bytes cons;
+    } copy_contiguous_bytes_0;
 
   } CopyContiguousElements·tableau;
 ````

@@ -20,8 +20,8 @@ the array.
     // ----------------------------------------
     // result tableau
     //
-      address_t element_n = 9;
-      address_t element_byte_n = 3; // extent of 32 bit int in elements
+      address_t n_Element = 9;
+      address_t element_n_Byte = 3; // extent of 32 bit int in elements
       TM2x·Tape *tm2x; // set by alloc_Tape_heap, then distributed
 
     // ----------------------------------------
@@ -75,8 +75,8 @@ the array.
     // ----------------------------------------
     // seqeuence args point into the tableau
     //
-      ce_args.element_n = &element_n;
-      ce_args.element_byte_n = &element_byte_n;
+      ce_args.n_Element = &n_Element;
+      ce_args.element_n_Byte = &element_n_Byte;
 
       // The alloc_Tape_heap result is a pointer to the allocation.  The distribution sequence that
       // follows it distributes this pointer to the parameters of other rourtines. Consequently

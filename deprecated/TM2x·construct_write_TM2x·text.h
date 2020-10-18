@@ -5,11 +5,11 @@ TM2x·construct_write_TM2x{
   continuation nominal  = TM2x·construct_write_TM2x·args.continuation nominal; 
   continuation fail     = TM2x·construct_write_TM2x·args.continuation fail;    
 
-  TM2x·construct_write·args.tape = tape;      
-  TM2x·construct_write·args.tape_source = tape_source->base_pt;  
-  TM2x·construct_write·args.source_byte_n = tape_source->byte_n;
-  TM2x·construct_write·args.continuation nominal = nominal;
-  TM2x·construct_write·args.continuation fail = fail;
-  continue_from TM2x·construct_write;
+  TM2x·construct_write_bytes·args.tape = tape;      
+  TM2x·construct_write_bytes·args.tape_source = tape_source->base_pt;  
+  TM2x·construct_write_bytes·args.source_byte_n = tape_source->byte_n;
+  TM2x·construct_write_bytes·args.continuation nominal = nominal;
+  TM2x·construct_write_bytes·args.continuation fail = fail;
+  continue_from TM2x·construct_write_bytes;
   cend;
 };

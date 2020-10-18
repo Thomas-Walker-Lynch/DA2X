@@ -9,4 +9,4 @@ struct{
   continuation alloc_fail;
   continuation bad_src_index;
   continuation bad_dst_index;
-} TM2x·copy_contiguous;
+} TM2x·copy_contiguous_bytes;

@@ -45,7 +45,7 @@
   }
 
   // elements are char *
-  TM2xHd·F_PREFIX void TM2xHd·f_print_cstring(void *context ,void *element_pt ,address_t element_byte_n){
+  TM2xHd·F_PREFIX void TM2xHd·f_print_cstring(void *context ,void *element_pt ,address_t element_n_Byte){
     fprintf(stderr ,"%s%s" ,(char *)context ,(char *)element_pt);
   }
 
@@ -55,13 +55,13 @@
 // print
 //
   // the array itself is a list of chars
-  TM2xHd·F_PREFIX void TM2xHd·f_print_char_array(void *context ,void *element_pt ,address_t element_byte_n){
+  TM2xHd·F_PREFIX void TM2xHd·f_print_char_array(void *context ,void *element_pt ,address_t element_n_Byte){
     // probably push a terminator, write, and pop it, though currently there is no hysterisis.  Wonder if
     // there is an easy way to add that.
   }
 
   // the array is a list of char * points to cstrings
-  TM2xHd·F_PREFIX void TM2xHd·f_print_cstring(void *context ,void *element_pt ,address_t element_byte_n){
+  TM2xHd·F_PREFIX void TM2xHd·f_print_cstring(void *context ,void *element_pt ,address_t element_n_Byte){
     fprintf(stderr ,"%s%s" ,(char *)context ,(char *)element_pt);
   }
 

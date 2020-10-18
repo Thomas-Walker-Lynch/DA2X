@@ -117,20 +117,20 @@ still the big parm loop in tranche has a funny condition for the first parm ..
   (
    TM2x·Tape *set_acc
    ,TM2x·Tape *set_src
-   ,address_t element_byte_n
-   ,bool pred(void *context ,void *el ,address_t element_byte_n)
+   ,address_t element_n_Byte
+   ,bool pred(void *context ,void *el ,address_t element_n_Byte)
    ){
     bool subset = true;
     TM2xHd_Mount(set_acc ,hd_acc);
     TM2xHd_Mount(set_src ,hd_src);
     do{
       void *src_element_pt = TM2xHd_pt(hd_src);
-      if( !TM2xHd_exists(set_acc ,hd_acc ,element_byte_n ,src_element_pt ,pred) ){
-        TM2x_push_write(set_acc ,src_element_pt ,element_byte_n);      
+      if( !TM2xHd_exists(set_acc ,hd_acc ,element_n_Byte ,src_element_pt ,pred) ){
+        TM2x_push_write(set_acc ,src_element_pt ,element_n_Byte);      
         subset = false;
       }
       TM2xHd_rewind(set_acc ,hd_acc);
-    }while( TM2xHd_step(set_src ,hd_src ,element_byte_n) );
+    }while( TM2xHd_step(set_src ,hd_src ,element_n_Byte) );
     return subset;
   }
 
@@ -142,20 +142,20 @@ still the big parm loop in tranche has a funny condition for the first parm ..
    TM2x·Tape *array_acc
    ,TM2x·Tape *set_a
    ,TM2x·Tape *set_b
-   ,address_t element_byte_n
-   ,bool pred(void *context ,void *el ,address_t element_byte_n)
+   ,address_t element_n_Byte
+   ,bool pred(void *context ,void *el ,address_t element_n_Byte)
    ){
     bool distinct = true;
     TM2xHd_Mount(set_a ,hd_a);
     TM2xHd_Mount(set_b ,hd_b);
     do{
       void *a_element_pt = TM2xHd_pt(hd_a);
-      if( TM2xHd_exists(set_b ,hd_b ,element_byte_n ,a_element_pt ,pred) ){
-        TM2x_push_write(array_acc ,a_element_pt ,element_byte_n);      
+      if( TM2xHd_exists(set_b ,hd_b ,element_n_Byte ,a_element_pt ,pred) ){
+        TM2x_push_write(array_acc ,a_element_pt ,element_n_Byte);      
         distinct = false;
       }
       TM2xHd_rewind(set_b ,hd_b);
-    }while( TM2xHd_step(set_a ,hd_a ,element_byte_n) );
+    }while( TM2xHd_step(set_a ,hd_a ,element_n_Byte) );
     return distinct;
   }
 

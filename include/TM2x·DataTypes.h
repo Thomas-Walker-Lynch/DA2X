@@ -36,8 +36,8 @@
 
   typedef struct{
     TM2x·Tape *tm2x;
-    address_t *element_n;  // extent of the array, in elements
-    address_t *element_byte_n; // extent of the element, in bytes
+    address_t *n_Element;  // extent of the array, in elements
+    address_t *element_n_Byte; // extent of the element, in bytes
   } TM2x·AllocArrayElements·Args;
   typedef struct{
   } TM2x·AllocArrayElements·Ress;
@@ -128,8 +128,8 @@
     address_t *src_element_0;
          TM2x·Tape *dst;
     address_t *dst_element_0;
-    address_t *element_n;
-    address_t *element_byte_n;
+    address_t *n_Element;
+    address_t *element_n_Byte;
   } TM2x·CopyContiguousElements·Args;
   typedef struct{
   } TM2x·CopyContiguousElements·Ress;
@@ -147,7 +147,11 @@
 
   typedef struct{
          TM2x·Tape *src;
-    address_t *element_byte_n;
+    address_t *src_element_0;
+         TM2x·Tape *dst;
+    address_t *dst_element_0;
+    address_t *n_Element;
+    address_t *element_n_Byte;
   } TM2x·Resize·Args;
   typedef struct{
   } TM2x·Resize·Ress;
@@ -170,8 +174,8 @@
 struct TM2x·index·read_0{
   TM2x·Tape *tape;
   address_t index;
-  address_t element_n;
-  address_t element_byte_n;
+  address_t n_Element;
+  address_t element_n_Byte;
   void *dst_element_pt;
   SQ·Lnk nominal;
   SQ·Lnk index_gt_n;
@@ -180,7 +184,7 @@ struct TM2x·index·read_0{
 struct TM2x·index·to_pt_0{
   TM2x·Tape *tape ;
   address_t index;
-  address_t element_byte_n;
+  address_t element_n_Byte;
   void **pt;
   SQ·Lnk nominal;
   SQ·Lnk index_gt_n;
@@ -188,7 +192,7 @@ struct TM2x·index·to_pt_0{
 
 struct TM2x·pop_0{
   TM2x·Tape *tape;
-  address_t element_byte_n;
+  address_t element_n_Byte;
   SQ·Lnk nominal;
   SQ·Lnk pop_last;
   SQ·Lnk alloc_fail;
@@ -197,12 +201,12 @@ struct TM2x·pop_0{
 struct TM2x·push_0{
   TM2x·Tape *tape;
   void *element_base_pt;
-  address_t element_byte_n;
+  address_t element_n_Byte;
   SQ·Lnk nominal;
   SQ·Lnk alloc_fail;
 };
 
-struct TM2x·push_0{
+struct TM2x·push_bytes_0{
   TM2x·Tape *tape;
   void *source_pt;
   address_t source_byte_n;
@@ -213,8 +217,8 @@ struct TM2x·push_0{
 struct TM2x·push_elements_0{
   TM2x·Tape *tape ;
   void *base_pt;
-  address_t element_n ;
-  address_t element_byte_n ;
+  address_t n_Element ;
+  address_t element_n_Byte ;
   SQ·Lnk nominal;
   SQ·Lnk alloc_fail;
   SQ·Lnk index_gt_n;
@@ -230,13 +234,13 @@ struct TM2x·push_TM2x_0{
 struct TM2x·read_pop_0{
   TM2x·Tape *tape ;
   void *dst_element_pt ;
-  address_t element_byte_n;
+  address_t element_n_Byte;
   SQ·Lnk nominal;
   SQ·Lnk pop_last;
   SQ·Lnk alloc_fail;
 };
 
-struct TM2x·resize_0{
+struct TM2x·resize_bytes_0{
   TM2x·Tape *tape;
   address_t after_byte_n;
   SQ·Lnk nominal;
@@ -245,14 +249,14 @@ struct TM2x·resize_0{
 
 struct TM2x·resize_elements_0{
   TM2x·Tape *tape;
-  address_t after_element_n;
-  address_t element_byte_n;
+  address_t after_n_Element;
+  address_t element_n_Byte;
   SQ·Lnk nominal;
   SQ·Lnk alloc_fail;
   SQ·Lnk index_gt_n;
 };
 
-struct TM2x·write_0{
+struct TM2x·write_bytes_0{
   void *src_pt;
   TM2x·Tape *dst;
   address_t dst_byte_i;
