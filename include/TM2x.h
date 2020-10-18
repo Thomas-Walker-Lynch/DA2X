@@ -58,6 +58,7 @@
 //
   #define TM2x·MINIMUM_ALLOC_N power_2_extent(15)
 
+  // returns the allocation extent for an array of extent n
   INLINE_PREFIX address_t TM2x·alloc_n(address_t n){
     if( n <= TM2x·MINIMUM_ALLOC_N) return TM2x·MINIMUM_ALLOC_N;
     return power_2_extent(n);

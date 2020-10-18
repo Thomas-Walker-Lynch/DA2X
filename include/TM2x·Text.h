@@ -259,17 +259,46 @@ address_t TM2x·alloc_array_count = 0;
 /*--------------------------------------------------------------------------------
  */
 
+
 #if 0
 
   SQ·def(TM2x·resize){
     TM2x·Resize·Lnk *lnk = (TM2x·Resize·Lnk *)SQ·lnk;
     
+    address_t alloc_n = TM2x·alloc_n(lnk->tape->n);
+    address_t resized_alloc_n = TM2x·alloc_n(lnk->args->n);
+    if( alloc_n == resized_alloc_n ) SQ·continue_indirect(lnk->lnks->nominal);
+      
+    // rtab
 
+    SQ·continue_indirect(alloc_header_lnk);
+
+    SQ·def(pt1){
+
+      uint i = 0;
+      pt1·lp0:{
+        
+        
+
+        if(i == n) goto pt1·lp0_end;
+        i++;
+        goto pt1·lp0;
+
+      } pt1·lp0_end;
+
+    }SQ·end(pt1);
+
+    
+
+    
+    
+    
 
 
     memcpyn(TM2x·0_pt(dst) + dst_0, TM2x·0_pt(src) + src_0, n);
     SQ·continue_indirect(lnk->lnks->nominal);
   } SQ·end(TM2x·resize);
+
 
 
 
