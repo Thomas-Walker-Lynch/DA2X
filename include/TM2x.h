@@ -64,9 +64,5 @@
     return power_2_extent(n);
   }
 
-  // tm2x becomes a pointer to a static allocation of a TM2x·Tape struct
-  #define TM2x·alloc_Tape_static(tm2x) TM2x·Tape TM2x· ## tm2x ,*tm2x; tm2x = &TM2x· ## tm2x;
-
-
 #endif
 

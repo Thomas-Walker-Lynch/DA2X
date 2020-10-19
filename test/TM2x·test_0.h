@@ -28,7 +28,7 @@ Deallocates the header.
     // Links
     //
       SQ·make_Lnk(ah  ,TM2x·AllocTapeHeap   ,&&TM2x·alloc_Tape_heap);
-      SQ·make_Lnk(cb  ,TM2x·AllocArray      ,&&TM2x·alloc_array_bytes);
+      SQ·make_Lnk(cb  ,TM2x·AllocArray      ,&&TM2x·alloc_array);
       SQ·make_Lnk(da  ,TM2x·DeallocArray    ,&&TM2x·dealloc_array);
       SQ·make_Lnk(dh  ,TM2x·DeallocTapeHeap ,&&TM2x·dealloc_Tape_heap);
 

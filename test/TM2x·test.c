@@ -32,8 +32,6 @@ int main(){
   SQ·continue(test_0);
   #include "TM2x·test_0.h"
   #include "TM2x·test_1.h"
-  #include "TM2x·test_2.h"
-  #include "TM2x·test_3.h"
 
   SQ·def(tests_finished){
     Result·Tallies·print("TM2x·test results" ,accumulated_results_pt);

@@ -7,8 +7,8 @@ address_t TM2x·alloc_array_count = 0;
 
 */
 
-  // allocate a TM2x·Tape header on the heap
-  // See also the TM2x·alloc_Tape_static macro in TM2x.h 
+  // Allocate a TM2x·Tape header on the heap.
+  // Note that it is also perfectly fine to statically allocate a TM2x·Tape.
   SQ·def(TM2x·alloc_Tape_heap){
     TM2x·AllocTapeHeap·Lnk *lnk = (TM2x·AllocTapeHeap·Lnk *)SQ·lnk;
 
@@ -32,7 +32,7 @@ address_t TM2x·alloc_array_count = 0;
   } SQ·end(TM2x·alloc_Tape_heap);
 
   // allocates data on the heap
-  SQ·def(TM2x·alloc_array_bytes){
+  SQ·def(TM2x·alloc_array){
     TM2x·alloc_array_count++; // to assist with debugging
     TM2x·AllocArray·Lnk *lnk = (TM2x·AllocArray·Lnk *)SQ·lnk;
 
@@ -58,7 +58,7 @@ address_t TM2x·alloc_array_count = 0;
 
     SQ·continue_indirect(m_lnk);
 
-  } SQ·end(TM2x·alloc_array_bytes);
+  } SQ·end(TM2x·alloc_array);
 
   SQ·def(TM2x·alloc_array_elements){
     TM2x·AllocArrayElements·Lnk *lnk = (TM2x·AllocArrayElements·Lnk *)SQ·lnk;
@@ -72,14 +72,14 @@ address_t TM2x·alloc_array_count = 0;
     // Links
     //
       SQ·make_Lnk(scale_ext ,Inclusive·3opLL ,&&Inclusive·mul_idx);
-      SQ·make_Lnk(alloc_array_bytes ,TM2x·AllocArray ,&&TM2x·alloc_array_bytes);
+      SQ·make_Lnk(alloc_array ,TM2x·AllocArray ,&&TM2x·alloc_array);
 
       scale_ext_lnks = (Inclusive·3opLL·Lnks)
-        { .nominal = AS(alloc_array_bytes_lnk ,SQ·Lnk)
+        { .nominal = AS(alloc_array_lnk ,SQ·Lnk)
           ,.gt_address_t_n = lnk->lnks->index_gt_n
         };
 
-      alloc_array_bytes_lnks = (TM2x·AllocArray·Lnks)
+      alloc_array_lnks = (TM2x·AllocArray·Lnks)
         { .nominal = lnk->lnks->nominal
           ,.alloc_fail = lnk->lnks->alloc_fail
         };
@@ -95,8 +95,8 @@ address_t TM2x·alloc_array_count = 0;
       scale_ext_args.a_0 = lnk->args->n_Element;
       scale_ext_args.a_1 = lnk->args->element_n_Byte;
 
-      alloc_array_bytes_args.tape = lnk->args->tape;
-      alloc_array_bytes_args.n = &n;
+      alloc_array_args.tape = lnk->args->tape;
+      alloc_array_args.n = &n;
 
     SQ·continue_indirect(scale_ext_lnk);
 
@@ -118,30 +118,8 @@ address_t TM2x·alloc_array_count = 0;
   } SQ·end(TM2x·dealloc_Tape_heap);
 
 
-/*--------------------------------------------------------------------------------
- copying data
-
-    If we copied as much as possible, then took the overflow upon hitting a bound, we
-    would end up redoing the copy if the array expansion reallocates the array into a
-    bigger heap block.  This due to 'resize', even by a small amount, possibly allocating
-    a new array.
-
-    With this implementation we do no copy until we see that the copy will fit.  If it
-    does not fit we take the overflow continuation.
-
-    In order to drop an area, first allocate a new destination tape that is smaller by the
-    number of elements dropped.  Then copy the contiguous bytes up to the area to be 
-    dropped, then copy the bytes after the area to be dropped. Then deallocate the 
-    source machine.
-
-    Analogously, to insert bytes, create a new destination machine and then do piecewise
-    contiguous copies as for delete.
-
-*/
-  // copy_header will often be followed by the deallocation of the src tape header.  The
-  // source destination nomenclature here is local, in the bigger picture the roles are
-  // often the opposite.
-  SQ·def(TM2x·copy_header){
+  // copy_header will often be followed by the deallocation of the src tape header. 
+  SQ·def(TM2x·copy_tape){
     // some aliases
     TM2x·CopyTape·Lnk *lnk = (TM2x·CopyTape·Lnk *)SQ·lnk;
     TM2x·Tape *src = lnk->args->src;
@@ -150,167 +128,52 @@ address_t TM2x·alloc_array_count = 0;
     dst->base_pt = src->base_pt;
     dst->n = src->n;
     SQ·continue_indirect(lnk->lnks->nominal);
-  } SQ·end(TM2x·copy_header);
-
-  SQ·def(TM2x·copy_contiguous_bytes){
-    // some aliases
-    //
-      TM2x·CopyContiguous·Lnk *lnk = (TM2x·CopyContiguous·Lnk *)SQ·lnk;
-      TM2x·Tape *src = lnk->args->src;
-      TM2x·Tape *dst = lnk->args->dst;
-      address_t src_0 = *lnk->args->src_0;
-      address_t dst_0 = *lnk->args->dst_0;
-      address_t n = *lnk->args->n;
-    if( 
-       TM2x·n(src) < n
-       ||
-       TM2x·n(src) - n < src_0
-        ){
-      SQ·continue_indirect(lnk->lnks->src_index_gt_n);
-    }
-    if( 
-       TM2x·n(dst) < n
-       ||
-       TM2x·n(dst) - n < dst_0
-        ){
-      SQ·continue_indirect(lnk->lnks->dst_index_gt_n);
-    }
-    memcpyn(TM2x·0_pt(dst) + dst_0, TM2x·0_pt(src) + src_0, n);
-    SQ·continue_indirect(lnk->lnks->nominal);
-  } SQ·end(TM2x·copy_contiguous_bytes);
+  } SQ·end(TM2x·copy_tape);
 
 
-  SQ·def(TM2x·copy_contiguous_elements){
-    TM2x·CopyContiguousElements·Lnk *lnk = (TM2x·CopyContiguousElements·Lnk *)SQ·lnk;
-
-    // ----------------------------------------
-    // local result tableau
-    //
-      address_t src_0;  
-      address_t dst_0;  
-      address_t ext_n;  
-
-    // ----------------------------------------
-    // Links
-    //
-      SQ·make_Lnk(scale_src ,Inclusive·3opLL ,&&Inclusive·mul_idx);
-      SQ·make_Lnk(scale_dst ,Inclusive·3opLL ,&&Inclusive·mul_idx);
-      SQ·make_Lnk(scale_ext ,Inclusive·3opLL ,&&Inclusive·mul_ext);
-      SQ·make_Lnk(copy_contiguous_bytes ,TM2x·CopyContiguous ,&&TM2x·copy_contiguous_bytes);
-
-      scale_src_lnks = (Inclusive·3opLL·Lnks)
-        {  .nominal = AS(scale_dst_lnk ,SQ·Lnk)
-          ,.gt_address_t_n = lnk->lnks->src_index_gt_n
-        };
-
-      scale_dst_lnks = (Inclusive·3opLL·Lnks)
-        {  .nominal = AS(scale_ext_lnk ,SQ·Lnk)
-          ,.gt_address_t_n = lnk->lnks->dst_index_gt_n
-        };
-
-      scale_ext_lnks = (Inclusive·3opLL·Lnks)
-        {  .nominal = AS(copy_contiguous_bytes_lnk ,SQ·Lnk)
-          ,.gt_address_t_n = lnk->lnks->src_index_gt_n
-        };
-
-      copy_contiguous_bytes_lnks = (TM2x·CopyContiguous·Lnks)
-        {  .nominal = lnk->lnks->nominal
-          ,.src_index_gt_n = lnk->lnks->src_index_gt_n
-          ,.dst_index_gt_n = lnk->lnks->dst_index_gt_n
-        };
-
-    // ----------------------------------------
-    // sequence results point into the tableau
-    //
-      scale_src_ress.r = &src_0;
-      scale_dst_ress.r = &dst_0;
-      scale_ext_ress.r = &ext_n;
-
-    // ----------------------------------------
-    // seqeuence args point into this tableau or the parent tableau
-    //
-      scale_src_args = (Inclusive·3opLL·Args)
-        {  .a_0 = lnk->args->src_element_0
-          ,.a_1 = lnk->args->element_n_Byte
-        };
-
-      scale_dst_args = (Inclusive·3opLL·Args)
-        {  .a_0 = lnk->args->dst_element_0
-          ,.a_1 = lnk->args->element_n_Byte
-        };
-
-      scale_ext_args = (Inclusive·3opLL·Args)
-        {  .a_0 = lnk->args->n_Element
-          ,.a_1 = lnk->args->element_n_Byte
-        };
-
-      copy_contiguous_bytes_args  = (TM2x·CopyContiguous·Args)
-        {  .src        = lnk->args->src
-          ,.src_0 = &src_0
-          ,.dst        = lnk->args->dst
-          ,.dst_0 = &dst_0
-          ,.n     = &ext_n
-        };
-
-    SQ·continue_indirect(scale_src_lnk);
-
-  } SQ·end(TM2x·copy_contiguous_elements);
-
-/*--------------------------------------------------------------------------------
- */
-
-
-#if 0
-
+  // This should not appear on an interface.
+  // Create a new 'resized' tape of the requested size, copy the data over, then copy the
+  // the pointers in the resized tape header back to the original tape header.
   SQ·def(TM2x·resize){
+    SQ·Sequence copy_data ,SQ·copy_data;
     TM2x·Resize·Lnk *lnk = (TM2x·Resize·Lnk *)SQ·lnk;
     
-    address_t alloc_n = TM2x·alloc_n(lnk->tape->n);
-    address_t resized_alloc_n = TM2x·alloc_n(lnk->args->n);
+    address_t n = *lnk->args->n;
+    address_t alloc_n = TM2x·alloc_n(lnk->args->tape->n);
+    address_t resized_alloc_n = TM2x·alloc_n(n);
     if( alloc_n == resized_alloc_n ){
-      lnk->args->tape.n = lnk->args->n;
+      lnk->args->tape->n = n;
       SQ·continue_indirect(lnk->lnks->nominal);
     }
   
     // rtab
-    TM2x·Tape tape;
+    TM2x·Tape *original_tape = lnk->args->tape;
+    TM2x·Tape resized_tape;
 
-    
-    SQ·make_Lnk(alloc_tape ,TM2x·AllocTapeHeap ,&&TM2x·alloc_tape_heap);
-    alloc_tape_args.tape
-    alloc_tape_lnks.nominal = 
-    
+    // lnks
+    SQ·make_Lnk(alloc_array  ,TM2x·AllocArray ,&&TM2x·alloc_array);
+    SQ·make_Lnk(copy_tape    ,TM2x·CopyTape   ,&&TM2x·copy_tape);
 
-    SQ·continue_indirect(alloc_header_lnk);
+    alloc_array_args.tape = &resized_tape;
+    alloc_array_args.n    = lnk->args->n;
+    alloc_array_lnks.nominal.sequence = &&copy_data;
+    alloc_array_lnks.alloc_fail = lnk->lnks->alloc_fail;
 
-    SQ·def(pt1){
+    copy_tape_args.src = &resized_tape;
+    copy_tape_args.dst = original_tape;
 
-      uint i = 0;
-      pt1·lp0:{
-        
-        
+    SQ·continue_indirect(alloc_array_lnk);
 
-        if(i == n) goto pt1·lp0_end;
-        i++;
-        goto pt1·lp0;
+    SQ·def(copy_data){
+      address_t n = resized_tape.n < original_tape->n ? resized_tape.n : original_tape->n;
+      memcpyn(resized_tape.base_pt, original_tape->base_pt, n);
+      SQ·continue_indirect(copy_tape_lnk);
+    }SQ·end(copy_data);
 
-      } pt1·lp0_end;
-
-    }SQ·end(pt1);
-
-    
-
-    
-    
-    
-
-
-    memcpyn(TM2x·0_pt(dst) + dst_0, TM2x·0_pt(src) + src_0, n);
-    SQ·continue_indirect(lnk->lnks->nominal);
   } SQ·end(TM2x·resize);
 
 
-
+#if 0
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

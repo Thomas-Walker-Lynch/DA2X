@@ -426,7 +426,7 @@
      ,ContinuationPtr index_gt_n
      ,ContinuationPtr alloc_fail
      ){
-    Sequence scale ,alloc_array_bytes ,local_index_gt_n ,local_nominal ,local_alloc_fail;
+    Sequence scale ,alloc_array ,local_index_gt_n ,local_nominal ,local_alloc_fail;
     Sequence·swap();
     P1(p1 ,TM2x·alloc_array_elements ,1);
 
@@ -440,15 +440,15 @@
       p0->a0 = p1->n_Element;
       p0->a1 = p1->element_n_Byte;
       p0->rpt = &n;
-      continue Inclusive·mul_ext(&&alloc_array_bytes ,&&local_index_gt_n);
+      continue Inclusive·mul_ext(&&alloc_array ,&&local_index_gt_n);
       cend;
     };
 
-    cdef(alloc_array_bytes){
-      P0(p0 ,TM2x·alloc_array_bytes ,0);
+    cdef(alloc_array){
+      P0(p0 ,TM2x·alloc_array ,0);
       p0->tape       = tape;
       p0->n     = n;
-      continue TM2x·alloc_array_bytes(&&local_nominal ,&&local_alloc_fail);
+      continue TM2x·alloc_array(&&local_nominal ,&&local_alloc_fail);
       cend;
     };
 
@@ -474,9 +474,9 @@
 
   It is too bad we need the local sequences, `local_index_gt_n`, `local_nominal`, and
   `local_alloc_fail`.  Their sole purpose is to maintain the integrity of the
-  encapsulation.  By having `TM2x·alloc_array_bytes` and `Inclusive·mul_ext` first
+  encapsulation.  By having `TM2x·alloc_array` and `Inclusive·mul_ext` first
   continue locally we assure that the stack frame gets popped.  If we did not need to pop
-  the stack frame, `TM2x·alloc_array_bytes` and `Inclusive·mul_ext` could continue directly to
+  the stack frame, `TM2x·alloc_array` and `Inclusive·mul_ext` could continue directly to
   `index_gt_n`, `nominal`, and `alloc_fail`.
 
 
@@ -498,11 +498,11 @@
       p0->a0 = p1->n_Element;
       p0->a1 = p1->element_n_Byte;
       p0->rpt = &cx->n;
-      p0->nominal = &&alloc_array_bytes;
+      p0->nominal = &&alloc_array;
       p0->gt_address_t_n = p1->index_gt_n;
       continue Inclusive·mul_ext;
 
-      cdef(alloc_array_bytes){
+      cdef(alloc_array){
         leave_to nominal;
         cend;
       };
@@ -539,10 +539,10 @@
   class variable despite our request to make it a register.
 
   Assuming that by some miracle things went well `Inclusive·mul_ext` then continues to either
-  `alloc_array_bytes` or to `p1->index_gt_n`.
+  `alloc_array` or to `p1->index_gt_n`.
 
-  The sequence `alloc_array_bytes` was defined in the lexical scope for `f`.  Hence
-  continueing to it will restore order to the universe.  `alloc_array_bytes` then returns
+  The sequence `alloc_array` was defined in the lexical scope for `f`.  Hence
+  continueing to it will restore order to the universe.  `alloc_array` then returns
   from the function via `leave_to nominal`.
 
   Had we instead continueed `p1->index_gt_n`, the stack to code correspondence would
@@ -621,22 +621,22 @@
   context gets deallocated.
 
   Here is a concrete example of this pattern. Here `TM2x·alloc_array_elements` corresponds to c1.
-  `Inclusive·mul_ext` corresponds to c2, and `alloc_array_bytes` corresponds to c3.
-  `TM2x·alloc_array_elements` is an encapsulating sequence. `alloc_array_bytes` is local
+  `Inclusive·mul_ext` corresponds to c2, and `alloc_array` corresponds to c3.
+  `TM2x·alloc_array_elements` is an encapsulating sequence. `alloc_array` is local
   sequence, and `Inclusive·mul_ext` is a general purpose sequence.  
 
   Note that execution flow from in `TM2x·alloc_array_elements` never reaches
-  `alloc_array_bytes`, rather we reach the end of dynamic scope for
+  `alloc_array`, rather we reach the end of dynamic scope for
   `TM2x·alloc_array_elements` when it continues to `Inclusive·mul_ext`, yet the static scope
-  continues to the closing bracket, so `alloc_array_bytes` is defined within the lexical
+  continues to the closing bracket, so `alloc_array` is defined within the lexical
   scope of of `TM2x·alloc_array_elements`.  What this accomplishes for us is to make the
-  `alloc_array_bytes` entry point viewable to only `TM2x·alloc_array_elements`.
+  `alloc_array` entry point viewable to only `TM2x·alloc_array_elements`.
   `TM2x·alloc_array_elements` then uses its ability to see this entry point to give a value
   to the `Inclusive·mul_ext`'s `nominal` sequence argument.
 
 ````
     cdef(TM2x·alloc_array_elements){
-      Sequence alloc_array_bytes;
+      Sequence alloc_array;
       Sequence·swap();
       P1(p1 ,TM2x·alloc_array_elements ,1);
 
@@ -651,17 +651,17 @@
       p0->a0 = p1->n_Element;
       p0->a1 = p1->element_n_Byte;
       p0->rpt = &cx->n;
-      p0->nominal = &&alloc_array_bytes;
+      p0->nominal = &&alloc_array;
       p0->gt_address_t_n = p1->index_gt_n;
       continue Inclusive·mul_ext;
 
-      cdef(alloc_array_bytes){
-        P0(p0 ,TM2x·alloc_array_bytes ,0);
+      cdef(alloc_array){
+        P0(p0 ,TM2x·alloc_array ,0);
         p0->tape       = cx->tape;
         p0->n     = cx->n;
         p0->nominal    = cx->nominal;
         p0->alloc_fail = cx->alloc_fail;
-        continue TM2x·alloc_array_bytes;
+        continue TM2x·alloc_array;
         cend;
       };
 
@@ -682,7 +682,7 @@
 
   After setting up the `p0` pad, this code continues to general purpose sequence
   `Inclusive·mul_ext`, which has its `nominal` sequence argument set to
-  `alloc_array_bytes`.  Note that its `gt_address_t_n` sequence argument has been set to
+  `alloc_array`.  Note that its `gt_address_t_n` sequence argument has been set to
   go elsewhere.
 
   So we have an open question. How does the context get deallocated?

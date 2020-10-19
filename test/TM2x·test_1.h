@@ -82,7 +82,7 @@ the array.
       f[i++] = constructed_cnt == TM2x·alloc_array_count;
       Result·Tallies·tally("test_1" ,&results ,f ,i);
       Result·Tallies·accumulate(accumulated_results_pt ,&results);
-      SQ·continue(test_2);
+      SQ·continue(tests_finished);
     } SQ·end(report)
 
   }SQ·end(test_1)
