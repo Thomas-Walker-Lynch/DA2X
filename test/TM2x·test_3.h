@@ -27,48 +27,17 @@ Currnenly this is just a copy of the copy_contiguous_bytes test.
     // result tableau
     //
       address_t n = 4;  // input constant
-      TM2x·Tape *dst;             // result of alloc_Tape_heap, it gets distributed
+      TM2x·Tape *dst;    // result of alloc_Tape_heap, it gets distributed
       address_t offset = 0;  // input constant
 
     // ----------------------------------------
     // Links
     //
-      TM2x·AllocTapeHeap·Args ah_args;
-      TM2x·AllocTapeHeap·Ress ah_ress;
-      TM2x·AllocTapeHeap·Lnks ah_lnks;
-      TM2x·AllocTapeHeap·Lnk  ah_lnk;
-      ah_lnk.args = &ah_args;
-      ah_lnk.ress = &ah_ress;
-      ah_lnk.lnks = &ah_lnks;
-      ah_lnk.sequence = &&TM2x·alloc_Tape_heap;
-
-      TM2x·AllocArray·Args cb_args;
-      TM2x·AllocArray·Lnks cb_lnks;
-      TM2x·AllocArray·Lnk  cb_lnk;
-      cb_lnk.args = &cb_args;
-      cb_lnk.lnks = &cb_lnks;
-      cb_lnk.sequence = &&TM2x·alloc_array_bytes;
-
-      TM2x·CopyContiguous·Args cpb_args;
-      TM2x·CopyContiguous·Lnks cpb_lnks;
-      TM2x·CopyContiguous·Lnk  cpb_lnk;
-      cpb_lnk.args = &cpb_args;
-      cpb_lnk.lnks = &cpb_lnks;
-      cpb_lnk.sequence = &&TM2x·copy_contiguous_bytes;
-
-      TM2x·DeallocArray·Args       da_args;
-      TM2x·DeallocArray·Lnks       da_lnks;
-      TM2x·DeallocArray·Lnk        da_lnk;
-      da_lnk.args = &da_args;
-      da_lnk.lnks = &da_lnks;
-      da_lnk.sequence = &&TM2x·dealloc_array;
-
-      TM2x·DeallocTapeHeap·Args    dh_args;
-      TM2x·DeallocTapeHeap·Lnks    dh_lnks;
-      TM2x·DeallocTapeHeap·Lnk     dh_lnk;
-      dh_lnk.args = &dh_args;
-      dh_lnk.lnks = &dh_lnks;
-      dh_lnk.sequence = &&TM2x·dealloc_Tape_heap;
+      SQ·make_Lnk(ah  ,TM2x·AllocTapeHeap   ,&&TM2x·alloc_Tape_heap);
+      SQ·make_Lnk(cb  ,TM2x·AllocArray      ,&&TM2x·alloc_array_bytes);
+      SQ·make_Lnk(cpb ,TM2x·CopyContiguous  ,&&TM2x·copy_contiguous_bytes);
+      SQ·make_Lnk(da  ,TM2x·DeallocArray    ,&&TM2x·dealloc_array);
+      SQ·make_Lnk(dh  ,TM2x·DeallocTapeHeap ,&&TM2x·dealloc_Tape_heap);
 
       ah_lnks.nominal.sequence = &&ah_dist;
       ah_lnks.fail.sequence = &&fail;
@@ -87,7 +56,7 @@ Currnenly this is just a copy of the copy_contiguous_bytes test.
     // ----------------------------------------
     // sequence results point into the tableau
     //
-      ah_ress.tm2x = &dst;
+      ah_ress.tape = &dst;
 
     // ----------------------------------------
     // seqeuence args point into the tableau
@@ -104,10 +73,10 @@ Currnenly this is just a copy of the copy_contiguous_bytes test.
     SQ·continue_indirect(ah_lnk);
 
     SQ·def(ah_dist){ // distribute the allocation
-      cb_args.tm2x = dst;
+      cb_args.tape = dst;
       cpb_args.dst = dst;
-      da_args.tm2x = dst;
-      dh_args.tm2x = dst;
+      da_args.tape = dst;
+      dh_args.tape = dst;
       SQ·continue_indirect(cb_lnk); // continue to construct bytes
     }SQ·end(ah_dist);
 

@@ -22,40 +22,15 @@ Deallocates the header.
     // result tableau
     //
       address_t n = 9;
-      TM2x·Tape *tm2x; // set by alloc_Tape_heap, then distributed
+      TM2x·Tape *tape; // set by alloc_Tape_heap, then distributed
 
     // ----------------------------------------
     // Links
     //
-      TM2x·AllocTapeHeap·Args ah_args;
-      TM2x·AllocTapeHeap·Ress ah_ress;
-      TM2x·AllocTapeHeap·Lnks ah_lnks;
-      TM2x·AllocTapeHeap·Lnk  ah_lnk;
-      ah_lnk.args = &ah_args;
-      ah_lnk.ress = &ah_ress;
-      ah_lnk.lnks = &ah_lnks;
-      ah_lnk.sequence = &&TM2x·alloc_Tape_heap;
-
-      TM2x·AllocArray·Args cb_args;
-      TM2x·AllocArray·Lnks cb_lnks;
-      TM2x·AllocArray·Lnk  cb_lnk;
-      cb_lnk.args = &cb_args;
-      cb_lnk.lnks = &cb_lnks;
-      cb_lnk.sequence = &&TM2x·alloc_array_bytes;
-
-      TM2x·DeallocArray·Args       da_args;
-      TM2x·DeallocArray·Lnks       da_lnks;
-      TM2x·DeallocArray·Lnk        da_lnk;
-      da_lnk.args = &da_args;
-      da_lnk.lnks = &da_lnks;
-      da_lnk.sequence = &&TM2x·dealloc_array;
-
-      TM2x·DeallocTapeHeap·Args    dh_args;
-      TM2x·DeallocTapeHeap·Lnks    dh_lnks;
-      TM2x·DeallocTapeHeap·Lnk     dh_lnk;
-      dh_lnk.args = &dh_args;
-      dh_lnk.lnks = &dh_lnks;
-      dh_lnk.sequence = &&TM2x·dealloc_Tape_heap;
+      SQ·make_Lnk(ah  ,TM2x·AllocTapeHeap   ,&&TM2x·alloc_Tape_heap);
+      SQ·make_Lnk(cb  ,TM2x·AllocArray      ,&&TM2x·alloc_array_bytes);
+      SQ·make_Lnk(da  ,TM2x·DeallocArray    ,&&TM2x·dealloc_array);
+      SQ·make_Lnk(dh  ,TM2x·DeallocTapeHeap ,&&TM2x·dealloc_Tape_heap);
 
       ah_lnks.nominal.sequence = &&ah_dist;
       ah_lnks.fail.sequence = &&fail;
@@ -70,7 +45,7 @@ Deallocates the header.
     // ----------------------------------------
     // sequence results point into the tableau
     //
-      ah_ress.tm2x = &tm2x;
+      ah_ress.tape = &tape;
 
     // ----------------------------------------
     // seqeuence args point into the tableau
@@ -85,9 +60,9 @@ Deallocates the header.
     SQ·continue_indirect(ah_lnk);
 
     SQ·def(ah_dist){ // distribute the allocation
-      cb_args.tm2x = tm2x;
-      da_args.tm2x = tm2x;
-      dh_args.tm2x = tm2x;
+      cb_args.tape = tape;
+      da_args.tape = tape;
+      dh_args.tape = tape;
       SQ·continue_indirect(cb_lnk); // continue to construct bytes
     }SQ·end(ah_dist);
 

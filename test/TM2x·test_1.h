@@ -22,40 +22,15 @@ the array.
     //
       address_t n_Element = 9;
       address_t element_n_Byte = 3; // extent of 32 bit int in elements
-      TM2x·Tape *tm2x; // set by alloc_Tape_heap, then distributed
+      TM2x·Tape *tape; // set by alloc_Tape_heap, then distributed
 
     // ----------------------------------------
     // Links
     //
-      TM2x·AllocTapeHeap·Args ah_args;
-      TM2x·AllocTapeHeap·Ress ah_ress;
-      TM2x·AllocTapeHeap·Lnks ah_lnks;
-      TM2x·AllocTapeHeap·Lnk  ah_lnk;
-      ah_lnk.args = &ah_args;
-      ah_lnk.ress = &ah_ress;
-      ah_lnk.lnks = &ah_lnks;
-      ah_lnk.sequence = &&TM2x·alloc_Tape_heap;
-
-      TM2x·AllocArrayElements·Args ce_args;
-      TM2x·AllocArrayElements·Lnks ce_lnks;
-      TM2x·AllocArrayElements·Lnk  ce_lnk;
-      ce_lnk.args = &ce_args;
-      ce_lnk.lnks = &ce_lnks;
-      ce_lnk.sequence = &&TM2x·alloc_array_elements;
-
-      TM2x·DeallocArray·Args       da_args;
-      TM2x·DeallocArray·Lnks       da_lnks;
-      TM2x·DeallocArray·Lnk        da_lnk;
-      da_lnk.args = &da_args;
-      da_lnk.lnks = &da_lnks;
-      da_lnk.sequence = &&TM2x·dealloc_array;
-
-      TM2x·DeallocTapeHeap·Args    dh_args;
-      TM2x·DeallocTapeHeap·Lnks    dh_lnks;
-      TM2x·DeallocTapeHeap·Lnk     dh_lnk;
-      dh_lnk.args = &dh_args;
-      dh_lnk.lnks = &dh_lnks;
-      dh_lnk.sequence = &&TM2x·dealloc_Tape_heap;
+      SQ·make_Lnk(ah  ,TM2x·AllocTapeHeap   ,&&TM2x·alloc_Tape_heap);
+      SQ·make_Lnk(ce  ,TM2x·AllocArrayElements ,&&TM2x·alloc_array_elements);
+      SQ·make_Lnk(da  ,TM2x·DeallocArray    ,&&TM2x·dealloc_array);
+      SQ·make_Lnk(dh  ,TM2x·DeallocTapeHeap ,&&TM2x·dealloc_Tape_heap);
 
       ah_lnks.nominal.sequence = &&ah_dist;
       ah_lnks.fail.sequence = &&fail;
@@ -70,7 +45,7 @@ the array.
     // ----------------------------------------
     // sequence results point into the tableau
     //
-      ah_ress.tm2x = &tm2x;
+      ah_ress.tape = &tape;
 
     // ----------------------------------------
     // seqeuence args point into the tableau
@@ -85,9 +60,9 @@ the array.
     SQ·continue_indirect(ah_lnk);
 
     SQ·def(ah_dist){ // distribute the allocation
-      ce_args.tm2x = tm2x;
-      da_args.tm2x = tm2x;
-      dh_args.tm2x = tm2x;
+      ce_args.tape = tape;
+      da_args.tape = tape;
+      dh_args.tape = tape;
       SQ·continue_indirect(ce_lnk); // continue to construct elements
     }SQ·end(ah_dist);
 

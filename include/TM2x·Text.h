@@ -23,7 +23,7 @@ address_t TM2x·alloc_array_count = 0;
 
     address_t n = n_of(TM2x·Tape ); // stack base allocated, so we can safely use its address
     m_args.n  = &n;
-    m_ress.allocation = (void **)lnk->ress->tm2x;
+    m_ress.allocation = (void **)lnk->ress->tape;
     m_lnks.nominal = lnk->lnks->nominal;
     m_lnks.fail = lnk->lnks->fail;
 
@@ -36,7 +36,7 @@ address_t TM2x·alloc_array_count = 0;
     TM2x·alloc_array_count++; // to assist with debugging
     TM2x·AllocArray·Lnk *lnk = (TM2x·AllocArray·Lnk *)SQ·lnk;
 
-    lnk->args->tm2x->n = *lnk->args->n;
+    lnk->args->tape->n = *lnk->args->n;
 
     // local result tableau (stack base allocated, like everything else)
     //
@@ -52,7 +52,7 @@ address_t TM2x·alloc_array_count = 0;
       m_lnk.sequence = &&CLib·mallocn;
 
       m_args.n  = &alloc_n;
-      m_ress.allocation = (void **)&lnk->args->tm2x->base_pt;
+      m_ress.allocation = (void **)&lnk->args->tape->base_pt;
       m_lnks.nominal = lnk->lnks->nominal;
       m_lnks.fail = lnk->lnks->alloc_fail;
 
@@ -95,7 +95,7 @@ address_t TM2x·alloc_array_count = 0;
       scale_ext_args.a_0 = lnk->args->n_Element;
       scale_ext_args.a_1 = lnk->args->element_n_Byte;
 
-      alloc_array_bytes_args.tm2x = lnk->args->tm2x;
+      alloc_array_bytes_args.tape = lnk->args->tape;
       alloc_array_bytes_args.n = &n;
 
     SQ·continue_indirect(scale_ext_lnk);
@@ -106,14 +106,14 @@ address_t TM2x·alloc_array_count = 0;
   SQ·def(TM2x·dealloc_array){
     TM2x·alloc_array_count--; // to assist with debugging
     TM2x·DeallocArray·Lnk *lnk = (TM2x·DeallocArray·Lnk *)SQ·lnk;
-    free(lnk->args->tm2x->base_pt);
+    free(lnk->args->tape->base_pt);
     SQ·continue_indirect(lnk->lnks->nominal);  
   } SQ·end(TM2x·dealloc_array);
 
   // we are to deallocate the header from the heap
   SQ·def(TM2x·dealloc_Tape_heap){
     TM2x·DeallocTapeHeap·Lnk *lnk = (TM2x·DeallocTapeHeap·Lnk *)SQ·lnk;
-    free(lnk->args->tm2x);
+    free(lnk->args->tape);
     SQ·continue_indirect(lnk->lnks->nominal);
   } SQ·end(TM2x·dealloc_Tape_heap);
 
@@ -267,9 +267,19 @@ address_t TM2x·alloc_array_count = 0;
     
     address_t alloc_n = TM2x·alloc_n(lnk->tape->n);
     address_t resized_alloc_n = TM2x·alloc_n(lnk->args->n);
-    if( alloc_n == resized_alloc_n ) SQ·continue_indirect(lnk->lnks->nominal);
-      
+    if( alloc_n == resized_alloc_n ){
+      lnk->args->tape.n = lnk->args->n;
+      SQ·continue_indirect(lnk->lnks->nominal);
+    }
+  
     // rtab
+    TM2x·Tape tape;
+
+    
+    SQ·make_Lnk(alloc_tape ,TM2x·AllocTapeHeap ,&&TM2x·alloc_tape_heap);
+    alloc_tape_args.tape
+    alloc_tape_lnks.nominal = 
+    
 
     SQ·continue_indirect(alloc_header_lnk);
 

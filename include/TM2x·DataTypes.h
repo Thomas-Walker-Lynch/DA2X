@@ -2,7 +2,7 @@
   typedef struct{
   } TM2x·AllocTapeHeap·Args;
   typedef struct{
-    TM2x·Tape **tm2x;
+    TM2x·Tape **tape;
   } TM2x·AllocTapeHeap·Ress;
   typedef struct{
     SQ·Lnk nominal;
@@ -17,7 +17,7 @@
 
 
   typedef struct{
-    TM2x·Tape *tm2x;
+    TM2x·Tape *tape;
     address_t *n;   // extent of the array, in bytes
   } TM2x·AllocArray·Args;
   typedef struct{
@@ -35,7 +35,7 @@
 
 
   typedef struct{
-    TM2x·Tape *tm2x;
+    TM2x·Tape *tape;
     address_t *n_Element;  // extent of the array, in elements
     address_t *element_n_Byte; // extent of the element, in bytes
   } TM2x·AllocArrayElements·Args;
@@ -55,7 +55,7 @@
 
 
   typedef struct{
-    TM2x·Tape *tm2x;
+    TM2x·Tape *tape;
   } TM2x·DeallocArray·Args;
   typedef struct{
   } TM2x·DeallocArray·Ress;
@@ -71,7 +71,7 @@
 
 
   typedef struct{
-    TM2x·Tape *tm2x;
+    TM2x·Tape *tape;
   } TM2x·DeallocTapeHeap·Args;
   typedef struct{
   } TM2x·DeallocTapeHeap·Ress;
@@ -146,8 +146,8 @@
   } TM2x·CopyContiguousElements·Lnk;
 
   typedef struct{
-         TM2x·Tape *tape;
-         address_t *n;
+    TM2x·Tape *tape;
+    address_t *n;
   } TM2x·Resize·Args;
   typedef struct{
   } TM2x·Resize·Ress;
