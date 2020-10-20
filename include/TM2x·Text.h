@@ -118,17 +118,22 @@ address_t TM2x·alloc_array_count = 0;
   } SQ·end(TM2x·dealloc_Tape_heap);
 
 
-  // copy_header will often be followed by the deallocation of the src tape header. 
+  // When operating on a single tape, we often create a temporary tape to accumulate changes
+  // on. When finished we move the contents of the temporary tape back to the single tape we
+  // are operating on.  This instruction sequence does the move.
   SQ·def(TM2x·move_array){
     // some aliases
-    TM2x·CopyTape·Lnk *lnk = (TM2x·CopyTape·Lnk *)SQ·lnk;
+    TM2x·MoveArray·Lnk *lnk = (TM2x·MoveArray·Lnk *)SQ·lnk;
     TM2x·Tape *src = lnk->args->src;
     TM2x·Tape *dst = lnk->args->dst;
 
+    TM2x·alloc_array_count--;
+    free(dst->base_pt);
     dst->base_pt = src->base_pt;
+    src->base_pt = 0; 
     dst->n = src->n;
     SQ·continue_indirect(lnk->lnks->nominal);
-  } SQ·end(TM2x·copy_tape);
+  } SQ·end(TM2x·move_array);
 
 
   // This should not appear on an interface.
@@ -152,23 +157,23 @@ address_t TM2x·alloc_array_count = 0;
 
     // lnks
     SQ·make_Lnk(alloc_array  ,TM2x·AllocArray ,&&TM2x·alloc_array);
-    SQ·make_Lnk(copy_tape    ,TM2x·CopyTape   ,&&TM2x·copy_tape);
+    SQ·make_Lnk(move_array    ,TM2x·MoveArray   ,&&TM2x·move_array);
 
     alloc_array_args.tape = &resized_tape;
     alloc_array_args.n    = lnk->args->n;
     alloc_array_lnks.nominal.sequence = &&copy_data;
     alloc_array_lnks.alloc_fail = lnk->lnks->alloc_fail;
 
-    copy_tape_args.src = &resized_tape;
-    copy_tape_args.dst = original_tape;
-    copy_tape_lnks.nominal = lnk->lnks->nominal;
+    move_array_args.src = &resized_tape;
+    move_array_args.dst = original_tape;
+    move_array_lnks.nominal = lnk->lnks->nominal;
 
     SQ·continue_indirect(alloc_array_lnk);
 
     SQ·def(copy_data){
       address_t n = resized_tape.n < original_tape->n ? resized_tape.n : original_tape->n;
       memcpyn(resized_tape.base_pt, original_tape->base_pt, n);
-      SQ·continue_indirect(copy_tape_lnk);
+      SQ·continue_indirect(move_array_lnk);
     }SQ·end(copy_data);
 
   } SQ·end(TM2x·resize);

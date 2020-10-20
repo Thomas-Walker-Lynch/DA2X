@@ -88,18 +88,18 @@
   typedef struct{
          TM2x·Tape *src;
          TM2x·Tape *dst;
-  } TM2x·CopyTape·Args;
+  } TM2x·MoveArray·Args;
   typedef struct{
-  } TM2x·CopyTape·Ress;
+  } TM2x·MoveArray·Ress;
   typedef struct{
     SQ·Lnk nominal;
-  } TM2x·CopyTape·Lnks;
+  } TM2x·MoveArray·Lnks;
   typedef struct{
     SQ·Ptr sequence;
-    TM2x·CopyTape·Args *args;
-    TM2x·CopyTape·Ress *ress;
-    TM2x·CopyTape·Lnks *lnks;
-  } TM2x·CopyTape·Lnk;
+    TM2x·MoveArray·Args *args;
+    TM2x·MoveArray·Ress *ress;
+    TM2x·MoveArray·Lnks *lnks;
+  } TM2x·MoveArray·Lnk;
 
   typedef struct{
          TM2x·Tape *src;
