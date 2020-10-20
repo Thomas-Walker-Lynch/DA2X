@@ -18,7 +18,7 @@
 #include "TM2x·DataTypes.h"
 
 int main(){
-  SQ·Sequence test_0 ,test_1;
+  SQ·Sequence test_0 ,SQ·test_0 ,test_1 ,SQ·test_1 ,test_2  ,SQ·test_2 ,tests_finished, SQ·tests_finished;
 
   #include "Sequence·Text.h"
   #include "CLib·Text.h"
@@ -32,6 +32,7 @@ int main(){
   SQ·continue(test_0);
   #include "TM2x·test_0.h"
   #include "TM2x·test_1.h"
+  #include "TM2x·test_2.h"
 
   SQ·def(tests_finished){
     Result·Tallies·print("TM2x·test results" ,accumulated_results_pt);

@@ -22,48 +22,44 @@ Deallocates the header.
     // result tableau
     //
       address_t n = 9;
-      TM2x·Tape *tape; // set by alloc_Tape_heap, then distributed
+      TM2x·Tape *tape; // will point to a heap allocated Tape structure.
 
     // ----------------------------------------
     // Links
     //
       SQ·make_Lnk(ah  ,TM2x·AllocTapeHeap   ,&&TM2x·alloc_Tape_heap);
-      SQ·make_Lnk(cb  ,TM2x·AllocArray      ,&&TM2x·alloc_array);
+      SQ·make_Lnk(aa  ,TM2x·AllocArray      ,&&TM2x·alloc_array);
       SQ·make_Lnk(da  ,TM2x·DeallocArray    ,&&TM2x·dealloc_array);
       SQ·make_Lnk(dh  ,TM2x·DeallocTapeHeap ,&&TM2x·dealloc_Tape_heap);
 
+      ah_ress.tape = &tape;
       ah_lnks.nominal.sequence = &&ah_dist;
       ah_lnks.fail.sequence = &&fail;
 
-      cb_lnks.nominal = AS(da_lnk ,SQ·Lnk);
-      cb_lnks.alloc_fail.sequence = &&fail;
+      aa_args.n = &n;
+      aa_lnks.nominal = AS(da_lnk ,SQ·Lnk);
+      aa_lnks.alloc_fail.sequence = &&fail;
 
       da_lnks.nominal = AS(dh_lnk ,SQ·Lnk);
       dh_lnks.nominal.sequence = &&nominal;
 
 
-    // ----------------------------------------
-    // sequence results point into the tableau
-    //
-      ah_ress.tape = &tape;
-
-    // ----------------------------------------
-    // seqeuence args point into the tableau
-    //
-      cb_args.n = &n;
-
-      // The alloc_Tape_heap result is a pointer to the allocation.  The distribution sequence that
-      // follows it distributes this pointer to the parameters of other rourtines. Consequently
-      // those parameters are not set here.
-
-
     SQ·continue_indirect(ah_lnk);
 
-    SQ·def(ah_dist){ // distribute the allocation
-      cb_args.tape = tape;
+    // Instruction sequences such as alloc_array, dealloc_array, and even
+    // dalloc_tape_heap, gather a tape argument.  Hence their args structure will be
+    // initialized with a pointer to a tape structure. In this test we allocate said tape
+    // structure on the heap.  Thus we may only initialize the relevant args structures
+    // after the tape has been allocated.  With a literal read of our code, the allocation
+    // of the tape structure and the initialization of the arg pointers will occur at run
+    // time, but an astute optimizer would notice that in this case both may be done at
+    // compile time. TM2x·test_1 has an example where the tape is placed directly on the
+    // result tableau instead of on the heap.
+    SQ·def(ah_dist){ 
+      aa_args.tape = tape;
       da_args.tape = tape;
       dh_args.tape = tape;
-      SQ·continue_indirect(cb_lnk); // continue to construct bytes
+      SQ·continue_indirect(aa_lnk); // continue to allocate the array
     }SQ·end(ah_dist);
 
     SQ·def(nominal){

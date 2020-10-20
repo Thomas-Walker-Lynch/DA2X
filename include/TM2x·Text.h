@@ -119,7 +119,7 @@ address_t TM2x·alloc_array_count = 0;
 
 
   // copy_header will often be followed by the deallocation of the src tape header. 
-  SQ·def(TM2x·copy_tape){
+  SQ·def(TM2x·move_array){
     // some aliases
     TM2x·CopyTape·Lnk *lnk = (TM2x·CopyTape·Lnk *)SQ·lnk;
     TM2x·Tape *src = lnk->args->src;
@@ -161,6 +161,7 @@ address_t TM2x·alloc_array_count = 0;
 
     copy_tape_args.src = &resized_tape;
     copy_tape_args.dst = original_tape;
+    copy_tape_lnks.nominal = lnk->lnks->nominal;
 
     SQ·continue_indirect(alloc_array_lnk);
 
