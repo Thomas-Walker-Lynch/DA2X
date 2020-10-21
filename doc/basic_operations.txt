@@ -19,16 +19,16 @@ II. Discussion of Deleting Cells
 
   A. Definition
 
-    Suppose we have identified three areas of a tape,  a lefthand side,  a middle area, and a righthand side.
+    Suppose we have identified three areas of a tape,  a left hand side,  a middle area, and a right hand side.
 
     Suppose we have an operation that 
 
       1. before the operation this is true:
-         a. the rightmost cell of the lefthand side and the leftmost cell of the middle area are neighbors.
-         b. the leftmost cell of the righthand side and the rightmost cell of the middle area are neighbors.
+         a. the rightmost cell of the left hand side and the leftmost cell of the middle area are neighbors.
+         b. the leftmost cell of the right hand side and the rightmost cell of the middle area are neighbors.
 
       2. after the operation this is true:
-         a. the rightmost cell of the lefthand side and the leftmost cell of the righthand side are neighbors.
+         a. the rightmost cell of the left hand side and the leftmost cell of the right hand side are neighbors.
 
     Any operation that accomplishes this is a deletion operation.
 
@@ -42,7 +42,7 @@ II. Discussion of Deleting Cells
 
     i. within tape approach
 
-       1. We copy the righthand side data to the left starting at the leftmost cell of the middle area.
+       1. We copy the right hand side data to the left starting at the leftmost cell of the middle area.
        2. We resize the tape to a smaller size.
 
        In step 2, if the resize does not cross a power of two extent, the resize will simply update
@@ -57,7 +57,7 @@ II. Discussion of Deleting Cells
        + This will be more efficient than the within tape approach when a resize triggers a new
        smaller allocation for the tape, as it saves a full array copy operation.
 
-       - This is less efficient than the 'within tape' approach when a resize does not trigger
+       - This is less efficient than the ‘within tape’ approach when a resize does not trigger
        a new allocation, as the two array approach always does a new allocation.
 
        + The two array approach can handle a variety of operations that can't be done with the
@@ -73,26 +73,13 @@ III. Functions that should be on the TM library interface
   she is finished using them.  The user need not know the details of the allocation
   algorithm to call these.
 
-  For a user to efficiently use a 'resize' method, the user would have to be aware of the
-  allocation boundaries and of the array copies which happen when they are crossed.
-  I.e. be aware of the allocation algorithm details, something we did not want to expose.
-  Consequently, we would like to hide resize calls behind the interface.
-
-  It is common to use an array to implement a stack or a queue.  It would be reasonable to
-  provide interface functions for these things.  Push and pop must call resize, so a user
-  would need to call resize to implement them, consequently it is better that the
-  interface provides push and pop.
-
-  Pushing an element is the same as appending a sequence of bytes, so we we will need
-  the more general append_bytes rather than just push.
-
-  Queuing is more complex because the array base is at a fixed location. Something special
-  needs to be done to push on the left.  Chances are we need a new header struct, and to
-  blance the array data in the middle of the data allocation. Then on special boundaries
-  on either end would resize and copy as per the stack.  We will postpone this
-  implementation to a later date.
+  Initially I attempted to bury resize behind operations.  It didn't work out.  Take for
+  example, push.  When pushing an element, we must push multiple bytes.  Hence push turned
+  into a more general byte append. That turns into a resize and a write.  However, write to
+  the array is currently done in a conventional fashion through an index or indirectly through
+  a pointer, so push was modified to return a pointer to the base or the newly expanded area.
+  I.e. it turned into resize that returns a pointer to the base of the expanded area.  Push
+  is gone, resize prevails.  
 
   
-
-
-
+  

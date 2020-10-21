@@ -137,8 +137,8 @@ address_t TM2x·alloc_array_count = 0;
 
 
   // This should not appear on an interface.
-  // Create a new 'resized' tape of the requested size, copy the data over, then copy the
-  // the pointers in the resized tape header back to the original tape header.
+  // Create a new 'resized' tape of the requested size, copy the data over, then move
+  // the the array on the resized tape back to the original tape.
   SQ·def(TM2x·resize){
     SQ·Sequence copy_data ,SQ·copy_data;
     TM2x·Resize·Lnk *lnk = (TM2x·Resize·Lnk *)SQ·lnk;
@@ -157,7 +157,7 @@ address_t TM2x·alloc_array_count = 0;
 
     // lnks
     SQ·make_Lnk(alloc_array  ,TM2x·AllocArray ,&&TM2x·alloc_array);
-    SQ·make_Lnk(move_array    ,TM2x·MoveArray   ,&&TM2x·move_array);
+    SQ·make_Lnk(move_array   ,TM2x·MoveArray  ,&&TM2x·move_array);
 
     alloc_array_args.tape = &resized_tape;
     alloc_array_args.n    = lnk->args->n;
@@ -178,60 +178,116 @@ address_t TM2x·alloc_array_count = 0;
 
   } SQ·end(TM2x·resize);
 
+  // resize version where the n arg is relative to the current length
+  SQ·def(TM2x·lengthen){
+    SQ·Sequence copy_array_data ,SQ·copy_array_data;
+    TM2x·Lengthen·Lnk *lnk = (TM2x·Lengthen·Lnk *)SQ·lnk;
+    TM2x·Tape *tape = lnk->args->tape;
+
+    address_t alloc_n = TM2x·alloc_n(tape->n);
+    address_t resized_n =  *lnk->args->n + tape->n + 1;
+    address_t resized_alloc_n = TM2x·alloc_n(resized_n);
+
+    // early exit
+    if( alloc_n == resized_alloc_n ){
+      *lnk->ress->new_area_pt = tape->base_pt + tape->n + 1;
+      tape->n = resized_n;
+      SQ·continue_indirect(lnk->lnks->nominal);
+    }
+  
+    // rtab
+    TM2x·Tape resized_tape;
+
+    // lnks
+    SQ·make_Lnk(alloc_array  ,TM2x·AllocArray ,&&TM2x·alloc_array);
+    SQ·make_Lnk(move_array   ,TM2x·MoveArray  ,&&TM2x·move_array);
+
+    alloc_array_args.tape = &resized_tape;
+    alloc_array_args.n    = lnk->args->n;
+    alloc_array_lnks.nominal.sequence = &&copy_array_data;
+    alloc_array_lnks.alloc_fail = lnk->lnks->alloc_fail;
+
+    move_array_args.src = &resized_tape;
+    move_array_args.dst = tape;
+    move_array_lnks.nominal = lnk->lnks->nominal;
+
+    SQ·continue_indirect(alloc_array_lnk);
+
+    SQ·def(copy_array_data){
+      *lnk->ress->new_area_pt = resized_tape.base_pt + tape->n + 1;
+      memcpyn(resized_tape.base_pt, tape->base_pt, tape->n);
+      SQ·continue_indirect(move_array_lnk);
+    }SQ·end(copy_array_data);
+
+  } SQ·end(TM2x·lengthen);
+
+  // resize version where the n arg is relative to the current length
+  SQ·def(TM2x·shorten){
+    SQ·Sequence copy_array_data ,SQ·copy_array_data;
+    TM2x·Shorten·Lnk *lnk = (TM2x·Shorten·Lnk *)SQ·lnk;
+    TM2x·Tape *tape = lnk->args->tape;
+
+    if( *lnk->args->n == tape->n ){
+      TM2x·alloc_array_count--;
+      free(dst->base_pt);
+      dst->base_pt = 0;
+      SQ·continue_indirect(lnk->lnks->empty);
+    }
+
+    if( *lnk->args->n > tape->n ){
+      SQ·continue_indirect(lnk->lnks->fail_left_leftmost);
+    }
+
+    address_t alloc_n = TM2x·alloc_n(tape->n);
+
+    
+
+    address_t resized_n =  *lnk->args->n + tape->n + 1;
+    address_t resized_alloc_n = TM2x·alloc_n(resized_n);
+
+
+    if( alloc_n == resized_alloc_n ){
+      *lnk->ress->new_area_pt = tape->base_pt + tape->n + 1;
+      tape->n = resized_n;
+      SQ·continue_indirect(lnk->lnks->nominal);
+    }
+  
+
+
+    // rtab
+    TM2x·Tape resized_tape;
+
+    // lnks
+    SQ·make_Lnk(alloc_array  ,TM2x·AllocArray ,&&TM2x·alloc_array);
+    SQ·make_Lnk(move_array   ,TM2x·MoveArray  ,&&TM2x·move_array);
+
+    alloc_array_args.tape = &resized_tape;
+    alloc_array_args.n    = lnk->args->n;
+    alloc_array_lnks.nominal.sequence = &&copy_array_data;
+    alloc_array_lnks.alloc_fail = lnk->lnks->alloc_fail;
+
+    move_array_args.src = &resized_tape;
+    move_array_args.dst = tape;
+    move_array_lnks.nominal = lnk->lnks->nominal;
+
+    SQ·continue_indirect(alloc_array_lnk);
+
+    SQ·def(copy_array_data){
+      *lnk->ress->new_area_pt = resized_tape.base_pt + tape->n + 1;
+      memcpyn(resized_tape.base_pt, tape->base_pt, tape->n);
+      SQ·continue_indirect(move_array_lnk);
+    }SQ·end(copy_array_data);
+
+  } SQ·end(TM2x·shorten);
+
+
+
+
 
 #if 0
 
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
---------------------------------------------------------------------------------
-
-SQ·def(resize_bytes){
-  // shorten the arg names, give the optimizer something more to do
-  TM2x·Tape *tm2x = Args.TM2x·resize_bytes.tm2x;
-  address_t after_n = Args.TM2x·resize_bytes.after_n;
-  SequencePtr nominal = Args.TM2x·resize_bytes.nominal;
-  SequencePtr alloc_fail = Args.TM2x·resize_bytes.alloc_fail;
-
-  address_t before_alloc_n = TM2x·alloc_n(tm2x->n);
-  address_t after_alloc_n = TM2x·alloc_n(after_n);
-
-  if( after_alloc_n == before_alloc_n ){
-    tm2x->n = after_n;
-    continue_via_trampoline nominal;
-  }
-
-  char *after_base_pt;
-
-  #include "Args.CLib·mallocn.h"
-  Args.CLib·mallocn.pt      = (void **)&after_base_pt;
-  Args.CLib·mallocn.n       = after_alloc_n;
-  Args.CLib·mallocn.nominal = &&malloc_nominal;
-  Args.CLib·mallocn.fail    = &&malloc_fail; 
-  #include "CLib·mallocn.h"
-  continue CLib·mallocn;
-
-  SQ·def(malloc_nominal){
-    #ifdef TM2x·TEST
-      TM2x·Test·allocation_n = after_alloc_n;
-    #endif
-    address_t copy_n = after_n < tm2x->n ? after_n : tm2x->n;
-    memcpyn( after_base_pt ,tm2x->base_pt ,copy_n);
-    free(tm2x->base_pt);
-    tm2x->base_pt = after_base_pt;
-    tm2x->n = after_n;
-    continue *nominal;
-  } SQ·end(malloc_nominal){
-
-  SQ·def(malloc_fail){
-   continue *alloc_fail;
-  } SQ·end(malloc_fail);
-  
-} SQ·end(resize_bytes);
-
-
-
-
-
+  SQ·def(TM2x·push){
+  } SQ·end(TM2x·push);
 
 
 

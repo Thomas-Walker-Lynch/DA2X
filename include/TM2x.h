@@ -28,9 +28,6 @@
   INLINE_PREFIX char *TM2x·0_pt(TM2x·Tape *tm2x){
     return tm2x->base_pt;
   }
-  INLINE_PREFIX void *TM2x·element_0_pt(TM2x·Tape *tm2x){
-    return tm2x->base_pt;
-  }
 
   // max offsets
   INLINE_PREFIX address_t TM2x·n(TM2x·Tape *tm2x){
