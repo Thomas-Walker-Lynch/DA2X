@@ -183,12 +183,8 @@ address_t TM2x·alloc_array_count = 0;
     TM2x·Tape *tape = lnk->args->tape;
 
     if( *lnk->args->n == tape->n ){
-      TM2x·alloc_array_count--;
-      free(dst->base_pt);
-      dst->base_pt = 0;
       SQ·continue_indirect(lnk->lnks->empty);
     }
-
     if( *lnk->args->n > tape->n ){
       SQ·continue_indirect(lnk->lnks->fail_left_leftmost);
     }
@@ -198,7 +194,6 @@ address_t TM2x·alloc_array_count = 0;
     address_t resized_alloc_n = TM2x·alloc_n(resized_n);
 
     if( alloc_n == resized_alloc_n ){
-      *lnk->ress->new_area_pt = tape->base_pt + tape->n + 1;
       tape->n = resized_n;
       SQ·continue_indirect(lnk->lnks->nominal);
     }

@@ -1,13 +1,13 @@
 /*
-Allocates a tape, then resizes it.
+Allocates a tape, then lengthen it.
 
 
 */
 
   // allocate, construct, destruct, dealloc an array
   SQ·def(test_2){
-    SQ·Sequence ah_dist ,initialize ,extend ,check ,fail ,report;
-    SQ·Sequence SQ·ah_dist ,SQ·initialize ,SQ·extend ,SQ·check ,SQ·fail ,SQ·report;
+    SQ·Sequence ah_dist ,initialize ,lengthen ,check ,fail ,report;
+    SQ·Sequence SQ·ah_dist ,SQ·initialize ,SQ·lengthen ,SQ·check ,SQ·fail ,SQ·report;
 
     address_t malloc_cnt = MallocCounter·count;
     address_t constructed_cnt = TM2x·alloc_array_count;
@@ -21,25 +21,27 @@ Allocates a tape, then resizes it.
     // result tableau
     //
       address_t n0 = 9;
-      address_t n1 = 18;
+      address_t n1 = 9;
       TM2x·Tape tape;
+      char *new_area_pt;
 
     // ----------------------------------------
     // Links
     //
-      SQ·make_Lnk(allocate   ,TM2x·AllocArray   ,&&TM2x·alloc_array);
-      SQ·make_Lnk(resize     ,TM2x·Resize       ,&&TM2x·resize);
-      SQ·make_Lnk(dealloc ,TM2x·DeallocArray ,&&TM2x·dealloc_array);
+      SQ·make_Lnk(allocate ,TM2x·AllocArray   ,&&TM2x·alloc_array);
+      SQ·make_Lnk(lengthen ,TM2x·Lengthen     ,&&TM2x·lengthen);
+      SQ·make_Lnk(dealloc  ,TM2x·DeallocArray ,&&TM2x·dealloc_array);
 
       allocate_args.tape = &tape;
       allocate_args.n = &n0;
       allocate_lnks.nominal.sequence = &&initialize;
       allocate_lnks.fail_alloc.sequence = &&fail;
 
-      resize_args.tape = &tape;
-      resize_args.n = &n1;
-      resize_lnks.nominal.sequence = &&extend;
-      resize_lnks.fail_alloc.sequence = &&fail;
+      lengthen_args.tape = &tape;
+      lengthen_args.n = &n1;
+      lengthen_ress.new_area_pt = &new_area_pt;
+      lengthen_lnks.nominal.sequence = &&append;
+      lengthen_lnks.fail_alloc.sequence = &&fail;
 
       dealloc_args.tape = &tape;
       dealloc_lnks.nominal.sequence = &&report;
@@ -60,40 +62,45 @@ Allocates a tape, then resizes it.
         goto lp0;
       lp0_end:
 
-      SQ·continue_indirect(resize_lnk);
+      SQ·continue_indirect(lengthen_lnk);
     }SQ·end(initialize);
 
-    SQ·def(extend){
-      f[fi++] = Test·CLib·allocation_n == power_2_extent(18);
+    SQ·def(append){
+      f[fi++] = Test·CLib·allocation_n == power_2_extent(19);
 
       uint8_t i = 0;
       uint8_t *pt = (uint8_t *)tape.base_pt;
-      do{
-        f[fi++] = *pt == i;
-        pt++;
-        i++;
-      }while( i <= 9 );
       lp1:
-        *pt = i;
-        if( i == 18 ) goto lp1_end;
+        f[fi++] = *pt == i;
+        if( i == 9 ) goto lp1_end;
         pt++;
         i++;
         goto lp1;
       lp1_end:
-      SQ·continue(check);
 
-    }SQ·end(extend);
-
-    SQ·def(check){
-      uint8_t i = 0;
-      uint8_t *pt = (uint8_t *)tape.base_pt;
+      i = 10;
+      pt = (uint8_t *)new_area_pt;
       lp2:
-        f[fi++] = *pt == i;
-        if( i == 18 ) goto lp2_end;
+        *pt = i;
+        if( i == 19 ) goto lp2_end;
         pt++;
         i++;
         goto lp2;
       lp2_end:
+      SQ·continue(check);
+
+    }SQ·end(append);
+
+    SQ·def(check){
+      uint8_t i = 0;
+      uint8_t *pt = (uint8_t *)tape.base_pt;
+      lp3:
+        f[fi++] = *pt == i;
+        if( i == 19 ) goto lp3_end;
+        pt++;
+        i++;
+        goto lp3;
+      lp3_end:
       SQ·continue_indirect(dealloc_lnk);
     }SQ·end(check);
 
