@@ -54,7 +54,7 @@ address_t TM2x·alloc_array_count = 0;
       m_args.n  = &alloc_n;
       m_ress.allocation = (void **)&lnk->args->tape->base_pt;
       m_lnks.nominal = lnk->lnks->nominal;
-      m_lnks.fail = lnk->lnks->alloc_fail;
+      m_lnks.fail = lnk->lnks->fail_alloc;
 
     SQ·continue_indirect(m_lnk);
 
@@ -81,7 +81,7 @@ address_t TM2x·alloc_array_count = 0;
 
       alloc_array_lnks = (TM2x·AllocArray·Lnks)
         { .nominal = lnk->lnks->nominal
-          ,.alloc_fail = lnk->lnks->alloc_fail
+          ,.fail_alloc = lnk->lnks->fail_alloc
         };
 
     // ----------------------------------------
@@ -135,49 +135,6 @@ address_t TM2x·alloc_array_count = 0;
     SQ·continue_indirect(lnk->lnks->nominal);
   } SQ·end(TM2x·move_array);
 
-
-  // This should not appear on an interface.
-  // Create a new 'resized' tape of the requested size, copy the data over, then move
-  // the the array on the resized tape back to the original tape.
-  SQ·def(TM2x·resize){
-    SQ·Sequence copy_data ,SQ·copy_data;
-    TM2x·Resize·Lnk *lnk = (TM2x·Resize·Lnk *)SQ·lnk;
-    
-    address_t n = *lnk->args->n;
-    address_t alloc_n = TM2x·alloc_n(lnk->args->tape->n);
-    address_t resized_alloc_n = TM2x·alloc_n(n);
-    if( alloc_n == resized_alloc_n ){
-      lnk->args->tape->n = n;
-      SQ·continue_indirect(lnk->lnks->nominal);
-    }
-  
-    // rtab
-    TM2x·Tape *original_tape = lnk->args->tape;
-    TM2x·Tape resized_tape;
-
-    // lnks
-    SQ·make_Lnk(alloc_array  ,TM2x·AllocArray ,&&TM2x·alloc_array);
-    SQ·make_Lnk(move_array   ,TM2x·MoveArray  ,&&TM2x·move_array);
-
-    alloc_array_args.tape = &resized_tape;
-    alloc_array_args.n    = lnk->args->n;
-    alloc_array_lnks.nominal.sequence = &&copy_data;
-    alloc_array_lnks.alloc_fail = lnk->lnks->alloc_fail;
-
-    move_array_args.src = &resized_tape;
-    move_array_args.dst = original_tape;
-    move_array_lnks.nominal = lnk->lnks->nominal;
-
-    SQ·continue_indirect(alloc_array_lnk);
-
-    SQ·def(copy_data){
-      address_t n = resized_tape.n < original_tape->n ? resized_tape.n : original_tape->n;
-      memcpyn(resized_tape.base_pt, original_tape->base_pt, n);
-      SQ·continue_indirect(move_array_lnk);
-    }SQ·end(copy_data);
-
-  } SQ·end(TM2x·resize);
-
   // resize version where the n arg is relative to the current length
   SQ·def(TM2x·lengthen){
     SQ·Sequence copy_array_data ,SQ·copy_array_data;
@@ -188,14 +145,12 @@ address_t TM2x·alloc_array_count = 0;
     address_t resized_n =  *lnk->args->n + tape->n + 1;
     address_t resized_alloc_n = TM2x·alloc_n(resized_n);
 
-    // early exit
     if( alloc_n == resized_alloc_n ){
       *lnk->ress->new_area_pt = tape->base_pt + tape->n + 1;
       tape->n = resized_n;
       SQ·continue_indirect(lnk->lnks->nominal);
     }
   
-    // rtab
     TM2x·Tape resized_tape;
 
     // lnks
@@ -203,9 +158,9 @@ address_t TM2x·alloc_array_count = 0;
     SQ·make_Lnk(move_array   ,TM2x·MoveArray  ,&&TM2x·move_array);
 
     alloc_array_args.tape = &resized_tape;
-    alloc_array_args.n    = lnk->args->n;
+    alloc_array_args.n    = &resized_n;
     alloc_array_lnks.nominal.sequence = &&copy_array_data;
-    alloc_array_lnks.alloc_fail = lnk->lnks->alloc_fail;
+    alloc_array_lnks.fail_alloc = lnk->lnks->fail_alloc;
 
     move_array_args.src = &resized_tape;
     move_array_args.dst = tape;
@@ -239,12 +194,8 @@ address_t TM2x·alloc_array_count = 0;
     }
 
     address_t alloc_n = TM2x·alloc_n(tape->n);
-
-    
-
-    address_t resized_n =  *lnk->args->n + tape->n + 1;
+    address_t resized_n = tape->n - *lnk->args->n - 1;
     address_t resized_alloc_n = TM2x·alloc_n(resized_n);
-
 
     if( alloc_n == resized_alloc_n ){
       *lnk->ress->new_area_pt = tape->base_pt + tape->n + 1;
@@ -252,8 +203,6 @@ address_t TM2x·alloc_array_count = 0;
       SQ·continue_indirect(lnk->lnks->nominal);
     }
   
-
-
     // rtab
     TM2x·Tape resized_tape;
 
@@ -262,9 +211,9 @@ address_t TM2x·alloc_array_count = 0;
     SQ·make_Lnk(move_array   ,TM2x·MoveArray  ,&&TM2x·move_array);
 
     alloc_array_args.tape = &resized_tape;
-    alloc_array_args.n    = lnk->args->n;
+    alloc_array_args.n    = &resized_n;
     alloc_array_lnks.nominal.sequence = &&copy_array_data;
-    alloc_array_lnks.alloc_fail = lnk->lnks->alloc_fail;
+    alloc_array_lnks.fail_alloc = lnk->lnks->fail_alloc;
 
     move_array_args.src = &resized_tape;
     move_array_args.dst = tape;
@@ -273,8 +222,7 @@ address_t TM2x·alloc_array_count = 0;
     SQ·continue_indirect(alloc_array_lnk);
 
     SQ·def(copy_array_data){
-      *lnk->ress->new_area_pt = resized_tape.base_pt + tape->n + 1;
-      memcpyn(resized_tape.base_pt, tape->base_pt, tape->n);
+      memcpyn(resized_tape.base_pt, tape->base_pt, resized_n);
       SQ·continue_indirect(move_array_lnk);
     }SQ·end(copy_array_data);
 
@@ -285,11 +233,6 @@ address_t TM2x·alloc_array_count = 0;
 
 
 #if 0
-
-  SQ·def(TM2x·push){
-  } SQ·end(TM2x·push);
-
-
 
 
 INLINE_PREFIX ContinuationPtr index·to_pt{
@@ -317,185 +260,4 @@ INLINE_PREFIX ContinuationPtr index·to_pt{
   SQ·end;
 }
 
-
-
-SQ·def(pop){
-   TM2x·Tape *tm2x                = Args.TM2x·pop.tm2x;           
-   address_t element_n_Byte  = Args.TM2x·pop.element_n_Byte; 
-   SequencePtr nominal      = Args.TM2x·pop.nominal;        
-   SequencePtr pop_last     = Args.TM2x·pop.pop_last;       
-   SequencePtr alloc_fail   = Args.TM2x·pop.alloc_fail;     
-} Args.TM2x·pop.
-
-
-
-
-
-
-
-SQ·def(push_bytes){
-  TM2x·Tape *tm2x              = TM2x·push_bytes.args.tm2x;           
-  void *source_pt         = TM2x·push_bytes.args.source_pt;      
-  address_t source_n = TM2x·push_bytes.args.source_n;  
-  SequencePtr nominal    = TM2x·push_bytes.args.nominal;        
-  SequencePtr alloc_fail = TM2x·push_bytes.args.alloc_fail;     
-}
-
-
-
-
-
-
-
-
-Args.TM2x·push_elements.{
-  TM2x·Tape *tm2x                = Args.TM2x·push_elements.tm2x;
-  void *base_pt             = Args.TM2x·push_elements.base_pt;
-  address_t n_Element       = Args.TM2x·push_elements.n_Element;
-  address_t element_n_Byte  = Args.TM2x·push_elements.element_n_Byte;
-  SequencePtr nominal      = Args.TM2x·push_elements.nominal;
-  SequencePtr alloc_fail   = Args.TM2x·push_elements.alloc_fail;
-  SequencePtr index_gt_n    = Args.TM2x·push_elements.index_gt_n;
- }
-
-  SQ·def(TM2x·push){
-    TM2x·Tape *tm2x                 = Args.TM2x·push.tm2x;
-    void *element_base_pt      = Args.TM2x·push.element_base_pt;
-    address_t element_n_Byte   = Args.TM2x·push.element_n_Byte;
-    SequencePtr nominal       = Args.TM2x·push.nominal;
-    SequencePtr alloc_fail    = Args.TM2x·push.alloc_fail;
-    SQ·end;
-  }
-
-Args.TM2x·push_TM2x.{
-  TM2x·Tape *tm2x                = Args.TM2x·push_TM2x.tm2x;
-  TM2x·Tape *tm2x_source         = Args.TM2x·push_TM2x.tm2x_source;
-  SequencePtr nominal      = Args.TM2x·push_TM2x.nominal;
-  SequencePtr alloc_fail   = Args.TM2x·push_TM2x.alloc_fail;
-}
-
-SQ·def(read_pop){
-  TM2x·Tape *tm2x                 = Args.TM2x·read_pop.TM2x·Tape *tm2x;            
-  void *dst_element_pt       = Args.TM2x·read_pop.void *dst_element_pt;  
-  address_t element_n_Byte   = Args.TM2x·read_pop.address_t element_n_Byte;
-  SequencePtr nominal       = Args.TM2x·read_pop.SequencePtr nominal;   
-  SequencePtr pop_last      = Args.TM2x·read_pop.SequencePtr pop_last;  
-  SequencePtr alloc_fail    = Args.TM2x·read_pop.SequencePtr alloc_fail;
-  SQ·end;
-}
-
-
-
-/*
-  Dynamic allocation of the TM2x·Tape header.  For static allocation use the AllocStatic() macro.
-  This does not allocate data for the array itself.
-*/
-
-#ifdef TM2x·TEST
-  extern address_t TM2x·Test·allocation_n;
 #endif
-
-extern address_t TM2x·alloc_array_count;
-
-SQ·def(resize_bytes){
-  // shorten the arg names, give the optimizer something more to do
-  TM2x·Tape *tm2x = Args.TM2x·resize_bytes.tm2x;
-  address_t after_n = Args.TM2x·resize_bytes.after_n;
-  SequencePtr nominal = Args.TM2x·resize_bytes.nominal;
-  SequencePtr alloc_fail = Args.TM2x·resize_bytes.alloc_fail;
-
-  address_t before_alloc_n = TM2x·alloc_n(tm2x->n);
-  address_t after_alloc_n = TM2x·alloc_n(after_n);
-
-  if( after_alloc_n == before_alloc_n ){
-    tm2x->n = after_n;
-    continue_via_trampoline nominal;
-  }
-
-  char *after_base_pt;
-
-  #include "Args.CLib·mallocn.h"
-  Args.CLib·mallocn.pt      = (void **)&after_base_pt;
-  Args.CLib·mallocn.n       = after_alloc_n;
-  Args.CLib·mallocn.nominal = &&malloc_nominal;
-  Args.CLib·mallocn.fail    = &&malloc_fail; 
-  #include "CLib·mallocn.h"
-  continue CLib·mallocn;
-
-  SQ·def(malloc_nominal){
-    #ifdef TM2x·TEST
-      TM2x·Test·allocation_n = after_alloc_n;
-    #endif
-    address_t copy_n = after_n < tm2x->n ? after_n : tm2x->n;
-    memcpyn( after_base_pt ,tm2x->base_pt ,copy_n);
-    free(tm2x->base_pt);
-    tm2x->base_pt = after_base_pt;
-    tm2x->n = after_n;
-    continue *nominal;
-    SQ·end
-  }
-
-  SQ·def(malloc_fail){
-   continue *alloc_fail;
-   SQ·end
-  }
-
-  SQ·end
-}
-/*
-  Dynamic allocation of the TM2x·Tape header.  For static allocation use the AllocStatic() macro.
-  This does not allocate data for the array itself.
-*/
-
-
-SQ·def(F_PREFIX SequencePtr TM2x·resize_elements){
-  TM2x·Tape *tm2x                = Args.TM2x·resize_elements.tm2x;
-  address_t after_n_Element = Args.TM2x·resize_elements.after_n_Element;
-  address_t element_n_Byte  = Args.TM2x·resize_elements.element_n_Byte;
-  SequencePtr nominal      = Args.TM2x·resize_elements.nominal;
-  SequencePtr alloc_fail   = Args.TM2x·resize_elements.alloc_fail;
-  SequencePtr index_gt_n    = Args.TM2x·resize_elements.index_gt_n;
-
-  address_t after_n;
-  #include "inclusive·mul_ext·args.h"
-  inclusive·mul_ext·args.an = after_n_Element;
-  inclusive·mul_ext·args.bn = element_n_Byte;
-  inclusive·mul_ext·args.cn = &after_n;
-  inclusive·mul_ext·args.nominal = &&mul_ext·nominal;
-  inclusive·mul_ext·args.gt_address_n = index_gt_n;
-  continue inclusive·mul_ext;
-
-  SQ·def(mul_ext·nominal){
-    resize_bytes·args.tm2x = tm2x;
-    resize_bytes·args.after_n = after_n;
-    resize_bytes·args.nominal = nominal;
-    resize_bytes·args.alloc_fail = alloc_fail;
-    contine_from TM2x·resize_bytes;
-    SQ·end;
-  }
-
-  SQ·end;
-}
-
-/*
-
-Copies a region stemming from src_pt to src_pt + n on to the 
-dst tm2x starting from byte offset dst_i.
-
-The only tm2x explicitly identified is the dst tm2x, so we say that
-we are writing the dst tm2x.
-
-*/
-SQ·def(write_bytes){
-          TM2x·Tape *dst               = Args.TM2x·write_bytes.dst          
-     address_t  dst_i        = Args.TM2x·write_bytes.dst_i   
-          void *src_pt            = Args.TM2x·write_bytes.src_pt       
-     address_t  n            = Args.TM2x·write_bytes.n       
-  SequencePtr  nominal          = Args.TM2x·write_bytes.nominal      
-  SequencePtr  alloc_fail       = Args.TM2x·write_bytes.alloc_fail   
-  SequencePtr  src_index_gt_n   = Args.TM2x·write_bytes.src_index_gt_n
-  SequencePtr  dst_index_gt_n   = Args.TM2x·write_bytes.dst_index_gt_n
-}
-
-#endif
-

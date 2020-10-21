@@ -41,7 +41,7 @@ should be indented
     #define pt      tape
     #define n       n_of(TM2x·Tape )
     #define nominal malloc_nominal
-    #define fail    malloc_fail
+    #define fail    mfail_alloc
     #include "CLib·mallocn.h"
 
   turns out we are not doing operand continuations like this, but the #includes

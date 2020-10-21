@@ -237,11 +237,11 @@
       continue_via_trampoline already_on_tape_dst;
     }
     not_found:{
-      continue_into TM2x·push(tape_dst ,src_element_pt ,element_n_Byte ,&&pw_wrote_it ,&&pw_alloc_failed);
+      continue_into TM2x·push(tape_dst ,src_element_pt ,element_n_Byte ,&&pw_wrote_it ,&&pw_fail_alloced);
       pw_wrote_it:{
         continue_via_trampoline wrote_it;
       }
-      pw_alloc_failed:{
+      pw_fail_alloced:{
         continue_via_trampoline allocate_failed;
       }
     }
@@ -328,36 +328,36 @@
     }
 
     init:{
-      Sequence nominal ,alloc_fail;
+      Sequence nominal ,fail_alloc;
       continue_into TM2x·construct_write
         ( set_intersection 
           ,TM2xHd·pt(hd_a) 
           ,element_n_Byte 
           ,&&nominal
-          ,&&alloc_fail
+          ,&&fail_alloc
           );
       nominal:{
         do_write = &&extend;
         continue_from next;
       }
-      alloc_fail:{
+      fail_alloc:{
         continue_via_trampoline init_intersection·allocation_failed;
       }
     }
         
     extend:{
-      Sequence nominal ,alloc_fail;
+      Sequence nominal ,fail_alloc;
       continue_into TM2x·push
         ( set_intersection 
           ,TM2xHd·pt(hd_a) 
           ,element_n_Byte 
           ,&&nominal 
-          ,&&alloc_fail
+          ,&&fail_alloc
           );        
       nominal:{
         continue_from next;
       }
-      alloc_fail:{
+      fail_alloc:{
         continue_via_trampoline init_intersection·allocation_failed;
       }
     }

@@ -424,9 +424,9 @@
     (
      ContinuationPtr nominal
      ,ContinuationPtr index_gt_n
-     ,ContinuationPtr alloc_fail
+     ,ContinuationPtr fail_alloc
      ){
-    Sequence scale ,alloc_array ,local_index_gt_n ,local_nominal ,local_alloc_fail;
+    Sequence scale ,alloc_array ,local_index_gt_n ,local_nominal ,local_fail_alloc;
     Sequence·swap();
     P1(p1 ,TM2x·alloc_array_elements ,1);
 
@@ -448,7 +448,7 @@
       P0(p0 ,TM2x·alloc_array ,0);
       p0->tape       = tape;
       p0->n     = n;
-      continue TM2x·alloc_array(&&local_nominal ,&&local_alloc_fail);
+      continue TM2x·alloc_array(&&local_nominal ,&&local_fail_alloc);
       cend;
     };
 
@@ -462,8 +462,8 @@
       cend;
     }
 
-    cdef(local_alloc_fail){
-      leave_to alloc_fail;
+    cdef(local_fail_alloc){
+      leave_to fail_alloc;
       cend;
     }
 
@@ -473,11 +473,11 @@
   ````
 
   It is too bad we need the local sequences, `local_index_gt_n`, `local_nominal`, and
-  `local_alloc_fail`.  Their sole purpose is to maintain the integrity of the
+  `local_fail_alloc`.  Their sole purpose is to maintain the integrity of the
   encapsulation.  By having `TM2x·alloc_array` and `Inclusive·mul_ext` first
   continue locally we assure that the stack frame gets popped.  If we did not need to pop
   the stack frame, `TM2x·alloc_array` and `Inclusive·mul_ext` could continue directly to
-  `index_gt_n`, `nominal`, and `alloc_fail`.
+  `index_gt_n`, `nominal`, and `fail_alloc`.
 
 
 # Mixing functions with general use sequences
@@ -487,7 +487,7 @@
   code something like this:
 
 ````
-    encapsulation(f)(SequencePtr nominal ,SequencePtr alloc_fail){
+    encapsulation(f)(SequencePtr nominal ,SequencePtr fail_alloc){
 
       ...
 
@@ -644,7 +644,7 @@
       CX(cx ,TM2x0 ,alloc_array_elements);
       cx->tape       = p1->tape;
       cx->nominal    = p1->nominal;
-      cx->alloc_fail = p1->alloc_fail;
+      cx->fail_alloc = p1->fail_alloc;
 
       // P0 is a macro that points `p0` to the arguments pad and gives it type.
       P0(p0 ,Inclusive·3opLL ,0);
@@ -660,7 +660,7 @@
         p0->tape       = cx->tape;
         p0->n     = cx->n;
         p0->nominal    = cx->nominal;
-        p0->alloc_fail = cx->alloc_fail;
+        p0->fail_alloc = cx->fail_alloc;
         continue TM2x·alloc_array;
         cend;
       };
@@ -1099,7 +1099,7 @@ We start by defining a `Connector`.
 
 The three fields in the connect provide everything a sequence needs to run.  The
 entry field provides the entry point,  the connections is a list of connectors to
-other sequences.  These will have names like `nominal` and `alloc_fail`, etc.  The
+other sequences.  These will have names like `nominal` and `fail_alloc`, etc.  The
 arguments are being passed in to the sequence.
 
 

@@ -43,7 +43,7 @@ Currnenly this is just a copy of the copy_contiguous_bytes test.
       ah_lnks.fail.sequence = &&fail;
 
       cb_lnks.nominal = AS(cpb_lnk ,SQ·Lnk);
-      cb_lnks.alloc_fail.sequence = &&fail;
+      cb_lnks.fail_alloc.sequence = &&fail;
 
       cpb_lnks.nominal.sequence = &&check_copy;
       cpb_lnks.src_index_gt_n.sequence = &&fail;

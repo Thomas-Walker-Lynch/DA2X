@@ -39,7 +39,7 @@ the array.
       aa_args.n_Element = &n_Element;
       aa_args.element_n_Byte = &element_n_Byte;
       aa_lnks.nominal = AS(da_lnk ,SQ·Lnk);
-      aa_lnks.alloc_fail.sequence = &&fail;
+      aa_lnks.fail_alloc.sequence = &&fail;
 
       da_lnks.nominal = AS(dh_lnk ,SQ·Lnk);
       dh_lnks.nominal.sequence = &&nominal;

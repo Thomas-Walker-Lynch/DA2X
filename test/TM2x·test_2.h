@@ -34,12 +34,12 @@ Allocates a tape, then resizes it.
       allocate_args.tape = &tape;
       allocate_args.n = &n0;
       allocate_lnks.nominal.sequence = &&initialize;
-      allocate_lnks.alloc_fail.sequence = &&fail;
+      allocate_lnks.fail_alloc.sequence = &&fail;
 
       resize_args.tape = &tape;
       resize_args.n = &n1;
       resize_lnks.nominal.sequence = &&extend;
-      resize_lnks.alloc_fail.sequence = &&fail;
+      resize_lnks.fail_alloc.sequence = &&fail;
 
       dealloc_args.tape = &tape;
       dealloc_lnks.nominal.sequence = &&report;

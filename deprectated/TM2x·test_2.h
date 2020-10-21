@@ -43,7 +43,7 @@ we may create a tape machine header that points to the C array, and then do the 
       ah_lnks.fail.sequence = &&fail;
 
       cb_lnks.nominal = AS(cpb_lnk ,SQ·Lnk);
-      cb_lnks.alloc_fail.sequence = &&fail;
+      cb_lnks.fail_alloc.sequence = &&fail;
 
       cpb_lnks.nominal.sequence = &&check_copy;
       cpb_lnks.src_index_gt_n.sequence = &&fail;

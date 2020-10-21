@@ -35,7 +35,7 @@ write_construct() function on the interface is used, then the cells will be init
 with the provided write data.  Such a routine will typically also have a 'not_found'
 continuation that is taken when the array has not been constructed, and thus has no
 elements. There may be additional continuations for other special cases upon exit, such as
-errors.  Because our array methods call malloc, there will surely be an 'alloc_fail'
+errors.  Because our array methods call malloc, there will surely be an 'fail_alloc'
 continuation for the case that malloc fails to expand or contract the array.  (In the case
 of contraction, the array currently allocates a new smaller memory block and copies the
 elements over.  The idea being to give large memory blocks back to the heap.  The
@@ -58,22 +58,22 @@ A typical example of a path where construction is guaranteed is that stemming fr
 'nominal' continuation.  An example of a path where it is guaranteed that the array
 has not been constructed is that stemming from the 'not_found' path.
 
-The 'alloc_fail' continuation has a subtlety.  If the allocation failure occured when
+The 'fail_alloc' continuation has a subtlety.  If the allocation failure occured when
 allocating the first element, the array was not constructed.  On the other hand, if the
 allocation failure occured when extending the array, the array has been constructed.
-If the routine were to exit on one alloc_fail continuation immediately after malloc
+If the routine were to exit on one fail_alloc continuation immediately after malloc
 signaled a failure, it would not be possible to know on the downstream execution path if
 the array had been constructed or not, and thus it would not be possible to destruct it.
 
-We have a couple of options.  We could have two 'alloc_fail' continuations on our
-hypothetical routine, say 'alloc_fail_first' and 'alloc_fail_extend'.  On the
+We have a couple of options.  We could have two 'fail_alloc' continuations on our
+hypothetical routine, say 'fail_alloc_first' and 'fail_alloc_extend'.  On the
 'alloc_first' execution path have the guarantee that the array has not been constructed,
-while the 'alloc_fail_extend' path would have the guarantee that it was constructed.
+while the 'fail_alloc_extend' path would have the guarantee that it was constructed.
 
-Often times the only difference between the 'alloc_fail_first' and the 'alloc_fail_extend'
-paths would be the destruction of the array. Hence, we could instead keep one 'alloc_fail'
+Often times the only difference between the 'fail_alloc_first' and the 'fail_alloc_extend'
+paths would be the destruction of the array. Hence, we could instead keep one 'fail_alloc'
 continuation, and for the case where allocation failed when extending, the routine would
-destruct the array before taking the continuation.  In this manner the one 'alloc_fail'
+destruct the array before taking the continuation.  In this manner the one 'fail_alloc'
 continuation can carry the guarantee that that the array has not been constructed.
 However, there is a design pattern where upon an allocation failure we might want to do
 some sort of fix up, say expanding the memory allocated to the heap, and then to retry

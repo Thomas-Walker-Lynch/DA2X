@@ -24,7 +24,7 @@
   } TM2x·AllocArray·Ress;
   typedef struct{
     SQ·Lnk nominal;
-    SQ·Lnk alloc_fail;
+    SQ·Lnk fail_alloc;
   } TM2x·AllocArray·Lnks;
   typedef struct{
     SQ·Ptr sequence;
@@ -44,7 +44,7 @@
   typedef struct{
     SQ·Lnk nominal;
     SQ·Lnk index_gt_n;
-    SQ·Lnk alloc_fail;
+    SQ·Lnk fail_alloc;
   } TM2x·AllocArrayElements·Lnks;
   typedef struct{
     SQ·Ptr sequence;
@@ -105,30 +105,13 @@
   typedef struct{
     TM2x·Tape *tape;
     address_t *n;
-  } TM2x·Resize·Args;
-  typedef struct{
-  } TM2x·Resize·Ress;
-  typedef struct{
-    SQ·Lnk nominal;
-    SQ·Lnk alloc_fail;
-  } TM2x·Resize·Lnks;
-  typedef struct{
-    SQ·Ptr sequence;
-    TM2x·Resize·Args *args;
-    TM2x·Resize·Ress *ress;
-    TM2x·Resize·Lnks *lnks;
-  } TM2x·Resize·Lnk;
-
-  typedef struct{
-    TM2x·Tape *tape;
-    address_t *n;
   } TM2x·Lengthen·Args;
   typedef struct{
     char **new_area_pt;
   } TM2x·Lengthen·Ress;
   typedef struct{
     SQ·Lnk nominal;
-    SQ·Lnk alloc_fail;
+    SQ·Lnk fail_alloc;
   } TM2x·Lengthen·Lnks;
   typedef struct{
     SQ·Ptr sequence;
@@ -148,7 +131,7 @@
     SQ·Lnk nominal;
     SQ·Lnk empty;
     SQ·Lnk fail_left_leftmost;
-    SQ·Lnk alloc_fail;
+    SQ·Lnk fail_alloc;
   } TM2x·Shorten·Lnks;
   typedef struct{
     SQ·Ptr sequence;

@@ -38,7 +38,7 @@ Deallocates the header.
 
       aa_args.n = &n;
       aa_lnks.nominal = AS(da_lnk ,SQ·Lnk);
-      aa_lnks.alloc_fail.sequence = &&fail;
+      aa_lnks.fail_alloc.sequence = &&fail;
 
       da_lnks.nominal = AS(dh_lnk ,SQ·Lnk);
       dh_lnks.nominal.sequence = &&nominal;
