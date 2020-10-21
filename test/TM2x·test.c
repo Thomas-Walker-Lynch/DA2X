@@ -15,7 +15,7 @@
 
 #include "CLib·DataTypes.h"
 #include "Inclusive·DataTypes.h"
-#include "TM2x·DataTypes.h"
+#include "TM2x·TapeTypes.h"
 
 int main(){
   SQ·Sequence test_0 ,SQ·test_0 ,test_1 ,SQ·test_1 ,test_2  ,SQ·test_2 ,tests_finished, SQ·tests_finished;
@@ -23,7 +23,7 @@ int main(){
   #include "Sequence·Text.h"
   #include "CLib·Text.h"
   #include "Inclusive·Text.h"
-  #include "TM2x·Text.h"
+  #include "TM2x·Tape.h"
 
   Result·Tallies accumulated_results ,*accumulated_results_pt;
   accumulated_results_pt=&accumulated_results;
