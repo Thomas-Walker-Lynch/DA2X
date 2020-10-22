@@ -34,22 +34,22 @@
 // adjectives
 //
   TM2xHd·F_PREFIX SequencePtr TM2xHd·is_on_tape
-  ( TM2x·Tape *tape 
+  ( T02x·Tape *tape 
     ,TM2xHd *hd 
     ,SequencePtr is_true  
     ,SequencePtr is_false
     ){
-    if( hd->element_pt <= TM2x·n_pt(tape) && hd->element_pt >= TM2x·0_pt(tape) ) continue_via_trampoline is_true;
+    if( hd->element_pt <= T02x·n_pt(tape) && hd->element_pt >= T02x·0_pt(tape) ) continue_via_trampoline is_true;
     continue_via_trampoline is_false;
   }
   TM2xHd·F_PREFIX SequencePtr TM2xHd·at_n_Element
-  ( TM2x·Tape *tape 
+  ( T02x·Tape *tape 
     ,TM2xHd *hd 
     ,address_t element_n_Byte
     ,SequencePtr is_true  
     ,SequencePtr is_false
     ){
-    if( hd->element_pt == TM2x·n_Element_pt(tape ,element_n_Byte) ) continue_via_trampoline is_true;
+    if( hd->element_pt == T02x·n_Element_pt(tape ,element_n_Byte) ) continue_via_trampoline is_true;
     continue_via_trampoline is_false;
   }
 
@@ -57,8 +57,8 @@
 // motion
 //
   // this also initializes an hd
-  TM2xHd·F_PREFIX void TM2xHd·rewind(TM2x·Tape *tape ,TM2xHd *hd){
-    hd->element_pt = TM2x·0_pt(tape);
+  TM2xHd·F_PREFIX void TM2xHd·rewind(T02x·Tape *tape ,TM2xHd *hd){
+    hd->element_pt = T02x·0_pt(tape);
   }
 
   TM2xHd·F_PREFIX void TM2xHd·unguarded_step(TM2xHd *hd ,address_t element_n_Byte){
@@ -66,7 +66,7 @@
   }
 
   TM2xHd·F_PREFIX SequencePtr TM2xHd·step
-  ( TM2x·Tape *tape 
+  ( T02x·Tape *tape 
     ,TM2xHd *hd 
     ,address_t element_n_Byte
     ,SequencePtr nominal
@@ -103,18 +103,18 @@
 // quantifiers
 //
 
-  // nah .. better to implement this with memcpyn, see TM2x·construct_write
+  // nah .. better to implement this with memcpyn, see T02x·construct_write
   // shallow copy tape_src elements to the end of tape_acc
-  TM2xHd·F_PREFIX SequencePtr TM2x·cat
-  ( TM2x·Tape *tape_acc
-    ,TM2x·Tape *tape_src
+  TM2xHd·F_PREFIX SequencePtr T02x·cat
+  ( T02x·Tape *tape_acc
+    ,T02x·Tape *tape_src
     ,address_t element_n_Byte
     ,SequencePtr nominal
     ,SequencePtr allocation_failed
     ){
     TM2xHd·AllocStaticRewind(tape_src, hd_src);
     loop:{
-      continue_into TM2x·push(tape_acc ,TM2xHd·pt(hd_src) ,element_n_Byte ,&&pw_nominal ,&&pw_allocation_failed);
+      continue_into T02x·push(tape_acc ,TM2xHd·pt(hd_src) ,element_n_Byte ,&&pw_nominal ,&&pw_allocation_failed);
       pw_nominal:{
         continue_into TM2xHd·step(tape_src ,hd_src ,element_n_Byte ,&&loop ,&&at_n);
         at_n:{
@@ -130,7 +130,7 @@
   // applies f to each element, in order starting at the current hd position, until reaching the end of the tape
   // should f accept/return Sequence?  Should it take an hd instead of an element?
   TM2xHd·F_PREFIX void TM2xHd·apply_to_each
-  ( TM2x·Tape *tape
+  ( T02x·Tape *tape
     ,TM2xHd *hd
     ,address_t element_n_Byte
     ,void *context
@@ -152,7 +152,7 @@
 
   // applies pred to each element until either pred is not true, or reaching the end of the tape
   TM2xHd·F_PREFIX SequencePtr TM2xHd·all
-  ( TM2x·Tape *tape
+  ( T02x·Tape *tape
     ,TM2xHd *hd
     ,address_t element_n_Byte
     ,void *context
@@ -179,7 +179,7 @@
   }
 
   TM2xHd·F_PREFIX SequencePtr TM2xHd·exists
-  ( TM2x·Tape *tape
+  ( T02x·Tape *tape
     ,TM2xHd *hd
     ,address_t element_n_Byte
     ,void *context
@@ -215,7 +215,7 @@
   // when pred is a comparison can be used to force order
   // when pred is equality treats tape like a set
   TM2xHd·F_PREFIX SequencePtr TM2xHd·push_not_exists
-  ( TM2x·Tape *tape_dst
+  ( T02x·Tape *tape_dst
     ,void *src_element_pt 
     ,address_t element_n_Byte
     ,SequencePtr pred(void *context ,void *el ,address_t element_n_Byte ,SequencePtr pred_true ,SequencePtr pred_false)
@@ -237,7 +237,7 @@
       continue_via_trampoline already_on_tape_dst;
     }
     not_found:{
-      continue_into TM2x·push(tape_dst ,src_element_pt ,element_n_Byte ,&&pw_wrote_it ,&&pw_fail_alloced);
+      continue_into T02x·push(tape_dst ,src_element_pt ,element_n_Byte ,&&pw_wrote_it ,&&pw_fail_alloced);
       pw_wrote_it:{
         continue_via_trampoline wrote_it;
       }
@@ -253,8 +253,8 @@
   // -returns whether set_src was a subset of set_acc even before the union (make this a separate SequencePtr?)
   // -context given to the pred is a pointer to the src element
   TM2xHd·F_PREFIX SequencePtr TM2xHd·accumulate_union
-  ( TM2x·Tape *set_acc
-    ,TM2x·Tape *set_src
+  ( T02x·Tape *set_acc
+    ,T02x·Tape *set_src
     ,TM2xHd *hd_src
     ,address_t element_n_Byte
     ,SequencePtr pred(void *context ,void *el ,address_t element_n_Byte ,SequencePtr pred_true ,SequencePtr pred_false)
@@ -300,9 +300,9 @@
   // - on allocation failure the intersection set might be partially created
   // - if the intersection is empty, we never construct set_intersection
   TM2xHd·F_PREFIX SequencePtr TM2xHd·init_intersection
-  ( TM2x·Tape *set_intersection
-    ,TM2x·Tape *set_a
-    ,TM2x·Tape *set_b
+  ( T02x·Tape *set_intersection
+    ,T02x·Tape *set_a
+    ,T02x·Tape *set_b
     ,address_t element_n_Byte
     ,SequencePtr pred(void *context ,void *el ,address_t element_n_Byte ,SequencePtr pred_true ,SequencePtr pred_false)
     ,SequencePtr init_intersection·nominal
@@ -329,7 +329,7 @@
 
     init:{
       Sequence nominal ,fail_alloc;
-      continue_into TM2x·construct_write
+      continue_into T02x·construct_write
         ( set_intersection 
           ,TM2xHd·pt(hd_a) 
           ,element_n_Byte 
@@ -347,7 +347,7 @@
         
     extend:{
       Sequence nominal ,fail_alloc;
-      continue_into TM2x·push
+      continue_into T02x·push
         ( set_intersection 
           ,TM2xHd·pt(hd_a) 
           ,element_n_Byte 
@@ -388,7 +388,7 @@
 
   TM2xHd·F_PREFIX SequencePtr TM2xHd·true
   ( void *context 
-    ,TM2x·Tape *tape 
+    ,T02x·Tape *tape 
     ,TM2xHd *hd
     ,address_t element_n_Byte
     ,SequencePtr pred_true

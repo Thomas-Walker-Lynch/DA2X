@@ -10,7 +10,7 @@ Allocates a tape, then lengthen it.
     SQ·Sequence SQ·ah_dist ,SQ·initialize ,SQ·lengthen ,SQ·check ,SQ·fail ,SQ·report;
 
     address_t malloc_cnt = MallocCounter·count;
-    address_t constructed_cnt = TM2x·alloc_array_count;
+    address_t constructed_cnt = T02x·alloc_array_count;
     Result·Tallies results ,*results_pt;
     results_pt = &results;
     Result·Tallies·init(results_pt);
@@ -22,15 +22,15 @@ Allocates a tape, then lengthen it.
     //
       address_t n0 = 9;
       address_t n1 = 9;
-      TM2x·Tape tape;
+      T02x·Tape tape;
       char *new_area_pt;
 
     // ----------------------------------------
     // Links
     //
-      SQ·make_Lnk(allocate ,TM2x·AllocArray   ,&&TM2x·alloc_array);
-      SQ·make_Lnk(lengthen ,TM2x·Lengthen     ,&&TM2x·lengthen);
-      SQ·make_Lnk(dealloc  ,TM2x·DeallocArray ,&&TM2x·dealloc_array);
+      SQ·make_Lnk(allocate ,T02x·AllocArray   ,&&T02x·alloc_array);
+      SQ·make_Lnk(lengthen ,T02x·Lengthen     ,&&T02x·lengthen);
+      SQ·make_Lnk(dealloc  ,T02x·DeallocArray ,&&T02x·dealloc_array);
 
       allocate_args.tape = &tape;
       allocate_args.n = &n0;
@@ -111,7 +111,7 @@ Allocates a tape, then lengthen it.
 
     SQ·def(report){
       f[fi++] = malloc_cnt == MallocCounter·count;
-      f[fi++] = constructed_cnt == TM2x·alloc_array_count;
+      f[fi++] = constructed_cnt == T02x·alloc_array_count;
 
       Result·Tallies·tally("test_2" ,&results ,f ,fi);
       Result·Tallies·accumulate(accumulated_results_pt ,&results);

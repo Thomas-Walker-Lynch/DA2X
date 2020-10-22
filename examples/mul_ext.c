@@ -2,7 +2,7 @@
 #include "misc.h"
 #include "Sequence.h"
 #include "Inclusive.h"
-#include "Inclusive·DataTypes.h"
+#include "Inclusive·Types.h"
 
 int main(){
   SQ·Sequence nominal ,SQ·nominal ,gt_address_t_n ,SQ·gt_address_t_n;

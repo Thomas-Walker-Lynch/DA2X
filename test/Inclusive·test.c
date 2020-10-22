@@ -14,7 +14,7 @@ to nominal or gt_address_t_n depending if there is a good result or there was an
 #include "Sequence.h"
 #include "Inclusive.h"
 
-#include "Inclusive·DataTypes.h"
+#include "Inclusive·Types.h"
 
 int main(){
 
@@ -78,7 +78,7 @@ int main(){
 
     SQ·def(report){
       f[i++] = malloc_cnt == MallocCounter·count;
-      // f[i++] = constructed_cnt == TM2x·alloc_array_count;
+      // f[i++] = constructed_cnt == T02x·alloc_array_count;
       Result·Tallies·tally("test_0" ,results_pt ,f ,i);
       Result·Tallies·accumulate(accumulated_results_pt ,results_pt);
       SQ·continue(tests_finished);

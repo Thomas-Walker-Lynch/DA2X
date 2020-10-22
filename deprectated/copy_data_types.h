@@ -1,44 +1,44 @@
   typedef struct{
-         TM2x·Tape *src;
+         T02x·Tape *src;
     address_t *src_0;
-         TM2x·Tape *dst;
+         T02x·Tape *dst;
     address_t *dst_0;
     address_t *n;
-  } TM2x·CopyContiguous·Args;
+  } T02x·CopyContiguous·Args;
   typedef struct{
-  } TM2x·CopyContiguous·Ress;
+  } T02x·CopyContiguous·Ress;
   typedef struct{
     SQ·Lnk nominal;
     SQ·Lnk src_index_gt_n;
     SQ·Lnk dst_index_gt_n;
-  } TM2x·CopyContiguous·Lnks;
+  } T02x·CopyContiguous·Lnks;
   typedef struct{
     SQ·Ptr sequence;
-    TM2x·CopyContiguous·Args *args;
-    TM2x·CopyContiguous·Ress *ress;
-    TM2x·CopyContiguous·Lnks *lnks;
-  } TM2x·CopyContiguous·Lnk;
+    T02x·CopyContiguous·Args *args;
+    T02x·CopyContiguous·Ress *ress;
+    T02x·CopyContiguous·Lnks *lnks;
+  } T02x·CopyContiguous·Lnk;
 
 
   typedef struct{
-         TM2x·Tape *src;
+         T02x·Tape *src;
     address_t *src_element_0;
-         TM2x·Tape *dst;
+         T02x·Tape *dst;
     address_t *dst_element_0;
     address_t *n_Element;
     address_t *element_n_Byte;
-  } TM2x·CopyContiguousElements·Args;
+  } T02x·CopyContiguousElements·Args;
   typedef struct{
-  } TM2x·CopyContiguousElements·Ress;
+  } T02x·CopyContiguousElements·Ress;
   typedef struct{
     SQ·Lnk nominal;
     SQ·Lnk src_index_gt_n;
     SQ·Lnk dst_index_gt_n;
-  } TM2x·CopyContiguousElements·Lnks;
+  } T02x·CopyContiguousElements·Lnks;
   typedef struct{
     SQ·Ptr sequence;
-    TM2x·CopyContiguousElements·Args *args;
-    TM2x·CopyContiguousElements·Ress *ress;
-    TM2x·CopyContiguousElements·Lnks *lnks;
-  } TM2x·CopyContiguousElements·Lnk;
+    T02x·CopyContiguousElements·Args *args;
+    T02x·CopyContiguousElements·Ress *ress;
+    T02x·CopyContiguousElements·Lnks *lnks;
+  } T02x·CopyContiguousElements·Lnk;
 

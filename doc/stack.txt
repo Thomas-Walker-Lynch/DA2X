@@ -42,7 +42,7 @@
   sequences share these.  Due to being on the stack each thread will naturally operate
   on separate Args and Locals frames.
 
-## TM2x·alloc_array_count
+## T02x·alloc_array_count
 
   The constructed count is maintained by the library, but not used by it. It is there
   to assist programmers in balancing construction and destruction calls on dynamic

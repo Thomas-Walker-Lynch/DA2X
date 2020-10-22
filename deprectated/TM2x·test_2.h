@@ -10,7 +10,7 @@ we may create a tape machine header that points to the C array, and then do the 
     SQ·Sequence SQ·ah_dist ,SQ·check_copy ,SQ·nominal ,SQ·fail ,SQ·cleanup ,SQ·report;
 
     address_t malloc_cnt = MallocCounter·count;
-    address_t constructed_cnt = TM2x·alloc_array_count;
+    address_t constructed_cnt = T02x·alloc_array_count;
     Result·Tallies results ,*results_pt;
     results_pt = &results;
     Result·Tallies·init(results_pt);
@@ -21,23 +21,23 @@ we may create a tape machine header that points to the C array, and then do the 
     // the source machine
     //
       char cs[] = {'h' ,'e' ,'l' ,'l' ,'o'};
-      TM2x·Tape src = { .base_pt = cs ,.n = 4};
+      T02x·Tape src = { .base_pt = cs ,.n = 4};
 
     // ----------------------------------------
     // result tableau
     //
       address_t n = 4;  // input constant
-      TM2x·Tape *dst;             // result of alloc_Tape_heap, it gets distributed
+      T02x·Tape *dst;             // result of alloc_Tape_heap, it gets distributed
       address_t offset = 0;  // input constant
 
     // ----------------------------------------
     // Links
     //
-      SQ·make_Lnk(ah  ,TM2x·AllocTapeHeap   ,&&TM2x·alloc_Tape_heap);
-      SQ·make_Lnk(cb  ,TM2x·AllocArray      ,&&TM2x·alloc_array);
-      SQ·make_Lnk(cpb ,TM2x·CopyContiguous  ,&&TM2x·copy_contiguous_bytes);
-      SQ·make_Lnk(da  ,TM2x·DeallocArray    ,&&TM2x·dealloc_array);
-      SQ·make_Lnk(dh  ,TM2x·DeallocTapeHeap ,&&TM2x·dealloc_Tape_heap);
+      SQ·make_Lnk(ah  ,T02x·AllocTapeHeap   ,&&T02x·alloc_Tape_heap);
+      SQ·make_Lnk(cb  ,T02x·AllocArray      ,&&T02x·alloc_array);
+      SQ·make_Lnk(cpb ,T02x·CopyContiguous  ,&&T02x·copy_contiguous_bytes);
+      SQ·make_Lnk(da  ,T02x·DeallocArray    ,&&T02x·dealloc_array);
+      SQ·make_Lnk(dh  ,T02x·DeallocTapeHeap ,&&T02x·dealloc_Tape_heap);
 
       ah_lnks.nominal.sequence = &&ah_dist;
       ah_lnks.fail.sequence = &&fail;
@@ -97,7 +97,7 @@ we may create a tape machine header that points to the C array, and then do the 
 
     SQ·def(report){
       f[fi++] = malloc_cnt == MallocCounter·count;
-      f[fi++] = constructed_cnt == TM2x·alloc_array_count;
+      f[fi++] = constructed_cnt == T02x·alloc_array_count;
       Result·Tallies·tally("test_2" ,&results ,f ,fi);
       Result·Tallies·accumulate(accumulated_results_pt ,&results);
       SQ·continue(test_3);

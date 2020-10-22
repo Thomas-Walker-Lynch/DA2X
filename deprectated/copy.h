@@ -1,34 +1,34 @@
 
-  SQ·def(TM2x·copy_contiguous_bytes){
+  SQ·def(T02x·copy_contiguous_bytes){
     // some aliases
     //
-      TM2x·CopyContiguous·Lnk *lnk = (TM2x·CopyContiguous·Lnk *)SQ·lnk;
-      TM2x·Tape *src = lnk->args->src;
-      TM2x·Tape *dst = lnk->args->dst;
+      T02x·CopyContiguous·Lnk *lnk = (T02x·CopyContiguous·Lnk *)SQ·lnk;
+      T02x·Tape *src = lnk->args->src;
+      T02x·Tape *dst = lnk->args->dst;
       address_t src_0 = *lnk->args->src_0;
       address_t dst_0 = *lnk->args->dst_0;
       address_t n = *lnk->args->n;
     if( 
-       TM2x·n(src) < n
+       T02x·n(src) < n
        ||
-       TM2x·n(src) - n < src_0
+       T02x·n(src) - n < src_0
         ){
       SQ·continue_indirect(lnk->lnks->src_index_gt_n);
     }
     if( 
-       TM2x·n(dst) < n
+       T02x·n(dst) < n
        ||
-       TM2x·n(dst) - n < dst_0
+       T02x·n(dst) - n < dst_0
         ){
       SQ·continue_indirect(lnk->lnks->dst_index_gt_n);
     }
-    memcpyn(TM2x·0_pt(dst) + dst_0, TM2x·0_pt(src) + src_0, n);
+    memcpyn(T02x·0_pt(dst) + dst_0, T02x·0_pt(src) + src_0, n);
     SQ·continue_indirect(lnk->lnks->nominal);
-  } SQ·end(TM2x·copy_contiguous_bytes);
+  } SQ·end(T02x·copy_contiguous_bytes);
 
 
-  SQ·def(TM2x·copy_contiguous_elements){
-    TM2x·CopyContiguousElements·Lnk *lnk = (TM2x·CopyContiguousElements·Lnk *)SQ·lnk;
+  SQ·def(T02x·copy_contiguous_elements){
+    T02x·CopyContiguousElements·Lnk *lnk = (T02x·CopyContiguousElements·Lnk *)SQ·lnk;
 
     // ----------------------------------------
     // local result tableau
@@ -43,7 +43,7 @@
       SQ·make_Lnk(scale_src ,Inclusive·3opLL ,&&Inclusive·mul_idx);
       SQ·make_Lnk(scale_dst ,Inclusive·3opLL ,&&Inclusive·mul_idx);
       SQ·make_Lnk(scale_ext ,Inclusive·3opLL ,&&Inclusive·mul_ext);
-      SQ·make_Lnk(copy_contiguous_bytes ,TM2x·CopyContiguous ,&&TM2x·copy_contiguous_bytes);
+      SQ·make_Lnk(copy_contiguous_bytes ,T02x·CopyContiguous ,&&T02x·copy_contiguous_bytes);
 
       scale_src_lnks = (Inclusive·3opLL·Lnks)
         {  .nominal = AS(scale_dst_lnk ,SQ·Lnk)
@@ -60,7 +60,7 @@
           ,.gt_address_t_n = lnk->lnks->src_index_gt_n
         };
 
-      copy_contiguous_bytes_lnks = (TM2x·CopyContiguous·Lnks)
+      copy_contiguous_bytes_lnks = (T02x·CopyContiguous·Lnks)
         {  .nominal = lnk->lnks->nominal
           ,.src_index_gt_n = lnk->lnks->src_index_gt_n
           ,.dst_index_gt_n = lnk->lnks->dst_index_gt_n
@@ -91,7 +91,7 @@
           ,.a_1 = lnk->args->element_n_Byte
         };
 
-      copy_contiguous_bytes_args  = (TM2x·CopyContiguous·Args)
+      copy_contiguous_bytes_args  = (T02x·CopyContiguous·Args)
         {  .src        = lnk->args->src
           ,.src_0 = &src_0
           ,.dst        = lnk->args->dst
@@ -101,4 +101,4 @@
 
     SQ·continue_indirect(scale_src_lnk);
 
-  } SQ·end(TM2x·copy_contiguous_elements);
+  } SQ·end(T02x·copy_contiguous_elements);

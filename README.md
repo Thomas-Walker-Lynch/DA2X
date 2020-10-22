@@ -26,7 +26,7 @@ the 2x in the name.
   separate the namespace from the rest of the identifier:
 
     conventional:  `TM2x::alloc_Tape_heap`
-           using:  `TM2x·alloc_Tape_heap`
+           using:  `T02x·alloc_Tape_heap`
 
    Of course, the double colon is not available fo idnetifier names in C.
 

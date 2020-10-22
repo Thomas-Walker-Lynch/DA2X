@@ -413,7 +413,7 @@
   as a sequence rather than as an encapsulating function.
 
   The following example is what the `alloc_array_elements` encapsulation might look like in
-  the TM2x·Tape library. We make use of two pads.  One for arguments and one for local
+  the T02x·Tape library. We make use of two pads.  One for arguments and one for local
   variables.  We often swap these upon entering an encapsulation so that we might more
   easily build the arguments pad for the next sequence.  The P1 macro sets up a pointer
   to point to this second pad.
@@ -428,7 +428,7 @@
      ){
     Sequence scale ,alloc_array ,local_index_gt_n ,local_nominal ,local_fail_alloc;
     Sequence·swap();
-    P1(p1 ,TM2x·alloc_array_elements ,1);
+    P1(p1 ,T02x·alloc_array_elements ,1);
 
     tape = p1->tape;
     address_t n;
@@ -445,10 +445,10 @@
     };
 
     cdef(alloc_array){
-      P0(p0 ,TM2x·alloc_array ,0);
+      P0(p0 ,T02x·alloc_array ,0);
       p0->tape       = tape;
       p0->n     = n;
-      continue TM2x·alloc_array(&&local_nominal ,&&local_fail_alloc);
+      continue T02x·alloc_array(&&local_nominal ,&&local_fail_alloc);
       cend;
     };
 
@@ -474,9 +474,9 @@
 
   It is too bad we need the local sequences, `local_index_gt_n`, `local_nominal`, and
   `local_fail_alloc`.  Their sole purpose is to maintain the integrity of the
-  encapsulation.  By having `TM2x·alloc_array` and `Inclusive·mul_ext` first
+  encapsulation.  By having `T02x·alloc_array` and `Inclusive·mul_ext` first
   continue locally we assure that the stack frame gets popped.  If we did not need to pop
-  the stack frame, `TM2x·alloc_array` and `Inclusive·mul_ext` could continue directly to
+  the stack frame, `T02x·alloc_array` and `Inclusive·mul_ext` could continue directly to
   `index_gt_n`, `nominal`, and `fail_alloc`.
 
 
@@ -620,25 +620,25 @@
   that we might not ever reach c3 it is unclear as to how we can guarantee that the
   context gets deallocated.
 
-  Here is a concrete example of this pattern. Here `TM2x·alloc_array_elements` corresponds to c1.
+  Here is a concrete example of this pattern. Here `T02x·alloc_array_elements` corresponds to c1.
   `Inclusive·mul_ext` corresponds to c2, and `alloc_array` corresponds to c3.
-  `TM2x·alloc_array_elements` is an encapsulating sequence. `alloc_array` is local
+  `T02x·alloc_array_elements` is an encapsulating sequence. `alloc_array` is local
   sequence, and `Inclusive·mul_ext` is a general purpose sequence.  
 
-  Note that execution flow from in `TM2x·alloc_array_elements` never reaches
+  Note that execution flow from in `T02x·alloc_array_elements` never reaches
   `alloc_array`, rather we reach the end of dynamic scope for
-  `TM2x·alloc_array_elements` when it continues to `Inclusive·mul_ext`, yet the static scope
+  `T02x·alloc_array_elements` when it continues to `Inclusive·mul_ext`, yet the static scope
   continues to the closing bracket, so `alloc_array` is defined within the lexical
-  scope of of `TM2x·alloc_array_elements`.  What this accomplishes for us is to make the
-  `alloc_array` entry point viewable to only `TM2x·alloc_array_elements`.
-  `TM2x·alloc_array_elements` then uses its ability to see this entry point to give a value
+  scope of of `T02x·alloc_array_elements`.  What this accomplishes for us is to make the
+  `alloc_array` entry point viewable to only `T02x·alloc_array_elements`.
+  `T02x·alloc_array_elements` then uses its ability to see this entry point to give a value
   to the `Inclusive·mul_ext`'s `nominal` sequence argument.
 
 ````
-    cdef(TM2x·alloc_array_elements){
+    cdef(T02x·alloc_array_elements){
       Sequence alloc_array;
       Sequence·swap();
-      P1(p1 ,TM2x·alloc_array_elements ,1);
+      P1(p1 ,T02x·alloc_array_elements ,1);
 
       // CX is a macro that points `cx` at a context pad and gives it type
       CX(cx ,TM2x0 ,alloc_array_elements);
@@ -656,12 +656,12 @@
       continue Inclusive·mul_ext;
 
       cdef(alloc_array){
-        P0(p0 ,TM2x·alloc_array ,0);
+        P0(p0 ,T02x·alloc_array ,0);
         p0->tape       = cx->tape;
         p0->n     = cx->n;
         p0->nominal    = cx->nominal;
         p0->fail_alloc = cx->fail_alloc;
-        continue TM2x·alloc_array;
+        continue T02x·alloc_array;
         cend;
       };
 
@@ -671,7 +671,7 @@
 
   In this example we use pads for sending arguments.  By convention arguments are always placed
   on `p0`, while `p1` is used as a scratch pad. The swap statement swaps the `p0` and the
-  `p1` pads; hence after the swap `TM2x·alloc_array_elements`'s arguments are found on the `p1`
+  `p1` pads; hence after the swap `T02x·alloc_array_elements`'s arguments are found on the `p1`
   pad.  This swapping is reminiscent of D flip-flops in hardware.  It registers our inputs to
   a place they will not be overwritten while we set up the inputs for the next
   computation.
@@ -804,7 +804,7 @@
    structures we are willing to analyze.
 
    Hence, context pads can be a solution to statically analyzable code structures, but
-   it is not a general solution. Our TM2x·Tape library is pretty easy to analyze, and given
+   it is not a general solution. Our T02x·Tape library is pretty easy to analyze, and given
    the efficiency of context pads, I will probably use them there.
 
 ### Context stack
@@ -862,7 +862,7 @@
    execution. This approach would require even more memory than dedicating a context pad
    to each sequence.  It would also be unusual to do such a thing when we are not
    synchronizing data between separate threads of execution. It is a too heavy of a
-   solution for something like our TM2x·Tape library.
+   solution for something like our T02x·Tape library.
 
    We will also need some means of allocating and deallocating messages. If explicit
    deallocation is required, c3 cannot be solely responsible for deallocating the message
@@ -944,7 +944,7 @@
 
       // c4
       cdef(copy_contiguous_bytes){
-        P0(p0 ,TM2x·construct_copy_contiguous_bytes ,0);
+        P0(p0 ,T02x·construct_copy_contiguous_bytes ,0);
         p0->src             = cx->src;
         p0->src_i      = cx->src_i;
         p0->dst             = cx->dst;
@@ -953,7 +953,7 @@
         p0->nominal         = pop(n_of(struct c0 ,cx->nominal);         // goes elsewhere
         p0->src_index_gt_n  = pop(n_of(struct c0 ,cx->src_index_gt_n);  // goes elsewhere
         p0->dst_index_gt_n  = pop(n_of(struct c0 ,cx->dst_index_gt_n);  // goes elsewhere
-        continue TM2x·copy_contiguous_bytes;
+        continue T02x·copy_contiguous_bytes;
         cend;
       }
 
@@ -1045,7 +1045,7 @@ stack push and pop.
 
       // c4
       cdef(copy_contiguous_bytes){
-        P0(p0 ,TM2x·construct_copy_contiguous_bytes ,0);
+        P0(p0 ,T02x·construct_copy_contiguous_bytes ,0);
         p0->src             = cx->src;
         p0->src_i      = cx->src_i;
         p0->dst             = cx->dst;
@@ -1054,7 +1054,7 @@ stack push and pop.
         p0->nominal         = cx_dealloc(n_of(struct c0) ,cx->nominal);         // goes elsewhere
         p0->src_index_gt_n  = cx_dealloc(n_of(struct c0) ,cx->src_index_gt_n);  // goes elsewhere
         p0->dst_index_gt_n  = cx_dealloc(n_of(struct c0) ,cx->dst_index_gt_n);  // goes elsewhere
-        continue TM2x·copy_contiguous_bytes;
+        continue T02x·copy_contiguous_bytes;
         cend;
       }
 
@@ -1138,8 +1138,8 @@ be stack base allocated.
     } mul_ei_bi_1;
 
     struct{
-      struct TM2x·Args·copy_contiguous_bytes0 args;
-      struct TM2x·Cons·copy_contiguous_bytes cons;
+      struct T02x·Args·copy_contiguous_bytes0 args;
+      struct T02x·Cons·copy_contiguous_bytes cons;
     } copy_contiguous_bytes_0;
 
   } CopyContiguousElements·tableau;
@@ -1176,14 +1176,14 @@ void copy_element_init(){
       ,.connections = &t.mul_ei_bi_0.cons
       ,.args = &t.mul_ei_bi_0.args
     }
-  t.mul_ib_0.cons.gt_address_t_n = (struct TM2x·Cons·copy_contiguous_elements)(current->cons)->gt_address_t_n;
+  t.mul_ib_0.cons.gt_address_t_n = (struct T02x·Cons·copy_contiguous_elements)(current->cons)->gt_address_t_n;
 
   t.mul_ib_1.cons.nominal= (Connector) 
     { .entry = &&Inclusive·mul_idx 
       ,.connections = &t.mul_ei_bi_1.cons
       ,.args = &t.mul_ei_bi_1.args
     }
-  t.mul_ib_1.cons.gt_address_t_n = (struct TM2x·Cons·copy_contiguous_elements)(current->cons)->gt_address_t_n;
+  t.mul_ib_1.cons.gt_address_t_n = (struct T02x·Cons·copy_contiguous_elements)(current->cons)->gt_address_t_n;
 
   t.copy_contiguous_bytes_0.cons.mominal = current.connections.nominal;
   t.copy_contiguous_bytes_0.cons.src_index_gt_n = current.connections->src_index_gt_n;
@@ -1223,8 +1223,8 @@ own context. The parent's context will be in the grandparent's tableau.
     } mul_ei_bi_1;
 
     struct CopyContiguous0·Context{
-      struct TM2x·Args·copy_contiguous_bytes0 args;
-      struct TM2x·Cons·copy_contiguous_bytes cons;
+      struct T02x·Args·copy_contiguous_bytes0 args;
+      struct T02x·Cons·copy_contiguous_bytes cons;
     } copy_contiguous_bytes_0;
 
   } CopyContiguousElements·tableau;

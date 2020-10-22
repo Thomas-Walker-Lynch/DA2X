@@ -22,14 +22,14 @@ void TM2xHd·f0(void *context ,void *item_pt ,address_t element_n_Byte){
 
 Result·Tallies test_0(){
   address_t malloc_cnt = MallocCounter·count;
-  address_t constructed_cnt = TM2x·alloc_array_count;
+  address_t constructed_cnt = T02x·alloc_array_count;
   bool f[256];
   uint32_t i = 0;
 
   Result·Tallies r ,*rp; rp = &r;
   Result·Tallies·init(rp);
-  TM2x·Tape *a0;
-  continue_into TM2x·alloc_Tape_heap_construct(&a0 ,0 ,n_of(uint32_t) ,&&nominal_0 ,&&fail_0 ,&&fail_0);
+  T02x·Tape *a0;
+  continue_into T02x·alloc_Tape_heap_construct(&a0 ,0 ,n_of(uint32_t) ,&&nominal_0 ,&&fail_0 ,&&fail_0);
   nominal_0:{
     f[i] = true;
     continue_from end_0;
@@ -45,10 +45,10 @@ Result·Tallies test_0(){
   // make an array of data
   f[i] = true; // allocation failure flag
   uint32_t j=10;
-  TM2x·Write(a0 ,0 ,j);
+  T02x·Write(a0 ,0 ,j);
   while( j < 99 ){
     j++;
-    continue_into TM2x·Push(a0 ,j ,&&nominal_1 ,&&fail_1);    
+    continue_into T02x·Push(a0 ,j ,&&nominal_1 ,&&fail_1);    
     fail_1:{
       f[i] = false;
     }
@@ -66,9 +66,9 @@ Result·Tallies test_0(){
   f[i++] = c->result;
   f[i++] = c->ref == 100;
 
-  TM2x·dealloc_Tape_heap(a0);
+  T02x·dealloc_Tape_heap(a0);
   f[i++] = malloc_cnt == MallocCounter·count;
-  f[i++] = constructed_cnt == TM2x·alloc_array_count;
+  f[i++] = constructed_cnt == T02x·alloc_array_count;
   Result·Tallies·tally("test_0" ,rp ,f ,i);
   return r;
 }
@@ -141,14 +141,14 @@ continuation TM2xHd·p4
 
 Result·Tallies test_1(){
   address_t malloc_cnt = MallocCounter·count;
-  address_t constructed_cnt = TM2x·alloc_array_count;
+  address_t constructed_cnt = T02x·alloc_array_count;
   bool f[256];
   uint32_t i = 0;
 
   Result·Tallies r ,*rp; rp = &r;
   Result·Tallies·init(rp);
-  TM2x·Tape *a0;
-  continue_into TM2x·alloc_Tape_heap_construct(&a0 ,0 ,n_of(uint32_t) ,&&nominal_0 ,&&fail_0 ,&&fail_0);
+  T02x·Tape *a0;
+  continue_into T02x·alloc_Tape_heap_construct(&a0 ,0 ,n_of(uint32_t) ,&&nominal_0 ,&&fail_0 ,&&fail_0);
   nominal_0:{
     f[i] = true;
     continue_from end_0;
@@ -164,10 +164,10 @@ Result·Tallies test_1(){
   // make an array of data
   f[i] = true; // allocation failure flag
   uint32_t j=100;
-  TM2x·Write(a0 ,0 ,j);
+  T02x·Write(a0 ,0 ,j);
   while( j < 355){
     j++;
-    continue_into TM2x·Push(a0 ,j ,&&nominal_1 ,&&fail_1);    
+    continue_into T02x·Push(a0 ,j ,&&nominal_1 ,&&fail_1);    
     fail_1:{
       f[i] = false;
     }
@@ -256,23 +256,23 @@ Result·Tallies test_1(){
     i++;
   }
   
-  TM2x·dealloc_Tape_heap(a0);
+  T02x·dealloc_Tape_heap(a0);
   f[i++] = malloc_cnt == MallocCounter·count;
-  f[i++] = constructed_cnt == TM2x·alloc_array_count;
+  f[i++] = constructed_cnt == T02x·alloc_array_count;
   Result·Tallies·tally("test_1" ,rp ,f ,i);
   return r;
 }
 
 Result·Tallies test_2(){
   address_t malloc_cnt = MallocCounter·count;
-  address_t constructed_cnt = TM2x·alloc_array_count;
+  address_t constructed_cnt = T02x·alloc_array_count;
   Result·Tallies r ,*rp; rp = &r;
   Result·Tallies·init(rp);
   bool f[256];
   uint32_t i = 0;
 
-  TM2x·Tape *a0;
-  continue_into TM2x·alloc_Tape_heap_construct(&a0 ,0 ,n_of(uint32_t) ,&&nominal_0 ,&&fail_0 ,&&fail_0);
+  T02x·Tape *a0;
+  continue_into T02x·alloc_Tape_heap_construct(&a0 ,0 ,n_of(uint32_t) ,&&nominal_0 ,&&fail_0 ,&&fail_0);
   nominal_0:{
     f[i] = true;
     continue_from end_0;
@@ -288,10 +288,10 @@ Result·Tallies test_2(){
   // make an array of data
   f[i] = true; // allocation failure flag
   uint32_t j=100;
-  TM2x·Write(a0 ,0 ,j);
+  T02x·Write(a0 ,0 ,j);
   while( j < 110){
     ++j;
-    continue_into TM2x·Push(a0 ,j ,&&nominal_1 ,&&fail_1);    
+    continue_into T02x·Push(a0 ,j ,&&nominal_1 ,&&fail_1);    
     fail_1:{
       f[i] = false;
     }
@@ -305,16 +305,16 @@ Result·Tallies test_2(){
   TM2xHd·apply_to_each(a0 ,hd ,n_of(uint32_t) ," " ,TM2xHd·f_print_int);
   fputc('\n' ,stderr);
 
-  TM2x·dealloc_Tape_heap(a0);
+  T02x·dealloc_Tape_heap(a0);
   f[i++] = malloc_cnt == MallocCounter·count;
-  f[i++] = constructed_cnt == TM2x·alloc_array_count;
+  f[i++] = constructed_cnt == T02x·alloc_array_count;
   Result·Tallies·tally("test_2" ,rp ,f ,i);
   return r;
 }
 
 Result·Tallies test_3(){
   address_t malloc_cnt = MallocCounter·count;
-  address_t constructed_cnt = TM2x·alloc_array_count;
+  address_t constructed_cnt = T02x·alloc_array_count;
   Result·Tallies r ,*rp; rp = &r;
   Result·Tallies·init(rp);
   bool f[256];
@@ -322,10 +322,10 @@ Result·Tallies test_3(){
   uint32_t j;
 
   j=0;
-  TM2x·AllocStatic(a0);
+  T02x·AllocStatic(a0);
   {
     continuations nominal ,fail ,end;
-    TM2x·construct_write(a0 ,&j ,n_of(j) ,&&nominal ,&&fail);
+    T02x·construct_write(a0 ,&j ,n_of(j) ,&&nominal ,&&fail);
     nominal:{
       f[i] = true;
       continue_from end;
@@ -343,7 +343,7 @@ Result·Tallies test_3(){
     f[i] = true; 
     while( j < 30 ){
       j+=3;
-      continue_into TM2x·Push(a0 ,j ,&&nominal ,&&fail);    
+      continue_into T02x·Push(a0 ,j ,&&nominal ,&&fail);    
       fail:{
         f[i] = false;
       }
@@ -360,7 +360,7 @@ Result·Tallies test_3(){
   fputc('\n' ,stderr);
 
   j=50;
-  TM2x·AllocStaticConstruct_Write(a1 ,j ,&&nominal_2 ,&&fail_2);
+  T02x·AllocStaticConstruct_Write(a1 ,j ,&&nominal_2 ,&&fail_2);
   nominal_2:{
     f[i] = true;
     continue_from end_2;
@@ -374,7 +374,7 @@ Result·Tallies test_3(){
   }
   while( j > 10 ){
     j-=5;
-    continue_into TM2x·Push(a1 ,j ,&&nominal_3 ,&&fail_3);    
+    continue_into T02x·Push(a1 ,j ,&&nominal_3 ,&&fail_3);    
     nominal_3:{
       f[i] = true;
       continue_from end_3;
@@ -394,7 +394,7 @@ Result·Tallies test_3(){
   fputc('\n' ,stderr);
 
   j=30;
-  TM2x·AllocStaticConstruct_Write(a2 ,j ,&&nominal_4 ,&&fail_4);
+  T02x·AllocStaticConstruct_Write(a2 ,j ,&&nominal_4 ,&&fail_4);
   nominal_4:{
     f[i] = true;
     continue_from end_4;
@@ -408,7 +408,7 @@ Result·Tallies test_3(){
   }
 
   j=57;
-  continue_into TM2x·Push(a2 ,j ,&&nominal_5 ,&&fail_5);    
+  continue_into T02x·Push(a2 ,j ,&&nominal_5 ,&&fail_5);    
   nominal_5:{
     f[i] = true;
     continue_from end_5;
@@ -422,7 +422,7 @@ Result·Tallies test_3(){
   }
 
   j=15;
-  continue_into TM2x·Push(a2 ,j ,&&nominal_6 ,&&fail_6);    
+  continue_into T02x·Push(a2 ,j ,&&nominal_6 ,&&fail_6);    
   nominal_6:{
     f[i] = true;
     continue_from end_6;
@@ -436,7 +436,7 @@ Result·Tallies test_3(){
   }
 
   j=59;
-  continue_into TM2x·Push(a2 ,j ,&&nominal_7 ,&&fail_7);    
+  continue_into T02x·Push(a2 ,j ,&&nominal_7 ,&&fail_7);    
   nominal_7:{
     f[i] = true;
     continue_from end_7;
@@ -450,7 +450,7 @@ Result·Tallies test_3(){
   }
 
   j=15;
-  continue_into TM2x·Push(a2 ,j ,&&nominal_8 ,&&fail_8);    
+  continue_into T02x·Push(a2 ,j ,&&nominal_8 ,&&fail_8);    
   nominal_8:{
     f[i] = true;
     continue_from end_8;
@@ -468,7 +468,7 @@ Result·Tallies test_3(){
   TM2xHd·apply_to_each(a2 ,hd ,n_of(uint) ," " ,TM2xHd·f_print_int);
   fputc('\n' ,stderr);
   // add test distinct == false
-  TM2x·AllocStatic(a3);
+  T02x·AllocStatic(a3);
   {
     continuations nominal ,fail ,end;
     continue_into TM2xHd·init_intersection
@@ -518,7 +518,7 @@ Result·Tallies test_3(){
       TM2xHd·rewind(a3 ,hd);
       TM2xHd·apply_to_each(a3 ,hd ,n_of(uint) ," " ,TM2xHd·f_print_int);
       fputc('\n' ,stderr);
-      TM2x·dealloc_array(a3);
+      T02x·dealloc_array(a3);
       continue_from end;
     }
 
@@ -537,11 +537,11 @@ Result·Tallies test_3(){
     }
   }
 
-  TM2x·dealloc_array(a0);
-  TM2x·dealloc_array(a1);
-  TM2x·dealloc_array(a2);
+  T02x·dealloc_array(a0);
+  T02x·dealloc_array(a1);
+  T02x·dealloc_array(a2);
   f[i++] = malloc_cnt == MallocCounter·count;
-  f[i++] = constructed_cnt == TM2x·alloc_array_count;
+  f[i++] = constructed_cnt == T02x·alloc_array_count;
   Result·Tallies·tally("test_3" ,rp ,f ,i);
   return r;
 }

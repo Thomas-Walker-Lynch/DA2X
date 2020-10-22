@@ -10,7 +10,7 @@ the array.
     SQ·Sequence SQ·ah_dist ,SQ·nominal ,SQ·fail ,SQ·cleanup ,SQ·report;
 
     address_t malloc_cnt = MallocCounter·count;
-    address_t constructed_cnt = TM2x·alloc_array_count;
+    address_t constructed_cnt = T02x·alloc_array_count;
     Result·Tallies results ,*results_pt;
     results_pt = &results;
     Result·Tallies·init(results_pt);
@@ -22,15 +22,15 @@ the array.
     //
       address_t n_Element = 9;
       address_t element_n_Byte = 3; // extent of 32 bit int in elements
-      TM2x·Tape *tape;  // will point to a heap allocated Tape structure.
+      T02x·Tape *tape;  // will point to a heap allocated Tape structure.
 
     // ----------------------------------------
     // Links
     //
-      SQ·make_Lnk(ah  ,TM2x·AllocTapeHeap   ,&&TM2x·alloc_Tape_heap);
-      SQ·make_Lnk(aa  ,TM2x·AllocArrayElements ,&&TM2x·alloc_array_elements);
-      SQ·make_Lnk(da  ,TM2x·DeallocArray    ,&&TM2x·dealloc_array);
-      SQ·make_Lnk(dh  ,TM2x·DeallocTapeHeap ,&&TM2x·dealloc_Tape_heap);
+      SQ·make_Lnk(ah  ,T02x·AllocTapeHeap   ,&&T02x·alloc_Tape_heap);
+      SQ·make_Lnk(aa  ,T02x·AllocArrayElements ,&&T02x·alloc_array_elements);
+      SQ·make_Lnk(da  ,T02x·DeallocArray    ,&&T02x·dealloc_array);
+      SQ·make_Lnk(dh  ,T02x·DeallocTapeHeap ,&&T02x·dealloc_Tape_heap);
 
       ah_ress.tape = &tape;
       ah_lnks.nominal.sequence = &&ah_dist;
@@ -67,7 +67,7 @@ the array.
 
     SQ·def(report){
       f[i++] = malloc_cnt == MallocCounter·count;
-      f[i++] = constructed_cnt == TM2x·alloc_array_count;
+      f[i++] = constructed_cnt == T02x·alloc_array_count;
       Result·Tallies·tally("test_1" ,&results ,f ,i);
       Result·Tallies·accumulate(accumulated_results_pt ,&results);
       SQ·continue(test_2);
