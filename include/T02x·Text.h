@@ -217,3 +217,14 @@ SQ·def(T02x·shorten){
 
 } SQ·end(T02x·shorten);
 
+
+T0 t02x;
+t02x.alloc_Tape_heap      = &&T02x·alloc_Tape_heap;
+t02x.alloc_array          = &&T02x·alloc_array;           
+t02x.alloc_array_elements = &&T02x·alloc_array_elements;  
+t02x.dealloc_array        = &&T02x·dealloc_array;         
+t02x.dealloc_Tape_heap    = &&T02x·dealloc_Tape_heap;     
+t02x.move_array           = &&T02x·move_array;            
+t02x.lengthen             = &&T02x·lengthen;              
+t02x.shorten              = &&T02x·shorten;
+

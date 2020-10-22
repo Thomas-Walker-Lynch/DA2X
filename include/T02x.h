@@ -1,5 +1,5 @@
-#ifndef TM2x_H
-#define TM2x_H
+#ifndef T02x_H
+#define T02x_H
 #include <stdlib.h> // size_t
 #include <string.h> // memcpy
 #include <stdbool.h>
@@ -60,6 +60,8 @@
     if( n <= T02x·MINIMUM_ALLOC_N) return T02x·MINIMUM_ALLOC_N;
     return power_2_extent(n);
   }
+
+
 
 #endif
 
