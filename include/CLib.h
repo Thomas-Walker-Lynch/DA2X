@@ -1,3 +1,8 @@
+#ifndef CLIB_H
+#define CLIB_H
+
+#include "misc.h"
+#include "Inclusive.h"
 
 // struct CLib·mallocn *ar = &Sequence·Args_pt->CLib·mallocn;
 typedef struct {
@@ -19,3 +24,5 @@ typedef struct{
   CLib·Mallocn·Ress *ress;
   CLib·Mallocn·Lnks *lnks;
 } CLib·Mallocn·Lnk;
+
+#endif

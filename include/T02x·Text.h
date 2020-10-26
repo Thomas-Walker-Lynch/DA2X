@@ -4,7 +4,7 @@ address_t T02x·alloc_array_count = 0;
 // Allocate a T02x·Tape header on the heap.
 // Note that it is also perfectly fine to statically allocate a T02x·Tape.
 SQ·def(T02x·alloc_Tape_heap){
-  T02x·AllocTapeHeap·Lnk *lnk = (T02x·AllocTapeHeap·Lnk *)SQ·lnk;
+  T0·AllocTapeHeap·Lnk *lnk = (T0·AllocTapeHeap·Lnk *)SQ·lnk;
 
   CLib·Mallocn·Args m_args;
   CLib·Mallocn·Ress m_ress;
@@ -28,9 +28,10 @@ SQ·def(T02x·alloc_Tape_heap){
 // allocates data on the heap
 SQ·def(T02x·alloc_array){
   T02x·alloc_array_count++; // to assist with debugging
-  T02x·AllocArray·Lnk *lnk = (T02x·AllocArray·Lnk *)SQ·lnk;
+  T0·AllocArray·Lnk *lnk = (T0·AllocArray·Lnk *)SQ·lnk;
+  T02x·Tape *tape = (T02x·Tape *) lnk->args->tape;
 
-  lnk->args->tape->n = *lnk->args->n;
+  tape->n = *lnk->args->n;
 
   // local result tableau (stack base allocated, like everything else)
   //
@@ -46,7 +47,7 @@ SQ·def(T02x·alloc_array){
     m_lnk.sequence = &&CLib·mallocn;
 
     m_args.n  = &alloc_n;
-    m_ress.allocation = (void **)&lnk->args->tape->base_pt;
+    m_ress.allocation = (void **)&tape->base_pt;
     m_lnks.nominal = lnk->lnks->nominal;
     m_lnks.fail = lnk->lnks->fail_alloc;
 
@@ -55,7 +56,7 @@ SQ·def(T02x·alloc_array){
 } SQ·end(T02x·alloc_array);
 
 SQ·def(T02x·alloc_array_elements){
-  T02x·AllocArrayElements·Lnk *lnk = (T02x·AllocArrayElements·Lnk *)SQ·lnk;
+  T0·AllocArrayElements·Lnk *lnk = (T0·AllocArrayElements·Lnk *)SQ·lnk;
 
   // ----------------------------------------
   // result tableau
@@ -66,14 +67,14 @@ SQ·def(T02x·alloc_array_elements){
   // Links
   //
     SQ·make_Lnk(scale_ext ,Inclusive·3opLL ,&&Inclusive·mul_idx);
-    SQ·make_Lnk(alloc_array ,T02x·AllocArray ,&&T02x·alloc_array);
+    SQ·make_Lnk(alloc_array ,T0·AllocArray ,&&T02x·alloc_array);
 
     scale_ext_lnks = (Inclusive·3opLL·Lnks)
       { .nominal = AS(alloc_array_lnk ,SQ·Lnk)
         ,.gt_address_t_n = lnk->lnks->index_gt_n
       };
 
-    alloc_array_lnks = (T02x·AllocArray·Lnks)
+    alloc_array_lnks = (T0·AllocArray·Lnks)
       { .nominal = lnk->lnks->nominal
         ,.fail_alloc = lnk->lnks->fail_alloc
       };
@@ -99,14 +100,15 @@ SQ·def(T02x·alloc_array_elements){
 // T02x·Tape header may be constructed again and reused
 SQ·def(T02x·dealloc_array){
   T02x·alloc_array_count--; // to assist with debugging
-  T02x·DeallocArray·Lnk *lnk = (T02x·DeallocArray·Lnk *)SQ·lnk;
-  free(lnk->args->tape->base_pt);
+  T0·DeallocArray·Lnk *lnk = (T0·DeallocArray·Lnk *)SQ·lnk;
+  T02x·Tape *tape = (T02x·Tape *) lnk->args->tape;
+  free(tape->base_pt);
   SQ·continue_indirect(lnk->lnks->nominal);  
 } SQ·end(T02x·dealloc_array);
 
 // we are to deallocate the header from the heap
 SQ·def(T02x·dealloc_Tape_heap){
-  T02x·DeallocTapeHeap·Lnk *lnk = (T02x·DeallocTapeHeap·Lnk *)SQ·lnk;
+  T0·DeallocTapeHeap·Lnk *lnk = (T0·DeallocTapeHeap·Lnk *)SQ·lnk;
   free(lnk->args->tape);
   SQ·continue_indirect(lnk->lnks->nominal);
 } SQ·end(T02x·dealloc_Tape_heap);
@@ -117,9 +119,9 @@ SQ·def(T02x·dealloc_Tape_heap){
 // are operating on.  This instruction sequence does the move.
 SQ·def(T02x·move_array){
   // some aliases
-  T02x·MoveArray·Lnk *lnk = (T02x·MoveArray·Lnk *)SQ·lnk;
-  T02x·Tape *src = lnk->args->src;
-  T02x·Tape *dst = lnk->args->dst;
+  T0·MoveArray·Lnk *lnk = (T0·MoveArray·Lnk *)SQ·lnk;
+  T02x·Tape *src = (T02x·Tape *)lnk->args->src;
+  T02x·Tape *dst = (T02x·Tape *)lnk->args->dst;
 
   T02x·alloc_array_count--;
   free(dst->base_pt);
@@ -132,8 +134,8 @@ SQ·def(T02x·move_array){
 // resize version where the n arg is relative to the current length
 SQ·def(T02x·lengthen){
   SQ·Sequence copy_array_data ,SQ·copy_array_data;
-  T02x·Lengthen·Lnk *lnk = (T02x·Lengthen·Lnk *)SQ·lnk;
-  T02x·Tape *tape = lnk->args->tape;
+  T0·Lengthen·Lnk *lnk = (T0·Lengthen·Lnk *)SQ·lnk;
+  T02x·Tape *tape = (T02x·Tape *) lnk->args->tape;
 
   address_t alloc_n = T02x·alloc_n(tape->n);
   address_t resized_n =  *lnk->args->n + tape->n + 1;
@@ -148,16 +150,16 @@ SQ·def(T02x·lengthen){
   T02x·Tape resized_tape;
 
   // lnks
-  SQ·make_Lnk(alloc_array  ,T02x·AllocArray ,&&T02x·alloc_array);
-  SQ·make_Lnk(move_array   ,T02x·MoveArray  ,&&T02x·move_array);
+  SQ·make_Lnk(alloc_array  ,T0·AllocArray ,&&T02x·alloc_array);
+  SQ·make_Lnk(move_array   ,T0·MoveArray  ,&&T02x·move_array);
 
-  alloc_array_args.tape = &resized_tape;
+  alloc_array_args.tape = (T0·Tape *)&resized_tape;
   alloc_array_args.n    = &resized_n;
   alloc_array_lnks.nominal.sequence = &&copy_array_data;
   alloc_array_lnks.fail_alloc = lnk->lnks->fail_alloc;
 
-  move_array_args.src = &resized_tape;
-  move_array_args.dst = tape;
+  move_array_args.src = (T0·Tape *)&resized_tape;
+  move_array_args.dst = (T0·Tape *)tape;
   move_array_lnks.nominal = lnk->lnks->nominal;
 
   SQ·continue_indirect(alloc_array_lnk);
@@ -173,8 +175,8 @@ SQ·def(T02x·lengthen){
 // resize version where the n arg is relative to the current length
 SQ·def(T02x·shorten){
   SQ·Sequence copy_array_data ,SQ·copy_array_data;
-  T02x·Shorten·Lnk *lnk = (T02x·Shorten·Lnk *)SQ·lnk;
-  T02x·Tape *tape = lnk->args->tape;
+  T0·Shorten·Lnk *lnk = (T0·Shorten·Lnk *)SQ·lnk;
+  T02x·Tape *tape = (T02x·Tape *) lnk->args->tape;
 
   if( *lnk->args->n == tape->n ){
     SQ·continue_indirect(lnk->lnks->empty);
@@ -196,16 +198,16 @@ SQ·def(T02x·shorten){
   T02x·Tape resized_tape;
 
   // lnks
-  SQ·make_Lnk(alloc_array  ,T02x·AllocArray ,&&T02x·alloc_array);
-  SQ·make_Lnk(move_array   ,T02x·MoveArray  ,&&T02x·move_array);
+  SQ·make_Lnk(alloc_array  ,T0·AllocArray ,&&T02x·alloc_array);
+  SQ·make_Lnk(move_array   ,T0·MoveArray  ,&&T02x·move_array);
 
-  alloc_array_args.tape = &resized_tape;
+  alloc_array_args.tape = (T0·Tape *)&resized_tape;
   alloc_array_args.n    = &resized_n;
   alloc_array_lnks.nominal.sequence = &&copy_array_data;
   alloc_array_lnks.fail_alloc = lnk->lnks->fail_alloc;
 
-  move_array_args.src = &resized_tape;
-  move_array_args.dst = tape;
+  move_array_args.src = (T0·Tape *)&resized_tape;
+  move_array_args.dst = (T0·Tape *)tape;
   move_array_lnks.nominal = lnk->lnks->nominal;
 
   SQ·continue_indirect(alloc_array_lnk);

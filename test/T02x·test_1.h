@@ -27,12 +27,12 @@ the array.
     // ----------------------------------------
     // Links
     //
-      SQ·make_Lnk(ah  ,T02x·AllocTapeHeap   ,&&T02x·alloc_Tape_heap);
-      SQ·make_Lnk(aa  ,T02x·AllocArrayElements ,&&T02x·alloc_array_elements);
-      SQ·make_Lnk(da  ,T02x·DeallocArray    ,&&T02x·dealloc_array);
-      SQ·make_Lnk(dh  ,T02x·DeallocTapeHeap ,&&T02x·dealloc_Tape_heap);
+      SQ·make_Lnk(ah  ,T0·AllocTapeHeap   ,&&T02x·alloc_Tape_heap);
+      SQ·make_Lnk(aa  ,T0·AllocArrayElements ,&&T02x·alloc_array_elements);
+      SQ·make_Lnk(da  ,T0·DeallocArray    ,&&T02x·dealloc_array);
+      SQ·make_Lnk(dh  ,T0·DeallocTapeHeap ,&&T02x·dealloc_Tape_heap);
 
-      ah_ress.tape = &tape;
+      ah_ress.tape = (T0·Tape **)&tape;
       ah_lnks.nominal.sequence = &&ah_dist;
       ah_lnks.fail.sequence = &&fail;
 
@@ -48,9 +48,9 @@ the array.
 
     // initialize our tape argument from the heap
     SQ·def(ah_dist){ 
-      aa_args.tape = tape;
-      da_args.tape = tape;
-      dh_args.tape = tape;
+      aa_args.tape = (T0·Tape *)tape;
+      da_args.tape = (T0·Tape *)tape;
+      dh_args.tape = (T0·Tape *)tape;
       SQ·continue_indirect(aa_lnk); // continue to construct elements
     }SQ·end(ah_dist);
 

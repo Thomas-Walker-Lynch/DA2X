@@ -28,22 +28,22 @@ Allocates a tape, then lengthen it.
     // ----------------------------------------
     // Links
     //
-      SQ·make_Lnk(allocate ,T02x·AllocArray   ,&&T02x·alloc_array);
-      SQ·make_Lnk(lengthen ,T02x·Lengthen     ,&&T02x·lengthen);
-      SQ·make_Lnk(dealloc  ,T02x·DeallocArray ,&&T02x·dealloc_array);
+      SQ·make_Lnk(allocate ,T0·AllocArray   ,&&T02x·alloc_array);
+      SQ·make_Lnk(lengthen ,T0·Lengthen     ,&&T02x·lengthen);
+      SQ·make_Lnk(dealloc  ,T0·DeallocArray ,&&T02x·dealloc_array);
 
-      allocate_args.tape = &tape;
+      allocate_args.tape = (T0·Tape *)&tape;
       allocate_args.n = &n0;
       allocate_lnks.nominal.sequence = &&initialize;
       allocate_lnks.fail_alloc.sequence = &&fail;
 
-      lengthen_args.tape = &tape;
+      lengthen_args.tape = (T0·Tape *)&tape;
       lengthen_args.n = &n1;
       lengthen_ress.new_area_pt = &new_area_pt;
       lengthen_lnks.nominal.sequence = &&append;
       lengthen_lnks.fail_alloc.sequence = &&fail;
 
-      dealloc_args.tape = &tape;
+      dealloc_args.tape = (T0·Tape *)&tape;
       dealloc_lnks.nominal.sequence = &&report;
 
     SQ·continue_indirect(allocate_lnk);
