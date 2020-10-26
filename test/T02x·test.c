@@ -7,15 +7,13 @@
 #include "misc.h"
 #include "MallocCounter.h"
 #include "Result.h"
-#include "Sequence.h"
-#include "Inclusive.h"
 
+#include "Sequence.h"
+#include "CLib.h"
+#include "Inclusive.h"
+#include "T0.h"
 #define T02x·TEST
 #include "T02x.h"
-
-#include "CLib·Types.h"
-#include "Inclusive·Types.h"
-#include "T02x·Types.h"
 
 int main(){
   SQ·Sequence test_0 ,SQ·test_0 ,test_1 ,SQ·test_1 ,test_2  ,SQ·test_2 ,tests_finished, SQ·tests_finished;

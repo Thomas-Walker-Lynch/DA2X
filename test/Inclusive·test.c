@@ -14,8 +14,6 @@ to nominal or gt_address_t_n depending if there is a good result or there was an
 #include "Sequence.h"
 #include "Inclusive.h"
 
-#include "Inclusive·Types.h"
-
 int main(){
 
   #include "Sequence·Text.h"

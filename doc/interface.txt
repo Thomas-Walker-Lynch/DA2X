@@ -1,9 +1,6 @@
 
-/* Tested, works, but I will add an interface to L2
-struct Text·CLib{
-  SequencePtr mallocn;
-} Text·CLib
-={
-  &&CLib·mallocn
-};
-*/
+       T0.h a generic interface to a layer 0 tape.
+     T02x.h the static definitions for the doubling array implementation of the tape
+T02x·Text.h this part of the doubling array tape implementation should be included into main
+
+
