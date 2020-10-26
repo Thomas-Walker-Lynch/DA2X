@@ -1,9 +1,16 @@
+/*
+A generic interface for a T0 level tape implementation.
+
+*/
+
+
 #ifndef T0_H
 #define T0_H
 #include "Sequence.h"
+#include "Inclusive.h"
 
 typedef struct {
-  SQ·Ptr alloc_Tape_heap;
+  SQ·Ptr alloc_Tape_heap; // a convenience function
   SQ·Ptr alloc_array;
   SQ·Ptr alloc_array_elements;
   SQ·Ptr dealloc_array;

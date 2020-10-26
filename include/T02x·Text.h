@@ -6,15 +6,7 @@ address_t T02x·alloc_array_count = 0;
 SQ·def(T02x·alloc_Tape_heap){
   T0·AllocTapeHeap·Lnk *lnk = (T0·AllocTapeHeap·Lnk *)SQ·lnk;
 
-  CLib·Mallocn·Args m_args;
-  CLib·Mallocn·Ress m_ress;
-  CLib·Mallocn·Lnks m_lnks;
-  CLib·Mallocn·Lnk m_lnk;
-  m_lnk.args = &m_args;
-  m_lnk.ress = &m_ress;
-  m_lnk.lnks = &m_lnks;
-  m_lnk.sequence = &&CLib·mallocn;
-
+  SQ·make_Lnk(m ,CLib·Mallocn ,&&CLib·mallocn);
   address_t n = n_of(T02x·Tape ); // stack base allocated, so we can safely use its address
   m_args.n  = &n;
   m_ress.allocation = (void **)lnk->ress->tape;
@@ -37,15 +29,7 @@ SQ·def(T02x·alloc_array){
   //
     address_t alloc_n = T02x·alloc_n(*lnk->args->n);
 
-    CLib·Mallocn·Args m_args;
-    CLib·Mallocn·Ress m_ress;
-    CLib·Mallocn·Lnks m_lnks;
-    CLib·Mallocn·Lnk m_lnk;
-    m_lnk.args = &m_args;
-    m_lnk.ress = &m_ress;
-    m_lnk.lnks = &m_lnks;
-    m_lnk.sequence = &&CLib·mallocn;
-
+    SQ·make_Lnk(m ,CLib·Mallocn ,&&CLib·mallocn);
     m_args.n  = &alloc_n;
     m_ress.allocation = (void **)&tape->base_pt;
     m_lnks.nominal = lnk->lnks->nominal;
@@ -126,7 +110,7 @@ SQ·def(T02x·move_array){
   T02x·alloc_array_count--;
   free(dst->base_pt);
   dst->base_pt = src->base_pt;
-  src->base_pt = 0; 
+  src->base_pt = NULL;
   dst->n = src->n;
   SQ·continue_indirect(lnk->lnks->nominal);
 } SQ·end(T02x·move_array);
