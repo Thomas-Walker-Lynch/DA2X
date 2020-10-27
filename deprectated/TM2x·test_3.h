@@ -21,13 +21,13 @@ Currnenly this is just a copy of the copy_contiguous_bytes test.
     // the source machine
     //
       char cs[] = {'h' ,'e' ,'l' ,'l' ,'o'};
-      T02x·Tape src = { .base_pt = cs ,.n = 4};
+      T02x·Root src = { .base_pt = cs ,.n = 4};
 
     // ----------------------------------------
     // result tableau
     //
       address_t n = 4;  // input constant
-      T02x·Tape *dst;    // result of alloc_Tape_heap, it gets distributed
+      T02x·Root *dst;    // result of alloc_Tape_heap, it gets distributed
       address_t offset = 0;  // input constant
 
     // ----------------------------------------

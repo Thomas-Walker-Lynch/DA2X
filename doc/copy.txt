@@ -1,0 +1,68 @@
+this should be done through iterators
+
+
+Read and write are the two ends of a copy operation.
+
+1. read
+
+Read takes as arguments an instruction sequence that will perform a write.
+
+
+
+
+
+
+
+
+--------------------------------------------------------------------------------
+Read and write are the two ends of a copy operation.
+
+1. read (from the perspective of the source tape)
+
+With read, we guarantee that the destination of the copy has enough space to hold the
+data, so our only concern is that our read can source enough data.
+
+If the tape is empty, we take an empty continuation.  It is possible that this continuation
+somehow gets more data, and then reissues the read.
+
+We have two choices for handling the situation only enough data to partially perform the read:
+
+  1. We can do a partial write, then hit the end of the tape and take a continuation.
+  2. We can check up front that enough bytes are available, and if not, take a continuation.
+
+
+Upon continuation after a partial write, we would either have to go find some data to and
+finish the write, would have to fix the mess, or would have to signal an error.  Unless
+we did some cleanup, the signaled error would leave the program in an intermediate state.
+
+Upon continuation after an up front check, we would either have to go find some more data
+and reissue the read, would have to reissue the read with a smaller value for n, or would
+have to signal an error.
+
+The advantage of the partial write is that some forward progress is made even when there
+is not enough data to fulfill the order, so to speak.  The disadvage is the possible need
+for mess fix up code or intermediate error states.
+
+The advantage of the upfront check is that it leaves things in a clean state for when
+we arrive at the continuation code.  I will go with that.
+
+
+2. write (from the perspective of the destination tape)
+
+With write, we guarantee that the source has enough data to complete the write, so
+our only concern is that the write does not overlow the tape.  This is an analogous
+situation as for read discussed above.
+
+Thus, upon a write operation we first check that there is enough space to hold the write
+data, and otherwise take an overflow continuation.  The continuation might elect to length
+the tape and reissue the write, might reissue a smaller write, or it might signal an error.
+
+3. copy
+
+With copy, we guarantee that the source has enough data and the destination has enough
+space for it.  We have three fixup continuations then, source underflow, destination
+overflow, or both.
+
+For now, I am leaving this off the interface. The programmer should manually check to
+guara...
+

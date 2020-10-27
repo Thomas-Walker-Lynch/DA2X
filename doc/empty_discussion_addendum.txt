@@ -115,8 +115,8 @@ still the big parm loop in tranche has a funny condition for the first parm ..
   // -context given to the pred is a pointer to the src element
   TM2xHd_F_PREFIX bool TM2xHd_accumulate_union
   (
-   T02x·Tape *set_acc
-   ,T02x·Tape *set_src
+   T02x·Root *set_acc
+   ,T02x·Root *set_src
    ,address_t element_n_Byte
    ,bool pred(void *context ,void *el ,address_t element_n_Byte)
    ){
@@ -139,9 +139,9 @@ still the big parm loop in tranche has a funny condition for the first parm ..
   // -context given to the pred is a_element, the src element is the b_element
   TM2xHd_F_PREFIX bool TM2xHd_intersection
   (
-   T02x·Tape *array_acc
-   ,T02x·Tape *set_a
-   ,T02x·Tape *set_b
+   T02x·Root *array_acc
+   ,T02x·Root *set_a
+   ,T02x·Root *set_b
    ,address_t element_n_Byte
    ,bool pred(void *context ,void *el ,address_t element_n_Byte)
    ){

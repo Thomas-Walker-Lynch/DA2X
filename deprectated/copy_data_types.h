@@ -1,7 +1,7 @@
   typedef struct{
-         T02x·Tape *src;
+         T02x·Root *src;
     address_t *src_0;
-         T02x·Tape *dst;
+         T02x·Root *dst;
     address_t *dst_0;
     address_t *n;
   } T02x·CopyContiguous·Args;
@@ -21,9 +21,9 @@
 
 
   typedef struct{
-         T02x·Tape *src;
+         T02x·Root *src;
     address_t *src_element_0;
-         T02x·Tape *dst;
+         T02x·Root *dst;
     address_t *dst_element_0;
     address_t *n_Element;
     address_t *element_n_Byte;

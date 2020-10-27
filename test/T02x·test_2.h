@@ -22,7 +22,7 @@ Allocates a tape, then lengthen it.
     //
       address_t n0 = 9;
       address_t n1 = 9;
-      T02x·Tape tape;
+      T02x·Root tape;
       char *new_area_pt;
 
     // ----------------------------------------
@@ -32,18 +32,18 @@ Allocates a tape, then lengthen it.
       SQ·make_Lnk(lengthen ,T0·Lengthen     ,&&T02x·lengthen);
       SQ·make_Lnk(dealloc  ,T0·DeallocArray ,&&T02x·dealloc_array);
 
-      allocate_args.tape = (T0·Tape *)&tape;
+      allocate_args.tape = (T0·Root *)&tape;
       allocate_args.n = &n0;
       allocate_lnks.nominal.sequence = &&initialize;
       allocate_lnks.fail_alloc.sequence = &&fail;
 
-      lengthen_args.tape = (T0·Tape *)&tape;
+      lengthen_args.tape = (T0·Root *)&tape;
       lengthen_args.n = &n1;
       lengthen_ress.new_area_pt = &new_area_pt;
       lengthen_lnks.nominal.sequence = &&append;
       lengthen_lnks.fail_alloc.sequence = &&fail;
 
-      dealloc_args.tape = (T0·Tape *)&tape;
+      dealloc_args.tape = (T0·Root *)&tape;
       dealloc_lnks.nominal.sequence = &&report;
 
     SQ·continue_indirect(allocate_lnk);

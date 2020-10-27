@@ -1,13 +1,13 @@
 // 'thread static' allocation class
 address_t T02x·alloc_array_count = 0;
 
-// Allocate a T02x·Tape header on the heap.
-// Note that it is also perfectly fine to statically allocate a T02x·Tape.
+// Allocate a T02x·Root header on the heap.
+// Note that it is also perfectly fine to statically allocate a T02x·Root.
 SQ·def(T02x·alloc_Tape_heap){
   T0·AllocTapeHeap·Lnk *lnk = (T0·AllocTapeHeap·Lnk *)SQ·lnk;
 
   SQ·make_Lnk(m ,CLib·Mallocn ,&&CLib·mallocn);
-  address_t n = n_of(T02x·Tape ); // stack base allocated, so we can safely use its address
+  address_t n = n_of(T02x·Root ); // stack base allocated, so we can safely use its address
   m_args.n  = &n;
   m_ress.allocation = (void **)lnk->ress->tape;
   m_lnks.nominal = lnk->lnks->nominal;
@@ -21,7 +21,7 @@ SQ·def(T02x·alloc_Tape_heap){
 SQ·def(T02x·alloc_array){
   T02x·alloc_array_count++; // to assist with debugging
   T0·AllocArray·Lnk *lnk = (T0·AllocArray·Lnk *)SQ·lnk;
-  T02x·Tape *tape = (T02x·Tape *) lnk->args->tape;
+  T02x·Root *tape = (T02x·Root *) lnk->args->tape;
 
   tape->n = *lnk->args->n;
 
@@ -81,11 +81,11 @@ SQ·def(T02x·alloc_array_elements){
 
 } SQ·end(T02x·alloc_array_elements);
 
-// T02x·Tape header may be constructed again and reused
+// T02x·Root header may be constructed again and reused
 SQ·def(T02x·dealloc_array){
   T02x·alloc_array_count--; // to assist with debugging
   T0·DeallocArray·Lnk *lnk = (T0·DeallocArray·Lnk *)SQ·lnk;
-  T02x·Tape *tape = (T02x·Tape *) lnk->args->tape;
+  T02x·Root *tape = (T02x·Root *) lnk->args->tape;
   free(tape->base_pt);
   SQ·continue_indirect(lnk->lnks->nominal);  
 } SQ·end(T02x·dealloc_array);
@@ -104,8 +104,8 @@ SQ·def(T02x·dealloc_Tape_heap){
 SQ·def(T02x·move_array){
   // some aliases
   T0·MoveArray·Lnk *lnk = (T0·MoveArray·Lnk *)SQ·lnk;
-  T02x·Tape *src = (T02x·Tape *)lnk->args->src;
-  T02x·Tape *dst = (T02x·Tape *)lnk->args->dst;
+  T02x·Root *src = (T02x·Root *)lnk->args->src;
+  T02x·Root *dst = (T02x·Root *)lnk->args->dst;
 
   T02x·alloc_array_count--;
   free(dst->base_pt);
@@ -119,7 +119,7 @@ SQ·def(T02x·move_array){
 SQ·def(T02x·lengthen){
   SQ·Sequence copy_array_data ,SQ·copy_array_data;
   T0·Lengthen·Lnk *lnk = (T0·Lengthen·Lnk *)SQ·lnk;
-  T02x·Tape *tape = (T02x·Tape *) lnk->args->tape;
+  T02x·Root *tape = (T02x·Root *) lnk->args->tape;
 
   address_t alloc_n = T02x·alloc_n(tape->n);
   address_t resized_n =  *lnk->args->n + tape->n + 1;
@@ -131,19 +131,19 @@ SQ·def(T02x·lengthen){
     SQ·continue_indirect(lnk->lnks->nominal);
   }
 
-  T02x·Tape resized_tape;
+  T02x·Root resized_tape;
 
   // lnks
   SQ·make_Lnk(alloc_array  ,T0·AllocArray ,&&T02x·alloc_array);
   SQ·make_Lnk(move_array   ,T0·MoveArray  ,&&T02x·move_array);
 
-  alloc_array_args.tape = (T0·Tape *)&resized_tape;
+  alloc_array_args.tape = (T0·Root *)&resized_tape;
   alloc_array_args.n    = &resized_n;
   alloc_array_lnks.nominal.sequence = &&copy_array_data;
   alloc_array_lnks.fail_alloc = lnk->lnks->fail_alloc;
 
-  move_array_args.src = (T0·Tape *)&resized_tape;
-  move_array_args.dst = (T0·Tape *)tape;
+  move_array_args.src = (T0·Root *)&resized_tape;
+  move_array_args.dst = (T0·Root *)tape;
   move_array_lnks.nominal = lnk->lnks->nominal;
 
   SQ·continue_indirect(alloc_array_lnk);
@@ -160,7 +160,7 @@ SQ·def(T02x·lengthen){
 SQ·def(T02x·shorten){
   SQ·Sequence copy_array_data ,SQ·copy_array_data;
   T0·Shorten·Lnk *lnk = (T0·Shorten·Lnk *)SQ·lnk;
-  T02x·Tape *tape = (T02x·Tape *) lnk->args->tape;
+  T02x·Root *tape = (T02x·Root *) lnk->args->tape;
 
   if( *lnk->args->n == tape->n ){
     SQ·continue_indirect(lnk->lnks->empty);
@@ -179,19 +179,19 @@ SQ·def(T02x·shorten){
   }
 
   // rtab
-  T02x·Tape resized_tape;
+  T02x·Root resized_tape;
 
   // lnks
   SQ·make_Lnk(alloc_array  ,T0·AllocArray ,&&T02x·alloc_array);
   SQ·make_Lnk(move_array   ,T0·MoveArray  ,&&T02x·move_array);
 
-  alloc_array_args.tape = (T0·Tape *)&resized_tape;
+  alloc_array_args.tape = (T0·Root *)&resized_tape;
   alloc_array_args.n    = &resized_n;
   alloc_array_lnks.nominal.sequence = &&copy_array_data;
   alloc_array_lnks.fail_alloc = lnk->lnks->fail_alloc;
 
-  move_array_args.src = (T0·Tape *)&resized_tape;
-  move_array_args.dst = (T0·Tape *)tape;
+  move_array_args.src = (T0·Root *)&resized_tape;
+  move_array_args.dst = (T0·Root *)tape;
   move_array_lnks.nominal = lnk->lnks->nominal;
 
   SQ·continue_indirect(alloc_array_lnk);
@@ -204,7 +204,7 @@ SQ·def(T02x·shorten){
 } SQ·end(T02x·shorten);
 
 
-T0 t02x;
+T0·Iface t02x;
 t02x.alloc_Tape_heap      = &&T02x·alloc_Tape_heap;
 t02x.alloc_array          = &&T02x·alloc_array;           
 t02x.alloc_array_elements = &&T02x·alloc_array_elements;  

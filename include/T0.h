@@ -18,15 +18,20 @@ typedef struct {
   SQ·Ptr move_array;
   SQ·Ptr lengthen;
   SQ·Ptr shorten;
-} T0;
+  SQ·Ptr make_hd;
+} T0·Iface;
 
 typedef struct{
-} T0·Tape;
+} T0·Root;
+
+typedef struct{
+} T0Hd·Root;
+
 
 typedef struct{
 } T0·AllocTapeHeap·Args;
 typedef struct{
-  T0·Tape **tape;
+  T0·Root **tape;
 } T0·AllocTapeHeap·Ress;
 typedef struct{
   SQ·Lnk nominal;
@@ -40,7 +45,7 @@ typedef struct{
 } T0·AllocTapeHeap·Lnk;
 
 typedef struct{
-  T0·Tape *tape;
+  T0·Root *tape;
   address_t *n;   // extent of the array, in bytes
 } T0·AllocArray·Args;
 typedef struct{
@@ -57,7 +62,7 @@ typedef struct{
 } T0·AllocArray·Lnk;
 
 typedef struct{
-  T0·Tape *tape;
+  T0·Root *tape;
   address_t *n_Element;  // extent of the array, in elements
   address_t *element_n_Byte; // extent of the element, in bytes
 } T0·AllocArrayElements·Args;
@@ -76,7 +81,7 @@ typedef struct{
 } T0·AllocArrayElements·Lnk;
 
 typedef struct{
-  T0·Tape *tape;
+  T0·Root *tape;
 } T0·DeallocArray·Args;
 typedef struct{
 } T0·DeallocArray·Ress;
@@ -91,7 +96,7 @@ typedef struct{
 } T0·DeallocArray·Lnk;
 
 typedef struct{
-  T0·Tape *tape;
+  T0·Root *tape;
 } T0·DeallocTapeHeap·Args;
 typedef struct{
 } T0·DeallocTapeHeap·Ress;
@@ -106,8 +111,8 @@ typedef struct{
 } T0·DeallocTapeHeap·Lnk;
 
 typedef struct{
-  T0·Tape *src;
-  T0·Tape *dst;
+  T0·Root *src;
+  T0·Root *dst;
 } T0·MoveArray·Args;
 typedef struct{
 } T0·MoveArray·Ress;
@@ -122,7 +127,7 @@ typedef struct{
 } T0·MoveArray·Lnk;
 
 typedef struct{
-  T0·Tape *tape;
+  T0·Root *tape;
   address_t *n;
 } T0·Lengthen·Args;
 typedef struct{
@@ -139,8 +144,9 @@ typedef struct{
   T0·Lengthen·Lnks *lnks;
 } T0·Lengthen·Lnk;
 
+
 typedef struct{
-  T0·Tape *tape;
+  T0·Root *tape;
   address_t *n;
 } T0·Shorten·Args;
 typedef struct{
@@ -157,7 +163,22 @@ typedef struct{
   T0·Shorten·Ress *ress;
   T0·Shorten·Lnks *lnks;
 } T0·Shorten·Lnk;
+
+
+typedef struct{
+  T0·Root *tape;
+} T0·MakeHd·Args;
+typedef struct{
+  T0It·Root *hd;
+} T0·MakeHd·Ress;
+typedef struct{
+  SQ·Lnk nominal;
+} T0·MakeHd·Lnks;
+typedef struct{
+  SQ·Ptr sequence;
+  T0·MakeHd·Args *args;
+  T0·MakeHd·Ress *ress;
+  T0·MakeHd·Lnks *lnks;
+} T0·MakeHd·Lnk;
  
 #endif
-
-

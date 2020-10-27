@@ -1,5 +1,5 @@
 /*
-Allocates a T02x·Tape header struct on the heap.  Constructs an array.  Destructs the array.
+Allocates a T02x·Root header struct on the heap.  Constructs an array.  Destructs the array.
 Deallocates the header.
 
 
@@ -22,7 +22,7 @@ Deallocates the header.
     // result tableau
     //
       address_t n = 9;
-      T02x·Tape *tape; // will point to a heap allocated Tape structure.
+      T02x·Root *tape; // will point to a heap allocated Tape structure.
 
     // ----------------------------------------
     // Links
@@ -32,7 +32,7 @@ Deallocates the header.
       SQ·make_Lnk(da  ,T0·DeallocArray    ,&&T02x·dealloc_array);
       SQ·make_Lnk(dh  ,T0·DeallocTapeHeap ,&&T02x·dealloc_Tape_heap);
 
-      ah_ress.tape = (T0·Tape **)&tape;
+      ah_ress.tape = (T0·Root **)&tape;
       ah_lnks.nominal.sequence = &&ah_dist;
       ah_lnks.fail.sequence = &&fail;
 
@@ -56,9 +56,9 @@ Deallocates the header.
     // compile time. T02x·test_1 has an example where the tape is placed directly on the
     // result tableau instead of on the heap.
     SQ·def(ah_dist){ 
-      aa_args.tape = (T0·Tape *)tape;
-      da_args.tape = (T0·Tape *)tape;
-      dh_args.tape = (T0·Tape *)tape;
+      aa_args.tape = (T0·Root *)tape;
+      da_args.tape = (T0·Root *)tape;
+      dh_args.tape = (T0·Root *)tape;
       SQ·continue_indirect(aa_lnk); // continue to allocate the array
     }SQ·end(ah_dist);
 

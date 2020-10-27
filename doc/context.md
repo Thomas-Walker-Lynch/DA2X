@@ -413,7 +413,7 @@
   as a sequence rather than as an encapsulating function.
 
   The following example is what the `alloc_array_elements` encapsulation might look like in
-  the T02x·Tape library. We make use of two pads.  One for arguments and one for local
+  the T02x·Root library. We make use of two pads.  One for arguments and one for local
   variables.  We often swap these upon entering an encapsulation so that we might more
   easily build the arguments pad for the next sequence.  The P1 macro sets up a pointer
   to point to this second pad.
@@ -804,7 +804,7 @@
    structures we are willing to analyze.
 
    Hence, context pads can be a solution to statically analyzable code structures, but
-   it is not a general solution. Our T02x·Tape library is pretty easy to analyze, and given
+   it is not a general solution. Our T02x·Root library is pretty easy to analyze, and given
    the efficiency of context pads, I will probably use them there.
 
 ### Context stack
@@ -862,7 +862,7 @@
    execution. This approach would require even more memory than dedicating a context pad
    to each sequence.  It would also be unusual to do such a thing when we are not
    synchronizing data between separate threads of execution. It is a too heavy of a
-   solution for something like our T02x·Tape library.
+   solution for something like our T02x·Root library.
 
    We will also need some means of allocating and deallocating messages. If explicit
    deallocation is required, c3 cannot be solely responsible for deallocating the message

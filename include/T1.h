@@ -15,13 +15,13 @@ typedef struct {
   SQ·Ptr move;
   SQ·Ptr lengthen;
   SQ·Ptr shorten;
-} T1;
+} T1·Iface;
 
 typedef struct {
   bool empty;
   T0 *t0;
-  T0·Tape *tape0;
-} T1·Tape ;
+  T0·Root *tape0;
+} T1·Tape;
 
 
 typedef struct{

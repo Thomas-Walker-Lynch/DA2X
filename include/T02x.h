@@ -9,14 +9,20 @@
 #include "Sequence.h"
 
 //--------------------------------------------------------------------------------
-// The T02x·Tape dynamic array header struct
+// The T02x·RootHeader dynamic array header struct
 //   .. does the mutex lock variable belongs here, or at L2? Perhaps here,
 //   because look at all the trouble we have already gone through to make
 //   this thread safe.
   typedef struct {
     char *base_pt;
     address_t n;
-  } T02x·Tape ;
+  } T02x·Root ;
+
+  typedef struct{
+    T02x·Root *tape;
+    pt char *;
+  } T02xIt·Root;
+
 
 //--------------------------------------------------------------------------------
 // adjectives
@@ -25,25 +31,25 @@
 //
 
   // base pointers
-  INLINE_PREFIX char *T02x·0_pt(T02x·Tape *tm2x){
+  INLINE_PREFIX char *T02x·0_pt(T02x·Root *tm2x){
     return tm2x->base_pt;
   }
 
   // max offsets
-  INLINE_PREFIX address_t T02x·n(T02x·Tape *tm2x){
+  INLINE_PREFIX address_t T02x·n(T02x·Root *tm2x){
     return tm2x->n;
   }
   // The index of the last element in the array.  Note that the
   // (element_n_Byte + 1) in the denominator must be representable:
-  INLINE_PREFIX address_t T02x·n_Element(T02x·Tape *tm2x ,address_t element_n_Byte){
+  INLINE_PREFIX address_t T02x·n_Element(T02x·Root *tm2x ,address_t element_n_Byte){
     return tm2x->n/(element_n_Byte + 1);
   }
 
   // nth pointers
-  INLINE_PREFIX char *T02x·n_pt(T02x·Tape *tm2x){
+  INLINE_PREFIX char *T02x·n_pt(T02x·Root *tm2x){
     return tm2x->base_pt + tm2x->n;
   }
-  INLINE_PREFIX void *T02x·n_Element_pt(T02x·Tape *tm2x ,address_t element_n_Byte){
+  INLINE_PREFIX void *T02x·n_Element_pt(T02x·Root *tm2x ,address_t element_n_Byte){
     return T02x·n_pt(tm2x) - element_n_Byte;
   }
 

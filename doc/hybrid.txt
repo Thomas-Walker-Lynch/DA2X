@@ -18,7 +18,7 @@ sequence within functions and share the functions in a library, but we can not
 share a library of sequences.  This is because continuing from a sequence found in
 a library would cause control to leave the function.
 
-See the 'pinnacle-function-encapsulated-sequences' branch of the T02x·Tape for examples
+See the 'pinnacle-function-encapsulated-sequences' branch of the T02x·Root for examples
 of this technique.
 
 

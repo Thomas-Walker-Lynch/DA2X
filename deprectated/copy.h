@@ -3,8 +3,8 @@
     // some aliases
     //
       T02x·CopyContiguous·Lnk *lnk = (T02x·CopyContiguous·Lnk *)SQ·lnk;
-      T02x·Tape *src = lnk->args->src;
-      T02x·Tape *dst = lnk->args->dst;
+      T02x·Root *src = lnk->args->src;
+      T02x·Root *dst = lnk->args->dst;
       address_t src_0 = *lnk->args->src_0;
       address_t dst_0 = *lnk->args->dst_0;
       address_t n = *lnk->args->n;

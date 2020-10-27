@@ -39,7 +39,7 @@ should be indented
   T02x·alloc_Tape_heap:{
     //  #include "CLib·mallocn·args.h"
     #define pt      tape
-    #define n       n_of(T02x·Tape )
+    #define n       n_of(T02x·Root )
     #define nominal malloc_nominal
     #define fail    mfail_alloc
     #include "CLib·mallocn.h"

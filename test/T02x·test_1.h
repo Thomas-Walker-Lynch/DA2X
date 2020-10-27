@@ -22,7 +22,7 @@ the array.
     //
       address_t n_Element = 9;
       address_t element_n_Byte = 3; // extent of 32 bit int in elements
-      T02x·Tape *tape;  // will point to a heap allocated Tape structure.
+      T02x·Root *tape;  // will point to a heap allocated Tape structure.
 
     // ----------------------------------------
     // Links
@@ -32,7 +32,7 @@ the array.
       SQ·make_Lnk(da  ,T0·DeallocArray    ,&&T02x·dealloc_array);
       SQ·make_Lnk(dh  ,T0·DeallocTapeHeap ,&&T02x·dealloc_Tape_heap);
 
-      ah_ress.tape = (T0·Tape **)&tape;
+      ah_ress.tape = (T0·Root **)&tape;
       ah_lnks.nominal.sequence = &&ah_dist;
       ah_lnks.fail.sequence = &&fail;
 
@@ -48,9 +48,9 @@ the array.
 
     // initialize our tape argument from the heap
     SQ·def(ah_dist){ 
-      aa_args.tape = (T0·Tape *)tape;
-      da_args.tape = (T0·Tape *)tape;
-      dh_args.tape = (T0·Tape *)tape;
+      aa_args.tape = (T0·Root *)tape;
+      da_args.tape = (T0·Root *)tape;
+      dh_args.tape = (T0·Root *)tape;
       SQ·continue_indirect(aa_lnk); // continue to construct elements
     }SQ·end(ah_dist);
 
