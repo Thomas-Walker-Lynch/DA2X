@@ -169,7 +169,7 @@ typedef struct{
   T0·Root *tape;
 } T0·MakeHd·Args;
 typedef struct{
-  T0It·Root *hd;
+  T0Hd·Root *hd;
 } T0·MakeHd·Ress;
 typedef struct{
   SQ·Lnk nominal;

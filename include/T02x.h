@@ -20,40 +20,8 @@
 
   typedef struct{
     T02x·Root *tape;
-    pt char *;
-  } T02xIt·Root;
-
-
-//--------------------------------------------------------------------------------
-// adjectives
-//
-// Use these adjectives rather than accessing the header struct directly.
-//
-
-  // base pointers
-  INLINE_PREFIX char *T02x·0_pt(T02x·Root *tm2x){
-    return tm2x->base_pt;
-  }
-
-  // max offsets
-  INLINE_PREFIX address_t T02x·n(T02x·Root *tm2x){
-    return tm2x->n;
-  }
-  // The index of the last element in the array.  Note that the
-  // (element_n_Byte + 1) in the denominator must be representable:
-  INLINE_PREFIX address_t T02x·n_Element(T02x·Root *tm2x ,address_t element_n_Byte){
-    return tm2x->n/(element_n_Byte + 1);
-  }
-
-  // nth pointers
-  INLINE_PREFIX char *T02x·n_pt(T02x·Root *tm2x){
-    return tm2x->base_pt + tm2x->n;
-  }
-  INLINE_PREFIX void *T02x·n_Element_pt(T02x·Root *tm2x ,address_t element_n_Byte){
-    return T02x·n_pt(tm2x) - element_n_Byte;
-  }
-
-  #define T02x·Element_N_Pt(tm2x ,type) T02x·n_Element_pt(tm2x ,n_of(type))
+    address_t i;
+  } T02xHd·Root;
 
 
 //--------------------------------------------------------------------------------
