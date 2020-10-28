@@ -175,6 +175,7 @@ typedef struct{
 } T0·Copy·Ress;
 typedef struct{
   SQ·Lnk nominal;
+  SQ·Lnk misfit;
 } T0·Copy·Lnks;
 typedef struct{
   SQ·Ptr sequence;
@@ -182,4 +183,20 @@ typedef struct{
   T0·Copy·Ress *ress;
   T0·Copy·Lnks *lnks;
 } T0·Copy·Lnk;
+
+typedef struct{
+  bool *underflow;
+  bool *overflow;
+} T0·Misfit·Args;
+typedef struct{
+} T0·Misfit·Ress;
+typedef struct{
+  SQ·Lnk nominal;
+} T0·Misfit·Lnks;
+typedef struct{
+  SQ·Ptr sequence;
+  T0·Misfit·Args *args;
+  T0·Misfit·Ress *ress;
+  T0·Misfit·Lnks *lnks;
+} T0·Misfit·Lnk;
 

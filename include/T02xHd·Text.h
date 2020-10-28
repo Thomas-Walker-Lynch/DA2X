@@ -65,29 +65,47 @@ SQ·def(T02xHd·step_right){
 } SQ·end(T02xHd·step_right);
 
 
-SQ·def(T02xHd·read_to_point){
-  T0Hd·ReadToPoint·Lnk *lnk = (T0Hd·ReadToPoint·Lnk *)SQ·lnk;
-  address_t rn = *lnk->args->n;
-  address_t  i = lnk->args->hd->i;
-  address_t tn = lnk->args->hd->tape->n;
-  if( tn - i > rn ){
+SQ·def(T02xHd·read_to_pt){
+  T0Hd·ReadToPt·Lnk *lnk = (T0Hd·ReadToPt·Lnk *)SQ·lnk;
+  address_t x = *lnk->args->n; // eXtent of area to copy
+  address_t i = lnk->args->hd->i;
+  address_t n = lnk->args->hd->tape->n;
+  if( n - i < x ){
     SQ·continue_indirect(lnk->lnks->underflow);
   }
-  memcpyn(lnk->args->pt ,lnk->args->hd->tape->base_pt + i ,rn);
+  memcpyn(lnk->args->pt ,lnk->args->hd->tape->base_pt + i ,x);
   SQ·continue_indirect(lnk->lnks->nominal);
-} SQ·end(T02xHd·read_to_point);
+} SQ·end(T02xHd·read_to_pt);
 
 
-SQ·def(T02xHd·write_to_point){
-  T0Hd·WriteToPoint·Lnk *lnk = (T0Hd·WriteToPoint·Lnk *)SQ·lnk;
-  address_t wn = *lnk->args->n;
-  address_t  i = lnk->args->hd->i;
-  address_t tn = lnk->args->hd->tape->n;
-  if( tn - i > rn ){
+SQ·def(T02xHd·write_from_pt){
+  T0Hd·WriteFromPt·Lnk *lnk = (T0Hd·WriteFromPt·Lnk *)SQ·lnk;
+  address_t x = *lnk->args->n;
+  address_t i = lnk->args->hd->i;
+  address_t n = lnk->args->hd->tape->n;
+  if( n - i < x ){
     SQ·continue_indirect(lnk->lnks->overflow);
   }
-  memcpyn(lnk->args->hd->tape->base_pt + i ,lnk->args->pt ,wn);
+  memcpyn(lnk->args->hd->tape->base_pt + i ,lnk->args->pt ,x);
   SQ·continue_indirect(lnk->lnks->nominal);
-} SQ·end(T02xHd·write_to_point);
+} SQ·end(T02xHd·write_from_pt);
+
+
+SQ·def(T02xHd·copy){
+  T0Hd·WriteFromPt·Lnk *lnk = (T0Hd·WriteFromPt·Lnk *)SQ·lnk;
+  T02xHd·Root *src = lnk->args->src;
+  T02xHd·Root *dst = lnk->args->dst;
+  address_t x = *lnk->args->n;
+  bool underflow = src->tape->n - src->i < x;
+  bool overflow  = dst->tape->n - dst->i < x;
+  if( underflow || overflow ){
+    SQ·Lnk misfit = lnk->lnks.misfit;
+    misfit.args->underflow = &underflow;
+    misfit.args->overflow  = &overflow;
+    SQ·continue_indirect(misfit);
+  }
+  memcpyn(dst->tape->base_pt + dst->i ,src->tape->base_pt + src->i ,x);
+  SQ·continue_indirect(lnk->lnks->nominal);
+} SQ·end(T02xHd·write_from_pt);
 
 
