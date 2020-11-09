@@ -23,180 +23,194 @@ typedef struct {
   SQ·Ptr copy;
 } T0Hd·Iface;
 
+typedef struct{
+  T0·Root *tape;
+} T0Hd·InitHd·Args;
+typedef struct{
+  T0Hd·Root *hd;
+} T0Hd·InitHd·Ress;
+typedef struct{
+  SQ·Lnk nominal;
+} T0Hd·InitHd·Lnks;
+typedef struct{
+  SQ·Ptr sequence;
+  T0Hd·InitHd·Args *args;
+  T0Hd·InitHd·Ress *ress;
+  T0Hd·InitHd·Lnks *lnks;
+} T0Hd·InitHd·Lnk;
 
 
 typedef struct{
   T0Hd·Root *hd;
-} T0·Remaining·Args;
+} T0Hd·Remaining·Args;
 typedef struct{
   address_t *r;
-} T0·Remaining·Ress;
+} T0Hd·Remaining·Ress;
 typedef struct{
   SQ·Lnk nominal;
-} T0·Remaining·Lnks;
+} T0Hd·Remaining·Lnks;
 typedef struct{
   SQ·Ptr sequence;
-  T0·Remaining·Args *args;
-  T0·Remaining·Ress *ress;
-  T0·Remaining·Lnks *lnks;
-} T0·Remaining·Lnk;
+  T0Hd·Remaining·Args *args;
+  T0Hd·Remaining·Ress *ress;
+  T0Hd·Remaining·Lnks *lnks;
+} T0Hd·Remaining·Lnk;
 
 
 typedef struct{
   T0Hd·Root *hd;
-} T0·Leftmost·Args;
+} T0Hd·Leftmost·Args;
 typedef struct{
-} T0·Leftmost·Ress;
+} T0Hd·Leftmost·Ress;
 typedef struct{
   SQ·Lnk nominal;
-} T0·Leftmost·Lnks;
+} T0Hd·Leftmost·Lnks;
 typedef struct{
   SQ·Ptr sequence;
-  T0·Leftmost·Args *args;
-  T0·Leftmost·Ress *ress;
-  T0·Leftmost·Lnks *lnks;
-} T0·Leftmost·Lnk;
+  T0Hd·Leftmost·Args *args;
+  T0Hd·Leftmost·Ress *ress;
+  T0Hd·Leftmost·Lnks *lnks;
+} T0Hd·Leftmost·Lnk;
 
 
 typedef struct{
   T0Hd·Root *hd;
   T0Hd·Root *element_n;
-} T0·Rightmost·Args;
+} T0Hd·Rightmost·Args;
 typedef struct{
-} T0·Rightmost·Ress;
+} T0Hd·Rightmost·Ress;
 typedef struct{
   SQ·Lnk nominal;
   SQ·Lnk left_of_leftmost;
-} T0·Rightmost·Lnks;
+} T0Hd·Rightmost·Lnks;
 typedef struct{
   SQ·Ptr sequence;
-  T0·Rightmost·Args *args;
-  T0·Rightmost·Ress *ress;
-  T0·Rightmost·Lnks *lnks;
-} T0·Rightmost·Lnk;
+  T0Hd·Rightmost·Args *args;
+  T0Hd·Rightmost·Ress *ress;
+  T0Hd·Rightmost·Lnks *lnks;
+} T0Hd·Rightmost·Lnk;
 
 
 typedef struct{
   T0Hd·Root *hd;
   address_t *i;
-} T0·Cue·Args;
+} T0Hd·Cue·Args;
 typedef struct{
-} T0·Cue·Ress;
+} T0Hd·Cue·Ress;
 typedef struct{
   SQ·Lnk nominal;
   SQ·Lnk right_of_rightmost;
-} T0·Cue·Lnks;
+} T0Hd·Cue·Lnks;
 typedef struct{
   SQ·Ptr sequence;
-  T0·Cue·Args *args;
-  T0·Cue·Ress *ress;
-  T0·Cue·Lnks *lnks;
-} T0·Cue·Lnk;
+  T0Hd·Cue·Args *args;
+  T0Hd·Cue·Ress *ress;
+  T0Hd·Cue·Lnks *lnks;
+} T0Hd·Cue·Lnk;
 
 typedef struct{
   T0Hd·Root *hd;
   address_t *d;
-} T0·StepLeft·Args;
+} T0Hd·StepLeft·Args;
 typedef struct{
-} T0·StepLeft·Ress;
+} T0Hd·StepLeft·Ress;
 typedef struct{
   SQ·Lnk nominal;
   SQ·Lnk right_of_rightmost;
-} T0·StepLeft·Lnks;
+} T0Hd·StepLeft·Lnks;
 typedef struct{
   SQ·Ptr sequence;
-  T0·StepLeft·Args *args;
-  T0·StepLeft·Ress *ress;
-  T0·StepLeft·Lnks *lnks;
-} T0·StepLeft·Lnk;
+  T0Hd·StepLeft·Args *args;
+  T0Hd·StepLeft·Ress *ress;
+  T0Hd·StepLeft·Lnks *lnks;
+} T0Hd·StepLeft·Lnk;
 
 typedef struct{
   T0Hd·Root *hd;
   address_t *d;
-} T0·StepRight·Args;
+} T0Hd·StepRight·Args;
 typedef struct{
-} T0·StepRight·Ress;
+} T0Hd·StepRight·Ress;
 typedef struct{
   SQ·Lnk nominal;
   SQ·Lnk right_of_rightmost;
-} T0·StepRight·Lnks;
+} T0Hd·StepRight·Lnks;
 typedef struct{
   SQ·Ptr sequence;
-  T0·StepRight·Args *args;
-  T0·StepRight·Ress *ress;
-  T0·StepRight·Lnks *lnks;
-} T0·StepRight·Lnk;
+  T0Hd·StepRight·Args *args;
+  T0Hd·StepRight·Ress *ress;
+  T0Hd·StepRight·Lnks *lnks;
+} T0Hd·StepRight·Lnk;
 
 
 typedef struct{
   T0Hd·Root *hd;
   char *pt;
   address_t *n;
-} T0·ReadToPt·Args;
+} T0Hd·ReadToPt·Args;
 typedef struct{
-} T0·ReadToPt·Ress;
+} T0Hd·ReadToPt·Ress;
 typedef struct{
   SQ·Lnk nominal;
   SQ·Lnk underflow;
-} T0·ReadToPt·Lnks;
+} T0Hd·ReadToPt·Lnks;
 typedef struct{
   SQ·Ptr sequence;
-  T0·ReadToPt·Args *args;
-  T0·ReadToPt·Ress *ress;
-  T0·ReadToPt·Lnks *lnks;
-} T0·ReadToPt·Lnk;
+  T0Hd·ReadToPt·Args *args;
+  T0Hd·ReadToPt·Ress *ress;
+  T0Hd·ReadToPt·Lnks *lnks;
+} T0Hd·ReadToPt·Lnk;
 
 
 typedef struct{
   T0Hd·Root *hd;
   char *pt;
   address_t *n;
-} T0·WriteFromPt·Args;
+} T0Hd·WriteFromPt·Args;
 typedef struct{
-} T0·WriteFromPt·Ress;
+} T0Hd·WriteFromPt·Ress;
 typedef struct{
   SQ·Lnk nominal;
   SQ·Lnk overflow;
-} T0·WriteFromPt·Lnks;
+} T0Hd·WriteFromPt·Lnks;
 typedef struct{
   SQ·Ptr sequence;
-  T0·WriteFromPt·Args *args;
-  T0·WriteFromPt·Ress *ress;
-  T0·WriteFromPt·Lnks *lnks;
-} T0·WriteFromPt·Lnk;
-
+  T0Hd·WriteFromPt·Args *args;
+  T0Hd·WriteFromPt·Ress *ress;
+  T0Hd·WriteFromPt·Lnks *lnks;
+} T0Hd·WriteFromPt·Lnk;
 
 typedef struct{
   T0Hd·Root *src;
   T0Hd·Root *dst;
   address_t *n;
-} T0·Copy·Args;
+} T0Hd·Copy·Args;
 typedef struct{
-} T0·Copy·Ress;
+} T0Hd·Copy·Ress;
 typedef struct{
   SQ·Lnk nominal;
   SQ·Lnk misfit;
-} T0·Copy·Lnks;
+} T0Hd·Copy·Lnks;
 typedef struct{
   SQ·Ptr sequence;
-  T0·Copy·Args *args;
-  T0·Copy·Ress *ress;
-  T0·Copy·Lnks *lnks;
-} T0·Copy·Lnk;
+  T0Hd·Copy·Args *args;
+  T0Hd·Copy·Ress *ress;
+  T0Hd·Copy·Lnks *lnks;
+} T0Hd·Copy·Lnk;
 
 typedef struct{
   bool *underflow;
   bool *overflow;
-} T0·Misfit·Args;
+} T0Hd·Misfit·Args;
 typedef struct{
-} T0·Misfit·Ress;
+} T0Hd·Misfit·Ress;
 typedef struct{
   SQ·Lnk nominal;
-} T0·Misfit·Lnks;
+} T0Hd·Misfit·Lnks;
 typedef struct{
   SQ·Ptr sequence;
-  T0·Misfit·Args *args;
-  T0·Misfit·Ress *ress;
-  T0·Misfit·Lnks *lnks;
-} T0·Misfit·Lnk;
+  T0Hd·Misfit·Args *args;
+  T0Hd·Misfit·Ress *ress;
+  T0Hd·Misfit·Lnks *lnks;
+} T0Hd·pMisfit·Lnk;
 

@@ -204,6 +204,7 @@ SQ·def(T02x·shorten){
 } SQ·end(T02x·shorten);
 
 
+
 T0·Iface t02x;
 t02x.alloc_Tape_heap      = &&T02x·alloc_Tape_heap;
 t02x.alloc_array          = &&T02x·alloc_array;           

@@ -18,6 +18,7 @@ typedef struct {
   SQ·Ptr move_array;
   SQ·Ptr lengthen;
   SQ·Ptr shorten;
+  SQ·Ptr init_hd;
 } T0·Iface;
 
 typedef struct{
@@ -164,4 +165,20 @@ typedef struct{
 } T0·Shorten·Lnk;
 
 
+typedef struct{
+  T0·Root *tape;
+} T0·MakeHd·Args;
+typedef struct{
+  T0Hd·Root *hd;
+} T0·MakeHd·Ress;
+typedef struct{
+  SQ·Lnk nominal;
+} T0·MakeHd·Lnks;
+typedef struct{
+  SQ·Ptr sequence;
+  T0·MakeHd·Args *args;
+  T0·MakeHd·Ress *ress;
+  T0·MakeHd·Lnks *lnks;
+} T0·MakeHd·Lnk;
+ 
 #endif

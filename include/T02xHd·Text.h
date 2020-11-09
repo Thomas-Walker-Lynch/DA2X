@@ -1,4 +1,11 @@
 
+SQ·def(T02xHd·init_hd){
+  T0Hd·InitHd·Lnk *lnk = (T0Hd·InitHd·Lnk *)SQ·lnk;
+  T02x·Root *tape = (T02x·Root *) lnk->args->tape;
+  T02xHd·Root *hd = (T02xHd·Root *) lnk->args->tape;
+  SQ·continue_indirect(lnk->lnks->nominal);
+} SQ·end(T02xHd·init_hd);
+
 SQ·def(T02xHd·remaining){
   T0Hd·StepRight·Lnk *lnk = (T0Hd·StepRight·Lnk *)SQ·lnk;
   address_t n = lnk->args->hd->tape->n;
@@ -92,7 +99,7 @@ SQ·def(T02xHd·write_from_pt){
 
 
 SQ·def(T02xHd·copy){
-  T0Hd·WriteFromPt·Lnk *lnk = (T0Hd·WriteFromPt·Lnk *)SQ·lnk;
+  T0Hd·Copy·Lnk *lnk = (T0Hd·Copy·Lnk *)SQ·lnk;
   T02xHd·Root *src = lnk->args->src;
   T02xHd·Root *dst = lnk->args->dst;
   address_t x = *lnk->args->n;
@@ -106,6 +113,7 @@ SQ·def(T02xHd·copy){
   }
   memcpyn(dst->tape->base_pt + dst->i ,src->tape->base_pt + src->i ,x);
   SQ·continue_indirect(lnk->lnks->nominal);
-} SQ·end(T02xHd·write_from_pt);
+} SQ·end(T02xHd·copy);
 
 
+// t02x.init_hd              = &&T02x·init_hd;
