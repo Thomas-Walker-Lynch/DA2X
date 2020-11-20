@@ -1,0 +1,100 @@
+
+
+  A C pointer is a memory address bound to a type definition. In the C model for memory,
+  instances are accessed through pointers, and pointers are produced either by malloc or
+  the '&' operator.
+
+  Instance types include those of arrays, structures and various integers. Addresses are
+  never explicitly mentioned in the language specification, rather they are only
+  implied through the use of pointers. The actual type for an address is implementation
+  dependent.
+
+  When given a pointer to an instance of a struct, we may access the fields of the data
+  structure by using the arrow operator, or equivalent star and dot operator, along with a
+  symbolic name for the field. Note that adding a value to a pointer to a structure does
+  not produce a pointer to the next field.
+
+  An array is a container of like typed elements. Elements are accessed through integer
+  indexes.  This use of integers to define the meaing of location gives the array a
+  discreate topology.  What I mean by this is that elements may be said to have neighbors.
+
+  A pointer to an array is said to also be a pointer to the first element of the array.
+  Indexes then specify neighbor counts.  Hence an array has a first element, a second
+  element, etc.  Adding an index to an element pointer yields a pointer to the element
+  that distance away.  I.e. pt + 1 points to the 'right' neigbhor.  And pt - 1 points to
+  the 'left' neighbor.  pt + 2 is the right neighbor of the right neighbor.  Etc. this
+  works provided that we do not walk off one of the ends of the array.
+
+  As mentioned above, the type of an address depends on the implementation. There are
+  machines that segmented memory, that have multiple memories, or use virtual memory. What
+  is perhaps the simplest model has also become the most common. With this model there is
+  one system memory, and that memory is a large array of bytes.  An address is then just
+  a byte index into that array.
+
+  Most all programs actually have more than one memory available to them. When using C
+  we typically assume that there is one system memory that is bound to an address space,
+  and any other type of memory is accessed through a library interface.  A good exmaple is
+  that of accessing a hard drive using the stdio library.
+
+  The set of all indexes into an array is called the index space.  The set of all addresses
+  used for accessing a memory is called the address space.
+
+  When using the byte index model for memory, and address will be held in unsigned
+  integers. In turn integers are held in words, which are bit vectors.  Such an integer
+  has a limited range. Zero will be the smallest value.  The largest value will typically
+  be either UINT64_MAX or in older machines UINT32_MAX.
+
+  Suppose for example that we had a machine with 16 gigabytes of memory.  If an address were
+  implemented as a 32 bit integer, then the address space would be smaller than the memory,
+  so we would not be able to address all of memories. This problem of having more memory than
+  address space is sometimes the motivation for moving to an address type that uses a segment
+  and offset pair.  The segment will be shared by many addresses.  In contemporary computing
+  we typically use wide addresses so as not to have this issue.
+
+  Now suppose we have a virtual memory system.  Suppose that the top 36 bits of an address
+  is translated into a page number, and the bottom 12 bits are an offset into the page.
+  Now suppose we use 64 bit integers to hold an address, then in this case, the extent or
+  our integer representation will be larger than the extent of our address space. If a
+  programmer synthesized and address with more than 48 bits, that address could not be
+  translated.  However, programmers generally do not synthesize addresses.  Rather they
+  are embedded in return values from malloc or the '&' operator, and such addresses will
+  be in the range of the address space.
+
+  Thus, we have three extents to think about.  We have the extent of the memory itself,
+  the extent of the address space, and while using the byte index address model, the
+  extent of an integer representation used for holding addresses.
+
+        mem_n  extent of memory
+  address_t_n  extent of the address space
+      int64_n  exent of the integer representation.
+
+   Address spaces can have holes in them.  I.e. there can be representable integers that
+   are less than address_t_n, but cannot be used for accessing memory.  However, a
+   programmer will never be made explicitly aware of this problem, as malloc will either
+   return a pointer to a block of memory large enough to hold an instance, or malloc will
+   fail.  There can be multiple reasons for a failure, but for a programmer they all mean
+   the same thing: malloc did not provide the requested allocation.
+
+    .. when using Clib malloc:
+
+    Our interface parameters are extends, but the Clib, such as Malloc, accepts a length.
+    To convert an extent to a length, we simply add one, but in so doing we pick up an
+    end case.  If the specified extent is also the maximum representable integer in the 
+    given represenation, then n+1 would wrap to 0 rather than giving us the proper length.
+
+    It is conceivable that in a future implementation that we might have an allocator
+    where it could make sense to request a block of memory that has the same extent as
+    the number representation used for representing extents. Hopefully such an allocator
+    would accept an extent value, so we will not have to convert it to a length.
+
+    Even if we could represent a maximum extent as a length, i.e. if n + 1 did not
+    overflow, malloc would fail anyway. Malloc uses the same heap the data comes from for
+    its overhead, so there can never be such a large block. In addition when using a
+    memory model where everything comes from a single system memory, that memory will
+    always have other things allocated in it already when we get to a malloc call. And as
+    a third constraint, Chances are for system memory there are holes in the address
+    space, so again such a large block would not be possible.  Hence, rather than issuing
+    an error when converting an extent to a length for malloc, we may safely continue iwth
+    fail_alloc.
+
+

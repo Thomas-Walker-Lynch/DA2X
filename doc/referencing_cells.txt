@@ -1,0 +1,28 @@
+
+
+`shorten` and `length` instruction sequences might reallocate the data array of a T2X tape. If there
+is a reallocation, the relative data will be copied over.
+
+Thus when a tape is shortened, the truncated data might still exist within the allocation
+for the tape, but also, it might not.  Data at locations with indexes larger than tape->n
+should not be accessed. In fact, the programmer has a contract with the library to never
+do that.
+
+If a programmer has a pointer to a cell on a T2X tape, and there is a call to either `lengthen`
+or `shorten`, then that pointer might become stale.  This is because lengthen and shorten might
+reallocate the data array, though they might not.  So again, according to the library contract,
+pointers must be invalidated going across these calls.
+
+More reliably, pointers into a tape will become stale upon a call to either move_array, or destruct,
+so the programmer is contracted to invalidate the pointers upon such function calls.
+
+In a multi threaded environment pointers into tapes may only be used when it can be guaranteed that
+the contracts will not be violated.  For example, one thread might be well behaved and never shorten,
+lengthen, move_array, or destruct the tape.  And yet, as nice as it is, the other thread might do so.
+In which case the well behaved thread should not use pointers, unless there is some sort of proof the
+contract will not be violated. This issue was discussed in great detail in the TM Lisp library section
+of 'Tom's Turing Complete Computing Architecture'.
+
+The `lengthen` instruction sequence returns a pointer to the leftmost cell of the
+extension area. This pointer is no different than others, and must also follow the
+contracts.

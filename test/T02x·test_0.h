@@ -1,11 +1,7 @@
 /*
-Allocates a T02x·Root header struct on the heap.  Constructs an array.  Destructs the array.
-Deallocates the header.
-
+  alloc, constr4uct, destruct, and dealloc a T02x array, and see if the code crashes.
 
 */
-
-  // allocate, construct, destruct, deallocate an array
   SQ·def(test_0){
     SQ·Sequence ah_dist ,nominal ,fail ,cleanup ,report;
     SQ·Sequence SQ·ah_dist ,SQ·nominal ,SQ·fail ,SQ·cleanup ,SQ·report;
@@ -15,70 +11,57 @@ Deallocates the header.
     Result·Tallies results ,*results_pt;
     results_pt = &results;
     Result·Tallies·init(results_pt);
+
     bool f[256]; // flags
-    uint i = 0;  // count
+    f[0] = false;
+    f[1] = false;
+    uint f·i = 2; 
 
     // ----------------------------------------
     // result tableau
     //
       address_t n = 9;
-      T02x·Root *tape; // will point to a heap allocated Tape structure.
+      T0·Root *tape = malloc(sizeof(T02x·Root));
 
     // ----------------------------------------
     // Links
     //
-      SQ·make_Lnk(ah  ,T0·AllocTapeHeap   ,&&T02x·alloc_Tape_heap);
-      SQ·make_Lnk(aa  ,T0·AllocArray      ,&&T02x·alloc_array);
-      SQ·make_Lnk(da  ,T0·DeallocArray    ,&&T02x·dealloc_array);
-      SQ·make_Lnk(dh  ,T0·DeallocTapeHeap ,&&T02x·dealloc_Tape_heap);
+      SQ·make_Lnk(construct ,T0·Construct ,t02x.construct);
+      SQ·make_Lnk(destruct  ,T0·Destruct  ,t02x.destruct);
 
-      ah_ress.tape = (T0·Root **)&tape;
-      ah_lnks.nominal.sequence = &&ah_dist;
-      ah_lnks.fail.sequence = &&fail;
+      construct_args.tape = tape;
+      construct_args.n = &n;
+      construct_lnks.fail_alloc.sequence = &&fail;
+      construct_lnks.nominal.sequence = &&nominal;
 
-      aa_args.n = &n;
-      aa_lnks.nominal = AS(da_lnk ,SQ·Lnk);
-      aa_lnks.fail_alloc.sequence = &&fail;
+      destruct_args.tape = tape;
+      destruct_lnks.nominal.sequence = &&finish;
 
-      da_lnks.nominal = AS(dh_lnk ,SQ·Lnk);
-      dh_lnks.nominal.sequence = &&nominal;
-
-
-    SQ·continue_indirect(ah_lnk);
-
-    // Instruction sequences such as alloc_array, dealloc_array, and even
-    // dalloc_tape_heap, gather a tape argument.  Hence their args structure will be
-    // initialized with a pointer to a tape structure. In this test we allocate said tape
-    // structure on the heap.  Thus we may only initialize the relevant args structures
-    // after the tape has been allocated.  With a literal read of our code, the allocation
-    // of the tape structure and the initialization of the arg pointers will occur at run
-    // time, but an astute optimizer would notice that in this case both may be done at
-    // compile time. T02x·test_1 has an example where the tape is placed directly on the
-    // result tableau instead of on the heap.
-    SQ·def(ah_dist){ 
-      aa_args.tape = (T0·Root *)tape;
-      da_args.tape = (T0·Root *)tape;
-      dh_args.tape = (T0·Root *)tape;
-      SQ·continue_indirect(aa_lnk); // continue to allocate the array
-    }SQ·end(ah_dist);
-
-    SQ·def(nominal){
-      f[i++] = Test·CLib·allocation_n == 15;
-      f[i++] = true;
-      SQ·continue(report);
-    }SQ·end(nominal);
+    SQ·continue_indirect(construct_lnk);
 
     SQ·def(fail){
-      f[i++] = false;
+      f[f·i++] = false;
+      SQ·continue(finish);
+    }SQ·end(fail);
+
+    SQ·def(nominal){
+      f[0] = true;
+      f[f·i++] = Test·CLib·allocation_n == 15;
+      SQ·continue_indirect(destruct_lnk);
+    }SQ·end(nominal);
+
+    SQ·def(finish){
+      f[1] = true;
+      free(tape);
       SQ·continue(report);
-    } SQ·end(fail);
+    }SQ·end(finish);
 
     SQ·def(report){
-      f[i++] = malloc_cnt == MallocCounter·count;
-      f[i++] = constructed_cnt == T02x·alloc_array_count;
-      Result·Tallies·tally("test_0" ,&results ,f ,i);
+      f[f·i++] = malloc_cnt == MallocCounter·count;
+      f[f·i++] = constructed_cnt == T02x·alloc_array_count;
+      Result·Tallies·tally("test_0" ,&results ,f ,f·i);
       Result·Tallies·accumulate(accumulated_results_pt ,&results);
-      SQ·continue(test_1);
-    } SQ·end(report)
+      SQ·continue(tests_finished);
+    } SQ·end(report);
 
   }SQ·end(test_0)

@@ -13,15 +13,11 @@
 //   .. does the mutex lock variable belongs here, or at L2? Perhaps here,
 //   because look at all the trouble we have already gone through to make
 //   this thread safe.
+//
   typedef struct {
     char *base_pt;
     address_t n;
   } T02x·Root ;
-
-  typedef struct{
-    T02x·Root *tape;
-    address_t i;
-  } T02xHd·Root;
 
 
 //--------------------------------------------------------------------------------

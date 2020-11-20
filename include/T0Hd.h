@@ -12,6 +12,7 @@ Both read and write check for fit first, before moving any data.
 #include "T0.h"
 
 typedef struct {
+  SQ·Ptr init;
   SQ·Ptr remaining;
   SQ·Ptr leftmost;
   SQ·Ptr rightmost;
@@ -24,20 +25,23 @@ typedef struct {
 } T0Hd·Iface;
 
 typedef struct{
-  T0·Root *tape;
-} T0Hd·InitHd·Args;
+} T0Hd·Root;
+
 typedef struct{
+  T0·Root *tape;
   T0Hd·Root *hd;
-} T0Hd·InitHd·Ress;
+} T0Hd·Init·Args;
+typedef struct{
+} T0Hd·Init·Ress;
 typedef struct{
   SQ·Lnk nominal;
-} T0Hd·InitHd·Lnks;
+} T0Hd·Init·Lnks;
 typedef struct{
   SQ·Ptr sequence;
-  T0Hd·InitHd·Args *args;
-  T0Hd·InitHd·Ress *ress;
-  T0Hd·InitHd·Lnks *lnks;
-} T0Hd·InitHd·Lnk;
+  T0Hd·Init·Args *args;
+  T0Hd·Init·Ress *ress;
+  T0Hd·Init·Lnks *lnks;
+} T0Hd·Init·Lnk;
 
 
 typedef struct{

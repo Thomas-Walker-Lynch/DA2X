@@ -2,7 +2,8 @@
 #define INCLUSIVE_H
 
 /*--------------------------------------------------------------------------------
-  Inclusive bound region addressing support.  Hacks for now.
+  Inclusive bound region addressing support.
+
 
 */
 #include <stdint.h>
@@ -13,10 +14,11 @@
   #define address_t uint64_t
   #define address_bit_length 64
 
-  // address_t_n is the largest address that may be used to access a byte from memory.  If
+  // with the C model for memory, we have one grand memory and in theory 
   // this array is implemented over virtual memory, that might be the largest virtual
   // memory address, i.e. UINT64_MAX.  That is what I have put here.
-  #define address_t_n UINT64_MAX
+#define uint64_t_n UINT64_MAX // maximum representable 64 bit integer
+#define address_t_n UINT64_MAX  // maximum representable address value
 
   #define n_of(type) sizeof(type)-1
 

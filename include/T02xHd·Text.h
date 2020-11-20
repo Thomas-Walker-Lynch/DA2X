@@ -1,10 +1,12 @@
 
-SQ·def(T02xHd·init_hd){
-  T0Hd·InitHd·Lnk *lnk = (T0Hd·InitHd·Lnk *)SQ·lnk;
+SQ·def(T02xHd·init){
+  T0Hd·Init·Lnk *lnk = (T0Hd·Init·Lnk *)SQ·lnk;
   T02x·Root *tape = (T02x·Root *) lnk->args->tape;
-  T02xHd·Root *hd = (T02xHd·Root *) lnk->args->tape;
+  T02xHd·Root *hd = (T02xHd·Root *) lnk->args->hd;
+  hd->tape = tape;
+  hd->i = 0;
   SQ·continue_indirect(lnk->lnks->nominal);
-} SQ·end(T02xHd·init_hd);
+} SQ·end(T02xHd·init);
 
 SQ·def(T02xHd·remaining){
   T0Hd·StepRight·Lnk *lnk = (T0Hd·StepRight·Lnk *)SQ·lnk;

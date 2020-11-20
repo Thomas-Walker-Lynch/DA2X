@@ -10,11 +10,8 @@ A generic interface for a T0 level tape implementation.
 #include "Inclusive.h"
 
 typedef struct {
-  SQ·Ptr alloc_Tape_heap; // a convenience function
-  SQ·Ptr alloc_array;
-  SQ·Ptr alloc_array_elements;
-  SQ·Ptr dealloc_array;
-  SQ·Ptr dealloc_Tape_heap;
+  SQ·Ptr construct;
+  SQ·Ptr destruct;
   SQ·Ptr move_array;
   SQ·Ptr lengthen;
   SQ·Ptr shorten;
@@ -23,91 +20,40 @@ typedef struct {
 typedef struct{
 } T0·Root;
 
-typedef struct{
-} T0Hd·Root;
-
-
-typedef struct{
-} T0·AllocTapeHeap·Args;
-typedef struct{
-  T0·Root **tape;
-} T0·AllocTapeHeap·Ress;
-typedef struct{
-  SQ·Lnk nominal;
-  SQ·Lnk fail;
-} T0·AllocTapeHeap·Lnks;
-typedef struct{
-  SQ·Ptr sequence;
-  T0·AllocTapeHeap·Args *args;
-  T0·AllocTapeHeap·Ress *ress;
-  T0·AllocTapeHeap·Lnks *lnks;
-} T0·AllocTapeHeap·Lnk;
 
 typedef struct{
   T0·Root *tape;
-  address_t *n;   // extent of the array, in bytes
-} T0·AllocArray·Args;
+  address_t *n;
+} T0·Construct·Args;
 typedef struct{
-} T0·AllocArray·Ress;
+} T0·Construct·Ress;
 typedef struct{
   SQ·Lnk nominal;
   SQ·Lnk fail_alloc;
-} T0·AllocArray·Lnks;
+} T0·Construct·Lnks;
 typedef struct{
   SQ·Ptr sequence;
-  T0·AllocArray·Args *args;
-  T0·AllocArray·Ress *ress;
-  T0·AllocArray·Lnks *lnks;
-} T0·AllocArray·Lnk;
+  T0·Construct·Args *args;
+  T0·Construct·Ress *ress;
+  T0·Construct·Lnks *lnks;
+} T0·Construct·Lnk;
+
 
 typedef struct{
   T0·Root *tape;
-  address_t *n_Element;  // extent of the array, in elements
-  address_t *element_n_Byte; // extent of the element, in bytes
-} T0·AllocArrayElements·Args;
+} T0·Destruct·Args;
 typedef struct{
-} T0·AllocArrayElements·Ress;
+} T0·Destruct·Ress;
 typedef struct{
   SQ·Lnk nominal;
-  SQ·Lnk index_gt_n;
-  SQ·Lnk fail_alloc;
-} T0·AllocArrayElements·Lnks;
+} T0·Destruct·Lnks;
 typedef struct{
   SQ·Ptr sequence;
-  T0·AllocArrayElements·Args *args;
-  T0·AllocArrayElements·Ress *ress;
-  T0·AllocArrayElements·Lnks *lnks;
-} T0·AllocArrayElements·Lnk;
+  T0·Destruct·Args *args;
+  T0·Destruct·Ress *ress;
+  T0·Destruct·Lnks *lnks;
+} T0·Destruct·Lnk;
 
-typedef struct{
-  T0·Root *tape;
-} T0·DeallocArray·Args;
-typedef struct{
-} T0·DeallocArray·Ress;
-typedef struct{
-  SQ·Lnk nominal;
-} T0·DeallocArray·Lnks;
-typedef struct{
-  SQ·Ptr sequence;
-  T0·DeallocArray·Args *args;
-  T0·DeallocArray·Ress *ress;
-  T0·DeallocArray·Lnks *lnks;
-} T0·DeallocArray·Lnk;
-
-typedef struct{
-  T0·Root *tape;
-} T0·DeallocTapeHeap·Args;
-typedef struct{
-} T0·DeallocTapeHeap·Ress;
-typedef struct{
-  SQ·Lnk nominal;
-} T0·DeallocTapeHeap·Lnks;
-typedef struct{
-  SQ·Ptr sequence;
-  T0·DeallocTapeHeap·Args *args;
-  T0·DeallocTapeHeap·Ress *ress;
-  T0·DeallocTapeHeap·Lnks *lnks;
-} T0·DeallocTapeHeap·Lnk;
 
 typedef struct{
   T0·Root *src;
@@ -152,8 +98,8 @@ typedef struct{
 } T0·Shorten·Ress;
 typedef struct{
   SQ·Lnk nominal;
-  SQ·Lnk empty;
-  SQ·Lnk fail_left_leftmost;
+  SQ·Lnk fail_empty;
+  SQ·Lnk fail_underflow;
   SQ·Lnk fail_alloc;
 } T0·Shorten·Lnks;
 typedef struct{

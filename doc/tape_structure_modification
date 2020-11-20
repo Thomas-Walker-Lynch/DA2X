@@ -1,0 +1,68 @@
+
+
+I. definition of deleting cells
+
+    Suppose we have identified three areas of a tape,  a left hand side,  a middle area, and a right hand side.
+
+    By definition a middle area deletion operator is one that does the following:
+
+      1. before the operation this is true:
+         a the rightmost cell of a leftside area is a left neighbor of the leftmost cell of a middle area.
+         b.the leftmost cell of a rightside area is a right neibhbor of the rightmost cell of a middle area.
+
+      2. after the operation this is true: a. the rightmost cell of the leftside area is a
+         left neighbor of the leftmost sell of the rightside area.
+
+    Generally tape structural transforms consist of an arbitrary number of cell
+    permutations, duplications, deletions, and insertions.
+
+    If our tape were implemented as a linked list, structural transforms could be
+    implemented through the he insertion of new cons cells, and the general modification
+    of cons cell pointers.  Orphaned cells would then perhaps be cleaned up by a garbage
+    collector. However, we are using an array, which is a block of contiguous cells in
+    memory, not a linked list.
+
+II. copy back approach to middle area deletion (destrucive programming approach)
+
+  1. copy the rightside data back to where it should be after the delete
+  2. shorten the tape by the length of the middle area
+
+  At best this approach requires one copy operation for the rightside data.  However, 
+  or our T2x array, the second step might trigger a reallocation and copy of the leftside and
+  rightside areas to a new smaller allocation.  In which case there would be in total one copy
+  of the rightside data, and two copies of the same leftside data.
+
+  For some transforms temporary memory will be required.  Even the simply rotation of three
+  cells would require this, i.e. a -> b -> c.  Applying general structural modifications to
+  a single tape can be complicated.
+
+III. clocked approach to general structural modifications to t0 (non-destructive programming approach)
+
+    1. create a new destination tape of the correct length, t1
+    2. copy elements from t0 to desired positions in t1
+    3. call `move_array` to move the t1 to t0  
+
+  In step 2 we can also introduce new data from other sources. For a simple deletion in
+  all cases there will be a total there will be one copy of the rightside data, and one
+  copy of the leftside data.
+
+  As long as we can derive the length of t1 in advance, apart from state data for the
+  algorithm being applied, we will not need temporary memory to perform tape structural
+  transforms. 
+
+  As another advantage, in a multi-threaded environment, t0 remains unchanged and can
+  be read by the other threads until the clocking event when t1 is takes the place of
+  t0.
+
+IV. Functions that should be on the TM library interface
+
+  Initially I attempted to bury resize behind operations.  It didn't work out.  Take for
+  example, push.  When pushing an element, we must push multiple bytes.  Hence push turned
+  into a more general byte append. That turns into a resize and a write.  However, write to
+  the array is currently done in a conventional fashion through an index or indirectly through
+  a pointer, so push was modified to return a pointer to the base or the newly expanded area.
+  I.e. it turned into resize that returns a pointer to the base of the expanded area.  Push
+  is gone, resize prevails.  
+
+  
+  
