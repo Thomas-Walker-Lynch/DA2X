@@ -3,8 +3,8 @@
 
 */
   SQ·def(test_0){
-    SQ·Sequence ah_dist ,nominal ,fail ,cleanup ,report;
-    SQ·Sequence SQ·ah_dist ,SQ·nominal ,SQ·fail ,SQ·cleanup ,SQ·report;
+    SQ·Sequence ah_dist ,nominal ,fail ,finish ,cleanup ,report;
+    SQ·Sequence SQ·ah_dist ,SQ·nominal ,SQ·fail ,SQ·finish ,SQ·cleanup ,SQ·report;
 
     address_t malloc_cnt = MallocCounter·count;
     address_t constructed_cnt = T02x·alloc_array_count;
@@ -61,7 +61,7 @@
       f[f·i++] = constructed_cnt == T02x·alloc_array_count;
       Result·Tallies·tally("test_0" ,&results ,f ,f·i);
       Result·Tallies·accumulate(accumulated_results_pt ,&results);
-      SQ·continue(tests_finished);
+      SQ·continue(test_1);
     } SQ·end(report);
 
   }SQ·end(test_0)

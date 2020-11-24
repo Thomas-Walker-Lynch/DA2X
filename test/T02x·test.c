@@ -29,7 +29,7 @@ int main(){
 
   SQ·continue(test_0);
   #include "T02x·test_0.h"
-  //  #include "T02x·test_1.h"
+  #include "T02x·test_1.h"
   //  #include "T02x·test_2.h"
 
   SQ·def(tests_finished){

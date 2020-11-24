@@ -21,7 +21,7 @@ address_t T02x·alloc_array_count = 0;
     T02x·Root *tape = (T02x·Root *) lnk->args->tape;
     address_t n = *lnk->args->n;
 
-    address_t alloc_n = T02x·alloc_n(tape->n);
+    address_t alloc_n = T02x·alloc_n(n);
     if( alloc_n == address_t_n ){
       SQ·continue_indirect(lnk->lnks->fail_alloc);
     }
@@ -139,7 +139,6 @@ address_t T02x·alloc_array_count = 0;
 
 */
 SQ·def(T02x·shorten){
-  SQ·Sequence copy_array_data ,SQ·copy_array_data;
   T0·Shorten·Lnk *lnk = (T0·Shorten·Lnk *)SQ·lnk;
   T02x·Root *tape = (T02x·Root *) lnk->args->tape;
 
