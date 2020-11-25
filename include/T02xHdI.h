@@ -7,8 +7,9 @@
 
 typedef struct{
   T02x·Root *tape;
-  address_t i;
-} T02xHd·Root;
+  address_t i;  // byte index
+  address_t element_n; // extent of an element
+} T02xHdI·Root;
 
 
 

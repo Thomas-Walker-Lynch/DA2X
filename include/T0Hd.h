@@ -12,11 +12,13 @@ Both read and write check for fit first, before moving any data.
 #include "T0.h"
 
 typedef struct {
-  SQ·Ptr init;
-  SQ·Ptr remaining;
-  SQ·Ptr leftmost;
-  SQ·Ptr rightmost;
-  SQ·Ptr cue;
+  SQ·Ptr bind;
+  SQ·Ptr rhs_n;
+  SQ·Ptr lhs_n;
+  SQ·Ptr cue_leftmost;
+  SQ·Ptr cue_rightmost;
+  SQ·Ptr cue_i;
+  SQ·Ptr cue_pt;
   SQ·Ptr step_left;
   SQ·Ptr step_right;
   SQ·Ptr read_to_pt;
@@ -30,87 +32,124 @@ typedef struct{
 typedef struct{
   T0·Root *tape;
   T0Hd·Root *hd;
-} T0Hd·Init·Args;
+} T0Hd·Bind·Args;
 typedef struct{
-} T0Hd·Init·Ress;
+} T0Hd·Bind·Ress;
 typedef struct{
   SQ·Lnk nominal;
-} T0Hd·Init·Lnks;
+} T0Hd·Bind·Lnks;
 typedef struct{
   SQ·Ptr sequence;
-  T0Hd·Init·Args *args;
-  T0Hd·Init·Ress *ress;
-  T0Hd·Init·Lnks *lnks;
-} T0Hd·Init·Lnk;
+  T0Hd·Bind·Args *args;
+  T0Hd·Bind·Ress *ress;
+  T0Hd·Bind·Lnks *lnks;
+} T0Hd·Bind·Lnk;
 
 
 typedef struct{
   T0Hd·Root *hd;
-} T0Hd·Remaining·Args;
+} T0Hd·Rhs_N·Args;
 typedef struct{
-  address_t *r;
-} T0Hd·Remaining·Ress;
+  address_t *n;
+} T0Hd·Rhs_N·Ress;
 typedef struct{
   SQ·Lnk nominal;
-} T0Hd·Remaining·Lnks;
+} T0Hd·Rhs_N·Lnks;
 typedef struct{
   SQ·Ptr sequence;
-  T0Hd·Remaining·Args *args;
-  T0Hd·Remaining·Ress *ress;
-  T0Hd·Remaining·Lnks *lnks;
-} T0Hd·Remaining·Lnk;
+  T0Hd·Rhs_N·Args *args;
+  T0Hd·Rhs_N·Ress *ress;
+  T0Hd·Rhs_N·Lnks *lnks;
+} T0Hd·Rhs_N·Lnk;
 
 
 typedef struct{
   T0Hd·Root *hd;
-} T0Hd·Leftmost·Args;
+} T0Hd·Lhs_N·Args;
 typedef struct{
-} T0Hd·Leftmost·Ress;
+  address_t *n;
+} T0Hd·Lhs_N·Ress;
 typedef struct{
   SQ·Lnk nominal;
-} T0Hd·Leftmost·Lnks;
+} T0Hd·Lhs_N·Lnks;
 typedef struct{
   SQ·Ptr sequence;
-  T0Hd·Leftmost·Args *args;
-  T0Hd·Leftmost·Ress *ress;
-  T0Hd·Leftmost·Lnks *lnks;
-} T0Hd·Leftmost·Lnk;
+  T0Hd·Lhs_N·Args *args;
+  T0Hd·Lhs_N·Ress *ress;
+  T0Hd·Lhs_N·Lnks *lnks;
+} T0Hd·Lhs_N·Lnk;
 
 
 typedef struct{
   T0Hd·Root *hd;
-  T0Hd·Root *element_n;
-} T0Hd·Rightmost·Args;
+} T0Hd·CueLeftmost·Args;
 typedef struct{
-} T0Hd·Rightmost·Ress;
+} T0Hd·CueLeftmost·Ress;
+typedef struct{
+  SQ·Lnk nominal;
+} T0Hd·CueLeftmost·Lnks;
+typedef struct{
+  SQ·Ptr sequence;
+  T0Hd·CueLeftmost·Args *args;
+  T0Hd·CueLeftmost·Ress *ress;
+  T0Hd·CueLeftmost·Lnks *lnks;
+} T0Hd·CueLeftmost·Lnk;
+
+
+typedef struct{
+  T0Hd·Root *hd;
+  T0Hd·Root *element_n; // extent of an element
+} T0Hd·CueRightmost·Args;
+typedef struct{
+} T0Hd·CueRightmost·Ress;
 typedef struct{
   SQ·Lnk nominal;
   SQ·Lnk left_of_leftmost;
-} T0Hd·Rightmost·Lnks;
+} T0Hd·CueRightmost·Lnks;
 typedef struct{
   SQ·Ptr sequence;
-  T0Hd·Rightmost·Args *args;
-  T0Hd·Rightmost·Ress *ress;
-  T0Hd·Rightmost·Lnks *lnks;
-} T0Hd·Rightmost·Lnk;
+  T0Hd·CueRightmost·Args *args;
+  T0Hd·CueRightmost·Ress *ress;
+  T0Hd·CueRightmost·Lnks *lnks;
+} T0Hd·CueRightmost·Lnk;
 
 
 typedef struct{
   T0Hd·Root *hd;
   address_t *i;
-} T0Hd·Cue·Args;
+} T0Hd·CueI·Args;
 typedef struct{
-} T0Hd·Cue·Ress;
+} T0Hd·CueI·Ress;
 typedef struct{
   SQ·Lnk nominal;
   SQ·Lnk right_of_rightmost;
-} T0Hd·Cue·Lnks;
+} T0Hd·CueI·Lnks;
 typedef struct{
   SQ·Ptr sequence;
-  T0Hd·Cue·Args *args;
-  T0Hd·Cue·Ress *ress;
-  T0Hd·Cue·Lnks *lnks;
-} T0Hd·Cue·Lnk;
+  T0Hd·CueI·Args *args;
+  T0Hd·CueI·Ress *ress;
+  T0Hd·CueI·Lnks *lnks;
+} T0Hd·CueI·Lnk;
+
+
+typedef struct{
+  T0Hd·Root *hd;
+  char **pt;
+} T0Hd·CuePt·Args;
+typedef struct{
+} T0Hd·CuePt·Ress;
+typedef struct{
+  SQ·Lnk nominal;
+  SQ·Lnk left_of_leftmost;
+  SQ·Lnk right_of_rightmost;
+} T0Hd·CuePt·Lnks;
+typedef struct{
+  SQ·Ptr sequence;
+  T0Hd·CuePt·Args *args;
+  T0Hd·CuePt·Ress *ress;
+  T0Hd·CuePt·Lnks *lnks;
+} T0Hd·CuePt·Lnk;
+
 
 typedef struct{
   T0Hd·Root *hd;
